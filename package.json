@@ -1,0 +1,33 @@
+{
+  "name": "rhuds",
+  "version": "0.1.0",
+  "description": "Reactive HUD UI Design System - A production-ready React-based UI design system with HUD aesthetics",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "test": "turbo run test",
+    "test:watch": "turbo run test:watch",
+    "lint": "turbo run lint",
+    "format": "turbo run format",
+    "storybook": "turbo run storybook --filter=@rhuds/storybook",
+    "demo": "turbo run dev --filter=@rhuds/demo-app",
+    "clean": "turbo run clean && rm -rf node_modules"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "@types/jest": "^29.5.0",
+    "@types/node": "^20.0.0",
+    "turbo": "^1.10.0",
+    "typescript": "^5.0.0",
+    "eslint": "^8.0.0",
+    "prettier": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  }
+}
