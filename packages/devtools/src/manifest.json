@@ -1,0 +1,13 @@
+{
+  "manifest_version": 3,
+  "name": "RHUDS Pro DevTools",
+  "version": "0.1.0",
+  "description": "Browser DevTools extension for RHUDS Pro",
+  "devtools_page": "devtools.html",
+  "permissions": ["tabs"],
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  }
+}

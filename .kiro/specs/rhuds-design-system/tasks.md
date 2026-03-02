@@ -4,7 +4,7 @@
 
 - [x] 1.1 Initialize monorepo with Turborepo
   - [x] 1.1.1 Create root package.json with workspace configuration
-  - [x] 1.1.2 Create turbo.json with build pipeline
+  - [ ] 1.1.2 Create turbo.json with build pipeline
   - [x] 1.1.3 Configure pnpm workspaces
   - [x] 1.1.4 Set up root tsconfig.json
 
