@@ -45,3 +45,55 @@ yarn-error.log*
 # Kiro
 .kiro/cache
 .kiro/logs
+.kiro/specs
+
+# Documentation files (internal development only)
+*_SUMMARY.md
+*_STATUS.md
+*_REPORT.md
+*_COMPLETION.md
+*_GUIDE.md
+*_IMPLEMENTATION*.md
+*_PROGRESS*.md
+TASK_*.md
+PROJECT_STATUS*.md
+SESSION_SUMMARY.md
+FILES_CREATED_THIS_SESSION.md
+COMPLETION_INDEX.md
+NEXT_STEPS.md
+ACTUAL_PROJECT_STATUS.md
+FINAL_PERSIAN_SUMMARY.md
+PROJECT_COMPLETE.md
+ARWES_*.md
+BACKGROUND_EFFECTS_COMPLETION.md
+ADDITIONAL_COMPONENTS_COMPLETION.md
+GITHUB_PUSH_SUCCESS.md
+QUICK_START_COMPONENTS.md
+PROJECT_STATUS_UPDATED.md
+RHUDS_PRO_*.md
+README_RHUDS_PRO.md
+INSTALLATION_GUIDE.md
+EXECUTION_GUIDE.md
+RUN_INSTRUCTIONS.md
+SETUP_AND_RUN_GUIDE.md
+START_HERE.md
+MONOREPO_SETUP.md
+CREATE_REPO_MANUAL.md
+
+# Package-specific internal docs
+packages/*/FINAL_STATUS.md
+packages/*/IMPLEMENTATION_SUMMARY.md
+packages/*/ARWES_*.md
+packages/*/*_API.md
+packages/*/*_GUIDE.md
+packages/*/Z_INDEX_GUIDE.md
+
+# Demo and test files (keep in repo but exclude from npm packages)
+packages/*/demo.html
+packages/*/src/__tests__/*Demo.tsx
+packages/*/src/__tests__/*.demo.ts
+
+# Build scripts
+setup.ps1
+fix-theme-tokens.ps1
+fix_all_themes.py

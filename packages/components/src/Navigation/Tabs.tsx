@@ -21,6 +21,10 @@ export const Tabs: React.FC<TabsProps> = ({
   const theme = useTheme();
   const [internalActiveIndex, setInternalActiveIndex] = useState(controlledActiveIndex);
 
+  // Safe theme access with fallback
+  const primaryColor = theme?.currentMode?.tokens?.colors?.primary || '#00f6ff';
+  const textColor = theme?.currentMode?.tokens?.colors?.text || '#ffffff';
+
   const activeIndex = controlledActiveIndex !== undefined ? controlledActiveIndex : internalActiveIndex;
 
   const handleTabChange = (index: number) => {
@@ -38,28 +42,35 @@ export const Tabs: React.FC<TabsProps> = ({
 
   const tabsHeaderStyle: React.CSSProperties = {
     display: 'flex',
-    borderBottom: variant === 'line' ? `2px solid ${theme.currentMode.tokens.colors.primary}` : 'none',
+    borderBottom: variant === 'line' ? `2px solid ${primaryColor}` : 'none',
     backgroundColor: variant === 'card' ? '#0a0a0a' : 'transparent',
     gap: variant === 'button' ? '0.5rem' : 0,
     padding: variant === 'button' ? '0.5rem' : 0,
+    flexWrap: 'wrap',
+    maxWidth: '100%',
+    boxSizing: 'border-box',
   };
 
   const getTabStyle = (isActive: boolean): React.CSSProperties => {
     const baseStyle: React.CSSProperties = {
-      padding: '1rem',
+      padding: 'clamp(0.5rem, 1.5vw, 0.75rem) clamp(0.75rem, 2vw, 1rem)',
       cursor: 'pointer',
       transition: 'all 0.2s ease-in-out',
-      color: isActive && variant !== 'button' ? theme.currentMode.tokens.colors.primary : theme.currentMode.tokens.colors.text,
+      color: isActive && variant !== 'button' ? primaryColor : textColor,
       backgroundColor: 'transparent',
       border: 'none',
       borderRadius: variant === 'card' ? '4px 4px 0 0' : 0,
-      fontSize: '1rem',
+      fontSize: 'clamp(0.75rem, 1.8vw, 0.9rem)',
       fontWeight: 500,
+      whiteSpace: 'nowrap',
+      flex: '1 1 auto',
+      minWidth: 'fit-content',
+      textAlign: 'center',
     };
 
     if (variant === 'line') {
       baseStyle.borderBottom = isActive 
-        ? `3px solid ${theme.currentMode.tokens.colors.primary}` 
+        ? `3px solid ${primaryColor}` 
         : '3px solid transparent';
     }
 
@@ -67,7 +78,7 @@ export const Tabs: React.FC<TabsProps> = ({
       if (variant === 'card') {
         baseStyle.backgroundColor = '#1a1a1a';
       } else if (variant === 'button') {
-        baseStyle.backgroundColor = theme.currentMode.tokens.colors.primary;
+        baseStyle.backgroundColor = primaryColor;
         baseStyle.color = '#000';
       }
     }
@@ -76,9 +87,12 @@ export const Tabs: React.FC<TabsProps> = ({
   };
 
   const contentStyle: React.CSSProperties = {
-    padding: '1.5rem',
+    padding: 'clamp(1rem, 3vw, 1.5rem)',
     backgroundColor: variant === 'card' ? '#1a1a1a' : 'transparent',
     borderRadius: variant === 'card' ? '0 0 4px 4px' : 0,
+    maxWidth: '100%',
+    overflowX: 'hidden',
+    boxSizing: 'border-box',
   };
 
   return (
@@ -94,12 +108,12 @@ export const Tabs: React.FC<TabsProps> = ({
               disabled={item.disabled}
               onMouseEnter={(e) => {
                 if (!item.disabled && !isActive) {
-                  (e.currentTarget as HTMLElement).style.color = theme.currentMode.tokens.colors.primary;
+                  (e.currentTarget as HTMLElement).style.color = primaryColor;
                 }
               }}
               onMouseLeave={(e) => {
                 if (!item.disabled && !isActive) {
-                  (e.currentTarget as HTMLElement).style.color = theme.currentMode.tokens.colors.text;
+                  (e.currentTarget as HTMLElement).style.color = textColor;
                 }
               }}
             >
