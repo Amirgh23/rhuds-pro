@@ -37,6 +37,10 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
 }) => {
   const [loading, setLoading] = useState(false);
 
+  // Safe theme access with fallback
+  const primaryColor = theme?.currentMode?.tokens?.colors?.primary || theme?.colors?.primary || '#00f6ff';
+  const textColor = theme?.currentMode?.tokens?.colors?.text || theme?.colors?.text || '#ffffff';
+
   const handleToggle = async () => {
     if (expanded) {
       onCollapse(node.key);
@@ -63,7 +67,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
     gap: '0.5rem',
     padding: '0.5rem',
     cursor: 'pointer',
-    backgroundColor: isSelected ? theme.currentMode.tokens.colors.primary : 'transparent',
+    backgroundColor: isSelected ? primaryColor : 'transparent',
     opacity: isSelected ? 0.2 : 1,
     transition: `background-color ${animationDuration}ms ease-in-out`,
     userSelect: 'none',
@@ -76,7 +80,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
     alignItems: 'center',
     justifyContent: 'center',
     cursor: 'pointer',
-    color: theme.currentMode.tokens.colors.primary,
+    color: primaryColor,
     fontWeight: 'bold',
     visibility: node.expandable || hasChildren ? 'visible' : 'hidden',
   };
@@ -111,7 +115,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
           </div>
         )}
         {node.icon && <span>{node.icon}</span>}
-        <span style={{ color: node.disabled ? theme.currentMode.tokens.colors.primary : theme.currentMode.tokens.colors.text, opacity: node.disabled ? 0.5 : 1 }}>
+        <span style={{ color: node.disabled ? primaryColor : textColor, opacity: node.disabled ? 0.5 : 1 }}>
           {node.render ? node.render(node) : node.label}
         </span>
       </div>
@@ -154,7 +158,29 @@ export const Tree: React.FC<TreeProps> = ({
   style,
 }) => {
   const themeContext = useTheme();
-  const theme = (themeContext as any).currentMode?.tokens || (themeContext as any);
+  
+  // Safe theme access with fallback
+  const primaryColor = themeContext?.currentMode?.tokens?.colors?.primary || '#00f6ff';
+  const textColor = themeContext?.currentMode?.tokens?.colors?.text || '#ffffff';
+  const backgroundColor = themeContext?.currentMode?.tokens?.colors?.background || '#0a0a0a';
+  
+  const theme = {
+    currentMode: {
+      tokens: {
+        colors: {
+          primary: primaryColor,
+          text: textColor,
+          background: backgroundColor,
+        },
+      },
+    },
+    colors: {
+      primary: primaryColor,
+      text: textColor,
+      background: backgroundColor,
+    },
+  };
+  
   const [internalExpandedNodes, setInternalExpandedNodes] = useState<string[]>(controlledExpandedNodes);
 
   const expandedNodes = controlledExpandedNodes.length > 0 ? controlledExpandedNodes : internalExpandedNodes;
@@ -173,13 +199,13 @@ export const Tree: React.FC<TreeProps> = ({
 
   const containerStyle = useMemo<React.CSSProperties>(() => {
     return {
-      backgroundColor: theme.currentMode.tokens.colors.background,
-      color: theme.currentMode.tokens.colors.text,
+      backgroundColor: backgroundColor,
+      color: textColor,
       borderRadius: '4px',
       overflow: 'hidden',
       ...style,
     };
-  }, [theme, style]);
+  }, [backgroundColor, textColor, style]);
 
   return (
     <div className={className} style={containerStyle}>

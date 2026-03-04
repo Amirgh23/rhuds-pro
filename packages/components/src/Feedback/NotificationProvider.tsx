@@ -4,6 +4,7 @@
  */
 
 import React, { createContext, useContext, useState, useCallback } from 'react';
+import { Portal } from '../Utility/Portal';
 import { Notification } from './Notification';
 import { NotificationContextValue, NotificationType } from './types';
 
@@ -62,19 +63,21 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
   return (
     <NotificationContext.Provider value={value}>
       {children}
-      <div style={{ position: 'fixed', bottom: 0, right: 0, zIndex: 2000 }}>
-        {notifications.map((notification) => (
-          <Notification
-            key={notification.id}
-            message={notification.message}
-            type={notification.type}
-            duration={notification.duration}
-            onClose={() => {
-              setNotifications((prev) => prev.filter((n) => n.id !== notification.id));
-            }}
-          />
-        ))}
-      </div>
+      <Portal containerId="notifications-root">
+        <div style={{ position: 'fixed', bottom: 0, right: 0, zIndex: 2000, padding: '1rem' }}>
+          {notifications.map((notification) => (
+            <Notification
+              key={notification.id}
+              message={notification.message}
+              type={notification.type}
+              duration={notification.duration}
+              onClose={() => {
+                setNotifications((prev) => prev.filter((n) => n.id !== notification.id));
+              }}
+            />
+          ))}
+        </div>
+      </Portal>
     </NotificationContext.Provider>
   );
 };

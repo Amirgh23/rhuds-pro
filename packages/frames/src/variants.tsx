@@ -1,224 +1,393 @@
 /**
- * Frame Variants
- * Pre-built frame components with different styles
+ * Arwes-style Frame Components
+ * Uses clip-path and CSS styling like original Arwes
  */
 
-import React, { useMemo } from 'react';
-import { FrameVariantConfig } from './types';
-import { FrameSVG, useFrameSVGRenderer } from './FrameSVG';
+import React from 'react';
 import {
-  createOctagonPath,
-  createKranoxPath,
-  createCornersPath,
-  createLinesPath,
-  createUnderlinePath,
-  createNefrexPath,
-  pathToString,
-} from './svg';
+  createFrameOctagonClip,
+  createFrameCornersClip,
+  createFrameAssemblingClip,
+  createFrameLinesClip,
+  createFrameUnderlineClip,
+  createFrameNefrexClip,
+  createFrameKranoxClip,
+  FrameClipOptions
+} from './clipPaths';
+
+export interface ArwesFrameProps extends FrameClipOptions {
+  width?: string | number;
+  height?: string | number;
+  background?: string;
+  border?: string;
+  children?: React.ReactNode;
+  className?: string;
+  style?: React.CSSProperties;
+}
 
 /**
- * FrameSVGOctagon - Octagonal frame with cut corners
+ * Base Arwes Frame Component
  */
-export const FrameSVGOctagon: React.FC<FrameVariantConfig> = ({
-  width,
-  height,
-  color = '#00ffff',
-  strokeWidth = 2,
-  cornerSize = 20,
+const ArwesFrameBase: React.FC<ArwesFrameProps & { clipPath: string; borderStyle?: React.CSSProperties }> = ({
+  width = '200px',
+  height = '100px',
+  background = '#077',
+  border,
+  clipPath,
+  borderStyle,
   children,
   className,
   style,
 }) => {
-  const svgRef = React.useRef<SVGSVGElement>(null);
-
-  const pathString = useMemo(() => {
-    const path = createOctagonPath(width, height, cornerSize);
-    return pathToString(path);
-  }, [width, height, cornerSize]);
-
-  useFrameSVGRenderer(svgRef, pathString, { color, strokeWidth });
+  const frameStyle: React.CSSProperties = {
+    width: typeof width === 'number' ? `${width}px` : width,
+    height: typeof height === 'number' ? `${height}px` : height,
+    clipPath,
+    background,
+    border,
+    position: 'relative',
+    ...borderStyle,
+    ...style,
+  };
 
   return (
-    <FrameSVG
-      config={{ width, height, color, strokeWidth }}
-      className={className}
-      style={style}
-    >
-      <svg ref={svgRef} style={{ position: 'absolute', top: 0, left: 0 }} />
+    <div className={className} style={frameStyle}>
       {children}
-    </FrameSVG>
+    </div>
   );
 };
 
 /**
- * FrameSVGKranox - Kranox-style assembly frame
+ * FrameSVGOctagon - Arwes basic style with octagon clip
  */
-export const FrameSVGKranox: React.FC<FrameVariantConfig> = ({
-  width,
-  height,
-  color = '#00ffff',
-  strokeWidth = 2,
-  lineLength = 20,
-  children,
-  className,
-  style,
-}) => {
-  const svgRef = React.useRef<SVGSVGElement>(null);
-
-  const pathString = useMemo(() => {
-    const path = createKranoxPath(width, height, lineLength);
-    return pathToString(path);
-  }, [width, height, lineLength]);
-
-  useFrameSVGRenderer(svgRef, pathString, { color, strokeWidth });
-
+export const FrameSVGOctagon: React.FC<ArwesFrameProps> = (props) => {
+  const clipPath = createFrameOctagonClip(props);
+  
   return (
-    <FrameSVG
-      config={{ width, height, color, strokeWidth }}
-      className={className}
-      style={style}
-    >
-      <svg ref={svgRef} style={{ position: 'absolute', top: 0, left: 0 }} />
-      {children}
-    </FrameSVG>
+    <ArwesFrameBase
+      {...props}
+      clipPath={clipPath}
+      background={props.background || '#077'}
+    />
   );
 };
 
 /**
- * FrameSVGCorners - Corner-only frame
+ * FrameSVGCorners - Arwes corners style
  */
-export const FrameSVGCorners: React.FC<
-  FrameVariantConfig & { position?: 'inside' | 'outside' }
-> = ({
-  width,
-  height,
-  color = '#00ffff',
-  strokeWidth = 2,
-  cornerSize = 20,
-  position = 'outside',
-  children,
-  className,
-  style,
-}) => {
-  const svgRef = React.useRef<SVGSVGElement>(null);
-
-  const pathString = useMemo(() => {
-    const path = createCornersPath(width, height, cornerSize, position);
-    return pathToString(path);
-  }, [width, height, cornerSize, position]);
-
-  useFrameSVGRenderer(svgRef, pathString, { color, strokeWidth });
-
+export const FrameSVGCorners: React.FC<ArwesFrameProps> = (props) => {
+  const clipPath = createFrameCornersClip(props);
+  
   return (
-    <FrameSVG
-      config={{ width, height, color, strokeWidth }}
-      className={className}
-      style={style}
-    >
-      <svg ref={svgRef} style={{ position: 'absolute', top: 0, left: 0 }} />
-      {children}
-    </FrameSVG>
+    <div style={{ position: 'relative' }}>
+      {/* Corner elements */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: props.cornerLength || '1rem',
+          height: '2px',
+          background: '#0ff',
+          boxShadow: '0 0 4px #0ff',
+        }}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '2px',
+          height: props.cornerLength || '1rem',
+          background: '#0ff',
+          boxShadow: '0 0 4px #0ff',
+        }}
+      />
+      {/* Top right */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          width: props.cornerLength || '1rem',
+          height: '2px',
+          background: '#0ff',
+          boxShadow: '0 0 4px #0ff',
+        }}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          width: '2px',
+          height: props.cornerLength || '1rem',
+          background: '#0ff',
+          boxShadow: '0 0 4px #0ff',
+        }}
+      />
+      {/* Bottom right */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          right: 0,
+          width: props.cornerLength || '1rem',
+          height: '2px',
+          background: '#0ff',
+          boxShadow: '0 0 4px #0ff',
+        }}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          right: 0,
+          width: '2px',
+          height: props.cornerLength || '1rem',
+          background: '#0ff',
+          boxShadow: '0 0 4px #0ff',
+        }}
+      />
+      {/* Bottom left */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          width: props.cornerLength || '1rem',
+          height: '2px',
+          background: '#0ff',
+          boxShadow: '0 0 4px #0ff',
+        }}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          width: '2px',
+          height: props.cornerLength || '1rem',
+          background: '#0ff',
+          boxShadow: '0 0 4px #0ff',
+        }}
+      />
+      
+      <ArwesFrameBase
+        {...props}
+        clipPath="none"
+        background="transparent"
+        style={{ ...props.style, zIndex: 1 }}
+      />
+    </div>
   );
 };
 
 /**
- * FrameSVGLines - Dashed line frame
+ * FrameSVGKranox - Arwes assembling style (Kranox)
  */
-export const FrameSVGLines: React.FC<FrameVariantConfig> = ({
-  width,
-  height,
-  color = '#00ffff',
-  strokeWidth = 2,
-  dashArray = '5,5',
-  children,
-  className,
-  style,
-}) => {
-  const svgRef = React.useRef<SVGSVGElement>(null);
-
-  const pathString = useMemo(() => {
-    const path = createLinesPath(width, height, dashArray);
-    return pathToString(path);
-  }, [width, height, dashArray]);
-
-  useFrameSVGRenderer(svgRef, pathString, { color, strokeWidth, dashArray });
-
+export const FrameSVGKranox: React.FC<ArwesFrameProps> = (props) => {
+  const clipPath = createFrameKranoxClip(props);
+  
   return (
-    <FrameSVG
-      config={{ width, height, color, strokeWidth }}
-      className={className}
-      style={style}
-    >
-      <svg ref={svgRef} style={{ position: 'absolute', top: 0, left: 0 }} />
-      {children}
-    </FrameSVG>
+    <div style={{ position: 'relative' }}>
+      {/* Assembly corner elements */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: props.cornerLength || '1.5rem',
+          height: '1px',
+          background: '#0ff',
+          boxShadow: '0 0 2px #0ff',
+        }}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '1px',
+          height: props.cornerLength || '1.5rem',
+          background: '#0ff',
+          boxShadow: '0 0 2px #0ff',
+        }}
+      />
+      {/* Assembly dots */}
+      <div
+        style={{
+          position: 'absolute',
+          top: '4px',
+          left: '4px',
+          width: '3px',
+          height: '3px',
+          borderRadius: '50%',
+          background: '#0ff',
+          boxShadow: '0 0 4px #0ff',
+        }}
+      />
+      
+      {/* Repeat for other corners */}
+      <ArwesFrameBase
+        {...props}
+        clipPath={clipPath}
+        background={props.background || 'transparent'}
+        border="1px solid #0ff"
+        borderStyle={{
+          boxShadow: '0 0 4px #0ff, inset 0 0 4px rgba(0, 255, 255, 0.1)',
+        }}
+      />
+    </div>
   );
 };
 
 /**
- * FrameSVGUnderline - Underline with corner squares
+ * FrameSVGLines - Arwes lines style
  */
-export const FrameSVGUnderline: React.FC<FrameVariantConfig> = ({
-  width,
-  height,
-  color = '#00ffff',
-  strokeWidth = 2,
-  cornerSize = 10,
-  children,
-  className,
-  style,
-}) => {
-  const svgRef = React.useRef<SVGSVGElement>(null);
-
-  const pathString = useMemo(() => {
-    const path = createUnderlinePath(width, height, cornerSize);
-    return pathToString(path);
-  }, [width, height, cornerSize]);
-
-  useFrameSVGRenderer(svgRef, pathString, { color, strokeWidth, fill: 'currentColor' });
-
+export const FrameSVGLines: React.FC<ArwesFrameProps> = (props) => {
+  const clipPath = createFrameLinesClip(props);
+  
   return (
-    <FrameSVG
-      config={{ width, height, color, strokeWidth }}
-      className={className}
-      style={style}
-    >
-      <svg ref={svgRef} style={{ position: 'absolute', top: 0, left: 0 }} />
-      {children}
-    </FrameSVG>
+    <ArwesFrameBase
+      {...props}
+      clipPath={clipPath}
+      background={props.background || 'transparent'}
+      border="2px dashed #0ff"
+      borderStyle={{
+        boxShadow: '0 0 4px #0ff',
+      }}
+    />
   );
 };
 
 /**
- * FrameSVGNefrex - Nefrex-style assembly frame
+ * FrameSVGUnderline - Arwes basic + squareSize style
  */
-export const FrameSVGNefrex: React.FC<FrameVariantConfig> = ({
-  width,
-  height,
-  color = '#00ffff',
-  strokeWidth = 2,
-  lineLength = 15,
-  children,
-  className,
-  style,
-}) => {
-  const svgRef = React.useRef<SVGSVGElement>(null);
-
-  const pathString = useMemo(() => {
-    const path = createNefrexPath(width, height, lineLength);
-    return pathToString(path);
-  }, [width, height, lineLength]);
-
-  useFrameSVGRenderer(svgRef, pathString, { color, strokeWidth });
-
+export const FrameSVGUnderline: React.FC<ArwesFrameProps> = (props) => {
+  const clipPath = createFrameUnderlineClip(props);
+  const squareSize = props.squareSize || '0.5rem';
+  
   return (
-    <FrameSVG
-      config={{ width, height, color, strokeWidth }}
-      className={className}
-      style={style}
-    >
-      <svg ref={svgRef} style={{ position: 'absolute', top: 0, left: 0 }} />
-      {children}
-    </FrameSVG>
+    <div style={{ position: 'relative' }}>
+      {/* Corner squares */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: squareSize,
+          height: squareSize,
+          background: '#0ff',
+          boxShadow: '0 0 4px #0ff',
+        }}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          width: squareSize,
+          height: squareSize,
+          background: '#0ff',
+          boxShadow: '0 0 4px #0ff',
+        }}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          right: 0,
+          width: squareSize,
+          height: squareSize,
+          background: '#0ff',
+          boxShadow: '0 0 4px #0ff',
+        }}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          width: squareSize,
+          height: squareSize,
+          background: '#0ff',
+          boxShadow: '0 0 4px #0ff',
+        }}
+      />
+      
+      {/* Bottom underline */}
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          width: '100%',
+          height: '2px',
+          background: '#0ff',
+          boxShadow: '0 0 4px #0ff',
+        }}
+      />
+      
+      <ArwesFrameBase
+        {...props}
+        clipPath={clipPath}
+        background={props.background || 'transparent'}
+        style={{ ...props.style, zIndex: 1 }}
+      />
+    </div>
+  );
+};
+
+/**
+ * FrameSVGNefrex - Arwes basic + assembling style (Nefrex)
+ */
+export const FrameSVGNefrex: React.FC<ArwesFrameProps> = (props) => {
+  const clipPath = createFrameNefrexClip(props);
+  
+  return (
+    <div style={{ position: 'relative' }}>
+      {/* Full border */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          border: '1px solid #0ff',
+          boxShadow: '0 0 4px #0ff',
+        }}
+      />
+      
+      {/* Assembly elements in corners */}
+      <div
+        style={{
+          position: 'absolute',
+          top: '8px',
+          left: '8px',
+          width: '12px',
+          height: '1px',
+          background: '#0ff',
+        }}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          top: '8px',
+          left: '8px',
+          width: '1px',
+          height: '12px',
+          background: '#0ff',
+        }}
+      />
+      
+      <ArwesFrameBase
+        {...props}
+        clipPath={clipPath}
+        background={props.background || 'transparent'}
+        style={{ ...props.style, zIndex: 1 }}
+      />
+    </div>
   );
 };

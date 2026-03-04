@@ -44,6 +44,9 @@ export interface FrameVariantConfig extends FrameConfig {
   lineLength?: number;
   dashArray?: string;
   rotation?: number;
+  children?: React.ReactNode;
+  className?: string;
+  style?: React.CSSProperties;
 }
 
 /**

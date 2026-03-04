@@ -21,6 +21,10 @@ export const Menu: React.FC<MenuProps> = ({
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
+  // Safe theme access with fallback
+  const primaryColor = theme?.currentMode?.tokens?.colors?.primary || '#00f6ff';
+  const textColor = theme?.currentMode?.tokens?.colors?.text || '#ffffff';
+
   // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -46,7 +50,7 @@ export const Menu: React.FC<MenuProps> = ({
     top: '100%',
     left: 0,
     backgroundColor: '#1a1a1a',
-    border: `2px solid ${theme.currentMode.tokens.colors.primary}`,
+    border: `2px solid ${primaryColor}`,
     borderRadius: '4px',
     minWidth: '200px',
     zIndex: 1000,
@@ -57,7 +61,7 @@ export const Menu: React.FC<MenuProps> = ({
 
   const itemStyle: React.CSSProperties = {
     padding: '0.75rem 1rem',
-    color: theme.currentMode.tokens.colors.text,
+    color: textColor,
     cursor: 'pointer',
     transition: 'all 0.2s ease-in-out',
     display: 'block',
@@ -116,8 +120,8 @@ export const Menu: React.FC<MenuProps> = ({
       <button
         style={{
           backgroundColor: 'transparent',
-          border: `2px solid ${theme.currentMode.tokens.colors.primary}`,
-          color: theme.currentMode.tokens.colors.primary,
+          border: `2px solid ${primaryColor}`,
+          color: primaryColor,
           padding: '0.5rem 1rem',
           cursor: 'pointer',
           borderRadius: '4px',

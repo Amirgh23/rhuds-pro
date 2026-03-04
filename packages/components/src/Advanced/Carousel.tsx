@@ -22,7 +22,12 @@ export const Carousel: React.FC<CarouselProps> = ({
   style,
 }) => {
   const themeContext = useTheme();
-  const theme = (themeContext as any).currentMode?.tokens || (themeContext as any);
+  
+  // Safe theme access with fallback
+  const primaryColor = themeContext?.currentMode?.tokens?.colors?.primary || '#00f6ff';
+  const textColor = themeContext?.currentMode?.tokens?.colors?.text || '#ffffff';
+  const backgroundColor = themeContext?.currentMode?.tokens?.colors?.background || '#0a0a0a';
+  
   const [internalCurrentIndex, setInternalCurrentIndex] = useState(controlledCurrentIndex);
 
   const currentIndex = controlledCurrentIndex !== undefined ? controlledCurrentIndex : internalCurrentIndex;
@@ -60,12 +65,12 @@ export const Carousel: React.FC<CarouselProps> = ({
     return {
       position: 'relative',
       width: '100%',
-      backgroundColor: theme.currentMode.tokens.colors.background,
+      backgroundColor: backgroundColor,
       borderRadius: '8px',
       overflow: 'hidden',
       ...style,
     };
-  }, [theme, style]);
+  }, [backgroundColor, style]);
 
   const slideContainerStyle: React.CSSProperties = {
     position: 'relative',
@@ -91,8 +96,8 @@ export const Carousel: React.FC<CarouselProps> = ({
     position: 'absolute',
     top: '50%',
     transform: 'translateY(-50%)',
-    backgroundColor: theme.currentMode.tokens.colors.primary,
-    color: theme.currentMode.tokens.colors.background,
+    backgroundColor: primaryColor,
+    color: backgroundColor,
     border: 'none',
     width: '40px',
     height: '40px',
@@ -120,7 +125,7 @@ export const Carousel: React.FC<CarouselProps> = ({
     width: '12px',
     height: '12px',
     borderRadius: '50%',
-    backgroundColor: theme.currentMode.tokens.colors.primary,
+    backgroundColor: primaryColor,
     cursor: 'pointer',
     opacity: 0.5,
     transition: 'opacity 0.2s ease-in-out',

@@ -4,12 +4,13 @@
  */
 
 import React, { useState } from 'react';
-import { Text, Button, Icon, Input, Select, Grid, Container, Stack } from '../index';
+import { Text, Button, HudButton, GlitchButton, Icon, Input, HackerInput, Select, Grid, Container, Stack, HudBox, HudFrame } from '../index';
 
 export const ComponentsDemo: React.FC = () => {
   const [inputValue, setInputValue] = useState('');
   const [selectedValue, setSelectedValue] = useState('option1');
   const [inputError, setInputError] = useState('');
+  const [hudBoxAnimated, setHudBoxAnimated] = useState(true);
 
   const options = [
     { label: 'Option 1', value: 'option1' },
@@ -85,6 +86,26 @@ export const ComponentsDemo: React.FC = () => {
           <Button size="md">Medium</Button>
           <Button size="lg">Large</Button>
         </Stack>
+
+        <Text variant="h4" color="#1BFD9C" style={{ marginTop: '2rem', marginBottom: '1rem' }}>
+          HUD Button
+        </Text>
+        <Stack direction="row" gap="1rem" align="center" style={{ flexWrap: 'wrap' }}>
+          <HudButton>I'M READY</HudButton>
+          <HudButton>LAUNCH</HudButton>
+          <HudButton>ACTIVATE</HudButton>
+          <HudButton disabled>DISABLED</HudButton>
+        </Stack>
+
+        <Text variant="h4" color="#ffff00" style={{ marginTop: '2rem', marginBottom: '1rem' }}>
+          Glitch Button
+        </Text>
+        <Stack direction="row" gap="1rem" align="center" style={{ flexWrap: 'wrap' }}>
+          <GlitchButton>// Hover me</GlitchButton>
+          <GlitchButton>// Click here</GlitchButton>
+          <GlitchButton>// Execute</GlitchButton>
+          <GlitchButton disabled>// Disabled</GlitchButton>
+        </Stack>
       </section>
 
       {/* Icon Component Section */}
@@ -153,6 +174,15 @@ export const ComponentsDemo: React.FC = () => {
             label="Number Input"
             type="number"
             placeholder="Enter number..."
+          />
+          <HackerInput
+            label="Input Command"
+            placeholder="Enter command..."
+          />
+          <HackerInput
+            label="Access Code"
+            type="password"
+            placeholder="Enter access code..."
           />
         </Grid>
       </section>
@@ -244,6 +274,151 @@ export const ComponentsDemo: React.FC = () => {
             </div>
           ))}
         </Stack>
+
+        <Text variant="h4" color="#ff00ff" style={{ marginBottom: '1rem', marginTop: '2rem' }}>
+          HudBox (Asymmetrical Container) - 18 Variants with Different Colors
+        </Text>
+        
+        <div style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <HudButton onClick={() => setHudBoxAnimated(!hudBoxAnimated)}>
+            {hudBoxAnimated ? '⏸ Switch to Static Border' : '▶ Switch to Animated Border'}
+          </HudButton>
+          <Text color="#00f6ff">
+            Current Mode: {hudBoxAnimated ? 'Animated' : 'Static'}
+          </Text>
+        </div>
+        
+        <Text variant="body" color="#00f6ff" style={{ marginBottom: '1rem' }}>
+          Standard Variants:
+        </Text>
+        <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', justifyContent: 'center', marginBottom: '2rem' }}>
+          <HudBox variant="compact" color="#00f6ff" animated={hudBoxAnimated}>
+            <Text color="#00f6ff">Compact</Text>
+          </HudBox>
+          <HudBox variant="default" color="#1BFD9C" animated={hudBoxAnimated}>
+            <Text color="#1BFD9C">Default</Text>
+          </HudBox>
+          <HudBox variant="wide" color="#FF6B9D" animated={hudBoxAnimated}>
+            <Text color="#FF6B9D">Wide</Text>
+          </HudBox>
+        </div>
+
+        <Text variant="body" color="#00f6ff" style={{ marginBottom: '1rem' }}>
+          Geometric Variants:
+        </Text>
+        <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', justifyContent: 'center', marginBottom: '2rem' }}>
+          <HudBox variant="hexagon" color="#FFD700" animated={hudBoxAnimated}>
+            <Text color="#FFD700">Hexagon</Text>
+          </HudBox>
+          <HudBox variant="octagon" color="#FF4500" animated={hudBoxAnimated}>
+            <Text color="#FF4500">Octagon</Text>
+          </HudBox>
+          <HudBox variant="diagonal" color="#9D00FF" animated={hudBoxAnimated}>
+            <Text color="#9D00FF">Diagonal</Text>
+          </HudBox>
+          <HudBox variant="corner-cut" color="#00FFFF" animated={hudBoxAnimated}>
+            <Text color="#00FFFF">Corner Cut</Text>
+          </HudBox>
+          <HudBox variant="tech-panel" color="#FF00FF" animated={hudBoxAnimated}>
+            <Text color="#FF00FF">Tech Panel</Text>
+          </HudBox>
+          <HudBox variant="arrow-right" color="#00FF00" animated={hudBoxAnimated}>
+            <Text color="#00FF00">Arrow Right</Text>
+          </HudBox>
+          <HudBox variant="chevron" color="#FFA500" animated={hudBoxAnimated}>
+            <Text color="#FFA500">Chevron</Text>
+          </HudBox>
+        </div>
+
+        <Text variant="body" color="#00f6ff" style={{ marginBottom: '1rem' }}>
+          Portrait Variants (Vertical):
+        </Text>
+        <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', justifyContent: 'center', marginBottom: '2rem' }}>
+          <HudBox variant="portrait-tall" color="#00CED1" animated={hudBoxAnimated}>
+            <Text color="#00CED1" align="center">Portrait<br/>Tall</Text>
+          </HudBox>
+          <HudBox variant="portrait-slim" color="#FF1493" animated={hudBoxAnimated}>
+            <Text color="#FF1493" align="center">Portrait<br/>Slim</Text>
+          </HudBox>
+          <HudBox variant="portrait-card" color="#7FFF00" animated={hudBoxAnimated}>
+            <Text color="#7FFF00" align="center">Portrait<br/>Card</Text>
+          </HudBox>
+          <HudBox variant="portrait-banner" color="#FF69B4" animated={hudBoxAnimated}>
+            <Text color="#FF69B4" align="center">Portrait<br/>Banner</Text>
+          </HudBox>
+        </div>
+
+        <Text variant="body" color="#00f6ff" style={{ marginBottom: '1rem' }}>
+          Landscape Variants (Horizontal):
+        </Text>
+        <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', justifyContent: 'center', marginBottom: '2rem', flexDirection: 'column', alignItems: 'center' }}>
+          <HudBox variant="landscape-wide" color="#00BFFF" animated={hudBoxAnimated}>
+            <Text color="#00BFFF">Landscape Wide</Text>
+          </HudBox>
+          <HudBox variant="landscape-ultra" color="#FF6347" animated={hudBoxAnimated}>
+            <Text color="#FF6347">Landscape Ultra</Text>
+          </HudBox>
+          <HudBox variant="landscape-bar" color="#32CD32" animated={hudBoxAnimated}>
+            <Text color="#32CD32">Landscape Bar</Text>
+          </HudBox>
+          <HudBox variant="landscape-ribbon" color="#BA55D3" animated={hudBoxAnimated}>
+            <Text color="#BA55D3">Landscape Ribbon</Text>
+          </HudBox>
+        </div>
+
+        <Text variant="body" color="#00f6ff" style={{ marginBottom: '1rem' }}>
+          Custom Size:
+        </Text>
+        <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+          <HudBox width="350px" height="180px" color="#FFD700">
+            <Text color="#FFD700">Custom Size</Text>
+          </HudBox>
+        </div>
+
+        <Text variant="h4" color="#ff00ff" style={{ marginTop: '2rem', marginBottom: '1rem' }}>
+          HudFrame (Complex Frame with Neon Lines)
+        </Text>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', alignItems: 'center' }}>
+          <div style={{ width: '100%', maxWidth: '800px', height: '400px', position: 'relative' }}>
+            <HudFrame
+              header={{
+                title: 'SYSTEM STATUS',
+                description: 'Real-time system monitoring',
+                number: 1,
+              }}
+              color="#00f6ff"
+            >
+              <div style={{ padding: '2rem' }}>
+                <Text color="#00f6ff" variant="h3" style={{ marginBottom: '1rem' }}>
+                  HUD FRAME DEMO
+                </Text>
+                <Text color="#ffffff" variant="body">
+                  This is a complex HUD frame with decorative neon lines around the edges.
+                  Perfect for dashboards and monitoring interfaces.
+                </Text>
+              </div>
+            </HudFrame>
+          </div>
+          <div style={{ width: '100%', maxWidth: '800px', height: '400px', position: 'relative' }}>
+            <HudFrame
+              header={{
+                title: 'DATA ANALYSIS',
+                description: 'Analytics dashboard',
+                number: 2,
+              }}
+              color="#1BFD9C"
+            >
+              <div style={{ padding: '2rem' }}>
+                <Text color="#1BFD9C" variant="h3" style={{ marginBottom: '1rem' }}>
+                  GREEN THEME
+                </Text>
+                <Text color="#ffffff" variant="body">
+                  HudFrame supports custom colors for all neon lines and title box.
+                </Text>
+              </div>
+            </HudFrame>
+          </div>
+        </div>
       </section>
 
       {/* Combined Example */}

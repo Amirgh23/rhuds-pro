@@ -5,6 +5,7 @@
 
 import React, { useMemo, useEffect } from 'react';
 import { useTheme } from '@rhuds/core';
+import { Portal } from '../Utility/Portal';
 import { DialogProps } from './types';
 
 /**
@@ -159,58 +160,60 @@ export const Dialog: React.FC<DialogProps> = ({
   }
 
   return (
-    <div style={overlayStyle} onClick={onClose}>
-      <div
-        className={className}
-        style={dialogStyle}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div style={headerStyle}>
-          <h2 style={titleStyle}>{title}</h2>
-          {showClose && (
-            <button
-              style={closeButtonStyle}
-              onClick={onClose}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLElement).style.opacity = '0.7';
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.opacity = '1';
-              }}
-            >
-              ✕
-            </button>
-          )}
-        </div>
-
-        <div style={contentStyle}>{children}</div>
-
-        {actions.length > 0 && (
-          <div style={footerStyle}>
-            {actions.map((action, index) => (
+    <Portal>
+      <div style={overlayStyle} onClick={onClose}>
+        <div
+          className={className}
+          style={dialogStyle}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div style={headerStyle}>
+            <h2 style={titleStyle}>{title}</h2>
+            {showClose && (
               <button
-                key={index}
-                style={getActionButtonStyle(action.variant)}
-                onClick={action.onClick}
-                disabled={action.disabled}
+                style={closeButtonStyle}
+                onClick={onClose}
                 onMouseEnter={(e) => {
-                  if (!action.disabled) {
-                    (e.currentTarget as HTMLElement).style.opacity = '0.8';
-                  }
+                  (e.currentTarget as HTMLElement).style.opacity = '0.7';
                 }}
                 onMouseLeave={(e) => {
-                  if (!action.disabled) {
-                    (e.currentTarget as HTMLElement).style.opacity = '1';
-                  }
+                  (e.currentTarget as HTMLElement).style.opacity = '1';
                 }}
               >
-                {action.label}
+                ✕
               </button>
-            ))}
+            )}
           </div>
-        )}
+
+          <div style={contentStyle}>{children}</div>
+
+          {actions.length > 0 && (
+            <div style={footerStyle}>
+              {actions.map((action, index) => (
+                <button
+                  key={index}
+                  style={getActionButtonStyle(action.variant)}
+                  onClick={action.onClick}
+                  disabled={action.disabled}
+                  onMouseEnter={(e) => {
+                    if (!action.disabled) {
+                      (e.currentTarget as HTMLElement).style.opacity = '0.8';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!action.disabled) {
+                      (e.currentTarget as HTMLElement).style.opacity = '1';
+                    }
+                  }}
+                >
+                  {action.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </Portal>
   );
 };
 

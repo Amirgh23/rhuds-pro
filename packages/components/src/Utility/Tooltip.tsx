@@ -5,6 +5,7 @@
 
 import React, { useState, useRef, useMemo } from 'react';
 import { useTheme } from '@rhuds/core';
+import { Portal } from './Portal';
 import { TooltipProps } from './types';
 
 /**
@@ -104,7 +105,11 @@ export const Tooltip: React.FC<TooltipProps> = ({
       >
         {children}
       </div>
-      {isVisible && <div style={tooltipStyle}>{content}</div>}
+      {isVisible && (
+        <Portal containerId="tooltip-root">
+          <div style={tooltipStyle}>{content}</div>
+        </Portal>
+      )}
     </>
   );
 };

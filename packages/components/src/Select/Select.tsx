@@ -3,8 +3,9 @@
  * Dropdown select with search support
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useTheme } from '@rhuds/core';
+import { Portal } from '../Utility/Portal';
 import { SelectProps } from './types';
 
 /**
@@ -26,6 +27,9 @@ export const Select: React.FC<SelectProps> = ({
   const theme = useTheme();
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
+  const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0, width: 0 });
+  const selectRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const filteredOptions = useMemo(() => {
     if (!searchable || !search) return options;
@@ -43,6 +47,43 @@ export const Select: React.FC<SelectProps> = ({
     setOpen(false);
     setSearch('');
   };
+
+  const updatePosition = () => {
+    if (selectRef.current) {
+      const rect = selectRef.current.getBoundingClientRect();
+      setDropdownPos({
+        top: rect.bottom + window.scrollY + 4,
+        left: rect.left + window.scrollX,
+        width: rect.width,
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (open) {
+      updatePosition();
+      window.addEventListener('scroll', updatePosition);
+      window.addEventListener('resize', updatePosition);
+
+      const handleClickOutside = (e: MouseEvent) => {
+        if (
+          selectRef.current &&
+          dropdownRef.current &&
+          !selectRef.current.contains(e.target as Node) &&
+          !dropdownRef.current.contains(e.target as Node)
+        ) {
+          setOpen(false);
+        }
+      };
+
+      document.addEventListener('click', handleClickOutside);
+      return () => {
+        document.removeEventListener('click', handleClickOutside);
+        window.removeEventListener('scroll', updatePosition);
+        window.removeEventListener('resize', updatePosition);
+      };
+    }
+  }, [open]);
 
   const containerStyle: React.CSSProperties = {
     display: 'flex',
@@ -65,17 +106,16 @@ export const Select: React.FC<SelectProps> = ({
   };
 
   const dropdownStyle: React.CSSProperties = {
-    position: 'absolute',
-    top: '100%',
-    left: 0,
-    right: 0,
+    position: 'fixed',
+    top: dropdownPos.top,
+    left: dropdownPos.left,
+    width: dropdownPos.width,
     backgroundColor: '#1a1a1a',
     border: `2px solid ${theme.currentMode.tokens.colors.primary}`,
     borderRadius: '4px',
     maxHeight: '200px',
     overflowY: 'auto',
-    zIndex: 1000,
-    marginTop: '0.25rem',
+    zIndex: 1001,
   };
 
   const optionStyle: React.CSSProperties = {
@@ -93,7 +133,7 @@ export const Select: React.FC<SelectProps> = ({
         </label>
       )}
 
-      <div style={{ position: 'relative' }}>
+      <div ref={selectRef} style={{ position: 'relative' }}>
         <button
           style={selectStyle}
           onClick={() => !disabled && setOpen(!open)}
@@ -103,50 +143,52 @@ export const Select: React.FC<SelectProps> = ({
         </button>
 
         {open && (
-          <div style={dropdownStyle}>
-            {searchable && (
-              <input
-                type="text"
-                placeholder="Search..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '0.5rem',
-                  border: 'none',
-                  borderBottom: `1px solid ${theme.currentMode.tokens.colors.primary}`,
-                  backgroundColor: '#1a1a1a',
-                  color: theme.currentMode.tokens.colors.text,
-                  outline: 'none',
-                }}
-              />
-            )}
+          <Portal containerId="select-root">
+            <div ref={dropdownRef} style={dropdownStyle}>
+              {searchable && (
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  style={{
+                    width: '100%',
+                    padding: '0.5rem',
+                    border: 'none',
+                    borderBottom: `1px solid ${theme.currentMode.tokens.colors.primary}`,
+                    backgroundColor: '#1a1a1a',
+                    color: theme.currentMode.tokens.colors.text,
+                    outline: 'none',
+                  }}
+                />
+              )}
 
-            {filteredOptions.map((option) => (
-              <div
-                key={option.value}
-                style={{
-                  ...optionStyle,
-                  backgroundColor: value === option.value ? theme.currentMode.tokens.colors.primary : 'transparent',
-                  opacity: option.disabled ? 0.5 : 1,
-                  cursor: option.disabled ? 'not-allowed' : 'pointer',
-                }}
-                onClick={() => !option.disabled && handleSelect(option.value)}
-                onMouseEnter={(e) => {
-                  if (!option.disabled) {
-                    (e.currentTarget as HTMLElement).style.backgroundColor = theme.currentMode.tokens.colors.primary;
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (value !== option.value) {
-                    (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
-                  }
-                }}
-              >
-                {option.label}
-              </div>
-            ))}
-          </div>
+              {filteredOptions.map((option) => (
+                <div
+                  key={option.value}
+                  style={{
+                    ...optionStyle,
+                    backgroundColor: value === option.value ? theme.currentMode.tokens.colors.primary : 'transparent',
+                    opacity: option.disabled ? 0.5 : 1,
+                    cursor: option.disabled ? 'not-allowed' : 'pointer',
+                  }}
+                  onClick={() => !option.disabled && handleSelect(option.value)}
+                  onMouseEnter={(e) => {
+                    if (!option.disabled) {
+                      (e.currentTarget as HTMLElement).style.backgroundColor = theme.currentMode.tokens.colors.primary;
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (value !== option.value) {
+                      (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
+                    }
+                  }}
+                >
+                  {option.label}
+                </div>
+              ))}
+            </div>
+          </Portal>
         )}
       </div>
 

@@ -31,7 +31,12 @@ export const DataGrid: React.FC<DataGridProps> = ({
   style,
 }) => {
   const themeContext = useTheme();
-  const theme = (themeContext as any).currentMode?.tokens || (themeContext as any);
+  
+  // Safe theme access with fallback
+  const primaryColor = themeContext?.currentMode?.tokens?.colors?.primary || '#00f6ff';
+  const textColor = themeContext?.currentMode?.tokens?.colors?.text || '#ffffff';
+  const backgroundColor = themeContext?.currentMode?.tokens?.colors?.background || '#0a0a0a';
+  
   const scrollRef = useRef<HTMLDivElement>(null);
   const [scrollTop, setScrollTop] = useState(0);
   const [internalSortColumn, setInternalSortColumn] = useState<string | undefined>(controlledSortColumn);
@@ -91,20 +96,20 @@ export const DataGrid: React.FC<DataGridProps> = ({
       height: visibleRows * rowHeight,
       overflowY: 'auto',
       overflowX: 'auto',
-      backgroundColor: theme.currentMode.tokens.colors.background,
+      backgroundColor: backgroundColor,
       ...style,
     };
-  }, [visibleRows, rowHeight, theme, style]);
+  }, [visibleRows, rowHeight, backgroundColor, style]);
 
   const tableStyle: React.CSSProperties = {
     width: '100%',
     borderCollapse: 'collapse',
-    color: theme.currentMode.tokens.colors.text,
+    color: textColor,
   };
 
   const headerStyle: React.CSSProperties = {
-    backgroundColor: theme.currentMode.tokens.colors.primary,
-    color: theme.currentMode.tokens.colors.background,
+    backgroundColor: primaryColor,
+    color: backgroundColor,
     padding: '0.5rem',
     textAlign: 'left',
     fontWeight: 600,
@@ -118,7 +123,7 @@ export const DataGrid: React.FC<DataGridProps> = ({
   const cellStyle: React.CSSProperties = {
     padding: '0.5rem',
     textAlign: 'left',
-    borderBottom: `1px solid ${theme.currentMode.tokens.colors.primary}`,
+    borderBottom: `1px solid ${primaryColor}`,
   };
 
   return (
@@ -174,7 +179,7 @@ export const DataGrid: React.FC<DataGridProps> = ({
               <tr
                 key={actualIndex}
                 style={{
-                  backgroundColor: isSelected ? theme.currentMode.tokens.colors.primary : 'transparent',
+                  backgroundColor: isSelected ? primaryColor : 'transparent',
                   opacity: isSelected ? 0.2 : 1,
                   cursor: onRowClick ? 'pointer' : 'default',
                 }}
@@ -217,9 +222,9 @@ export const DataGrid: React.FC<DataGridProps> = ({
                         style={{
                           width: '100%',
                           padding: '0.25rem',
-                          border: `1px solid ${theme.currentMode.tokens.colors.primary}`,
-                          backgroundColor: theme.currentMode.tokens.colors.background,
-                          color: theme.currentMode.tokens.colors.text,
+                          border: `1px solid ${primaryColor}`,
+                          backgroundColor: backgroundColor,
+                          color: textColor,
                         }}
                       />
                     ) : column.render ? (

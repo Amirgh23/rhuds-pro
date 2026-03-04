@@ -30,10 +30,17 @@ export function Chart({
   const theme = useTheme();
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
+  // Safe theme access with fallback
+  const primaryColor = theme?.currentMode?.tokens?.colors?.primary || '#00f6ff';
+  const secondaryColor = theme?.currentMode?.tokens?.colors?.secondary || '#7b61ff';
+  const accentColor = theme?.currentMode?.tokens?.colors?.accent || '#ff006e';
+  const textColor = theme?.currentMode?.tokens?.colors?.text || '#ffffff';
+  const borderColor = theme?.currentMode?.tokens?.colors?.border || '#333333';
+
   const defaultColors = colors || [
-    theme.currentMode.colors.primary,
-    theme.currentMode.colors.secondary,
-    theme.currentMode.colors.accent,
+    primaryColor,
+    secondaryColor,
+    accentColor,
     '#FF6384',
     '#36A2EB',
     '#FFCE56',
@@ -63,7 +70,7 @@ export function Chart({
     } else if (type === 'area') {
       drawAreaChart(ctx, data, padding, chartWidth, chartHeight, defaultColors[0], showGrid);
     }
-  }, [data, type, width, height, showGrid, defaultColors]);
+  }, [data, type, width, height, showGrid, defaultColors, borderColor, textColor]);
 
   const drawBarChart = (
     ctx: CanvasRenderingContext2D,
@@ -79,7 +86,7 @@ export function Chart({
 
     // Draw grid
     if (showGrid) {
-      ctx.strokeStyle = theme.currentMode.colors.border;
+      ctx.strokeStyle = borderColor;
       ctx.lineWidth = 1;
       for (let i = 0; i <= 5; i++) {
         const y = padding + (chartHeight / 5) * i;
@@ -100,7 +107,7 @@ export function Chart({
       ctx.fillRect(x, y, barWidth, barHeight);
 
       // Draw label
-      ctx.fillStyle = theme.currentMode.colors.text;
+      ctx.fillStyle = textColor;
       ctx.font = '12px sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText(point.label, x + barWidth / 2, padding + chartHeight + 20);
@@ -120,7 +127,7 @@ export function Chart({
 
     // Draw grid
     if (showGrid) {
-      ctx.strokeStyle = theme.currentMode.colors.border;
+      ctx.strokeStyle = borderColor;
       ctx.lineWidth = 1;
       for (let i = 0; i <= 5; i++) {
         const y = padding + (chartHeight / 5) * i;
@@ -205,7 +212,7 @@ export function Chart({
 
     // Draw grid
     if (showGrid) {
-      ctx.strokeStyle = theme.currentMode.colors.border;
+      ctx.strokeStyle = borderColor;
       ctx.lineWidth = 1;
       for (let i = 0; i <= 5; i++) {
         const y = padding + (chartHeight / 5) * i;
@@ -265,7 +272,7 @@ export function Chart({
                   borderRadius: '2px',
                 }}
               />
-              <span style={{ color: theme.currentMode.colors.text, fontSize: '14px' }}>
+              <span style={{ color: textColor, fontSize: '14px' }}>
                 {point.label}: {point.value}
               </span>
             </div>

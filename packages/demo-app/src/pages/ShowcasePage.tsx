@@ -1,11 +1,11 @@
 import React, { useState, useRef } from 'react';
 import { useTheme } from '@rhuds/core';
 import {
-  Text, Button, Icon, Input, Select, Grid, Stack,
-  Checkbox, RadioGroup, Switch, Tabs, Pagination, Table,
+  Text, Button, HudButton, GlitchButton, Icon, Input, HackerInput, Select, Grid, Stack, HudBox, HudFrame,
+  Checkbox, HoloCheckbox, RadioGroup, Switch, Tabs, Pagination, Table,
   Modal, Dialog, Notification, Tooltip, Popover, Dropdown,
   Accordion, Stepper, Carousel, Slider, DatePicker, ColorPicker,
-  FileUpload, Chart, DataGrid, Tree, Navbar, Sidebar, Breadcrumb,
+  FileUpload, Chart, DataGrid, Tree, CyberCard, Navbar, Sidebar, Breadcrumb,
   Menu, CodeEditor, RichTextEditor,
 } from '@rhuds/components';
 import {
@@ -39,12 +39,14 @@ export const ShowcasePage: React.FC = () => {
   const [inputValue, setInputValue] = useState('');
   const [selectValue, setSelectValue] = useState('');
   const [checkboxValue, setCheckboxValue] = useState(false);
+  const [holoCheckboxValue, setHoloCheckboxValue] = useState(false);
   const [radioValue, setRadioValue] = useState('option1');
   const [switchValue, setSwitchValue] = useState(false);
   const [sliderValue, setSliderValue] = useState(50);
   const [colorValue, setColorValue] = useState('#00f6ff');
   const [dateValue, setDateValue] = useState(new Date());
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [hudBoxAnimated, setHudBoxAnimated] = useState(true);
   
   // UI states
   const [currentPage, setCurrentPage] = useState(1);
@@ -107,11 +109,31 @@ export const ShowcasePage: React.FC = () => {
             </Stack>
           </ComponentSection>
           <ComponentSection title="2. Button">
-            <Stack direction="row" gap="1rem">
+            <Stack direction="row" gap="1rem" style={{ flexWrap: 'wrap' }}>
               <Button variant="primary">Primary</Button>
               <Button variant="secondary">Secondary</Button>
               <Button variant="success">Success</Button>
             </Stack>
+            <div style={{ marginTop: '1rem' }}>
+              <Text variant="caption" style={{ display: 'block', marginBottom: '0.5rem', color: '#1BFD9C' }}>
+                HUD Button Style:
+              </Text>
+              <Stack direction="row" gap="1rem" style={{ flexWrap: 'wrap' }}>
+                <HudButton>I'M READY</HudButton>
+                <HudButton>LAUNCH</HudButton>
+                <HudButton>ACTIVATE</HudButton>
+              </Stack>
+            </div>
+            <div style={{ marginTop: '1rem' }}>
+              <Text variant="caption" style={{ display: 'block', marginBottom: '0.5rem', color: '#ffff00' }}>
+                Glitch Button Style:
+              </Text>
+              <Stack direction="row" gap="1rem" style={{ flexWrap: 'wrap' }}>
+                <GlitchButton>// Hover me</GlitchButton>
+                <GlitchButton>// Execute</GlitchButton>
+                <GlitchButton>// Run code</GlitchButton>
+              </Stack>
+            </div>
           </ComponentSection>
           <ComponentSection title="3. Icon">
             <Stack direction="row" gap="1rem">
@@ -121,6 +143,7 @@ export const ShowcasePage: React.FC = () => {
           </ComponentSection>
           <ComponentSection title="4. Input">
             <Input placeholder="Enter text..." value={inputValue} onChange={(e) => setInputValue(e.target.value)} />
+            <HackerInput label="Input Command" placeholder="Enter command..." />
           </ComponentSection>
           <ComponentSection title="5. Select">
             <Select
@@ -158,6 +181,131 @@ export const ShowcasePage: React.FC = () => {
               <Button>C</Button>
             </Stack>
           </ComponentSection>
+          <ComponentSection title="8b. HudBox (Asymmetrical) - 18 Variants with Colors">
+            <Stack direction="column" gap="2rem">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+                <HudButton onClick={() => setHudBoxAnimated(!hudBoxAnimated)}>
+                  {hudBoxAnimated ? '⏸ Static Border' : '▶ Animated Border'}
+                </HudButton>
+                <Text color="#00f6ff">
+                  Mode: {hudBoxAnimated ? 'Animated' : 'Static'}
+                </Text>
+              </div>
+              <div>
+                <Text color="#00f6ff" style={{ marginBottom: '1rem' }}>Standard & Geometric:</Text>
+                <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+                  <HudBox variant="compact" color="#00f6ff" animated={hudBoxAnimated}>
+                    <Text color="#00f6ff">Compact</Text>
+                  </HudBox>
+                  <HudBox variant="default" color="#1BFD9C" animated={hudBoxAnimated}>
+                    <Text color="#1BFD9C">Default</Text>
+                  </HudBox>
+                  <HudBox variant="wide" color="#FF6B9D" animated={hudBoxAnimated}>
+                    <Text color="#FF6B9D">Wide</Text>
+                  </HudBox>
+                  <HudBox variant="hexagon" color="#FFD700" animated={hudBoxAnimated}>
+                    <Text color="#FFD700">Hexagon</Text>
+                  </HudBox>
+                  <HudBox variant="octagon" color="#FF4500" animated={hudBoxAnimated}>
+                    <Text color="#FF4500">Octagon</Text>
+                  </HudBox>
+                  <HudBox variant="diagonal" color="#9D00FF" animated={hudBoxAnimated}>
+                    <Text color="#9D00FF">Diagonal</Text>
+                  </HudBox>
+                  <HudBox variant="corner-cut" color="#00FFFF" animated={hudBoxAnimated}>
+                    <Text color="#00FFFF">Corner Cut</Text>
+                  </HudBox>
+                  <HudBox variant="tech-panel" color="#FF00FF" animated={hudBoxAnimated}>
+                    <Text color="#FF00FF">Tech Panel</Text>
+                  </HudBox>
+                  <HudBox variant="arrow-right" color="#00FF00" animated={hudBoxAnimated}>
+                    <Text color="#00FF00">Arrow →</Text>
+                  </HudBox>
+                  <HudBox variant="chevron" color="#FFA500" animated={hudBoxAnimated}>
+                    <Text color="#FFA500">Chevron</Text>
+                  </HudBox>
+                </div>
+              </div>
+              <div>
+                <Text color="#00f6ff" style={{ marginBottom: '1rem' }}>Portrait (Vertical):</Text>
+                <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'flex-start' }}>
+                  <HudBox variant="portrait-tall" color="#00CED1" animated={hudBoxAnimated}>
+                    <Text color="#00CED1" align="center">Portrait<br/>Tall</Text>
+                  </HudBox>
+                  <HudBox variant="portrait-slim" color="#FF1493" animated={hudBoxAnimated}>
+                    <Text color="#FF1493" align="center">Portrait<br/>Slim</Text>
+                  </HudBox>
+                  <HudBox variant="portrait-card" color="#7FFF00" animated={hudBoxAnimated}>
+                    <Text color="#7FFF00" align="center">Portrait<br/>Card</Text>
+                  </HudBox>
+                  <HudBox variant="portrait-banner" color="#FF69B4" animated={hudBoxAnimated}>
+                    <Text color="#FF69B4" align="center">Portrait<br/>Banner</Text>
+                  </HudBox>
+                </div>
+              </div>
+              <div>
+                <Text color="#00f6ff" style={{ marginBottom: '1rem' }}>Landscape (Horizontal):</Text>
+                <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
+                  <HudBox variant="landscape-wide" color="#00BFFF" animated={hudBoxAnimated}>
+                    <Text color="#00BFFF">Landscape Wide</Text>
+                  </HudBox>
+                  <HudBox variant="landscape-ultra" color="#FF6347" animated={hudBoxAnimated}>
+                    <Text color="#FF6347">Landscape Ultra</Text>
+                  </HudBox>
+                  <HudBox variant="landscape-bar" color="#32CD32" animated={hudBoxAnimated}>
+                    <Text color="#32CD32">Landscape Bar</Text>
+                  </HudBox>
+                  <HudBox variant="landscape-ribbon" color="#BA55D3" animated={hudBoxAnimated}>
+                    <Text color="#BA55D3">Landscape Ribbon</Text>
+                  </HudBox>
+                </div>
+              </div>
+            </Stack>
+          </ComponentSection>
+          <ComponentSection title="8c. HudFrame (Complex Frame with Neon Lines)">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', alignItems: 'center' }}>
+              <div style={{ width: '100%', maxWidth: '800px', height: '400px', position: 'relative' }}>
+                <HudFrame
+                  header={{
+                    title: 'SYSTEM STATUS',
+                    description: 'Real-time system monitoring dashboard',
+                    number: 1,
+                  }}
+                  color="#00f6ff"
+                >
+                  <div style={{ padding: '2rem' }}>
+                    <Text color="#00f6ff" variant="h3" style={{ marginBottom: '1rem' }}>
+                      HUD FRAME DEMO
+                    </Text>
+                    <Text color="#ffffff" variant="body">
+                      Complex HUD frame with 18 decorative neon lines around the edges.
+                      Perfect for dashboards and monitoring interfaces.
+                    </Text>
+                  </div>
+                </HudFrame>
+              </div>
+              <div style={{ width: '100%', maxWidth: '800px', height: '400px', position: 'relative' }}>
+                <HudFrame
+                  header={{
+                    title: 'DATA ANALYSIS',
+                    description: 'Analytics and metrics dashboard',
+                    number: 2,
+                  }}
+                  color="#1BFD9C"
+                >
+                  <div style={{ padding: '2rem' }}>
+                    <Text color="#1BFD9C" variant="h3" style={{ marginBottom: '1rem' }}>
+                      GREEN THEME
+                    </Text>
+                    <Text color="#ffffff" variant="body">
+                      HudFrame supports custom colors for all neon lines and title box.
+                      Includes animated glow effects.
+                    </Text>
+                  </div>
+                </HudFrame>
+              </div>
+            </div>
+          </ComponentSection>
         </Stack>
       ),
     },
@@ -167,6 +315,11 @@ export const ShowcasePage: React.FC = () => {
         <Stack direction="column" gap="2rem">
           <ComponentSection title="9. Checkbox">
             <Checkbox checked={checkboxValue} onChange={setCheckboxValue} label="Accept" />
+          </ComponentSection>
+          <ComponentSection title="9b. HoloCheckbox (3D)">
+            <div style={{ display: 'flex', justifyContent: 'center', background: 'rgba(0, 0, 0, 0.9)', padding: '1rem', borderRadius: '8px' }}>
+              <HoloCheckbox checked={holoCheckboxValue} onChange={setHoloCheckboxValue} label="HOLOGRAPHIC" />
+            </div>
           </ComponentSection>
           <ComponentSection title="10. RadioGroup">
             <RadioGroup
@@ -255,6 +408,12 @@ export const ShowcasePage: React.FC = () => {
           </ComponentSection>
           <ComponentSection title="24. Tree">
             <Tree nodes={treeData} onNodeClick={(node) => console.log(node)} />
+          </ComponentSection>
+          <ComponentSection title="24b. CyberCard (HUD Style)">
+            <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <CyberCard title="PROFILE" footer="Social Links" />
+              <CyberCard title="CONTACT" footer="Connect" />
+            </div>
           </ComponentSection>
         </Stack>
       ),

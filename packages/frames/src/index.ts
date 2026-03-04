@@ -1,33 +1,58 @@
 /**
- * Frame Rendering System
- * SVG-based frame components for futuristic UI borders
+ * @rhuds/frames - Arwes-style Frame Components
  */
 
-// Types
-export * from './types';
+// Core
+export { renderFrameSVGPaths } from './core/svgRenderer';
+export type { FrameSVGPathGeneric, PathDefinition, PathCommand, PathValue } from './core/svgRenderer';
 
-// SVG utilities
 export {
-  SVGPathBuilder,
-  createOctagonPath,
-  createKranoxPath,
-  createCornersPath,
-  createLinesPath,
-  createUnderlinePath,
-  createNefrexPath,
-  pathToString,
-  combinePaths,
-} from './svg';
+  calculateOctagonPaths,
+  calculateKranoxPaths,
+  calculateCornersPaths,
+  calculateLinesPaths,
+  calculateUnderlinePaths,
+  calculateNefrexPaths,
+} from './core/pathCalculator';
 
-// Base component
-export { FrameSVG, useFrameSVGRenderer, createClipPathElement, applyClipPath } from './FrameSVG';
+export type {
+  OctagonPathOptions,
+  KranoxPathOptions,
+  CornersPathOptions,
+  LinesPathOptions,
+  UnderlinePathOptions,
+  NefrexPathOptions,
+} from './core/pathCalculator';
 
-// Frame variants
+// Hooks
+export { useFrameSVGRenderer, useFrameSVGAssemblingAnimation } from './hooks';
+export type { SVGRenderCallback, FrameAssemblingAnimationResult } from './hooks';
+
+// Components
 export {
+  FrameSVG,
   FrameSVGOctagon,
   FrameSVGKranox,
   FrameSVGCorners,
   FrameSVGLines,
   FrameSVGUnderline,
   FrameSVGNefrex,
-} from './variants';
+} from './components';
+
+export type {
+  FrameSVGProps,
+  FrameSVGOctagonProps,
+  FrameSVGKranoxProps,
+  FrameSVGCornersProps,
+  FrameSVGLinesProps,
+  FrameSVGUnderlineProps,
+  FrameSVGNefrexProps,
+} from './components';
+
+// ClipPath utilities (for direct CSS usage)
+export { createFrameOctagonClip, createFrameKranoxClip } from './clipPaths';
+export type { FrameOctagonClipOptions, FrameKranoxClipOptions } from './clipPaths';
+
+// HUD Frame (legacy/additional)
+export { HudFrame, HudFrameWithControls } from './HudFrame';
+export type { HudFrameProps, HudFrameWithControlsProps } from './HudFrame';

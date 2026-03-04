@@ -23,7 +23,12 @@ export const Table: React.FC<TableProps> = ({
   style,
 }) => {
   const themeContext = useTheme();
-  const theme = (themeContext as any).currentMode?.tokens || (themeContext as any);
+  
+  // Safe theme access with fallback
+  const primaryColor = themeContext?.currentMode?.tokens?.colors?.primary || '#00f6ff';
+  const textColor = themeContext?.currentMode?.tokens?.colors?.text || '#ffffff';
+  const backgroundColor = themeContext?.currentMode?.tokens?.colors?.background || '#0a0a0a';
+  
   const [internalSortColumn, setInternalSortColumn] = useState<string | undefined>(controlledSortColumn);
   const [internalSortDirection, setInternalSortDirection] = useState<'asc' | 'desc'>(controlledSortDirection);
 
@@ -61,13 +66,13 @@ export const Table: React.FC<TableProps> = ({
   const tableStyle: React.CSSProperties = {
     width: '100%',
     borderCollapse: 'collapse',
-    backgroundColor: theme.currentMode.tokens.colors.background,
-    color: theme.currentMode.tokens.colors.text,
+    backgroundColor: backgroundColor,
+    color: textColor,
   };
 
   const headerStyle: React.CSSProperties = {
-    backgroundColor: theme.currentMode.tokens.colors.primary,
-    color: theme.currentMode.tokens.colors.background,
+    backgroundColor: primaryColor,
+    color: backgroundColor,
     padding: '0.75rem',
     textAlign: 'left',
     fontWeight: 600,
@@ -77,7 +82,7 @@ export const Table: React.FC<TableProps> = ({
   };
 
   const rowStyle: React.CSSProperties = {
-    borderBottom: `1px solid ${theme.currentMode.tokens.colors.primary}`,
+    borderBottom: `1px solid ${primaryColor}`,
   };
 
   const cellStyle: React.CSSProperties = {
@@ -132,7 +137,7 @@ export const Table: React.FC<TableProps> = ({
               onClick={() => onRowClick?.(row, rowIndex)}
               onMouseEnter={(e) => {
                 if (onRowClick) {
-                  (e.currentTarget as HTMLElement).style.backgroundColor = theme.currentMode.tokens.colors.primary;
+                  (e.currentTarget as HTMLElement).style.backgroundColor = primaryColor;
                   (e.currentTarget as HTMLElement).style.opacity = '0.1';
                 }
               }}

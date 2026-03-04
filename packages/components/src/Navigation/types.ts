@@ -38,6 +38,9 @@ export interface SidebarProps {
   /** Sidebar width */
   width?: number | string;
 
+  /** Position type */
+  position?: 'static' | 'relative' | 'fixed' | 'absolute';
+
   /** Collapsible */
   collapsible?: boolean;
 

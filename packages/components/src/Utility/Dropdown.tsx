@@ -5,6 +5,7 @@
 
 import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { useTheme } from '@rhuds/core';
+import { Portal } from './Portal';
 import { DropdownProps } from './types';
 
 /**
@@ -153,36 +154,40 @@ export const Dropdown: React.FC<DropdownProps> = ({
       >
         {children}
       </div>
-      <div ref={dropdownRef} style={dropdownStyle} className={className}>
-        {items.map((item, index) => (
-          item.divider ? (
-            <div key={index} style={dividerStyle} />
-          ) : (
-            <div
-              key={item.key}
-              style={{
-                ...itemStyle,
-                opacity: item.disabled ? 0.5 : 1,
-                cursor: item.disabled ? 'not-allowed' : 'pointer',
-              }}
-              onClick={() => !item.disabled && handleItemClick(item)}
-              onMouseEnter={(e) => {
-                if (!item.disabled) {
-                  const tokens = (theme as any)?.currentMode?.tokens || theme;
-                  (e.currentTarget as HTMLElement).style.backgroundColor = tokens.colors?.primary || '#00f6ff';
-                  (e.currentTarget as HTMLElement).style.opacity = '0.1';
-                }
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
-              }}
-            >
-              {item.icon && <span>{item.icon}</span>}
-              <span>{item.label}</span>
-            </div>
-          )
-        ))}
-      </div>
+      {isOpen && (
+        <Portal containerId="dropdown-root">
+          <div ref={dropdownRef} style={dropdownStyle} className={className}>
+            {items.map((item, index) => (
+              item.divider ? (
+                <div key={index} style={dividerStyle} />
+              ) : (
+                <div
+                  key={item.key}
+                  style={{
+                    ...itemStyle,
+                    opacity: item.disabled ? 0.5 : 1,
+                    cursor: item.disabled ? 'not-allowed' : 'pointer',
+                  }}
+                  onClick={() => !item.disabled && handleItemClick(item)}
+                  onMouseEnter={(e) => {
+                    if (!item.disabled) {
+                      const tokens = (theme as any)?.currentMode?.tokens || theme;
+                      (e.currentTarget as HTMLElement).style.backgroundColor = tokens.colors?.primary || '#00f6ff';
+                      (e.currentTarget as HTMLElement).style.opacity = '0.1';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
+                  }}
+                >
+                  {item.icon && <span>{item.icon}</span>}
+                  <span>{item.label}</span>
+                </div>
+              )
+            ))}
+          </div>
+        </Portal>
+      )}
     </>
   );
 };

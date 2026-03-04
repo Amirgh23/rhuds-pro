@@ -3,10 +3,11 @@
  */
 
 import React, { useState } from 'react';
-import { Checkbox, Radio, RadioGroup, Switch, useForm, Input, Button, Text, Stack, Container, Grid } from '../index';
+import { Checkbox, HoloCheckbox, Radio, RadioGroup, Switch, useForm, Input, Button, Text, Stack, Container, Grid } from '../index';
 
 export const FormDemo: React.FC = () => {
   const [checkboxValue, setCheckboxValue] = useState(false);
+  const [holoCheckboxValue, setHoloCheckboxValue] = useState(false);
   const [radioValue, setRadioValue] = useState('option1');
   const [switchValue, setSwitchValue] = useState(false);
 
@@ -68,6 +69,20 @@ export const FormDemo: React.FC = () => {
             disabled={true}
           />
         </Stack>
+      </section>
+
+      {/* HoloCheckbox Section */}
+      <section style={{ marginBottom: '3rem' }}>
+        <Text variant="h2" color="#00ffff" style={{ marginBottom: '1rem' }}>
+          HoloCheckbox Component (Holographic 3D)
+        </Text>
+        <div style={{ display: 'flex', justifyContent: 'center', background: 'rgba(0, 0, 0, 0.8)', padding: '2rem', borderRadius: '8px' }}>
+          <HoloCheckbox
+            checked={holoCheckboxValue}
+            onChange={setHoloCheckboxValue}
+            label="HOLOGRAPHIC SYSTEM"
+          />
+        </div>
       </section>
 
       {/* Radio Section */}

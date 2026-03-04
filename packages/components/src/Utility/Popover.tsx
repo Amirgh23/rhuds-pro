@@ -5,6 +5,7 @@
 
 import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { useTheme } from '@rhuds/core';
+import { Portal } from './Portal';
 import { PopoverProps } from './types';
 
 /**
@@ -136,10 +137,14 @@ export const Popover: React.FC<PopoverProps> = ({
       >
         {children}
       </div>
-      <div ref={popoverRef} style={popoverStyle} className={className}>
-        {title && <div style={headerStyle}>{title}</div>}
-        <div style={contentStyle}>{content}</div>
-      </div>
+      {isOpen && (
+        <Portal containerId="popover-root">
+          <div ref={popoverRef} style={popoverStyle} className={className}>
+            {title && <div style={headerStyle}>{title}</div>}
+            <div style={contentStyle}>{content}</div>
+          </div>
+        </Portal>
+      )}
     </>
   );
 };

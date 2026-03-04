@@ -13,6 +13,7 @@ import { SidebarProps } from './types';
 export const Sidebar: React.FC<SidebarProps> = ({
   items,
   width = 250,
+  position = 'fixed',
   collapsible = true,
   collapsed: controlledCollapsed,
   onCollapsedChange,
@@ -22,6 +23,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const theme = useTheme();
   const [internalCollapsed, setInternalCollapsed] = useState(false);
 
+  // Safe theme access with fallback
+  const primaryColor = theme?.currentMode?.tokens?.colors?.primary || '#00f6ff';
+  const textColor = theme?.currentMode?.tokens?.colors?.text || '#ffffff';
+
   const collapsed = controlledCollapsed !== undefined ? controlledCollapsed : internalCollapsed;
 
   const handleCollapsedChange = (newCollapsed: boolean) => {
@@ -30,25 +35,35 @@ export const Sidebar: React.FC<SidebarProps> = ({
   };
 
   const sidebarStyle = useMemo<React.CSSProperties>(() => {
-    return {
+    const baseStyle: React.CSSProperties = {
       width: collapsed ? '60px' : typeof width === 'number' ? `${width}px` : width,
       backgroundColor: '#1a1a1a',
-      borderRight: `2px solid ${theme.currentMode.tokens.colors.primary}`,
+      borderRight: `2px solid ${primaryColor}`,
       padding: '1rem 0',
       transition: 'width 0.3s ease-in-out',
-      height: '100vh',
       overflowY: 'auto',
-      position: 'fixed',
-      left: 0,
-      top: 0,
-      zIndex: 99,
       ...style,
     };
-  }, [collapsed, width, theme, style]);
+
+    if (position === 'fixed') {
+      baseStyle.position = 'fixed';
+      baseStyle.height = '100vh';
+      baseStyle.left = 0;
+      baseStyle.top = 0;
+      baseStyle.zIndex = 950;
+    } else if (position === 'relative') {
+      baseStyle.position = 'relative';
+      baseStyle.height = '100%';
+    } else {
+      baseStyle.position = position as any;
+    }
+
+    return baseStyle;
+  }, [collapsed, width, primaryColor, position, style]);
 
   const itemStyle: React.CSSProperties = {
     padding: '1rem',
-    color: theme.currentMode.tokens.colors.text,
+    color: textColor,
     cursor: 'pointer',
     transition: 'all 0.2s ease-in-out',
     borderLeft: `3px solid transparent`,
@@ -65,12 +80,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
     padding: '1rem',
     backgroundColor: 'transparent',
     border: 'none',
-    color: theme.currentMode.tokens.colors.primary,
+    color: primaryColor,
     fontSize: '1.2rem',
     cursor: 'pointer',
     width: '100%',
     textAlign: 'center',
-    borderBottom: `1px solid ${theme.currentMode.tokens.colors.primary}`,
+    borderBottom: `1px solid ${primaryColor}`,
   };
 
   return (
@@ -91,7 +106,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             href={item.href || '#'}
             style={{
               ...itemStyle,
-              borderLeftColor: item.active ? theme.currentMode.tokens.colors.primary : 'transparent',
+              borderLeftColor: item.active ? primaryColor : 'transparent',
               backgroundColor: item.active ? 'rgba(0, 255, 255, 0.1)' : 'transparent',
               opacity: item.disabled ? 0.5 : 1,
               cursor: item.disabled ? 'not-allowed' : 'pointer',

@@ -21,7 +21,12 @@ export const Accordion: React.FC<AccordionProps> = ({
   style,
 }) => {
   const themeContext = useTheme();
-  const theme = (themeContext as any).currentMode?.tokens || (themeContext as any);
+  
+  // Safe theme access with fallback
+  const primaryColor = themeContext?.currentMode?.tokens?.colors?.primary || '#00f6ff';
+  const textColor = themeContext?.currentMode?.tokens?.colors?.text || '#ffffff';
+  const backgroundColor = themeContext?.currentMode?.tokens?.colors?.background || '#0a0a0a';
+  
   const [internalExpandedItems, setInternalExpandedItems] = useState<string[]>(controlledExpandedItems);
 
   const expandedItems = controlledExpandedItems.length > 0 ? controlledExpandedItems : internalExpandedItems;
@@ -46,17 +51,17 @@ export const Accordion: React.FC<AccordionProps> = ({
 
   const containerStyle = useMemo<React.CSSProperties>(() => {
     return {
-      backgroundColor: theme.currentMode.tokens.colors.background,
-      color: theme.currentMode.tokens.colors.text,
+      backgroundColor: backgroundColor,
+      color: textColor,
       borderRadius: '4px',
       overflow: 'hidden',
-      border: `1px solid ${theme.currentMode.tokens.colors.primary}`,
+      border: `1px solid ${primaryColor}`,
       ...style,
     };
-  }, [theme, style]);
+  }, [backgroundColor, textColor, primaryColor, style]);
 
   const itemStyle: React.CSSProperties = {
-    borderBottom: `1px solid ${theme.currentMode.tokens.colors.primary}`,
+    borderBottom: `1px solid ${primaryColor}`,
   };
 
   const headerStyle: React.CSSProperties = {
@@ -65,14 +70,14 @@ export const Accordion: React.FC<AccordionProps> = ({
     display: 'flex',
     alignItems: 'center',
     gap: '0.5rem',
-    backgroundColor: theme.currentMode.tokens.colors.background,
+    backgroundColor: backgroundColor,
     transition: 'background-color 0.2s ease-in-out',
     userSelect: 'none',
   };
 
   const contentStyle: React.CSSProperties = {
     padding: '1rem',
-    backgroundColor: theme.currentMode.tokens.colors.background,
+    backgroundColor: backgroundColor,
   };
 
   const contentWrapperStyle = (isExpanded: boolean): React.CSSProperties => ({
@@ -93,12 +98,12 @@ export const Accordion: React.FC<AccordionProps> = ({
               onClick={() => !item.disabled && handleToggle(item.key)}
               onMouseEnter={(e) => {
                 if (!item.disabled) {
-                  (e.currentTarget as HTMLElement).style.backgroundColor = theme.currentMode.tokens.colors.primary;
+                  (e.currentTarget as HTMLElement).style.backgroundColor = primaryColor;
                   (e.currentTarget as HTMLElement).style.opacity = '0.1';
                 }
               }}
               onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.backgroundColor = theme.currentMode.tokens.colors.background;
+                (e.currentTarget as HTMLElement).style.backgroundColor = backgroundColor;
               }}
             >
               <span

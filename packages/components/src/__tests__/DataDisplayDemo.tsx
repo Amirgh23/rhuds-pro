@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import { Table, DataGrid, Tree } from '../index';
+import { Table, DataGrid, Tree, CyberCard } from '../index';
 import { Text, Button } from '../index';
 
 interface User {
@@ -234,6 +234,29 @@ export const DataDisplayDemo: React.FC = () => {
           >
             Reset Tree
           </Button>
+        </div>
+      </section>
+
+      {/* CyberCard Section */}
+      <section style={{ marginBottom: '3rem' }}>
+        <Text variant="h2" color="#00ffff" style={{ marginBottom: '1rem' }}>
+          CyberCard Component (Cyberpunk Style)
+        </Text>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', flexWrap: 'wrap' }}>
+          <CyberCard
+            title="PROFILE"
+            footer="Connect with me"
+            socialLinks={{
+              facebook: 'https://facebook.com',
+              twitter: 'https://twitter.com',
+              instagram: 'https://instagram.com',
+              whatsapp: 'https://wa.me/1234567890',
+            }}
+          />
+          <CyberCard
+            title="CONTACT"
+            footer="Social Networks"
+          />
         </div>
       </section>
     </div>

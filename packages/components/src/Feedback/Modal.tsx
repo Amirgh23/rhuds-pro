@@ -5,6 +5,7 @@
 
 import React, { useMemo, useEffect } from 'react';
 import { useTheme } from '@rhuds/core';
+import { Portal } from '../Utility/Portal';
 import { ModalProps } from './types';
 
 /**
@@ -139,52 +140,53 @@ export const Modal: React.FC<ModalProps> = ({
   }
 
   return (
-    <div style={overlayStyle} onClick={onClose}>
-      <div
-        className={className}
-        style={modalStyle}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {(title || showClose) && (
-          <div style={headerStyle}>
-            {title && <h2 style={titleStyle}>{title}</h2>}
-            {showClose && (
-              <button
-                style={closeButtonStyle}
-                onClick={onClose}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.opacity = '0.7';
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.opacity = '1';
-                }}
-              >
-                ✕
-              </button>
-            )}
+    <Portal>
+      <div style={overlayStyle} onClick={onClose}>
+        <div
+          className={className}
+          style={modalStyle}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {(title || showClose) && (
+            <div style={headerStyle}>
+              {title && <h2 style={titleStyle}>{title}</h2>}
+              {showClose && (
+                <button
+                  style={closeButtonStyle}
+                  onClick={onClose}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLElement).style.opacity = '0.7';
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLElement).style.opacity = '1';
+                  }}
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+          )}
+
+          <div style={contentStyle}>{children}</div>
+
+          <div style={footerStyle}>
+            <button
+              style={closeButtonTextStyle}
+              onClick={onClose}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.opacity = '0.8';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.opacity = '1';
+              }}
+            >
+              {closeText}
+            </button>
           </div>
-        )}
-
-        <div style={contentStyle}>{children}</div>
-
-        <div style={footerStyle}>
-          <button
-            style={closeButtonTextStyle}
-            onClick={onClose}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.opacity = '0.8';
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.opacity = '1';
-            }}
-          >
-            {closeText}
-          </button>
         </div>
       </div>
-    </div>
+    </Portal>
   );
 };
 
 Modal.displayName = 'Modal';
-

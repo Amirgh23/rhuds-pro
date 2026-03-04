@@ -1,6 +1,6 @@
 /**
  * MovingLines Component
- * Renders animated moving lines
+ * Renders animated moving lines with gradient and glow effects
  */
 
 import React, { useEffect, useRef } from 'react';
@@ -24,6 +24,7 @@ export const MovingLines: React.FC<MovingLinesProps> = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const offsetRef = useRef(0);
   const animationRef = useRef<number | null>(null);
+  const timeRef = useRef(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -33,21 +34,32 @@ export const MovingLines: React.FC<MovingLinesProps> = ({
     if (!ctx) return;
 
     const render = () => {
-      // Clear canvas
-      ctx.fillStyle = 'rgba(0, 0, 0, 0)';
+      // Clear canvas with trail effect
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
       ctx.fillRect(0, 0, width, height);
-
-      // Set line style
-      ctx.strokeStyle = color;
-      ctx.lineWidth = strokeWidth;
-      ctx.globalAlpha = opacity;
 
       const spacing = direction === 'horizontal' ? height / lineCount : width / lineCount;
 
       if (direction === 'horizontal') {
-        // Horizontal moving lines
+        // Horizontal moving lines with gradient
         for (let i = 0; i < lineCount; i++) {
           const y = (i * spacing + offsetRef.current) % height;
+          
+          // Create gradient for each line
+          const gradient = ctx.createLinearGradient(0, y, width, y);
+          const pulse = Math.sin(timeRef.current * 2 + i * 0.5) * 0.5 + 0.5;
+          
+          gradient.addColorStop(0, `${color}00`);
+          gradient.addColorStop(0.5, color);
+          gradient.addColorStop(1, `${color}00`);
+          
+          ctx.strokeStyle = gradient;
+          ctx.lineWidth = strokeWidth + pulse * 2;
+          ctx.globalAlpha = opacity * (0.5 + pulse * 0.5);
+          
+          // Add glow effect
+          ctx.shadowBlur = 15 * pulse;
+          ctx.shadowColor = color;
 
           ctx.beginPath();
           ctx.moveTo(0, y);
@@ -55,9 +67,25 @@ export const MovingLines: React.FC<MovingLinesProps> = ({
           ctx.stroke();
         }
       } else if (direction === 'vertical') {
-        // Vertical moving lines
+        // Vertical moving lines with gradient
         for (let i = 0; i < lineCount; i++) {
           const x = (i * spacing + offsetRef.current) % width;
+          
+          // Create gradient for each line
+          const gradient = ctx.createLinearGradient(x, 0, x, height);
+          const pulse = Math.sin(timeRef.current * 2 + i * 0.5) * 0.5 + 0.5;
+          
+          gradient.addColorStop(0, `${color}00`);
+          gradient.addColorStop(0.5, color);
+          gradient.addColorStop(1, `${color}00`);
+          
+          ctx.strokeStyle = gradient;
+          ctx.lineWidth = strokeWidth + pulse * 2;
+          ctx.globalAlpha = opacity * (0.5 + pulse * 0.5);
+          
+          // Add glow effect
+          ctx.shadowBlur = 15 * pulse;
+          ctx.shadowColor = color;
 
           ctx.beginPath();
           ctx.moveTo(x, 0);
@@ -65,9 +93,18 @@ export const MovingLines: React.FC<MovingLinesProps> = ({
           ctx.stroke();
         }
       } else if (direction === 'diagonal') {
-        // Diagonal moving lines
+        // Diagonal moving lines with gradient
         for (let i = 0; i < lineCount; i++) {
           const offset = (i * spacing + offsetRef.current) % (width + height);
+          const pulse = Math.sin(timeRef.current * 2 + i * 0.5) * 0.5 + 0.5;
+          
+          ctx.strokeStyle = color;
+          ctx.lineWidth = strokeWidth + pulse * 2;
+          ctx.globalAlpha = opacity * (0.5 + pulse * 0.5);
+          
+          // Add glow effect
+          ctx.shadowBlur = 15 * pulse;
+          ctx.shadowColor = color;
 
           ctx.beginPath();
           ctx.moveTo(offset - height, 0);
@@ -76,9 +113,11 @@ export const MovingLines: React.FC<MovingLinesProps> = ({
         }
       }
 
+      ctx.shadowBlur = 0;
       ctx.globalAlpha = 1;
 
       offsetRef.current += speed;
+      timeRef.current += 0.016;
       animationRef.current = requestAnimationFrame(render);
     };
 

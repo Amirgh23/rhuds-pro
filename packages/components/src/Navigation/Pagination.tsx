@@ -21,7 +21,12 @@ export const Pagination: React.FC<PaginationProps> = ({
   style,
 }) => {
   const themeContext = useTheme();
-  const theme = (themeContext as any).currentMode?.tokens || (themeContext as any);
+  
+  // Safe theme access with fallback
+  const primaryColor = themeContext?.currentMode?.tokens?.colors?.primary || '#00f6ff';
+  const textColor = themeContext?.currentMode?.tokens?.colors?.text || '#ffffff';
+  const backgroundColor = themeContext?.currentMode?.tokens?.colors?.background || '#0a0a0a';
+  
   const [internalCurrentPage, setInternalCurrentPage] = useState(controlledCurrentPage);
   const [internalPerPage, setInternalPerPage] = useState(perPage);
 
@@ -56,8 +61,8 @@ export const Pagination: React.FC<PaginationProps> = ({
   const buttonStyle: React.CSSProperties = {
     padding: '0.5rem 0.75rem',
     backgroundColor: 'transparent',
-    border: `2px solid ${theme.currentMode.tokens.colors.primary}`,
-    color: theme.currentMode.tokens.colors.primary,
+    border: `2px solid ${primaryColor}`,
+    color: primaryColor,
     cursor: 'pointer',
     borderRadius: '4px',
     fontSize: '0.95rem',
@@ -65,8 +70,8 @@ export const Pagination: React.FC<PaginationProps> = ({
   };
 
   const activeButtonStyle: React.CSSProperties = {
-    backgroundColor: theme.currentMode.tokens.colors.primary,
-    color: theme.currentMode.tokens.colors.background,
+    backgroundColor: primaryColor,
+    color: backgroundColor,
   };
 
   const disabledButtonStyle: React.CSSProperties = {
@@ -76,16 +81,16 @@ export const Pagination: React.FC<PaginationProps> = ({
 
   const selectStyle: React.CSSProperties = {
     padding: '0.5rem',
-    backgroundColor: theme.currentMode.tokens.colors.background,
-    border: `2px solid ${theme.currentMode.tokens.colors.primary}`,
-    color: theme.currentMode.tokens.colors.primary,
+    backgroundColor: backgroundColor,
+    border: `2px solid ${primaryColor}`,
+    color: primaryColor,
     borderRadius: '4px',
     cursor: 'pointer',
     fontSize: '0.95rem',
   };
 
   const infoStyle: React.CSSProperties = {
-    color: theme.currentMode.tokens.colors.text,
+    color: textColor,
     fontSize: '0.95rem',
   };
 
@@ -160,7 +165,7 @@ export const Pagination: React.FC<PaginationProps> = ({
               ...buttonStyle,
               ...(page === currentPage ? activeButtonStyle : {}),
               cursor: page === '...' ? 'default' : 'pointer',
-              border: page === '...' ? 'none' : `2px solid ${theme.currentMode.tokens.colors.primary}`,
+              border: page === '...' ? 'none' : `2px solid ${primaryColor}`,
             }}
             onClick={() => typeof page === 'number' && handlePageChange(page)}
             disabled={page === '...'}

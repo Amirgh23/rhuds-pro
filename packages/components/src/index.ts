@@ -12,11 +12,20 @@ export type { TextProps } from './Text/types';
 export { Button } from './Button/Button';
 export type { ButtonProps } from './Button/types';
 
+export { HudButton } from './Button/HudButton';
+export type { HudButtonProps } from './Button/HudButton';
+
+export { GlitchButton } from './Button/GlitchButton';
+export type { GlitchButtonProps } from './Button/GlitchButton';
+
 export { Icon } from './Icon/Icon';
 export type { IconProps } from './Icon/types';
 
 export { Input } from './Input/Input';
 export type { InputProps } from './Input/types';
+
+export { HackerInput } from './Input/HackerInput';
+export type { HackerInputProps } from './Input/HackerInput';
 
 export { Select } from './Select/Select';
 export type { SelectProps } from './Select/types';
@@ -31,9 +40,24 @@ export type { ContainerProps } from './Layout/types';
 export { Stack } from './Layout/Stack';
 export type { StackProps } from './Layout/types';
 
+export { HudBox } from './Layout/HudBox';
+export type { HudBoxProps } from './Layout/HudBox';
+
+export { HudFrame } from './Layout/HudFrame';
+export type { HudFrameProps } from './Layout/HudFrame';
+
+export { NeonLine } from './Layout/NeonLine';
+export type { NeonLineProps } from './Layout/NeonLine';
+
+export { TitleBox } from './Layout/TitleBox';
+export type { TitleBoxProps } from './Layout/TitleBox';
+
 // Form Components
 export { Checkbox } from './Form/Checkbox';
 export type { CheckboxProps } from './Form/types';
+
+export { HoloCheckbox } from './Form/HoloCheckbox';
+export type { HoloCheckboxProps } from './Form/HoloCheckbox';
 
 export { Radio, RadioGroup } from './Form/Radio';
 export type { RadioProps, RadioGroupProps } from './Form/types';
@@ -73,6 +97,9 @@ export type { DataGridProps } from './DataDisplay/types';
 export { Tree } from './DataDisplay/Tree';
 export type { TreeProps } from './DataDisplay/types';
 
+export { CyberCard } from './DataDisplay/CyberCard';
+export type { CyberCardProps } from './DataDisplay/CyberCard';
+
 // Feedback Components
 export { Modal } from './Feedback/Modal';
 export type { ModalProps } from './Feedback/types';
@@ -95,6 +122,9 @@ export type { PopoverProps } from './Utility/types';
 
 export { Dropdown } from './Utility/Dropdown';
 export type { DropdownProps } from './Utility/types';
+
+export { Portal } from './Utility/Portal';
+export type { PortalProps } from './Utility/Portal';
 
 // Advanced Components
 export { Carousel } from './Advanced/Carousel';

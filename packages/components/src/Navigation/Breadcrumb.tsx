@@ -18,6 +18,10 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
 }) => {
   const theme = useTheme();
 
+  // Safe theme access with fallback
+  const primaryColor = theme?.currentMode?.tokens?.colors?.primary || '#00f6ff';
+  const textColor = theme?.currentMode?.tokens?.colors?.text || '#ffffff';
+
   const containerStyle = useMemo<React.CSSProperties>(() => {
     return {
       display: 'flex',
@@ -29,14 +33,14 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
   }, [style]);
 
   const itemStyle: React.CSSProperties = {
-    color: theme.currentMode.tokens.colors.text,
+    color: textColor,
     cursor: 'pointer',
     transition: 'color 0.2s ease-in-out',
     textDecoration: 'none',
   };
 
   const activeItemStyle: React.CSSProperties = {
-    color: theme.currentMode.tokens.colors.primary,
+    color: primaryColor,
     cursor: 'default',
   };
 
@@ -57,12 +61,12 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
             }}
             onMouseEnter={(e) => {
               if (!item.active) {
-                (e.currentTarget as HTMLElement).style.color = theme.currentMode.tokens.colors.primary;
+                (e.currentTarget as HTMLElement).style.color = primaryColor;
               }
             }}
             onMouseLeave={(e) => {
               if (!item.active) {
-                (e.currentTarget as HTMLElement).style.color = theme.currentMode.tokens.colors.text;
+                (e.currentTarget as HTMLElement).style.color = textColor;
               }
             }}
           >

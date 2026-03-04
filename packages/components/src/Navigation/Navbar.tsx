@@ -21,6 +21,10 @@ export const Navbar: React.FC<NavbarProps> = ({
   const theme = useTheme();
   const [collapsed, setCollapsed] = useState(false);
 
+  // Safe theme access with fallback
+  const primaryColor = theme?.currentMode?.tokens?.colors?.primary || '#00f6ff';
+  const textColor = theme?.currentMode?.tokens?.colors?.text || '#ffffff';
+
   const navbarStyle = useMemo<React.CSSProperties>(() => {
     return {
       position: position as any,
@@ -28,20 +32,20 @@ export const Navbar: React.FC<NavbarProps> = ({
       left: 0,
       right: 0,
       backgroundColor: '#1a1a1a',
-      borderBottom: `2px solid ${theme.currentMode.tokens.colors.primary}`,
+      borderBottom: `2px solid ${primaryColor}`,
       padding: '1rem 2rem',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
-      zIndex: 100,
+      zIndex: 900,
       ...style,
     };
-  }, [position, theme, style]);
+  }, [position, primaryColor, style]);
 
   const brandStyle: React.CSSProperties = {
     fontSize: '1.5rem',
     fontWeight: 700,
-    color: theme.currentMode.tokens.colors.primary,
+    color: primaryColor,
     cursor: 'pointer',
   };
 
@@ -55,7 +59,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   const navItemStyle: React.CSSProperties = {
-    color: theme.currentMode.tokens.colors.text,
+    color: textColor,
     cursor: 'pointer',
     transition: 'color 0.2s ease-in-out',
     textDecoration: 'none',
@@ -66,7 +70,7 @@ export const Navbar: React.FC<NavbarProps> = ({
     display: 'none',
     backgroundColor: 'transparent',
     border: 'none',
-    color: theme.currentMode.tokens.colors.primary,
+    color: primaryColor,
     fontSize: '1.5rem',
     cursor: 'pointer',
     '@media (max-width: 768px)': {
@@ -85,20 +89,20 @@ export const Navbar: React.FC<NavbarProps> = ({
             href={item.href || '#'}
             style={{
               ...navItemStyle,
-              color: item.active ? theme.currentMode.tokens.colors.primary : theme.currentMode.tokens.colors.text,
+              color: item.active ? primaryColor : textColor,
               opacity: item.disabled ? 0.5 : 1,
               cursor: item.disabled ? 'not-allowed' : 'pointer',
             }}
             onMouseEnter={(e) => {
               if (!item.disabled) {
-                (e.currentTarget as HTMLElement).style.color = theme.currentMode.tokens.colors.primary;
+                (e.currentTarget as HTMLElement).style.color = primaryColor;
               }
             }}
             onMouseLeave={(e) => {
               if (!item.disabled) {
                 (e.currentTarget as HTMLElement).style.color = item.active
-                  ? theme.currentMode.tokens.colors.primary
-                  : theme.currentMode.tokens.colors.text;
+                  ? primaryColor
+                  : textColor;
               }
             }}
           >

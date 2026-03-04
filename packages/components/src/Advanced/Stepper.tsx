@@ -22,7 +22,11 @@ export const Stepper: React.FC<StepperProps> = ({
   style,
 }) => {
   const themeContext = useTheme();
-  const theme = (themeContext as any).currentMode?.tokens || (themeContext as any);
+  
+  // Safe theme access with fallback
+  const primaryColor = themeContext?.currentMode?.tokens?.colors?.primary || '#00f6ff';
+  const textColor = themeContext?.currentMode?.tokens?.colors?.text || '#ffffff';
+  const backgroundColor = themeContext?.currentMode?.tokens?.colors?.background || '#0a0a0a';
 
   const currentStep = controlledCurrentStep !== undefined ? controlledCurrentStep : 0;
 
@@ -35,16 +39,17 @@ export const Stepper: React.FC<StepperProps> = ({
       display: 'flex',
       flexDirection: orientation === 'vertical' ? 'column' : 'row',
       gap: '1rem',
-      backgroundColor: theme.currentMode.tokens.colors.background,
-      color: theme.currentMode.tokens.colors.text,
+      backgroundColor: backgroundColor,
+      color: textColor,
       ...style,
     };
-  }, [orientation, theme, style]);
+  }, [orientation, backgroundColor, textColor, style]);
 
   const stepsContainerStyle: React.CSSProperties = {
     display: 'flex',
     flexDirection: orientation === 'vertical' ? 'column' : 'row',
-    gap: orientation === 'vertical' ? '0' : '0.5rem',
+    alignItems: orientation === 'vertical' ? 'flex-start' : 'center',
+    gap: '0',
     flex: 1,
   };
 
@@ -56,7 +61,7 @@ export const Stepper: React.FC<StepperProps> = ({
       display: 'flex',
       alignItems: 'center',
       gap: '0.5rem',
-      flex: orientation === 'horizontal' ? 1 : 'auto',
+      flex: orientation === 'horizontal' ? 'none' : 'auto',
       cursor: 'pointer',
       position: 'relative',
     };
@@ -74,9 +79,9 @@ export const Stepper: React.FC<StepperProps> = ({
       alignItems: 'center',
       justifyContent: 'center',
       fontWeight: 600,
-      backgroundColor: isCompleted || isActive ? theme.currentMode.tokens.colors.primary : theme.currentMode.tokens.colors.background,
-      color: isCompleted || isActive ? theme.currentMode.tokens.colors.background : theme.currentMode.tokens.colors.text,
-      border: `2px solid ${theme.currentMode.tokens.colors.primary}`,
+      backgroundColor: isCompleted || isActive ? primaryColor : backgroundColor,
+      color: isCompleted || isActive ? backgroundColor : textColor,
+      border: `2px solid ${primaryColor}`,
       transition: `all ${animationDuration}ms ease-in-out`,
       flexShrink: 0,
     };
@@ -103,34 +108,31 @@ export const Stepper: React.FC<StepperProps> = ({
 
     if (orientation === 'vertical') {
       return {
-        position: 'absolute',
-        left: '19px',
-        top: '40px',
         width: '2px',
-        height: 'calc(100% - 40px)',
-        backgroundColor: isCompleted ? theme.currentMode.tokens.colors.primary : theme.currentMode.tokens.colors.primary,
+        height: '40px',
+        backgroundColor: primaryColor,
         opacity: isCompleted ? 1 : 0.3,
         transition: `opacity ${animationDuration}ms ease-in-out`,
+        flexShrink: 0,
+        marginLeft: '19px',
       };
     } else {
       return {
-        position: 'absolute',
-        left: '40px',
-        top: '19px',
-        width: 'calc(100% - 40px)',
+        width: '60px',
         height: '2px',
-        backgroundColor: isCompleted ? theme.currentMode.tokens.colors.primary : theme.currentMode.tokens.colors.primary,
+        backgroundColor: primaryColor,
         opacity: isCompleted ? 1 : 0.3,
         transition: `opacity ${animationDuration}ms ease-in-out`,
+        flexShrink: 0,
       };
     }
   };
 
   const contentStyle: React.CSSProperties = {
     padding: '1rem',
-    backgroundColor: theme.currentMode.tokens.colors.background,
+    backgroundColor: backgroundColor,
     borderRadius: '4px',
-    border: `1px solid ${theme.currentMode.tokens.colors.primary}`,
+    border: `1px solid ${primaryColor}`,
     opacity: 0,
     transition: `opacity ${animationDuration}ms ease-in-out`,
   };
@@ -144,26 +146,27 @@ export const Stepper: React.FC<StepperProps> = ({
     <div className={className} style={containerStyle}>
       <div style={stepsContainerStyle}>
         {steps.map((step, index) => (
-          <div
-            key={step.key}
-            style={stepItemStyle(index)}
-            onClick={() => handleStepClick(index)}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.opacity = '0.8';
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.opacity = '1';
-            }}
-          >
+          <React.Fragment key={step.key}>
+            <div
+              style={stepItemStyle(index)}
+              onClick={() => handleStepClick(index)}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLElement).style.opacity = '0.8';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLElement).style.opacity = '1';
+              }}
+            >
+              <div style={stepCircleStyle(index)}>
+                {index < currentStep ? '✓' : index + 1}
+              </div>
+              <div style={stepLabelStyle}>
+                <div style={labelStyle}>{step.label}</div>
+                {step.description && <div style={descriptionStyle}>{step.description}</div>}
+              </div>
+            </div>
             {index < steps.length - 1 && <div style={connectorStyle(index)} />}
-            <div style={stepCircleStyle(index)}>
-              {index < currentStep ? '✓' : index + 1}
-            </div>
-            <div style={stepLabelStyle}>
-              <div style={labelStyle}>{step.label}</div>
-              {step.description && <div style={descriptionStyle}>{step.description}</div>}
-            </div>
-          </div>
+          </React.Fragment>
         ))}
       </div>
 

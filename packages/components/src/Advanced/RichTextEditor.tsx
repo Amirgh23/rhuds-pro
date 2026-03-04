@@ -19,6 +19,13 @@ export function RichTextEditor({
   className = '',
 }: RichTextEditorProps) {
   const theme = useTheme();
+  
+  // Safe theme access with fallback
+  const borderColor = theme?.currentMode?.tokens?.colors?.border || theme?.currentMode?.tokens?.colors?.primary || '#00f6ff';
+  const surfaceColor = theme?.currentMode?.tokens?.colors?.surface || theme?.currentMode?.tokens?.colors?.background || '#1a1a1a';
+  const backgroundColor = theme?.currentMode?.tokens?.colors?.background || '#0a0a0a';
+  const textColor = theme?.currentMode?.tokens?.colors?.text || '#ffffff';
+  
   const [content, setContent] = useState(value);
   const editorRef = useRef<HTMLDivElement>(null);
 
@@ -60,8 +67,8 @@ export function RichTextEditor({
           display: 'flex',
           gap: '4px',
           padding: '8px',
-          backgroundColor: theme.currentMode.colors.surface,
-          borderBottom: `1px solid ${theme.currentMode.colors.border}`,
+          backgroundColor: surfaceColor,
+          borderBottom: `1px solid ${borderColor}`,
           borderTopLeftRadius: '4px',
           borderTopRightRadius: '4px',
         }}
@@ -74,10 +81,10 @@ export function RichTextEditor({
             title={btn.title}
             style={{
               padding: '6px 12px',
-              border: `1px solid ${theme.currentMode.colors.border}`,
+              border: `1px solid ${borderColor}`,
               borderRadius: '4px',
-              backgroundColor: theme.currentMode.colors.background,
-              color: theme.currentMode.colors.text,
+              backgroundColor: backgroundColor,
+              color: textColor,
               cursor: disabled ? 'not-allowed' : 'pointer',
               fontWeight: 'bold',
             }}
@@ -92,10 +99,10 @@ export function RichTextEditor({
           title="Insert Link"
           style={{
             padding: '6px 12px',
-            border: `1px solid ${theme.currentMode.colors.border}`,
+            border: `1px solid ${borderColor}`,
             borderRadius: '4px',
-            backgroundColor: theme.currentMode.colors.background,
-            color: theme.currentMode.colors.text,
+            backgroundColor: backgroundColor,
+            color: textColor,
             cursor: disabled ? 'not-allowed' : 'pointer',
           }}
         >
@@ -107,10 +114,10 @@ export function RichTextEditor({
           disabled={disabled}
           style={{
             padding: '6px',
-            border: `1px solid ${theme.currentMode.colors.border}`,
+            border: `1px solid ${borderColor}`,
             borderRadius: '4px',
-            backgroundColor: theme.currentMode.colors.background,
-            color: theme.currentMode.colors.text,
+            backgroundColor: backgroundColor,
+            color: textColor,
             cursor: disabled ? 'not-allowed' : 'pointer',
           }}
         >
@@ -130,12 +137,12 @@ export function RichTextEditor({
         style={{
           minHeight: height,
           padding: '16px',
-          border: `1px solid ${theme.currentMode.colors.border}`,
+          border: `1px solid ${borderColor}`,
           borderTop: 'none',
           borderBottomLeftRadius: '4px',
           borderBottomRightRadius: '4px',
-          backgroundColor: theme.currentMode.colors.background,
-          color: theme.currentMode.colors.text,
+          backgroundColor: backgroundColor,
+          color: textColor,
           outline: 'none',
           overflowY: 'auto',
         }}

@@ -1,6 +1,6 @@
 /**
  * Dots Component
- * Renders animated dot patterns (grid, random, hexagonal)
+ * Renders animated dot patterns with connection lines
  */
 
 import React, { useEffect, useRef, useMemo } from 'react';
@@ -107,29 +107,59 @@ export const Dots: React.FC<DotsProps> = ({
     if (!ctx) return;
 
     const render = () => {
-      // Clear canvas
-      ctx.fillStyle = 'rgba(0, 0, 0, 0)';
+      // Clear canvas with slight trail effect
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
       ctx.fillRect(0, 0, width, height);
 
-      // Draw dots
-      ctx.fillStyle = color;
-      ctx.globalAlpha = opacity;
+      // Draw connection lines between nearby dots
+      const connectionDistance = spacing * 1.5;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 0.5;
+      
+      for (let i = 0; i < dots.length; i++) {
+        for (let j = i + 1; j < dots.length; j++) {
+          const dx = dots[i].x - dots[j].x;
+          const dy = dots[i].y - dots[j].y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          
+          if (distance < connectionDistance) {
+            const lineOpacity = (1 - distance / connectionDistance) * opacity * 0.3;
+            ctx.globalAlpha = lineOpacity;
+            
+            ctx.beginPath();
+            ctx.moveTo(dots[i].x, dots[i].y);
+            ctx.lineTo(dots[j].x, dots[j].y);
+            ctx.stroke();
+          }
+        }
+      }
 
-      dots.forEach((dot) => {
+      // Draw dots with pulsing animation
+      ctx.fillStyle = color;
+
+      dots.forEach((dot, index) => {
         let dotOpacity = opacity;
+        let currentSize = dotSize;
 
         if (animated) {
-          // Pulsing animation
-          const pulse = Math.sin(timeRef.current * animationSpeed + dot.x + dot.y) * 0.5 + 0.5;
-          dotOpacity = opacity * (0.5 + pulse * 0.5);
-          ctx.globalAlpha = dotOpacity;
+          // Pulsing animation with phase offset
+          const phase = index * 0.1;
+          const pulse = Math.sin(timeRef.current * animationSpeed + dot.x * 0.01 + dot.y * 0.01 + phase) * 0.5 + 0.5;
+          dotOpacity = opacity * (0.3 + pulse * 0.7);
+          currentSize = dotSize * (0.8 + pulse * 0.4);
+          
+          // Add glow effect
+          ctx.shadowBlur = 10 * pulse;
+          ctx.shadowColor = color;
         }
 
+        ctx.globalAlpha = dotOpacity;
         ctx.beginPath();
-        ctx.arc(dot.x, dot.y, dotSize, 0, Math.PI * 2);
+        ctx.arc(dot.x, dot.y, currentSize, 0, Math.PI * 2);
         ctx.fill();
       });
 
+      ctx.shadowBlur = 0;
       ctx.globalAlpha = 1;
 
       if (animated) {
@@ -149,7 +179,7 @@ export const Dots: React.FC<DotsProps> = ({
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [width, height, dots, dotSize, color, opacity, animated, animationSpeed]);
+  }, [width, height, dots, dotSize, color, opacity, animated, animationSpeed, spacing]);
 
   return (
     <canvas

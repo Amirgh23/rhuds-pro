@@ -91,17 +91,23 @@ const Navigation: React.FC = () => {
     <div style={{
       background: 'rgba(0, 0, 0, 0.5)',
       borderBottom: '1px solid rgba(0, 246, 255, 0.3)',
-      padding: '1rem 2rem',
+      padding: 'clamp(0.75rem, 2vw, 1rem) clamp(1rem, 3vw, 2rem)',
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
+      width: '100%',
+      maxWidth: '100vw',
+      boxSizing: 'border-box',
+      overflowX: 'hidden',
+      flexWrap: 'wrap',
+      gap: '1rem',
     }}>
       <Link to="/" style={{ textDecoration: 'none' }}>
         <Text variant="h2" style={{ color: appTheme.colors.primary.main }}>
           🎮 RHUDS Pro
         </Text>
       </Link>
-      <Stack direction="row" gap="1rem">
+      <Stack direction="row" gap="1rem" style={{ flexWrap: 'wrap', justifyContent: 'center' }}>
         <Link to="/" style={{ textDecoration: 'none' }}>
           <Button variant={isActive('/') ? 'primary' : 'secondary'}>
             Showcase
@@ -128,6 +134,10 @@ const AppContent: React.FC = () => {
       minHeight: '100vh',
       background: appTheme.colors.background.main,
       color: appTheme.colors.text.main,
+      width: '100%',
+      maxWidth: '100vw',
+      overflowX: 'hidden',
+      boxSizing: 'border-box',
     }}>
       <Navigation />
       <Routes>
