@@ -5,7 +5,7 @@ import {
   Checkbox, HoloCheckbox, RadioGroup, Switch, Tabs, Pagination, Table,
   Modal, Dialog, Notification, Tooltip, Popover, Dropdown,
   Accordion, Stepper, Carousel, Slider, DatePicker, ColorPicker,
-  FileUpload, Chart, DataGrid, Tree, CyberCard, Navbar, Sidebar, Breadcrumb,
+  FileUpload, Chart, DataGrid, Tree, CyberCard, GlitchProfileCard, Navbar, Sidebar, Breadcrumb,
   Menu, CodeEditor, RichTextEditor,
 } from '@rhuds/components';
 import {
@@ -413,6 +413,24 @@ export const ShowcasePage: React.FC = () => {
             <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center', flexWrap: 'wrap' }}>
               <CyberCard title="PROFILE" footer="Social Links" />
               <CyberCard title="CONTACT" footer="Connect" />
+            </div>
+          </ComponentSection>
+          <ComponentSection title="24c. GlitchProfileCard (GitHub Style)">
+            <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <GlitchProfileCard
+                username="octo_cat"
+                title="UI DEVELOPER"
+                repositories={128}
+                followers="42k"
+                githubUrl="https://github.com"
+              />
+              <GlitchProfileCard
+                username="cyber_dev"
+                title="FULL STACK"
+                repositories={256}
+                followers="89k"
+                githubUrl="https://github.com"
+              />
             </div>
           </ComponentSection>
         </Stack>

@@ -4,7 +4,7 @@ import {
   Text, Stack, Button, HudButton, GlitchButton, Input, HackerInput, Select, Checkbox, HoloCheckbox, Switch, Slider, Icon,
   Modal, Table, Tabs, Accordion, Radio, RadioGroup, Breadcrumb,
   Pagination, Grid, Container, Tooltip, Popover, Dropdown, Stepper,
-  ColorPicker, DatePicker, Navbar, Sidebar, Menu, DataGrid, Tree, CyberCard, HudBox, HudFrame,
+  ColorPicker, DatePicker, Navbar, Sidebar, Menu, DataGrid, Tree, CyberCard, GlitchProfileCard, HudBox, HudFrame,
   Dialog, Notification, Carousel, FileUpload, Chart
 } from '@rhuds/components';
 import { ComponentPlayground } from '../components/ComponentPlayground';
@@ -1177,6 +1177,39 @@ function MyComponent() {
                   <CyberCard 
                     title="CONTACT" 
                     footer="Connect"
+                  />
+                </Stack>
+              </div>
+            </ComponentPlayground>
+          )}
+
+          {selectedDoc === 'glitchprofilecard' && (
+            <ComponentPlayground 
+              title="GlitchProfileCard Examples" 
+              description="GitHub-style profile card with glitch effects and hover animations"
+              code={`<GlitchProfileCard
+  username="octo_cat"
+  title="UI DEVELOPER"
+  repositories={128}
+  followers="42k"
+  githubUrl="https://github.com"
+/>`}
+            >
+              <div style={{ background: 'rgba(0, 0, 0, 0.8)', padding: '2rem', borderRadius: '8px' }}>
+                <Stack direction="row" gap="2rem" style={{ justifyContent: 'center', flexWrap: 'wrap' }}>
+                  <GlitchProfileCard
+                    username="octo_cat"
+                    title="UI DEVELOPER"
+                    repositories={128}
+                    followers="42k"
+                    githubUrl="https://github.com"
+                  />
+                  <GlitchProfileCard
+                    username="cyber_dev"
+                    title="FULL STACK"
+                    repositories={256}
+                    followers="89k"
+                    githubUrl="https://github.com"
                   />
                 </Stack>
               </div>

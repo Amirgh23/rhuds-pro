@@ -31,6 +31,19 @@ const StyledTitleBox = styled.div<{ $color: string }>`
     inset 0 0 10px ${props => props.$color}20;
   backdrop-filter: blur(10px);
   z-index: 10;
+  
+  @media (max-width: 768px) {
+    padding: 0.4rem 0.75rem;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 0.3rem 0.5rem;
+    gap: 0.3rem;
+    font-size: 0.75rem;
+    max-width: 10rem;
+  }
 `;
 
 const NumberBadge = styled.div<{ $color: string }>`
@@ -48,6 +61,20 @@ const NumberBadge = styled.div<{ $color: string }>`
   font-weight: bold;
   color: ${props => props.$color};
   text-shadow: 0 0 10px ${props => props.$color};
+  
+  @media (max-width: 768px) {
+    min-width: 1.75rem;
+    height: 1.75rem;
+    font-size: 0.9rem;
+    padding: 0 0.4rem;
+  }
+  
+  @media (max-width: 480px) {
+    min-width: 1.5rem;
+    height: 1.5rem;
+    font-size: 0.75rem;
+    padding: 0 0.3rem;
+  }
 `;
 
 export function TitleBox({
@@ -74,6 +101,9 @@ export function TitleBox({
             letterSpacing: '1px',
             fontSize: '0.9rem',
             fontWeight: 600,
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
           }}
         >
           {title}

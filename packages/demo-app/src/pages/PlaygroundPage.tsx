@@ -3,7 +3,7 @@ import {
   Text, Stack, Button, HudButton, GlitchButton, Container, Input, HackerInput, Select, Checkbox, HoloCheckbox, Switch, Slider,
   Modal, Dialog, Tooltip, Popover, Dropdown, Table, Tabs, Accordion,
   Carousel, Stepper, DatePicker, ColorPicker, Radio, RadioGroup,
-  Navbar, Sidebar, Breadcrumb, Menu, Pagination, Grid, CyberCard, HudBox, HudFrame,
+  Navbar, Sidebar, Breadcrumb, Menu, Pagination, Grid, CyberCard, GlitchProfileCard, HudBox, HudFrame,
   useNotification, NotificationProvider
 } from '@rhuds/components';
 import { ComponentPlayground } from '../components/ComponentPlayground';
@@ -395,6 +395,36 @@ const PlaygroundContent: React.FC = () => {
         <div style={{ padding: '2rem', background: 'rgba(0, 0, 0, 0.5)', borderRadius: '8px', display: 'flex', justifyContent: 'center', gap: '2rem', flexWrap: 'wrap' }}>
           <CyberCard title="PROFILE" footer="Social Links" />
           <CyberCard title="CONTACT" footer="Connect" />
+        </div>
+      </ComponentPlayground>
+
+      {/* GlitchProfileCard */}
+      <ComponentPlayground
+        title="GlitchProfileCard (GitHub Style)"
+        description="GitHub-style profile card with glitch effects and hover animations"
+        code={`<GlitchProfileCard
+  username="octo_cat"
+  title="UI DEVELOPER"
+  repositories={128}
+  followers="42k"
+  githubUrl="https://github.com"
+/>`}
+      >
+        <div style={{ padding: '2rem', background: 'rgba(0, 0, 0, 0.5)', borderRadius: '8px', display: 'flex', justifyContent: 'center', gap: '2rem', flexWrap: 'wrap' }}>
+          <GlitchProfileCard
+            username="octo_cat"
+            title="UI DEVELOPER"
+            repositories={128}
+            followers="42k"
+            githubUrl="https://github.com"
+          />
+          <GlitchProfileCard
+            username="cyber_dev"
+            title="FULL STACK"
+            repositories={256}
+            followers="89k"
+            githubUrl="https://github.com"
+          />
         </div>
       </ComponentPlayground>
 

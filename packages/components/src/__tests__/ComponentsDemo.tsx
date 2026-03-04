@@ -4,7 +4,7 @@
  */
 
 import React, { useState } from 'react';
-import { Text, Button, HudButton, GlitchButton, Icon, Input, HackerInput, Select, Grid, Container, Stack, HudBox, HudFrame } from '../index';
+import { Text, Button, HudButton, GlitchButton, Icon, Input, HackerInput, Select, Grid, Container, Stack, HudBox, HudFrame, GlitchProfileCard } from '../index';
 
 export const ComponentsDemo: React.FC = () => {
   const [inputValue, setInputValue] = useState('');
@@ -418,6 +418,29 @@ export const ComponentsDemo: React.FC = () => {
               </div>
             </HudFrame>
           </div>
+        </div>
+      </section>
+
+      {/* GlitchProfileCard Section */}
+      <section style={{ marginBottom: '3rem' }}>
+        <Text variant="h2" color="#00ffff" style={{ marginBottom: '1rem' }}>
+          GlitchProfileCard Component
+        </Text>
+        <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+          <GlitchProfileCard
+            username="octo_cat"
+            title="UI DEVELOPER"
+            repositories={128}
+            followers="42k"
+            githubUrl="https://github.com"
+          />
+          <GlitchProfileCard
+            username="cyber_dev"
+            title="FULL STACK"
+            repositories={256}
+            followers="89k"
+            githubUrl="https://github.com"
+          />
         </div>
       </section>
 

@@ -100,6 +100,9 @@ export type { TreeProps } from './DataDisplay/types';
 export { CyberCard } from './DataDisplay/CyberCard';
 export type { CyberCardProps } from './DataDisplay/CyberCard';
 
+export { GlitchProfileCard } from './DataDisplay/GlitchProfileCard';
+export type { GlitchProfileCardProps } from './DataDisplay/GlitchProfileCard';
+
 // Feedback Components
 export { Modal } from './Feedback/Modal';
 export type { ModalProps } from './Feedback/types';
