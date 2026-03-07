@@ -18,7 +18,7 @@ export const FrameSVG: React.FC<FrameSVGProps> = ({
   responsive = true,
   preserveAspectRatio = 'xMidYMid meet',
 }) => {
-  const { width, height, color = '#00ffff', strokeWidth = 2 } = config;
+  const { width, height, color = '#29F2DF', strokeWidth = 2 } = config;
 
   const viewBox = useMemo(() => `0 0 ${width} ${height}`, [width, height]);
 
@@ -86,7 +86,7 @@ export function useFrameSVGRenderer(
     dashArray?: string;
   } = {}
 ) {
-  const { color = '#00ffff', strokeWidth = 2, fill = 'none', dashArray } = config;
+  const { color = '#29F2DF', strokeWidth = 2, fill = 'none', dashArray } = config;
 
   React.useEffect(() => {
     if (!svgRef.current) return;

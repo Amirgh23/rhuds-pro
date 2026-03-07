@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Advanced Components Demo
  * Demonstrates Carousel, Accordion, and Stepper components
  */
@@ -17,7 +17,7 @@ export const AdvancedDemo: React.FC = () => {
       key: 'slide1',
       title: 'Slide 1',
       content: (
-        <div style={{ width: '100%', height: '100%', backgroundColor: '#ff6b6b', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ width: '100%', height: '100%', backgroundColor: '#EF3EF1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <Text style={{ color: '#fff', fontSize: '2rem' }}>Slide 1</Text>
         </div>
       ),
@@ -26,7 +26,7 @@ export const AdvancedDemo: React.FC = () => {
       key: 'slide2',
       title: 'Slide 2',
       content: (
-        <div style={{ width: '100%', height: '100%', backgroundColor: '#4ecdc4', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ width: '100%', height: '100%', backgroundColor: '#1C7FA6', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <Text style={{ color: '#fff', fontSize: '2rem' }}>Slide 2</Text>
         </div>
       ),
@@ -35,7 +35,7 @@ export const AdvancedDemo: React.FC = () => {
       key: 'slide3',
       title: 'Slide 3',
       content: (
-        <div style={{ width: '100%', height: '100%', backgroundColor: '#45b7d1', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ width: '100%', height: '100%', backgroundColor: '#29F2DF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <Text style={{ color: '#fff', fontSize: '2rem' }}>Slide 3</Text>
         </div>
       ),
@@ -78,7 +78,7 @@ export const AdvancedDemo: React.FC = () => {
   ];
 
   return (
-    <div style={{ padding: '2rem', backgroundColor: '#0a0a0a', minHeight: '100vh', color: '#fff' }}>
+    <div style={{ padding: '2rem', backgroundColor: '#0A1225', minHeight: '100vh', color: '#fff' }}>
       <Text variant="h1" style={{ marginBottom: '2rem' }}>
         Advanced Components Demo
       </Text>
@@ -171,7 +171,7 @@ export const AdvancedDemo: React.FC = () => {
         <Text variant="h2" style={{ marginBottom: '1rem' }}>
           Features
         </Text>
-        <div style={{ backgroundColor: '#1a1a1a', borderRadius: '4px', padding: '1rem' }}>
+        <div style={{ backgroundColor: '#0A1225', borderRadius: '4px', padding: '1rem' }}>
           <Text style={{ marginBottom: '0.5rem' }}>✓ Carousel with auto-play</Text>
           <Text style={{ marginBottom: '0.5rem' }}>✓ Accordion with multiple items</Text>
           <Text style={{ marginBottom: '0.5rem' }}>✓ Stepper with horizontal/vertical</Text>

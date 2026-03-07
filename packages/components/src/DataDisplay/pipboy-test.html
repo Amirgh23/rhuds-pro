@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PipBoy Test</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      font-family: "Courier New", Courier, monospace;
+    }
+    
+    .pipboy-wrapper {
+      --pip-green: #1aff40;
+      --pip-glow: rgba(26, 255, 64, 0.6);
+      --bg-dark: #020a02;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-transform: uppercase;
+      width: 100%;
+      max-width: 650px;
+      padding: 1rem;
+    }
+    
+    .pipboy-chassis {
+      position: relative;
+      width: 100%;
+      background: linear-gradient(135deg, #28125A, #0A1225, #28125A);
+      padding: 2.5rem;
+      border-radius: 2rem;
+      box-shadow: inset 0 0 20px #000, 0 20px 40px rgba(0, 0, 0, 0.8);
+      border: 2px solid #444;
+    }
+    
+    .crt-screen {
+      background-color: var(--bg-dark);
+      border-radius: 1.5rem;
+      position: relative;
+      overflow: hidden;
+      border: 8px solid #0a0a0a;
+      min-height: 400px;
+      cursor: crosshair;
+    }
+    
+    .boot-sequence {
+      height: 100%;
+      min-height: 400px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      color: var(--pip-green);
+      text-shadow: 0 0 4px var(--pip-glow);
+    }
+    
+    .top-bar {
+      display: flex;
+      align-items: center;
+      font-size: 0.9rem;
+      font-weight: bold;
+      margin-bottom: 1.5rem;
+    }
+    
+    .dynamic-title { letter-spacing: 1px; }
+    
+    .line {
+      height: 2px;
+      background-color: var(--pip-green);
+      box-shadow: 0 0 8px var(--pip-glow);
+      opacity: 0.8;
+      flex-grow: 1;
+      margin: 0 10px;
+    }
+    
+    .stats-info { display: flex; gap: 12px; }
+    .bold { font-weight: 900; }
+    
+    .middle-section {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 250px;
+    }
+    
+    .tab-content {
+      display: none;
+      width: 100%;
+    }
+    
+    .tab-content.active {
+      display: flex;
+    }
+    
+    .content-stat {
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .clock-display {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .terminal-block {
+      background-color: var(--pip-green);
+      border-radius: 6px;
+      padding: 10px 20px;
+      margin-bottom: 5px;
+      box-shadow: 0 0 25px var(--pip-glow);
+    }
+    
+    .terminal-block .time {
+      color: var(--bg-dark);
+      font-size: 4rem;
+      font-weight: bold;
+      text-shadow: none;
+    }
+    
+    .date {
+      font-size: 1.2rem;
+      font-weight: bold;
+      letter-spacing: 2px;
+    }
+    
+    .bottom-bar {
+      display: flex;
+      align-items: center;
+      font-size: 0.9rem;
+      font-weight: bold;
+      margin-top: auto;
+      padding-top: 1rem;
+    }
+    
+    .nav-item {
+      padding: 4px 10px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      background: none;
+      color: var(--pip-green);
+      font-family: inherit;
+      font-size: inherit;
+      font-weight: inherit;
+      text-transform: inherit;
+    }
+    
+    .nav-item.active {
+      background-color: var(--pip-green);
+      color: var(--bg-dark);
+      text-shadow: none;
+      box-shadow: 0 0 10px var(--pip-glow);
+    }
+  </style>
+</head>
+<body>
+  <div class="pipboy-wrapper">
+    <div class="pipboy-chassis">
+      <div class="crt-screen">
+        <div class="boot-sequence">
+          <header class="top-bar">
+            <div class="dynamic-title" id="title">SYS_STATUS</div>
+            <div class="line"></div>
+            <div class="stats-info">
+              <span>HP <span class="bold">348/450</span></span>
+              <span>AP <span class="bold">67/67</span></span>
+            </div>
+          </header>
+          
+          <main class="middle-section">
+            <div class="tab-content content-stat active" id="stat-tab">
+              <div class="clock-display">
+                <div class="terminal-block">
+                  <div class="time">08:40</div>
+                </div>
+                <div class="date">02.23.2026</div>
+              </div>
+            </div>
+            
+            <div class="tab-content content-inv" id="inv-tab">
+              <div style="color: var(--pip-green);">INVENTORY CONTENT HERE</div>
+            </div>
+            
+            <div class="tab-content content-data" id="data-tab">
+              <div style="color: var(--pip-green);">DATA CONTENT HERE</div>
+            </div>
+          </main>
+          
+          <footer class="bottom-bar">
+            <button class="nav-item active" onclick="switchTab('stat')">STAT</button>
+            <div class="line"></div>
+            <button class="nav-item" onclick="switchTab('inv')">INV</button>
+            <div class="line"></div>
+            <button class="nav-item" onclick="switchTab('data')">DATA</button>
+          </footer>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    function switchTab(tab) {
+      // Hide all tabs
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+      
+      // Show selected tab
+      document.getElementById(tab + '-tab').classList.add('active');
+      event.target.classList.add('active');
+      
+      // Update title
+      const titles = { stat: 'SYS_STATUS', inv: 'INVENTORY', data: 'DATA_LINK' };
+      document.getElementById('title').textContent = titles[tab];
+    }
+  </script>
+</body>
+</html>

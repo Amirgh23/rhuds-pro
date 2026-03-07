@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Animator Demo Component
  * Demonstrates the Animator system functionality
  */
@@ -36,7 +36,7 @@ export const BasicAnimatorDemo: React.FC = () => {
             style={{
               marginTop: '20px',
               padding: '20px',
-              background: '#00f6ff',
+              background: '#29F2DF',
               color: '#000',
               opacity: control.flow.entered ? 1 : 0,
               transform: control.flow.entered
@@ -76,7 +76,7 @@ export const StaggerDemo: React.FC = () => {
                 style={{
                   marginTop: '10px',
                   padding: '15px',
-                  background: '#00f6ff',
+                  background: '#29F2DF',
                   color: '#000',
                   opacity: control.flow.entered ? 1 : 0,
                   transform: control.flow.entered
@@ -116,7 +116,7 @@ export const SequenceDemo: React.FC = () => {
                 style={{
                   marginTop: '10px',
                   padding: '15px',
-                  background: '#ff6b6b',
+                  background: '#EF3EF1',
                   color: '#fff',
                   opacity: control.flow.entered ? 1 : 0,
                 }}
@@ -131,7 +131,7 @@ export const SequenceDemo: React.FC = () => {
                 style={{
                   marginTop: '10px',
                   padding: '15px',
-                  background: '#4ecdc4',
+                  background: '#1C7FA6',
                   color: '#fff',
                   opacity: control.flow.entered ? 1 : 0,
                 }}
@@ -146,7 +146,7 @@ export const SequenceDemo: React.FC = () => {
                 style={{
                   marginTop: '10px',
                   padding: '15px',
-                  background: '#95e1d3',
+                  background: '#29F2DF',
                   color: '#000',
                   opacity: control.flow.entered ? 1 : 0,
                 }}
@@ -181,7 +181,7 @@ export const SwitchDemo: React.FC = () => {
               style={{
                 marginTop: '20px',
                 padding: '20px',
-                background: '#ff6b6b',
+                background: '#EF3EF1',
                 color: '#fff',
                 opacity: control.flow.entered ? 1 : 0,
                 transform: control.flow.entered
@@ -201,7 +201,7 @@ export const SwitchDemo: React.FC = () => {
               style={{
                 marginTop: '20px',
                 padding: '20px',
-                background: '#4ecdc4',
+                background: '#1C7FA6',
                 color: '#fff',
                 opacity: control.flow.entered ? 1 : 0,
                 transform: control.flow.entered
@@ -239,7 +239,7 @@ export const NestedAnimatorDemo: React.FC = () => {
             style={{
               marginTop: '20px',
               padding: '20px',
-              background: '#00f6ff',
+              background: '#29F2DF',
               color: '#000',
               opacity: parentControl.flow.entered ? 1 : 0,
               transition: `all ${parentControl.duration.enter}ms ease-out`,

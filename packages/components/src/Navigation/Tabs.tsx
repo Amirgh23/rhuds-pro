@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Tabs Component
  * Tabbed content navigation
  */
@@ -22,7 +22,7 @@ export const Tabs: React.FC<TabsProps> = ({
   const [internalActiveIndex, setInternalActiveIndex] = useState(controlledActiveIndex);
 
   // Safe theme access with fallback
-  const primaryColor = theme?.currentMode?.tokens?.colors?.primary || '#00f6ff';
+  const primaryColor = theme?.currentMode?.tokens?.colors?.primary || '#29F2DF';
   const textColor = theme?.currentMode?.tokens?.colors?.text || '#ffffff';
 
   const activeIndex = controlledActiveIndex !== undefined ? controlledActiveIndex : internalActiveIndex;

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * GlitchButton Component
  * Retro glitch-style button with VT323 monospace font and glitch effects
  */
@@ -25,9 +25,9 @@ const StyledWrapper = styled.div<{ disabled?: boolean }>`
   [class*="btn-glitch-"] {
     display: inline-block;
     font-family: "VT323", monospace, 'Courier New', Courier;
-    border: 2px solid #00f6ff;
-    color: #00f6ff;
-    background: rgba(0, 246, 255, 0.05);
+    border: 2px solid #29F2DF;
+    color: #29F2DF;
+    background: rgba(41, 242, 223, 0.05);
     padding: 10px 13px;
     min-width: 175px;
     line-height: 1.5em;
@@ -38,8 +38,8 @@ const StyledWrapper = styled.div<{ disabled?: boolean }>`
     text-decoration: none;
     opacity: ${props => props.disabled ? 0.5 : 1};
     pointer-events: ${props => props.disabled ? 'none' : 'auto'};
-    box-shadow: 0 0 10px rgba(0, 246, 255, 0.3),
-                inset 0 0 10px rgba(0, 246, 255, 0.1);
+    box-shadow: 0 0 10px rgba(41, 242, 223, 0.3),
+                inset 0 0 10px rgba(41, 242, 223, 0.1);
     transition: all 0.1s ease;
 
     .text,
@@ -56,11 +56,11 @@ const StyledWrapper = styled.div<{ disabled?: boolean }>`
     &:focus {
       animation-name: glitchButtonGlitch;
       animation-duration: 0.2s;
-      background-color: rgba(0, 246, 255, 0.2);
-      color: #00f6ff;
-      border: 2px solid #00f6ff;
-      box-shadow: 0 0 20px rgba(0, 246, 255, 0.6),
-                  inset 0 0 20px rgba(0, 246, 255, 0.2);
+      background-color: rgba(41, 242, 223, 0.2);
+      color: #29F2DF;
+      border: 2px solid #29F2DF;
+      box-shadow: 0 0 20px rgba(41, 242, 223, 0.6),
+                  inset 0 0 20px rgba(41, 242, 223, 0.2);
 
       .text-decoration {
         animation-name: glitchButtonBlink;
@@ -76,10 +76,10 @@ const StyledWrapper = styled.div<{ disabled?: boolean }>`
     }
 
     &:active {
-      background: rgba(0, 246, 255, 0.3);
-      color: #00f6ff;
-      box-shadow: 0 0 15px rgba(0, 246, 255, 0.8),
-                  inset 0 0 15px rgba(0, 246, 255, 0.3);
+      background: rgba(41, 242, 223, 0.3);
+      color: #29F2DF;
+      box-shadow: 0 0 15px rgba(41, 242, 223, 0.8),
+                  inset 0 0 15px rgba(41, 242, 223, 0.3);
 
       .text-decoration {
         animation-name: none;
@@ -124,11 +124,11 @@ const StyledWrapper = styled.div<{ disabled?: boolean }>`
       box-shadow: 0 0 20px rgba(100, 100, 255, 0.6);
     }
     100% {
-      background-color: rgba(0, 246, 255, 0.2);
-      border-color: #00f6ff;
-      color: #00f6ff;
+      background-color: rgba(41, 242, 223, 0.2);
+      border-color: #29F2DF;
+      color: #29F2DF;
       filter: blur(0px);
-      box-shadow: 0 0 20px rgba(0, 246, 255, 0.6);
+      box-shadow: 0 0 20px rgba(41, 242, 223, 0.6);
     }
   }
 

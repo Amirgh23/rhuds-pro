@@ -1,4 +1,4 @@
-/**
+﻿/**
  * RHUDS Pro Color Manipulation Utilities
  * 
  * This module provides advanced color manipulation capabilities including:
@@ -18,7 +18,7 @@ import type { RGB, HSL, GradientDefinition } from './models';
 
 /**
  * Convert hex color to RGB
- * @param hex - Hex color string (e.g., '#00f6ff')
+ * @param hex - Hex color string (e.g., '#29F2DF')
  * @returns RGB object with r, g, b values (0-255)
  */
 export function hexToRgb(hex: string): RGB {
@@ -48,7 +48,7 @@ export function hexToRgb(hex: string): RGB {
 /**
  * Convert RGB to hex
  * @param rgb - RGB object with r, g, b values (0-255)
- * @returns Hex color string (e.g., '#00f6ff')
+ * @returns Hex color string (e.g., '#29F2DF')
  */
 export function rgbToHex(rgb: RGB): string {
   const toHex = (n: number) => {
@@ -144,13 +144,13 @@ export function hslToRgb(hsl: HSL): RGB {
 
 /**
  * Lighten a color by a percentage
- * @param color - Hex color string (e.g., '#00f6ff')
+ * @param color - Hex color string (e.g., '#29F2DF')
  * @param amount - Amount to lighten (0-100)
  * @returns Lightened hex color string
  * 
  * @example
  * ```typescript
- * lighten('#00f6ff', 20); // Returns lighter version
+ * lighten('#29F2DF', 20); // Returns lighter version
  * ```
  */
 export function lighten(color: string, amount: number): string {
@@ -162,13 +162,13 @@ export function lighten(color: string, amount: number): string {
 
 /**
  * Darken a color by a percentage
- * @param color - Hex color string (e.g., '#00f6ff')
+ * @param color - Hex color string (e.g., '#29F2DF')
  * @param amount - Amount to darken (0-100)
  * @returns Darkened hex color string
  * 
  * @example
  * ```typescript
- * darken('#00f6ff', 20); // Returns darker version
+ * darken('#29F2DF', 20); // Returns darker version
  * ```
  */
 export function darken(color: string, amount: number): string {
@@ -180,13 +180,13 @@ export function darken(color: string, amount: number): string {
 
 /**
  * Increase saturation of a color
- * @param color - Hex color string (e.g., '#00f6ff')
+ * @param color - Hex color string (e.g., '#29F2DF')
  * @param amount - Amount to increase saturation (0-100)
  * @returns More saturated hex color string
  * 
  * @example
  * ```typescript
- * saturate('#00f6ff', 20); // Returns more saturated version
+ * saturate('#29F2DF', 20); // Returns more saturated version
  * ```
  */
 export function saturate(color: string, amount: number): string {
@@ -198,13 +198,13 @@ export function saturate(color: string, amount: number): string {
 
 /**
  * Decrease saturation of a color
- * @param color - Hex color string (e.g., '#00f6ff')
+ * @param color - Hex color string (e.g., '#29F2DF')
  * @param amount - Amount to decrease saturation (0-100)
  * @returns Less saturated hex color string
  * 
  * @example
  * ```typescript
- * desaturate('#00f6ff', 20); // Returns less saturated version
+ * desaturate('#29F2DF', 20); // Returns less saturated version
  * ```
  */
 export function desaturate(color: string, amount: number): string {
@@ -222,8 +222,8 @@ export function desaturate(color: string, amount: number): string {
  * 
  * @example
  * ```typescript
- * generateColorVariations('#00f6ff', { steps: 5, type: 'lighter' });
- * // Returns ['#00f6ff', '#33f8ff', '#66f9ff', '#99fbff', '#ccfdff']
+ * generateColorVariations('#29F2DF', { steps: 5, type: 'lighter' });
+ * // Returns ['#29F2DF', '#33f8ff', '#66f9ff', '#99fbff', '#ccfdff']
  * ```
  */
 export function generateColorVariations(
@@ -269,13 +269,13 @@ export function generateColorVariations(
 
 /**
  * Add alpha channel to a color
- * @param color - Hex color string (e.g., '#00f6ff')
+ * @param color - Hex color string (e.g., '#29F2DF')
  * @param opacity - Opacity value (0-1)
  * @returns RGBA color string
  * 
  * @example
  * ```typescript
- * alpha('#00f6ff', 0.5); // Returns 'rgba(0, 246, 255, 0.5)'
+ * alpha('#29F2DF', 0.5); // Returns 'rgba(0, 246, 255, 0.5)'
  * ```
  */
 export function alpha(color: string, opacity: number): string {
@@ -291,7 +291,7 @@ export function alpha(color: string, opacity: number): string {
  * 
  * @example
  * ```typescript
- * const primaryAlpha = createAlphaFunction('#00f6ff');
+ * const primaryAlpha = createAlphaFunction('#29F2DF');
  * primaryAlpha(0.5); // Returns 'rgba(0, 246, 255, 0.5)'
  * ```
  */
@@ -314,11 +314,11 @@ export function createAlphaFunction(baseColor: string): (opacity: number) => str
  *   type: 'linear',
  *   angle: 45,
  *   stops: [
- *     { color: '#00f6ff', position: 0 },
- *     { color: '#7b61ff', position: 100 }
+ *     { color: '#29F2DF', position: 0 },
+ *     { color: '#1C7FA6', position: 100 }
  *   ]
  * });
- * // Returns 'linear-gradient(45deg, #00f6ff 0%, #7b61ff 100%)'
+ * // Returns 'linear-gradient(45deg, #29F2DF 0%, #1C7FA6 100%)'
  * ```
  */
 export function createLinearGradient(definition: GradientDefinition): string {
@@ -344,11 +344,11 @@ export function createLinearGradient(definition: GradientDefinition): string {
  * createRadialGradient({
  *   type: 'radial',
  *   stops: [
- *     { color: '#00f6ff', position: 0 },
- *     { color: '#7b61ff', position: 100 }
+ *     { color: '#29F2DF', position: 0 },
+ *     { color: '#1C7FA6', position: 100 }
  *   ]
  * });
- * // Returns 'radial-gradient(circle, #00f6ff 0%, #7b61ff 100%)'
+ * // Returns 'radial-gradient(circle, #29F2DF 0%, #1C7FA6 100%)'
  * ```
  */
 export function createRadialGradient(definition: GradientDefinition): string {
@@ -374,11 +374,11 @@ export function createRadialGradient(definition: GradientDefinition): string {
  *   type: 'conic',
  *   angle: 0,
  *   stops: [
- *     { color: '#00f6ff', position: 0 },
- *     { color: '#7b61ff', position: 100 }
+ *     { color: '#29F2DF', position: 0 },
+ *     { color: '#1C7FA6', position: 100 }
  *   ]
  * });
- * // Returns 'conic-gradient(from 0deg, #00f6ff 0%, #7b61ff 100%)'
+ * // Returns 'conic-gradient(from 0deg, #29F2DF 0%, #1C7FA6 100%)'
  * ```
  */
 export function createConicGradient(definition: GradientDefinition): string {
@@ -405,8 +405,8 @@ export function createConicGradient(definition: GradientDefinition): string {
  *   type: 'linear',
  *   angle: 45,
  *   stops: [
- *     { color: '#00f6ff', position: 0 },
- *     { color: '#7b61ff', position: 100 }
+ *     { color: '#29F2DF', position: 0 },
+ *     { color: '#1C7FA6', position: 100 }
  *   ]
  * });
  * ```
@@ -463,7 +463,7 @@ export interface ColorTransitionConfig {
  * 
  * @example
  * ```typescript
- * interpolateColor('#00f6ff', '#7b61ff', 0.5);
+ * interpolateColor('#29F2DF', '#1C7FA6', 0.5);
  * // Returns color halfway between the two
  * ```
  */
@@ -489,8 +489,8 @@ export function interpolateColor(color1: string, color2: string, progress: numbe
  * @example
  * ```typescript
  * createColorTransitionKeyframes('fadeColor', {
- *   from: '#00f6ff',
- *   to: '#7b61ff',
+ *   from: '#29F2DF',
+ *   to: '#1C7FA6',
  *   duration: 1000
  * });
  * ```
@@ -528,8 +528,8 @@ export function createColorTransitionKeyframes(
  * @example
  * ```typescript
  * createColorTransitionAnimation('fadeColor', {
- *   from: '#00f6ff',
- *   to: '#7b61ff',
+ *   from: '#29F2DF',
+ *   to: '#1C7FA6',
  *   duration: 1000,
  *   easing: 'ease-in-out'
  * });
@@ -632,7 +632,7 @@ function getRelativeLuminance(rgb: RGB): number {
  * @example
  * ```typescript
  * getContrastRatio('#000000', '#ffffff'); // Returns 21 (maximum contrast)
- * getContrastRatio('#00f6ff', '#ffffff'); // Returns ~1.6
+ * getContrastRatio('#29F2DF', '#ffffff'); // Returns ~1.6
  * ```
  */
 export function getContrastRatio(color1: string, color2: string): number {
@@ -678,7 +678,7 @@ export type WCAGTextSize = 'normal' | 'large';
  * @example
  * ```typescript
  * meetsWCAG('#000000', '#ffffff', 'AA', 'normal'); // Returns true (21:1 ratio)
- * meetsWCAG('#00f6ff', '#ffffff', 'AA', 'normal'); // Returns false (~1.6:1 ratio)
+ * meetsWCAG('#29F2DF', '#ffffff', 'AA', 'normal'); // Returns false (~1.6:1 ratio)
  * ```
  */
 export function meetsWCAG(
@@ -715,8 +715,8 @@ export function meetsWCAG(
  * 
  * @example
  * ```typescript
- * findAccessibleColor('#00f6ff', '#ffffff', 'AA', 'normal');
- * // Returns a darker version of #00f6ff that meets AA contrast
+ * findAccessibleColor('#29F2DF', '#ffffff', 'AA', 'normal');
+ * // Returns a darker version of #29F2DF that meets AA contrast
  * ```
  */
 export function findAccessibleColor(
@@ -788,7 +788,7 @@ export function findAccessibleColor(
  * 
  * @example
  * ```typescript
- * getAccessibilityInfo('#00f6ff', '#ffffff');
+ * getAccessibilityInfo('#29F2DF', '#ffffff');
  * // Returns {
  * //   ratio: 1.6,
  * //   AA: { normal: false, large: false },
@@ -832,7 +832,7 @@ export type ColorFormat = 'hex' | 'rgb' | 'rgba' | 'hsl' | 'hsla' | 'unknown';
  * 
  * @example
  * ```typescript
- * detectColorFormat('#00f6ff'); // Returns 'hex'
+ * detectColorFormat('#29F2DF'); // Returns 'hex'
  * detectColorFormat('rgb(0, 246, 255)'); // Returns 'rgb'
  * detectColorFormat('rgba(0, 246, 255, 0.5)'); // Returns 'rgba'
  * detectColorFormat('hsl(184, 100%, 50%)'); // Returns 'hsl'
@@ -869,7 +869,7 @@ export function detectColorFormat(color: string): ColorFormat {
  * 
  * @example
  * ```typescript
- * isValidColor('#00f6ff'); // Returns true
+ * isValidColor('#29F2DF'); // Returns true
  * isValidColor('rgb(0, 246, 255)'); // Returns true
  * isValidColor('invalid'); // Returns false
  * ```
@@ -885,7 +885,7 @@ export function isValidColor(color: string): boolean {
  * 
  * @example
  * ```typescript
- * isValidHexColor('#00f6ff'); // Returns true
+ * isValidHexColor('#29F2DF'); // Returns true
  * isValidHexColor('#0ff'); // Returns true (3-digit hex)
  * isValidHexColor('00f6ff'); // Returns false (missing #)
  * ```
@@ -992,8 +992,8 @@ export function isValidHslaColor(color: string): boolean {
  * 
  * @example
  * ```typescript
- * normalizeColor('rgb(0, 246, 255)', 'hex'); // Returns '#00f6ff'
- * normalizeColor('#0ff', 'hex'); // Returns '#00ffff'
+ * normalizeColor('rgb(0, 246, 255)', 'hex'); // Returns '#29F2DF'
+ * normalizeColor('#0ff', 'hex'); // Returns '#28125A'
  * normalizeColor('hsl(184, 100%, 50%)', 'rgb'); // Returns 'rgb(0, 246, 255)'
  * ```
  */
@@ -1025,7 +1025,7 @@ export function normalizeColor(
  * 
  * @example
  * ```typescript
- * validateAndParseColor('#00f6ff');
+ * validateAndParseColor('#29F2DF');
  * // Returns { valid: true, format: 'hex', rgb: { r: 0, g: 246, b: 255 } }
  * 
  * validateAndParseColor('invalid');

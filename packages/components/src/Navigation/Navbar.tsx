@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Navbar Component
  * Responsive navigation bar
  */
@@ -22,7 +22,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [collapsed, setCollapsed] = useState(false);
 
   // Safe theme access with fallback
-  const primaryColor = theme?.currentMode?.tokens?.colors?.primary || '#00f6ff';
+  const primaryColor = theme?.currentMode?.tokens?.colors?.primary || '#29F2DF';
   const textColor = theme?.currentMode?.tokens?.colors?.text || '#ffffff';
 
   const navbarStyle = useMemo<React.CSSProperties>(() => {
@@ -31,7 +31,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       top: 0,
       left: 0,
       right: 0,
-      backgroundColor: '#1a1a1a',
+      backgroundColor: '#0A1225',
       borderBottom: `2px solid ${primaryColor}`,
       padding: '1rem 2rem',
       display: 'flex',
@@ -53,9 +53,6 @@ export const Navbar: React.FC<NavbarProps> = ({
     display: collapsed ? 'none' : 'flex',
     gap: '2rem',
     alignItems: 'center',
-    '@media (max-width: 768px)': {
-      display: collapsed ? 'none' : 'flex',
-    },
   };
 
   const navItemStyle: React.CSSProperties = {
@@ -73,9 +70,6 @@ export const Navbar: React.FC<NavbarProps> = ({
     color: primaryColor,
     fontSize: '1.5rem',
     cursor: 'pointer',
-    '@media (max-width: 768px)': {
-      display: 'block',
-    },
   };
 
   return (

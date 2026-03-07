@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { Button, Text } from '@rhuds/components';
 
 interface CodeBlockProps {
@@ -28,9 +28,9 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({ code, language = 'tsx' }) 
         background: 'rgba(0, 0, 0, 0.5)',
         borderTopLeftRadius: '8px',
         borderTopRightRadius: '8px',
-        borderBottom: '1px solid rgba(0, 246, 255, 0.3)',
+        borderBottom: '1px solid rgba(41, 242, 223, 0.3)',
       }}>
-        <Text variant="caption" style={{ color: '#00f6ff' }}>
+        <Text variant="caption" style={{ color: '#29F2DF' }}>
           {language}
         </Text>
         <Button
@@ -47,7 +47,7 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({ code, language = 'tsx' }) 
         background: 'rgba(0, 0, 0, 0.7)',
         borderBottomLeftRadius: '8px',
         borderBottomRightRadius: '8px',
-        border: '1px solid rgba(0, 246, 255, 0.3)',
+        border: '1px solid rgba(41, 242, 223, 0.3)',
         borderTop: 'none',
         overflow: 'auto',
         fontSize: '0.875rem',

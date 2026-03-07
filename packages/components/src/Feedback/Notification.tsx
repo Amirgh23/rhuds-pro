@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Notification Component
  * Toast notification with auto-dismiss
  */
@@ -43,26 +43,26 @@ export const Notification: React.FC<NotificationProps> = ({
     switch (notificationType) {
       case 'success':
         return {
-          backgroundColor: '#00ff00',
+          backgroundColor: '#29F2DF',
           color: '#000000',
           icon: '✓',
         };
       case 'error':
         return {
-          backgroundColor: '#ff0000',
+          backgroundColor: '#EF3EF1',
           color: '#ffffff',
           icon: '✕',
         };
       case 'warning':
         return {
-          backgroundColor: '#ffff00',
+          backgroundColor: '#29F2DF',
           color: '#000000',
           icon: '⚠',
         };
       case 'info':
       default:
         return {
-          backgroundColor: tokens.colors?.primary || '#00f6ff',
+          backgroundColor: tokens.colors?.primary || '#29F2DF',
           color: tokens.colors?.background || '#1a1a1a',
           icon: 'ℹ',
         };

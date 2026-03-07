@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+﻿import React, { useState, useRef, useEffect } from 'react';
 import styled from 'styled-components';
 
 export interface CodeEditorProps {
@@ -17,13 +17,13 @@ const StyledWrapper = styled.div<{ height: number }>`
     width: 100%;
     height: ${props => props.height}px;
     background: #0a0e1a;
-    border: 2px solid #00f6ff;
+    border: 2px solid #29F2DF;
     font-size: 14px;
     font-family: 'Courier New', monospace;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 0 20px rgba(0, 246, 255, 0.3);
+    box-shadow: 0 0 20px rgba(41, 242, 223, 0.3);
   }
 
   .titlebar {
@@ -36,11 +36,11 @@ const StyledWrapper = styled.div<{ height: number }>`
     align-items: center;
     padding: 0 10px;
     height: 35px;
-    border-bottom: 1px solid #00f6ff;
+    border-bottom: 1px solid #29F2DF;
   }
 
   .title-text {
-    color: #00f6ff;
+    color: #29F2DF;
     font-size: 12px;
   }
 
@@ -57,7 +57,7 @@ const StyledWrapper = styled.div<{ height: number }>`
   }
 
   button svg path, button svg rect, button svg polygon {
-    fill: #00f6ff;
+    fill: #29F2DF;
   }
 
   button svg {
@@ -78,8 +78,8 @@ const StyledWrapper = styled.div<{ height: number }>`
   .line-numbers {
     padding: 10px 8px;
     background-color: #060a12;
-    border-right: 1px solid #00f6ff;
-    color: #00f6ff;
+    border-right: 1px solid #29F2DF;
+    color: #29F2DF;
     opacity: 0.6;
     font-size: 14px;
     text-align: right;
@@ -117,7 +117,7 @@ const StyledWrapper = styled.div<{ height: number }>`
     border: none;
     background: transparent;
     color: transparent;
-    caret-color: #00f6ff;
+    caret-color: #29F2DF;
     font-size: 14px;
     resize: none;
     line-height: 1.5;
@@ -127,8 +127,8 @@ const StyledWrapper = styled.div<{ height: number }>`
   .string { color: #22ff00; }
   .number { color: #ffae00; }
   .function { color: #4281ff; }
-  .operator { color: #ffff00; }
-  .bracket { color: #ff0000; }
+  .operator { color: #29F2DF; }
+  .bracket { color: #EF3EF1; }
   .rounds { color: #ffffff; }
   .semicolon { color: #e600ff; }
   .variable { color: #ffae00; }

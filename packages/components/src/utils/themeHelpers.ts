@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Theme Helper Utilities
  * Safe access to theme tokens with fallbacks
  */
@@ -50,7 +50,7 @@ export const DEFAULT_COLORS = {
   warning: '#ffff00',
   error: '#ff0000',
   info: '#00f6ff',
-  background: '#1a1a1a',
+  background: '#0A1225',
   surface: '#2a2a2a',
   text: '#ffffff',
   border: '#444444',

@@ -1,20 +1,20 @@
-import { ThemeMode } from './types'
+﻿import { ThemeMode } from './types'
 
 export const darkMode: ThemeMode = {
   name: 'dark',
   tokens: {
     colors: {
-      primary: '#00ff00',
-      secondary: '#00ffff',
-      accent: '#ff00ff',
-      background: '#0a0e27',
-      surface: '#151932',
+      primary: '#29F2DF',
+      secondary: '#1C7FA6',
+      accent: '#EF3EF1',
+      background: '#0A1225',
+      surface: '#28125A',
       text: '#e0e0e0',
-      border: '#2a2f4a',
-      success: '#00ff00',
-      warning: '#ffaa00',
+      border: '#1C7FA6',
+      success: '#00ff9f',
+      warning: '#ffb800',
       error: '#ff0055',
-      info: '#00ffff',
+      info: '#29F2DF',
     },
     spacing: {
       xs: '4px',
@@ -50,8 +50,8 @@ export const darkMode: ThemeMode = {
       sm: '0 1px 2px rgba(0, 0, 0, 0.05)',
       md: '0 4px 6px rgba(0, 0, 0, 0.1)',
       lg: '0 10px 15px rgba(0, 0, 0, 0.1)',
-      glow: '0 0 10px rgba(0, 255, 0, 0.3)',
-      'glow-lg': '0 0 20px rgba(0, 255, 0, 0.6)',
+      glow: '0 0 10px rgba(41, 242, 223, 0.3)',
+      'glow-lg': '0 0 20px rgba(41, 242, 223, 0.6)',
     },
     transitions: {
       fast: '200ms ease-out',
@@ -140,14 +140,14 @@ export const neonGreenMode: ThemeMode = {
     ...darkMode.tokens,
     colors: {
       ...darkMode.tokens.colors,
-      primary: '#00ff00',
-      secondary: '#00ff88',
-      accent: '#ffff00',
+      primary: '#29F2DF',
+      secondary: '#1C7FA6',
+      accent: '#EF3EF1',
     },
     shadows: {
       ...darkMode.tokens.shadows,
-      glow: '0 0 10px rgba(0, 255, 0, 0.5)',
-      'glow-lg': '0 0 30px rgba(0, 255, 0, 0.8)',
+      glow: '0 0 10px rgba(41, 242, 223, 0.5)',
+      'glow-lg': '0 0 30px rgba(41, 242, 223, 0.8)',
     },
   },
 }
@@ -158,14 +158,14 @@ export const neonBlueMode: ThemeMode = {
     ...darkMode.tokens,
     colors: {
       ...darkMode.tokens.colors,
-      primary: '#00ffff',
-      secondary: '#0088ff',
-      accent: '#ff00ff',
+      primary: '#1C7FA6',
+      secondary: '#28125A',
+      accent: '#29F2DF',
     },
     shadows: {
       ...darkMode.tokens.shadows,
-      glow: '0 0 10px rgba(0, 255, 255, 0.5)',
-      'glow-lg': '0 0 30px rgba(0, 255, 255, 0.8)',
+      glow: '0 0 10px rgba(28, 127, 166, 0.5)',
+      'glow-lg': '0 0 30px rgba(28, 127, 166, 0.8)',
     },
   },
 }
@@ -176,14 +176,14 @@ export const neonRedMode: ThemeMode = {
     ...darkMode.tokens,
     colors: {
       ...darkMode.tokens.colors,
-      primary: '#ff0055',
-      secondary: '#ff0088',
-      accent: '#ffff00',
+      primary: '#EF3EF1',
+      secondary: '#29F2DF',
+      accent: '#1C7FA6',
     },
     shadows: {
       ...darkMode.tokens.shadows,
-      glow: '0 0 10px rgba(255, 0, 85, 0.5)',
-      'glow-lg': '0 0 30px rgba(255, 0, 85, 0.8)',
+      glow: '0 0 10px rgba(239, 62, 241, 0.5)',
+      'glow-lg': '0 0 30px rgba(239, 62, 241, 0.8)',
     },
   },
 }

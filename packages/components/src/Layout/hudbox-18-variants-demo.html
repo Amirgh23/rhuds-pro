@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HudBox - 18 Variants × 3 Colors</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #000;
+      color: #29F2DF;
+      font-family: 'Courier New', monospace;
+      padding: 40px;
+      min-height: 100vh;
+    }
+
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+      text-shadow: 0 0 10px #29F2DF;
+    }
+
+    .subtitle {
+      opacity: 0.7;
+      margin-bottom: 40px;
+    }
+
+    .controls {
+      margin-bottom: 40px;
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .control-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .control-label {
+      color: #fff;
+      font-weight: bold;
+    }
+
+    .color-btn {
+      padding: 10px 20px;
+      border: 2px solid;
+      background: transparent;
+      cursor: pointer;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      font-weight: bold;
+      text-transform: uppercase;
+      transition: all 0.3s;
+    }
+
+    .color-btn.active {
+      filter: brightness(1.5);
+    }
+
+    .color-btn.cyan {
+      border-color: #29F2DF;
+      color: #29F2DF;
+    }
+
+    .color-btn.cyan.active {
+      background: #29F2DF;
+      color: #000;
+    }
+
+    .color-btn.magenta {
+      border-color: #EF3EF1;
+      color: #EF3EF1;
+    }
+
+    .color-btn.magenta.active {
+      background: #EF3EF1;
+      color: #000;
+    }
+
+    .color-btn.blue {
+      border-color: #1C7FA6;
+      color: #1C7FA6;
+    }
+
+    .color-btn.blue.active {
+      background: #1C7FA6;
+      color: #000;
+    }
+
+    .variants-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 40px;
+      margin-bottom: 80px;
+    }
+
+    .variant-item {
+      text-align: center;
+    }
+
+    .variant-title {
+      margin-bottom: 15px;
+      font-size: 16px;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+
+    .hud-box-wrapper {
+      display: inline-block;
+      overflow: hidden;
+    }
+
+    .hud-box-container {
+      position: relative;
+      display: inline-block;
+      overflow: hidden;
+    }
+
+    .hud-box-container.animated {
+      animation: hudBoxBlinkShadows 8s ease-in infinite;
+    }
+
+    .hud-box-content {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2em;
+      background-color: rgba(10, 18, 37, 0.95);
+      overflow: hidden;
+    }
+
+    .hud-box-content::before {
+      content: "";
+      position: absolute;
+      inset: -3px;
+      z-index: -1;
+    }
+
+    .hud-box-container.animated .hud-box-content::before {
+      animation: hudBoxBorderRotate 4s linear infinite;
+    }
+
+    .hud-box-content::after {
+      content: "";
+      position: absolute;
+      top: 1%;
+      left: 1%;
+      width: 98%;
+      height: 98%;
+      box-shadow: inset 0px 0px 30px 40px rgba(10, 18, 37, 0.95);
+      animation: hudBoxBackglitch 94ms linear infinite;
+      z-index: -1;
+    }
+
+    .hud-box-inner {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hud-box-text {
+      text-align: center;
+    }
+
+    .hud-box-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .hud-box-subtitle {
+      font-size: 12px;
+      opacity: 0.7;
+    }
+
+    /* Clip paths for variants */
+    .variant-default .hud-box-content,
+    .variant-default .hud-box-content::before,
+    .variant-default .hud-box-content::after {
+      clip-path: polygon(0 0, 85% 0, 100% 14%, 100% 60%, 92% 65%, 93% 77%, 99% 80%, 99% 90%, 89% 100%, 0 100%);
+    }
+
+    .variant-compact .hud-box-content,
+    .variant-compact .hud-box-content::before,
+    .variant-compact .hud-box-content::after {
+      clip-path: polygon(0 0, 85% 0, 100% 14%, 100% 60%, 92% 65%, 93% 77%, 99% 80%, 99% 90%, 89% 100%, 0 100%);
+    }
+
+    .variant-wide .hud-box-content,
+    .variant-wide .hud-box-content::before,
+    .variant-wide .hud-box-content::after {
+      clip-path: polygon(0 0, 85% 0, 100% 14%, 100% 60%, 92% 65%, 93% 77%, 99% 80%, 99% 90%, 89% 100%, 0 100%);
+    }
+
+    .variant-hexagon .hud-box-content,
+    .variant-hexagon .hud-box-content::before,
+    .variant-hexagon .hud-box-content::after {
+      clip-path: polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%);
+    }
+
+    .variant-diagonal .hud-box-content,
+    .variant-diagonal .hud-box-content::before,
+    .variant-diagonal .hud-box-content::after {
+      clip-path: polygon(0 0, 90% 0, 100% 10%, 100% 100%, 10% 100%, 0 90%);
+    }
+
+    .variant-corner-cut .hud-box-content,
+    .variant-corner-cut .hud-box-content::before,
+    .variant-corner-cut .hud-box-content::after {
+      clip-path: polygon(15% 0, 100% 0, 100% 85%, 85% 100%, 0 100%, 0 15%);
+    }
+
+    .variant-tech-panel .hud-box-content,
+    .variant-tech-panel .hud-box-content::before,
+    .variant-tech-panel .hud-box-content::after {
+      clip-path: polygon(0 0, 100% 0, 100% 80%, 95% 85%, 90% 100%, 0 100%);
+    }
+
+    .variant-octagon .hud-box-content,
+    .variant-octagon .hud-box-content::before,
+    .variant-octagon .hud-box-content::after {
+      clip-path: polygon(25% 0%, 75% 0%, 100% 25%, 100% 75%, 75% 100%, 25% 100%, 0% 75%, 0% 25%);
+    }
+
+    .variant-arrow-right .hud-box-content,
+    .variant-arrow-right .hud-box-content::before,
+    .variant-arrow-right .hud-box-content::after {
+      clip-path: polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%);
+    }
+
+    .variant-chevron .hud-box-content,
+    .variant-chevron .hud-box-content::before,
+    .variant-chevron .hud-box-content::after {
+      clip-path: polygon(0 0, 90% 0, 100% 50%, 90% 100%, 0 100%, 10% 50%);
+    }
+
+    .variant-portrait-tall .hud-box-content,
+    .variant-portrait-tall .hud-box-content::before,
+    .variant-portrait-tall .hud-box-content::after {
+      clip-path: polygon(0 0, 100% 0, 100% 5%, 95% 8%, 100% 12%, 100% 88%, 95% 92%, 100% 95%, 100% 100%, 0 100%);
+    }
+
+    .variant-portrait-slim .hud-box-content,
+    .variant-portrait-slim .hud-box-content::before,
+    .variant-portrait-slim .hud-box-content::after {
+      clip-path: polygon(0 0, 85% 0, 100% 3%, 100% 97%, 85% 100%, 0 100%, 0 97%, 15% 94%, 0 90%);
+    }
+
+    .variant-portrait-card .hud-box-content,
+    .variant-portrait-card .hud-box-content::before,
+    .variant-portrait-card .hud-box-content::after {
+      clip-path: polygon(0 0, 100% 0, 100% 90%, 95% 93%, 90% 100%, 10% 100%, 5% 97%, 0 93%);
+    }
+
+    .variant-portrait-banner .hud-box-content,
+    .variant-portrait-banner .hud-box-content::before,
+    .variant-portrait-banner .hud-box-content::after {
+      clip-path: polygon(10% 0, 90% 0, 100% 5%, 100% 95%, 90% 100%, 10% 100%, 0 95%, 0 5%);
+    }
+
+    .variant-landscape-wide .hud-box-content,
+    .variant-landscape-wide .hud-box-content::before,
+    .variant-landscape-wide .hud-box-content::after {
+      clip-path: polygon(0 0, 5% 0, 8% 15%, 12% 0, 88% 0, 92% 15%, 95% 0, 100% 0, 100% 100%, 0 100%);
+    }
+
+    .variant-landscape-ultra .hud-box-content,
+    .variant-landscape-ultra .hud-box-content::before,
+    .variant-landscape-ultra .hud-box-content::after {
+      clip-path: polygon(0 0, 97% 0, 100% 15%, 97% 30%, 100% 45%, 100% 100%, 3% 100%, 0 85%, 3% 70%, 0 55%);
+    }
+
+    .variant-landscape-bar .hud-box-content,
+    .variant-landscape-bar .hud-box-content::before,
+    .variant-landscape-bar .hud-box-content::after {
+      clip-path: polygon(0 0, 100% 0, 100% 70%, 98% 80%, 100% 90%, 100% 100%, 0 100%);
+    }
+
+    .variant-landscape-ribbon .hud-box-content,
+    .variant-landscape-ribbon .hud-box-content::before,
+    .variant-landscape-ribbon .hud-box-content::after {
+      clip-path: polygon(5% 0, 95% 0, 100% 50%, 95% 100%, 5% 100%, 0 50%);
+    }
+
+    /* Sizes */
+    .variant-default .hud-box-content { width: 300px; height: 250px; }
+    .variant-compact .hud-box-content { width: 200px; height: 150px; }
+    .variant-wide .hud-box-content { width: 400px; height: 200px; }
+    .variant-hexagon .hud-box-content { width: 280px; height: 240px; }
+    .variant-diagonal .hud-box-content { width: 320px; height: 220px; }
+    .variant-corner-cut .hud-box-content { width: 300px; height: 200px; }
+    .variant-tech-panel .hud-box-content { width: 350px; height: 180px; }
+    .variant-octagon .hud-box-content { width: 300px; height: 260px; }
+    .variant-arrow-right .hud-box-content { width: 340px; height: 200px; }
+    .variant-chevron .hud-box-content { width: 320px; height: 210px; }
+    .variant-portrait-tall .hud-box-content { width: 250px; height: 400px; }
+    .variant-portrait-slim .hud-box-content { width: 200px; height: 350px; }
+    .variant-portrait-card .hud-box-content { width: 280px; height: 380px; }
+    .variant-portrait-banner .hud-box-content { width: 220px; height: 320px; }
+    .variant-landscape-wide .hud-box-content { width: 450px; height: 180px; }
+    .variant-landscape-ultra .hud-box-content { width: 500px; height: 150px; }
+    .variant-landscape-bar .hud-box-content { width: 550px; height: 120px; }
+    .variant-landscape-ribbon .hud-box-content { width: 480px; height: 140px; }
+
+    @keyframes hudBoxBackglitch {
+      0% { box-shadow: inset 0px 20px 30px 40px rgba(10, 18, 37, 0.95); }
+      50% { box-shadow: inset 0px -20px 30px 40px rgba(10, 18, 37, 0.95); }
+      100% { box-shadow: inset 0px 20px 30px 40px rgba(10, 18, 37, 0.95); }
+    }
+
+    @keyframes hudBoxBorderRotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes hudBoxBlinkShadows {
+      0% { filter: drop-shadow(0 8px 16px rgba(41, 242, 223, 0.45)) drop-shadow(0 4px 8px rgba(41, 242, 223, 0.3)); }
+      25% { filter: drop-shadow(12px -6px 14px rgba(41, 242, 223, 0.5)) drop-shadow(-8px 4px 10px rgba(41, 242, 223, 0.25)); }
+      50% { filter: drop-shadow(0 10px 18px rgba(41, 242, 223, 0.42)) drop-shadow(0 5px 10px rgba(41, 242, 223, 0.28)); }
+      75% { filter: drop-shadow(-10px 6px 14px rgba(41, 242, 223, 0.48)) drop-shadow(8px -4px 10px rgba(41, 242, 223, 0.26)); }
+      100% { filter: drop-shadow(0 8px 16px rgba(41, 242, 223, 0.45)) drop-shadow(0 4px 8px rgba(41, 242, 223, 0.3)); }
+    }
+
+    .summary-box {
+      margin-top: 80px;
+      padding: 30px;
+      border: 2px solid #29F2DF;
+      border-radius: 8px;
+      background: rgba(10, 18, 37, 0.8);
+    }
+
+    .summary-box h3 {
+      color: #29F2DF;
+      margin-bottom: 20px;
+      font-size: 20px;
+    }
+
+    .summary-box p {
+      color: #fff;
+      line-height: 1.8;
+      margin-bottom: 10px;
+    }
+
+    .summary-box ul {
+      margin-left: 20px;
+      margin-top: 10px;
+    }
+
+    .summary-box li {
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎮 HudBox - 18 Variants × 3 Colors</h1>
+  <p class="subtitle">Asymmetrical HUD-style containers with animated borders</p>
+
+  <div class="controls">
+    <div class="control-group">
+      <span class="control-label">Select Color:</span>
+      <button class="color-btn cyan active" onclick="changeColor('cyan', '#29F2DF')">Cyan (#29F2DF)</button>
+      <button class="color-btn magenta" onclick="changeColor('magenta', '#EF3EF1')">Magenta (#EF3EF1)</button>
+      <button class="color-btn blue" onclick="changeColor('blue', '#1C7FA6')">Blue (#1C7FA6)</button>
+    </div>
+    <div class="control-group">
+      <span class="control-label">Animation:</span>
+      <button class="color-btn cyan active" id="animToggle" onclick="toggleAnimation()">ON</button>
+    </div>
+  </div>
+
+  <div class="variants-grid" id="variantsGrid"></div>
+
+  <div class="summary-box">
+    <h3>📊 Summary</h3>
+    <p>✅ Total Variants: 18</p>
+    <p>✅ Total Colors: 3</p>
+    <p>✅ Total Combinations: 18 × 3 = 54</p>
+    <p style="margin-top: 20px; opacity: 0.8;">🎨 Color Palette:</p>
+    <ul>
+      <li style="color: #29F2DF;">Cyan: #29F2DF - Primary frame color</li>
+      <li style="color: #EF3EF1;">Magenta: #EF3EF1 - Accent frame color</li>
+      <li style="color: #1C7FA6;">Blue: #1C7FA6 - Secondary frame color</li>
+    </ul>
+  </div>
+
+  <script>
+    const variants = [
+      'default', 'compact', 'wide', 'hexagon', 'diagonal', 'corner-cut',
+      'tech-panel', 'octagon', 'arrow-right', 'chevron', 'portrait-tall',
+      'portrait-slim', 'portrait-card', 'portrait-banner', 'landscape-wide',
+      'landscape-ultra', 'landscape-bar', 'landscape-ribbon'
+    ];
+
+    let currentColor = '#29F2DF';
+    let isAnimated = true;
+
+    function renderVariants() {
+      const grid = document.getElementById('variantsGrid');
+      grid.innerHTML = '';
+
+      variants.forEach(variant => {
+        const item = document.createElement('div');
+        item.className = 'variant-item';
+        item.innerHTML = `
+          <h3 class="variant-title" style="color: ${currentColor}">${variant.toUpperCase()}</h3>
+          <div class="hud-box-wrapper">
+            <div class="hud-box-container variant-${variant} ${isAnimated ? 'animated' : ''}">
+              <div class="hud-box-content">
+                <div class="hud-box-inner">
+                  <div class="hud-box-text" style="color: ${currentColor}">
+                    <div class="hud-box-title">${variant.toUpperCase()}</div>
+                    <div class="hud-box-subtitle">${currentColor}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        grid.appendChild(item);
+      });
+
+      updateStyles();
+    }
+
+    function updateStyles() {
+      const containers = document.querySelectorAll('.hud-box-container');
+      containers.forEach(container => {
+        const content = container.querySelector('.hud-box-content');
+        if (content) {
+          const before = window.getComputedStyle(content, '::before');
+          content.style.setProperty('--hud-color', currentColor);
+        }
+      });
+    }
+
+    function changeColor(colorName, hex) {
+      currentColor = hex;
+      
+      // Update button states
+      document.querySelectorAll('.color-btn.cyan, .color-btn.magenta, .color-btn.blue').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      event.target.classList.add('active');
+
+      renderVariants();
+    }
+
+    function toggleAnimation() {
+      isAnimated = !isAnimated;
+      const btn = document.getElementById('animToggle');
+      btn.textContent = isAnimated ? 'ON' : 'OFF';
+      btn.classList.toggle('active');
+      renderVariants();
+    }
+
+    // Initial render
+    renderVariants();
+  </script>
+</body>
+</html>

@@ -245,15 +245,27 @@ export function HudBox({
   animated = true,
   variant = 'default',
 }: HudBoxProps) {
+  // Convert hex to RGB for CSS variables
+  const hex = color.replace('#', '');
+  const r = parseInt(hex.substring(0, 2), 16);
+  const g = parseInt(hex.substring(2, 4), 16);
+  const b = parseInt(hex.substring(4, 6), 16);
+
   return (
     <StyledWrapper 
-      key={`${variant}-${animated}`}
+      key={`${variant}-${color}-${animated}`}
       className={className} 
       $width={width} 
       $height={height} 
       $variant={variant} 
       $color={color} 
       $animated={animated}
+      style={{
+        ['--hud-color' as any]: color,
+        ['--shadow-r' as any]: r,
+        ['--shadow-g' as any]: g,
+        ['--shadow-b' as any]: b,
+      }}
     >
       <div className="hud-box-container">
         <div className="hud-box-content">

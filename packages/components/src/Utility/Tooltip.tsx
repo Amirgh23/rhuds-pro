@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Tooltip Component
  * Tooltip with configurable position
  */
@@ -80,8 +80,8 @@ export const Tooltip: React.FC<TooltipProps> = ({
       position: 'fixed',
       top: tooltipPos.top,
       left: tooltipPos.left,
-      backgroundColor: tokens.colors?.primary || '#00f6ff',
-      color: tokens.colors?.background || '#1a1a1a',
+      backgroundColor: tokens.colors?.primary || '#29F2DF',
+      color: tokens.colors?.background || '#0A1225',
       padding: '0.5rem 0.75rem',
       borderRadius: '4px',
       fontSize: '0.85rem',

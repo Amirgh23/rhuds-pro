@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+﻿import React, { useState, useRef, useEffect } from 'react';
 import { useTheme } from '@rhuds/core';
 
 export interface ColorPickerProps {
@@ -15,7 +15,7 @@ export function ColorPicker({
   onChange,
   disabled = false,
   presets = [
-    '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF',
+    '#29F2DF', '#1C7FA6', '#EF3EF1', '#28125A', '#0A1225', '#29F2DF',
     '#000000', '#FFFFFF', '#808080', '#FFA500', '#800080', '#008000',
   ],
   showAlpha = false,

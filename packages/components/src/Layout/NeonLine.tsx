@@ -1,4 +1,4 @@
-/**
+﻿/**
  * NeonLine Component
  * Decorative neon line for HUD frames with glow effect
  */
@@ -45,7 +45,7 @@ const StyledLine = styled.div<{ $color: string; $shadow: boolean }>`
 
 export function NeonLine({
   className = '',
-  color = '#00f6ff',
+  color = '#29F2DF',
   shadow = false,
 }: NeonLineProps) {
   return (

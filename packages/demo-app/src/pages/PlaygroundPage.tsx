@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import {
   Text, Stack, Button, HudButton, GlitchButton, Container, Input, HackerInput, Select, Checkbox, HoloCheckbox, Switch, Slider,
   Modal, Dialog, Tooltip, Popover, Dropdown, Table, Tabs, Accordion,
   Carousel, Stepper, DatePicker, ColorPicker, Radio, RadioGroup,
-  Navbar, Sidebar, Breadcrumb, Menu, Pagination, Grid, CyberCard, GlitchProfileCard, HudBox, HudFrame,
+  Navbar, Sidebar, Breadcrumb, Menu, Pagination, Grid, CyberCard, GlitchProfileCard, AbstergoLoader, HeartRateLoader, HudBox, HudFrame,
   useNotification, NotificationProvider
 } from '@rhuds/components';
 import { ComponentPlayground } from '../components/ComponentPlayground';
@@ -21,7 +21,7 @@ const PlaygroundContent: React.FC = () => {
   const [checkboxChecked, setCheckboxChecked] = useState(false);
   const [holoCheckboxChecked, setHoloCheckboxChecked] = useState(false);
   const [switchChecked, setSwitchChecked] = useState(false);
-  const [selectedColor, setSelectedColor] = useState('#00f6ff');
+  const [selectedColor, setSelectedColor] = useState('#29F2DF');
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [activeTab, setActiveTab] = useState(0);
   const [expandedAccordion, setExpandedAccordion] = useState<string[]>(['item1']);
@@ -37,7 +37,7 @@ const PlaygroundContent: React.FC = () => {
 
   return (
     <Container maxWidth="1400px" style={{ padding: '3rem 2rem' }}>
-      <Text variant="h1" style={{ color: '#00f6ff', marginBottom: '1rem' }}>
+      <Text variant="h1" style={{ color: '#29F2DF', marginBottom: '1rem' }}>
         Interactive Playground
       </Text>
       <Text variant="body" style={{ color: 'rgba(255, 255, 255, 0.7)', marginBottom: '3rem' }}>
@@ -149,7 +149,7 @@ const PlaygroundContent: React.FC = () => {
       >
         <div style={{ padding: '2rem', background: 'rgba(0, 0, 0, 0.3)', borderRadius: '8px' }}>
           <Slider value={sliderValue} onChange={setSliderValue} min={0} max={100} step={1} />
-          <Text variant="body" style={{ marginTop: '1rem', textAlign: 'center', color: '#00f6ff' }}>Value: {sliderValue}</Text>
+          <Text variant="body" style={{ marginTop: '1rem', textAlign: 'center', color: '#29F2DF' }}>Value: {sliderValue}</Text>
         </div>
       </ComponentPlayground>
 
@@ -295,12 +295,12 @@ const PlaygroundContent: React.FC = () => {
         <div style={{ padding: '2rem', background: 'rgba(0, 0, 0, 0.3)', borderRadius: '8px' }}>
           <Stack direction="column" gap="2rem">
             <div>
-              <Text variant="h4" style={{ marginBottom: '1rem', color: '#00f6ff' }}>Color Picker</Text>
+              <Text variant="h4" style={{ marginBottom: '1rem', color: '#29F2DF' }}>Color Picker</Text>
               <ColorPicker value={selectedColor} onChange={setSelectedColor} />
               <Text variant="body" style={{ marginTop: '1rem' }}>Selected: {selectedColor}</Text>
             </div>
             <div>
-              <Text variant="h4" style={{ marginBottom: '1rem', color: '#00f6ff' }}>Date Picker</Text>
+              <Text variant="h4" style={{ marginBottom: '1rem', color: '#29F2DF' }}>Date Picker</Text>
               <DatePicker value={selectedDate} onChange={setSelectedDate} />
               <Text variant="body" style={{ marginTop: '1rem' }}>Selected: {selectedDate?.toLocaleDateString() || 'None'}</Text>
             </div>
@@ -378,7 +378,7 @@ const PlaygroundContent: React.FC = () => {
         <div style={{ padding: '2rem', background: 'rgba(0, 0, 0, 0.3)', borderRadius: '8px' }}>
           <Grid columns={3} gap="1rem">
             {[1, 2, 3, 4, 5, 6].map(i => (
-              <div key={i} style={{ padding: '2rem', background: 'rgba(0, 246, 255, 0.1)', borderRadius: '4px', textAlign: 'center' }}>
+              <div key={i} style={{ padding: '2rem', background: 'rgba(41, 242, 223, 0.1)', borderRadius: '4px', textAlign: 'center' }}>
                 <Text variant="body">Item {i}</Text>
               </div>
             ))}
@@ -438,7 +438,7 @@ const PlaygroundContent: React.FC = () => {
     description: 'Real-time monitoring',
     number: 1,
   }}
-  color="#00f6ff"
+  color="#29F2DF"
 >
   <div style={{ padding: '2rem' }}>
     Content here...
@@ -454,10 +454,10 @@ const PlaygroundContent: React.FC = () => {
                   description: 'Real-time system monitoring dashboard',
                   number: 1,
                 }}
-                color="#00f6ff"
+                color="#29F2DF"
               >
                 <div style={{ padding: '2rem' }}>
-                  <Text color="#00f6ff" variant="h3" style={{ marginBottom: '1rem' }}>
+                  <Text color="#29F2DF" variant="h3" style={{ marginBottom: '1rem' }}>
                     HUD FRAME DEMO
                   </Text>
                   <Text color="#ffffff" variant="body">
@@ -474,10 +474,10 @@ const PlaygroundContent: React.FC = () => {
                   description: 'Analytics and metrics dashboard',
                   number: 2,
                 }}
-                color="#1BFD9C"
+                color="#29F2DF"
               >
                 <div style={{ padding: '2rem' }}>
-                  <Text color="#1BFD9C" variant="h3" style={{ marginBottom: '1rem' }}>
+                  <Text color="#29F2DF" variant="h3" style={{ marginBottom: '1rem' }}>
                     GREEN THEME
                   </Text>
                   <Text color="#ffffff" variant="body">
@@ -491,98 +491,127 @@ const PlaygroundContent: React.FC = () => {
         </div>
       </ComponentPlayground>
 
+      {/* Loader Components */}
+      <ComponentPlayground
+        title="Loader Components"
+        description="Animated loaders with different styles"
+        code={`<AbstergoLoader text="Loading" size={1} />
+<HeartRateLoader color="#29F2DF" width={400} height={150} />`}
+      >
+        <div style={{ padding: '2rem', background: 'rgba(0, 0, 0, 0.5)', borderRadius: '8px' }}>
+          <Stack direction="column" gap="3rem">
+            <div>
+              <Text variant="h4" style={{ marginBottom: '1rem', color: '#29F2DF' }}>AbstergoLoader (Triangular Animation)</Text>
+              <div style={{ display: 'flex', gap: '3rem', justifyContent: 'center', flexWrap: 'wrap', padding: '2rem', background: 'rgba(0, 0, 0, 0.3)', borderRadius: '8px' }}>
+                <AbstergoLoader text="Loading" size={0.8} />
+                <AbstergoLoader text="Synchronization" size={1} />
+                <AbstergoLoader text="Processing" size={1.2} />
+              </div>
+            </div>
+            <div>
+              <Text variant="h4" style={{ marginBottom: '1rem', color: '#29F2DF' }}>HeartRateLoader (ECG Animation)</Text>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', alignItems: 'center', padding: '2rem', background: 'rgba(0, 0, 0, 0.3)', borderRadius: '8px' }}>
+                <HeartRateLoader color="#EF3EF1" width={550} height={210} />
+                <HeartRateLoader color="#29F2DF" width={400} height={150} />
+                <HeartRateLoader color="#29F2DF" width={300} height={120} />
+              </div>
+            </div>
+          </Stack>
+        </div>
+      </ComponentPlayground>
+
       {/* HudBox */}
       <ComponentPlayground
         title="HudBox (Asymmetrical Container)"
         description="HUD-style box with 18 unique geometric shapes in different HUD colors"
-        code={`<HudBox variant="octagon" color="#FF4500" animated={true}>Content</HudBox>
-<HudBox variant="portrait-card" color="#7FFF00" animated={false}>Vertical</HudBox>
-<HudBox variant="landscape-bar" color="#32CD32" animated={true}>Horizontal</HudBox>`}
+        code={`<HudBox variant="octagon" color="#EF3EF1" animated={true}>Content</HudBox>
+<HudBox variant="portrait-card" color="#1C7FA6" animated={false}>Vertical</HudBox>
+<HudBox variant="landscape-bar" color="#1C7FA6" animated={true}>Horizontal</HudBox>`}
       >
         <div style={{ padding: '2rem', background: 'rgba(0, 0, 0, 0.5)', borderRadius: '8px' }}>
           <div style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
             <HudButton onClick={() => setHudBoxAnimated(!hudBoxAnimated)}>
               {hudBoxAnimated ? '⏸ Static Border' : '▶ Animated Border'}
             </HudButton>
-            <Text color="#00f6ff">
+            <Text color="#29F2DF">
               Mode: {hudBoxAnimated ? 'Animated' : 'Static'}
             </Text>
           </div>
           <Stack direction="column" gap="3rem">
             <div>
-              <Text color="#00f6ff" style={{ marginBottom: '1rem' }}>Standard Variants:</Text>
+              <Text color="#29F2DF" style={{ marginBottom: '1rem' }}>Standard Variants:</Text>
               <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', flexWrap: 'wrap' }}>
-                <HudBox variant="compact" color="#00f6ff" animated={hudBoxAnimated}>
-                  <Text color="#00f6ff">Compact</Text>
+                <HudBox variant="compact" color="#29F2DF" animated={hudBoxAnimated}>
+                  <Text color="#29F2DF">Compact</Text>
                 </HudBox>
-                <HudBox variant="default" color="#1BFD9C" animated={hudBoxAnimated}>
-                  <Text color="#1BFD9C">Default</Text>
+                <HudBox variant="default" color="#29F2DF" animated={hudBoxAnimated}>
+                  <Text color="#29F2DF">Default</Text>
                 </HudBox>
-                <HudBox variant="wide" color="#FF6B9D" animated={hudBoxAnimated}>
-                  <Text color="#FF6B9D">Wide</Text>
+                <HudBox variant="wide" color="#29F2DF" animated={hudBoxAnimated}>
+                  <Text color="#29F2DF">Wide</Text>
                 </HudBox>
               </div>
             </div>
             
             <div>
-              <Text color="#00f6ff" style={{ marginBottom: '1rem' }}>Geometric Variants:</Text>
+              <Text color="#29F2DF" style={{ marginBottom: '1rem' }}>Geometric Variants:</Text>
               <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', flexWrap: 'wrap' }}>
-                <HudBox variant="hexagon" color="#FFD700" animated={hudBoxAnimated}>
-                  <Text color="#FFD700">Hexagon</Text>
+                <HudBox variant="hexagon" color="#29F2DF" animated={hudBoxAnimated}>
+                  <Text color="#29F2DF">Hexagon</Text>
                 </HudBox>
-                <HudBox variant="octagon" color="#FF4500" animated={hudBoxAnimated}>
-                  <Text color="#FF4500">Octagon</Text>
+                <HudBox variant="octagon" color="#EF3EF1" animated={hudBoxAnimated}>
+                  <Text color="#EF3EF1">Octagon</Text>
                 </HudBox>
-                <HudBox variant="diagonal" color="#9D00FF" animated={hudBoxAnimated}>
-                  <Text color="#9D00FF">Diagonal</Text>
+                <HudBox variant="diagonal" color="#1C7FA6" animated={hudBoxAnimated}>
+                  <Text color="#1C7FA6">Diagonal</Text>
                 </HudBox>
-                <HudBox variant="corner-cut" color="#00FFFF" animated={hudBoxAnimated}>
-                  <Text color="#00FFFF">Corner Cut</Text>
+                <HudBox variant="corner-cut" color="#28125A" animated={hudBoxAnimated}>
+                  <Text color="#28125A">Corner Cut</Text>
                 </HudBox>
-                <HudBox variant="tech-panel" color="#FF00FF" animated={hudBoxAnimated}>
-                  <Text color="#FF00FF">Tech Panel</Text>
+                <HudBox variant="tech-panel" color="#29F2DF" animated={hudBoxAnimated}>
+                  <Text color="#29F2DF">Tech Panel</Text>
                 </HudBox>
-                <HudBox variant="arrow-right" color="#00FF00" animated={hudBoxAnimated}>
-                  <Text color="#00FF00">Arrow →</Text>
+                <HudBox variant="arrow-right" color="#29F2DF" animated={hudBoxAnimated}>
+                  <Text color="#29F2DF">Arrow →</Text>
                 </HudBox>
-                <HudBox variant="chevron" color="#FFA500" animated={hudBoxAnimated}>
-                  <Text color="#FFA500">Chevron</Text>
+                <HudBox variant="chevron" color="#29F2DF" animated={hudBoxAnimated}>
+                  <Text color="#29F2DF">Chevron</Text>
                 </HudBox>
               </div>
             </div>
 
             <div>
-              <Text color="#00f6ff" style={{ marginBottom: '1rem' }}>Portrait Variants (Vertical):</Text>
+              <Text color="#29F2DF" style={{ marginBottom: '1rem' }}>Portrait Variants (Vertical):</Text>
               <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', flexWrap: 'wrap' }}>
-                <HudBox variant="portrait-tall" color="#00CED1" animated={hudBoxAnimated}>
-                  <Text color="#00CED1" align="center">Portrait<br/>Tall<br/>400px</Text>
+                <HudBox variant="portrait-tall" color="#28125A" animated={hudBoxAnimated}>
+                  <Text color="#28125A" align="center">Portrait<br/>Tall<br/>400px</Text>
                 </HudBox>
-                <HudBox variant="portrait-slim" color="#FF1493" animated={hudBoxAnimated}>
-                  <Text color="#FF1493" align="center">Portrait<br/>Slim<br/>350px</Text>
+                <HudBox variant="portrait-slim" color="#29F2DF" animated={hudBoxAnimated}>
+                  <Text color="#29F2DF" align="center">Portrait<br/>Slim<br/>350px</Text>
                 </HudBox>
-                <HudBox variant="portrait-card" color="#7FFF00" animated={hudBoxAnimated}>
-                  <Text color="#7FFF00" align="center">Portrait<br/>Card<br/>380px</Text>
+                <HudBox variant="portrait-card" color="#1C7FA6" animated={hudBoxAnimated}>
+                  <Text color="#1C7FA6" align="center">Portrait<br/>Card<br/>380px</Text>
                 </HudBox>
-                <HudBox variant="portrait-banner" color="#FF69B4" animated={hudBoxAnimated}>
-                  <Text color="#FF69B4" align="center">Portrait<br/>Banner<br/>320px</Text>
+                <HudBox variant="portrait-banner" color="#29F2DF" animated={hudBoxAnimated}>
+                  <Text color="#29F2DF" align="center">Portrait<br/>Banner<br/>320px</Text>
                 </HudBox>
               </div>
             </div>
 
             <div>
-              <Text color="#00f6ff" style={{ marginBottom: '1rem' }}>Landscape Variants (Horizontal):</Text>
+              <Text color="#29F2DF" style={{ marginBottom: '1rem' }}>Landscape Variants (Horizontal):</Text>
               <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', flexWrap: 'wrap', flexDirection: 'column', alignItems: 'center' }}>
-                <HudBox variant="landscape-wide" color="#00BFFF" animated={hudBoxAnimated}>
-                  <Text color="#00BFFF">Landscape Wide - 450px × 180px</Text>
+                <HudBox variant="landscape-wide" color="#28125A" animated={hudBoxAnimated}>
+                  <Text color="#28125A">Landscape Wide - 450px × 180px</Text>
                 </HudBox>
-                <HudBox variant="landscape-ultra" color="#FF6347" animated={hudBoxAnimated}>
-                  <Text color="#FF6347">Landscape Ultra - 500px × 150px</Text>
+                <HudBox variant="landscape-ultra" color="#EF3EF1" animated={hudBoxAnimated}>
+                  <Text color="#EF3EF1">Landscape Ultra - 500px × 150px</Text>
                 </HudBox>
-                <HudBox variant="landscape-bar" color="#32CD32" animated={hudBoxAnimated}>
-                  <Text color="#32CD32">Landscape Bar - 550px × 120px</Text>
+                <HudBox variant="landscape-bar" color="#1C7FA6" animated={hudBoxAnimated}>
+                  <Text color="#1C7FA6">Landscape Bar - 550px × 120px</Text>
                 </HudBox>
-                <HudBox variant="landscape-ribbon" color="#BA55D3" animated={hudBoxAnimated}>
-                  <Text color="#BA55D3">Landscape Ribbon - 480px × 140px</Text>
+                <HudBox variant="landscape-ribbon" color="#1C7FA6" animated={hudBoxAnimated}>
+                  <Text color="#1C7FA6">Landscape Ribbon - 480px × 140px</Text>
                 </HudBox>
               </div>
             </div>

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Background Effects Demo
  */
 
@@ -8,20 +8,20 @@ import { Dots, Puffs, GridLines, MovingLines, Nebula, StarField, AnimatedGradien
 export const BackgroundsDemo: React.FC = () => {
   return (
     <div style={{ fontFamily: 'sans-serif', padding: '20px', background: '#000' }}>
-      <h1 style={{ color: '#00ffff' }}>Background Effects Demo</h1>
+      <h1 style={{ color: '#29F2DF' }}>Background Effects Demo</h1>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px' }}>
         {/* Dots - Grid Pattern */}
         <div>
-          <h2 style={{ color: '#00ffff' }}>Dots - Grid Pattern</h2>
-          <div style={{ border: '1px solid #00ffff', position: 'relative', height: '300px' }}>
+          <h2 style={{ color: '#29F2DF' }}>Dots - Grid Pattern</h2>
+          <div style={{ border: '1px solid #29F2DF', position: 'relative', height: '300px' }}>
             <Dots
               width={400}
               height={300}
               pattern="grid"
               dotSize={2}
               spacing={20}
-              color="#00ffff"
+              color="#29F2DF"
               opacity={0.6}
               animated={true}
               animationSpeed={1}
@@ -31,15 +31,15 @@ export const BackgroundsDemo: React.FC = () => {
 
         {/* Dots - Random Pattern */}
         <div>
-          <h2 style={{ color: '#ff00ff' }}>Dots - Random Pattern</h2>
-          <div style={{ border: '1px solid #ff00ff', position: 'relative', height: '300px' }}>
+          <h2 style={{ color: '#29F2DF' }}>Dots - Random Pattern</h2>
+          <div style={{ border: '1px solid #29F2DF', position: 'relative', height: '300px' }}>
             <Dots
               width={400}
               height={300}
               pattern="random"
               dotSize={3}
               spacing={30}
-              color="#ff00ff"
+              color="#29F2DF"
               opacity={0.5}
               animated={true}
               animationSpeed={0.5}
@@ -49,15 +49,15 @@ export const BackgroundsDemo: React.FC = () => {
 
         {/* Dots - Hexagonal Pattern */}
         <div>
-          <h2 style={{ color: '#00ff00' }}>Dots - Hexagonal Pattern</h2>
-          <div style={{ border: '1px solid #00ff00', position: 'relative', height: '300px' }}>
+          <h2 style={{ color: '#29F2DF' }}>Dots - Hexagonal Pattern</h2>
+          <div style={{ border: '1px solid #29F2DF', position: 'relative', height: '300px' }}>
             <Dots
               width={400}
               height={300}
               pattern="hexagonal"
               dotSize={2}
               spacing={25}
-              color="#00ff00"
+              color="#29F2DF"
               opacity={0.7}
               animated={true}
               animationSpeed={1.5}
@@ -67,14 +67,14 @@ export const BackgroundsDemo: React.FC = () => {
 
         {/* Puffs - Particle Effects */}
         <div>
-          <h2 style={{ color: '#ffff00' }}>Puffs - Particle Effects</h2>
-          <div style={{ border: '1px solid #ffff00', position: 'relative', height: '300px' }}>
+          <h2 style={{ color: '#29F2DF' }}>Puffs - Particle Effects</h2>
+          <div style={{ border: '1px solid #29F2DF', position: 'relative', height: '300px' }}>
             <Puffs
               width={400}
               height={300}
               particleCount={50}
               particleSize={4}
-              color="#ffff00"
+              color="#29F2DF"
               speed={1}
               opacity={0.6}
               animated={true}
@@ -168,12 +168,12 @@ export const BackgroundsDemo: React.FC = () => {
 
         {/* Nebula Effect */}
         <div>
-          <h2 style={{ color: '#ff00ff' }}>Nebula Effect</h2>
-          <div style={{ border: '1px solid #ff00ff', position: 'relative', height: '300px' }}>
+          <h2 style={{ color: '#29F2DF' }}>Nebula Effect</h2>
+          <div style={{ border: '1px solid #29F2DF', position: 'relative', height: '300px' }}>
             <Nebula
               width={400}
               height={300}
-              colors={['#ff00ff', '#00ffff', '#ff0080']}
+              colors={['#29F2DF', '#28125A', '#EF3EF1']}
               scale={1}
               speed={1}
               opacity={0.6}
@@ -183,27 +183,27 @@ export const BackgroundsDemo: React.FC = () => {
 
         {/* StarField Effect */}
         <div>
-          <h2 style={{ color: '#ffff00' }}>StarField Effect</h2>
-          <div style={{ border: '1px solid #ffff00', position: 'relative', height: '300px' }}>
+          <h2 style={{ color: '#29F2DF' }}>StarField Effect</h2>
+          <div style={{ border: '1px solid #29F2DF', position: 'relative', height: '300px' }}>
             <StarField
               width={400}
               height={300}
               starCount={200}
               speed={2}
               parallaxFactor={0.5}
-              color="#ffff00"
+              color="#29F2DF"
             />
           </div>
         </div>
 
         {/* AnimatedGradient Effect */}
         <div>
-          <h2 style={{ color: '#00ff00' }}>AnimatedGradient Effect</h2>
-          <div style={{ border: '1px solid #00ff00', position: 'relative', height: '300px' }}>
+          <h2 style={{ color: '#29F2DF' }}>AnimatedGradient Effect</h2>
+          <div style={{ border: '1px solid #29F2DF', position: 'relative', height: '300px' }}>
             <AnimatedGradient
               width={400}
               height={300}
-              colors={['#ff0080', '#00ffff', '#00ff00']}
+              colors={['#EF3EF1', '#28125A', '#29F2DF']}
               angle={0}
               speed={1}
               opacity={1}
@@ -218,8 +218,8 @@ export const BackgroundsDemo: React.FC = () => {
             <Plasma
               width={400}
               height={300}
-              color1="#ff0080"
-              color2="#00ffff"
+              color1="#EF3EF1"
+              color2="#28125A"
               speed={1}
               opacity={0.7}
             />
@@ -229,10 +229,10 @@ export const BackgroundsDemo: React.FC = () => {
 
       {/* Layered Background Example */}
       <div style={{ marginTop: '40px' }}>
-        <h2 style={{ color: '#00ffff' }}>Layered Background</h2>
+        <h2 style={{ color: '#29F2DF' }}>Layered Background</h2>
         <div
           style={{
-            border: '1px solid #00ffff',
+            border: '1px solid #29F2DF',
             position: 'relative',
             height: '400px',
             background: '#000',
@@ -245,7 +245,7 @@ export const BackgroundsDemo: React.FC = () => {
               width={800}
               height={400}
               cellSize={50}
-              color="#00ffff"
+              color="#29F2DF"
               strokeWidth={1}
               opacity={0.2}
             />
@@ -259,7 +259,7 @@ export const BackgroundsDemo: React.FC = () => {
               pattern="grid"
               dotSize={2}
               spacing={50}
-              color="#00ffff"
+              color="#29F2DF"
               opacity={0.4}
               animated={true}
             />
@@ -272,7 +272,7 @@ export const BackgroundsDemo: React.FC = () => {
               height={400}
               particleCount={30}
               particleSize={3}
-              color="#ff00ff"
+              color="#29F2DF"
               speed={0.5}
               opacity={0.3}
               animated={true}
@@ -286,7 +286,7 @@ export const BackgroundsDemo: React.FC = () => {
               top: '50%',
               left: '50%',
               transform: 'translate(-50%, -50%)',
-              color: '#00ffff',
+              color: '#29F2DF',
               fontSize: '24px',
               fontWeight: 'bold',
               textAlign: 'center',
@@ -300,12 +300,12 @@ export const BackgroundsDemo: React.FC = () => {
 
       {/* Advanced Effects Showcase */}
       <div style={{ marginTop: '40px' }}>
-        <h2 style={{ color: '#00ffff' }}>Advanced Effects Showcase</h2>
+        <h2 style={{ color: '#29F2DF' }}>Advanced Effects Showcase</h2>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px' }}>
           {/* Nebula + Dots */}
           <div
             style={{
-              border: '1px solid #ff00ff',
+              border: '1px solid #29F2DF',
               position: 'relative',
               height: '300px',
               overflow: 'hidden',
@@ -315,7 +315,7 @@ export const BackgroundsDemo: React.FC = () => {
               <Nebula
                 width={400}
                 height={300}
-                colors={['#ff00ff', '#00ffff']}
+                colors={['#29F2DF', '#28125A']}
                 scale={1}
                 speed={0.5}
                 opacity={0.4}
@@ -328,7 +328,7 @@ export const BackgroundsDemo: React.FC = () => {
                 pattern="grid"
                 dotSize={2}
                 spacing={40}
-                color="#00ffff"
+                color="#29F2DF"
                 opacity={0.5}
                 animated={true}
               />
@@ -338,7 +338,7 @@ export const BackgroundsDemo: React.FC = () => {
           {/* StarField + AnimatedGradient */}
           <div
             style={{
-              border: '1px solid #00ff00',
+              border: '1px solid #29F2DF',
               position: 'relative',
               height: '300px',
               overflow: 'hidden',
@@ -348,7 +348,7 @@ export const BackgroundsDemo: React.FC = () => {
               <AnimatedGradient
                 width={400}
                 height={300}
-                colors={['#ff0080', '#00ff00']}
+                colors={['#ff0080', '#29F2DF']}
                 angle={45}
                 speed={0.5}
                 opacity={0.6}

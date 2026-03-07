@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Breadcrumb Component
  * Navigation breadcrumb trail
  */
@@ -19,7 +19,7 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({
   const theme = useTheme();
 
   // Safe theme access with fallback
-  const primaryColor = theme?.currentMode?.tokens?.colors?.primary || '#00f6ff';
+  const primaryColor = theme?.currentMode?.tokens?.colors?.primary || '#29F2DF';
   const textColor = theme?.currentMode?.tokens?.colors?.text || '#ffffff';
 
   const containerStyle = useMemo<React.CSSProperties>(() => {

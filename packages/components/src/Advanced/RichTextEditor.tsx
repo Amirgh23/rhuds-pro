@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+﻿import React, { useState, useRef } from 'react';
 import { useTheme } from '@rhuds/core';
 
 export interface RichTextEditorProps {
@@ -21,9 +21,9 @@ export function RichTextEditor({
   const theme = useTheme();
   
   // Safe theme access with fallback
-  const borderColor = theme?.currentMode?.tokens?.colors?.border || theme?.currentMode?.tokens?.colors?.primary || '#00f6ff';
-  const surfaceColor = theme?.currentMode?.tokens?.colors?.surface || theme?.currentMode?.tokens?.colors?.background || '#1a1a1a';
-  const backgroundColor = theme?.currentMode?.tokens?.colors?.background || '#0a0a0a';
+  const borderColor = theme?.currentMode?.tokens?.colors?.border || theme?.currentMode?.tokens?.colors?.primary || '#29F2DF';
+  const surfaceColor = theme?.currentMode?.tokens?.colors?.surface || theme?.currentMode?.tokens?.colors?.background || '#28125A';
+  const backgroundColor = theme?.currentMode?.tokens?.colors?.background || '#0A1225';
   const textColor = theme?.currentMode?.tokens?.colors?.text || '#ffffff';
   
   const [content, setContent] = useState(value);

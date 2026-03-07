@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Unit tests for ThemeManager
  * 
  * Tests theme switching, persistence, inheritance, and composition.
@@ -27,13 +27,13 @@ describe('ThemeManager', () => {
     baseTheme = createAppTheme({
       name: 'base',
       version: '1.0.0',
-      primaryColor: '#00f6ff',
+      primaryColor: '#29F2DF',
     });
 
     darkTheme = createAppTheme({
       name: 'dark',
       version: '1.0.0',
-      primaryColor: '#00f6ff',
+      primaryColor: '#29F2DF',
     });
 
     // Clear localStorage before each test
@@ -289,11 +289,11 @@ describe('ThemeManager', () => {
       const fragment3 = {
         colors: {
           primary: {
-            main: '#00ff00',
+            main: '#29F2DF',
             light: '#66ff66',
-            dark: '#00cc00',
+            dark: '#1C7FA6',
             contrast: '#000000',
-            alpha: (opacity: number) => `rgba(0, 255, 0, ${opacity})`,
+            alpha: (opacity: number) => `rgba(41, 242, 223, ${opacity})`,
           },
         },
       };
@@ -302,7 +302,7 @@ describe('ThemeManager', () => {
       
       expect(composed.name).toBe('fragment1');
       expect(composed.version).toBe('2.0.0');
-      expect(composed.colors.primary.main).toBe('#00ff00');
+      expect(composed.colors.primary.main).toBe('#29F2DF');
     });
   });
 

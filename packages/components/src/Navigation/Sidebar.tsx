@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Sidebar Component
  * Collapsible sidebar navigation
  */
@@ -24,7 +24,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const [internalCollapsed, setInternalCollapsed] = useState(false);
 
   // Safe theme access with fallback
-  const primaryColor = theme?.currentMode?.tokens?.colors?.primary || '#00f6ff';
+  const primaryColor = theme?.currentMode?.tokens?.colors?.primary || '#29F2DF';
   const textColor = theme?.currentMode?.tokens?.colors?.text || '#ffffff';
 
   const collapsed = controlledCollapsed !== undefined ? controlledCollapsed : internalCollapsed;
@@ -37,7 +37,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const sidebarStyle = useMemo<React.CSSProperties>(() => {
     const baseStyle: React.CSSProperties = {
       width: collapsed ? '60px' : typeof width === 'number' ? `${width}px` : width,
-      backgroundColor: '#1a1a1a',
+      backgroundColor: '#0A1225',
       borderRight: `2px solid ${primaryColor}`,
       padding: '1rem 0',
       transition: 'width 0.3s ease-in-out',

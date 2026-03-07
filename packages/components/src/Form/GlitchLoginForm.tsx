@@ -1,0 +1,306 @@
+﻿import React from 'react';
+import styled from 'styled-components';
+
+export interface GlitchLoginFormProps {
+  onSubmit?: (username: string, password: string) => void;
+  userPlaceholder?: string;
+  passwordPlaceholder?: string;
+  submitText?: string;
+  className?: string;
+}
+
+export const GlitchLoginForm: React.FC<GlitchLoginFormProps> = ({
+  onSubmit,
+  userPlaceholder = 'User',
+  passwordPlaceholder = 'Password',
+  submitText = 'Log in',
+  className,
+}) => {
+  const [username, setUsername] = React.useState('');
+  const [password, setPassword] = React.useState('');
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (onSubmit) {
+      onSubmit(username, password);
+    }
+  };
+
+  return (
+    <StyledWrapper className={className}>
+      <form className="container" onSubmit={handleSubmit}>
+        <div className="input-container">
+          <div className="input-content">
+            <div className="input-dist">
+              <div className="input-type">
+                <input
+                  className="input-is"
+                  type="text"
+                  required
+                  placeholder={userPlaceholder}
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                />
+                <input
+                  className="input-is"
+                  type="password"
+                  required
+                  placeholder={passwordPlaceholder}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+        <button className="submit-button" type="submit">
+          {submitText}
+        </button>
+      </form>
+    </StyledWrapper>
+  );
+};
+
+const StyledWrapper = styled.div`
+  .container {
+    font-family: 'Courier New', monospace;
+    font-style: italic;
+    font-weight: bold;
+    display: flex;
+    margin: auto;
+    aspect-ratio: 16/9;
+    align-items: center;
+    justify-items: center;
+    justify-content: center;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    gap: 1em;
+  }
+
+  .input-container {
+    filter: drop-shadow(46px 36px 24px rgba(41, 242, 223, 0.4))
+      drop-shadow(-55px -40px 25px rgba(27, 253, 156, 0.3));
+    animation: blinkShadowsFilter 8s ease-in infinite;
+  }
+
+  .input-content {
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    align-items: center;
+    text-align: center;
+    padding-inline: 1em;
+  }
+
+  .input-content::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    filter: blur(40px);
+    clip-path: polygon(
+      26% 0,
+      66% 0,
+      92% 0,
+      100% 8%,
+      100% 89%,
+      91% 100%,
+      7% 100%,
+      0 92%,
+      0 0
+    );
+    background: rgba(41, 242, 223, 0.5);
+    transition: all 1s ease-in-out;
+  }
+
+  .input-content::after {
+    content: '';
+    position: absolute;
+    width: 98%;
+    height: 98%;
+    box-shadow: inset 0px 0px 20px 20px #0a0e27;
+    background: repeating-linear-gradient(
+        to bottom,
+        transparent 0%,
+        rgba(41, 242, 223, 0.15) 1px,
+        rgb(0, 0, 0) 3px,
+        #0a0e27 5px,
+        #151932 4px,
+        transparent 0.5%
+      ),
+      repeating-linear-gradient(
+        to left,
+        #0a0e27 100%,
+        rgba(10, 14, 39, 0.99) 100%
+      );
+    clip-path: polygon(
+      26% 0,
+      31% 5%,
+      61% 5%,
+      66% 0,
+      92% 0,
+      100% 8%,
+      100% 89%,
+      91% 100%,
+      7% 100%,
+      0 92%,
+      0 0
+    );
+    animation: backglitch 50ms linear infinite;
+  }
+
+  .input-dist {
+    z-index: 80;
+    display: grid;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    padding-inline: 1em;
+    padding-block: 1.2em;
+    grid-template-columns: 1fr;
+  }
+
+  .input-type {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 1em;
+    font-size: 1.1rem;
+    background-color: transparent;
+    width: 100%;
+    border: none;
+  }
+
+  .input-is {
+    color: #29F2DF;
+    font-size: 0.9rem;
+    background-color: transparent;
+    width: 100%;
+    box-sizing: border-box;
+    padding-inline: 0.5em;
+    padding-block: 0.7em;
+    border: none;
+    transition: all 1s ease-in-out;
+    border-bottom: 1px solid rgba(41, 242, 223, 0.3);
+  }
+
+  .input-is:hover {
+    transition: all 1s ease-in-out;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(41, 242, 223, 0.15) 27%,
+      rgba(41, 242, 223, 0.15) 63%,
+      transparent 100%
+    );
+  }
+
+  .input-content:focus-within::before {
+    transition: all 1s ease-in-out;
+    background: rgba(27, 253, 156, 0.6);
+  }
+
+  .input-is:focus {
+    outline: none;
+    border-bottom: 1px solid #29F2DF;
+    color: #29F2DF;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(27, 253, 156, 0.15) 27%,
+      rgba(27, 253, 156, 0.15) 63%,
+      transparent 100%
+    );
+  }
+
+  .input-is::placeholder {
+    color: rgba(41, 242, 223, 0.5);
+  }
+
+  .submit-button {
+    width: 50%;
+    min-width: 150px;
+    border: none;
+    color: #29F2DF;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(41, 242, 223, 0.2) 27%,
+      rgba(41, 242, 223, 0.2) 63%,
+      transparent 100%
+    );
+    clip-path: polygon(0 0, 85% 0%, 100% 0, 100% 15%, 100% 90%, 91% 100%, 0 100%);
+    padding: 0.7em 1.2em;
+    animation: blinkShadowsFilterButton 0.5s ease-in infinite;
+    transition: all 300ms ease-out;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    letter-spacing: 0.05em;
+  }
+
+  .submit-button:hover {
+    color: #29F2DF;
+    cursor: pointer;
+    font-weight: bold;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(27, 253, 156, 0.25) 27%,
+      rgba(27, 253, 156, 0.25) 63%,
+      transparent 100%
+    );
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(41, 242, 223, 0.3);
+  }
+
+  @keyframes backglitch {
+    0% {
+      box-shadow: inset 0px 20px 20px 30px #0a0e27;
+    }
+    50% {
+      box-shadow: inset 0px -20px 20px 30px #151932;
+    }
+    100% {
+      box-shadow: inset 0px 20px 20px 30px #0a0e27;
+    }
+  }
+
+  @keyframes blinkShadowsFilter {
+    0% {
+      filter: drop-shadow(46px 36px 28px rgba(41, 242, 223, 0.35))
+        drop-shadow(-55px -40px 28px rgba(27, 253, 156, 0.3));
+    }
+    25% {
+      filter: drop-shadow(46px -36px 24px rgba(41, 242, 223, 0.5))
+        drop-shadow(-55px 40px 24px rgba(27, 253, 156, 0.45));
+    }
+    50% {
+      filter: drop-shadow(46px 36px 30px rgba(41, 242, 223, 0.6))
+        drop-shadow(-55px 40px 30px rgba(27, 253, 156, 0.35));
+    }
+    75% {
+      filter: drop-shadow(20px -18px 25px rgba(41, 242, 223, 0.5))
+        drop-shadow(-20px 20px 25px rgba(27, 253, 156, 0.4));
+    }
+    100% {
+      filter: drop-shadow(46px 36px 28px rgba(41, 242, 223, 0.35))
+        drop-shadow(-55px -40px 28px rgba(27, 253, 156, 0.3));
+    }
+  }
+
+  @keyframes blinkShadowsFilterButton {
+    0% {
+      filter: drop-shadow(0 0 5px rgba(41, 242, 223, 0.4));
+    }
+    50% {
+      filter: drop-shadow(0 0 10px rgba(41, 242, 223, 0.7));
+    }
+    100% {
+      filter: drop-shadow(0 0 5px rgba(41, 242, 223, 0.4));
+    }
+  }
+`;
+
+export default GlitchLoginForm;

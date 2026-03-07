@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Unit tests for useThemeManager hook
  * 
  * Tests React integration for theme management.
@@ -21,13 +21,13 @@ describe('useThemeManager', () => {
     baseTheme = createAppTheme({
       name: 'base',
       version: '1.0.0',
-      primaryColor: '#00f6ff',
+      primaryColor: '#29F2DF',
     });
 
     darkTheme = createAppTheme({
       name: 'dark',
       version: '1.0.0',
-      primaryColor: '#7b61ff',
+      primaryColor: '#1C7FA6',
     });
 
     // Clear localStorage

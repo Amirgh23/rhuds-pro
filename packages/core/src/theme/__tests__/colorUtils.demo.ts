@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Demonstration of color manipulation functions
  * This file shows practical examples of using the color utilities
  * Requirements: 2.1-2.4
@@ -24,7 +24,7 @@ import {
 
 console.log('=== Color Variation Examples ===\n');
 
-const primaryColor = '#00f6ff';
+const primaryColor = '#29F2DF';
 console.log(`Base color: ${primaryColor}`);
 console.log(`Lighter (+20): ${lighten(primaryColor, 20)}`);
 console.log(`Darker (-20): ${darken(primaryColor, 20)}`);
@@ -67,8 +67,8 @@ const linearGradient = createGradient({
   type: 'linear',
   angle: 45,
   stops: [
-    { color: '#00f6ff', position: 0 },
-    { color: '#7b61ff', position: 100 },
+    { color: '#29F2DF', position: 0 },
+    { color: '#1C7FA6', position: 100 },
   ],
 });
 console.log('Linear gradient:');
@@ -77,8 +77,8 @@ console.log(`  ${linearGradient}`);
 const radialGradient = createGradient({
   type: 'radial',
   stops: [
-    { color: '#00f6ff', position: 0 },
-    { color: '#7b61ff', position: 50 },
+    { color: '#29F2DF', position: 0 },
+    { color: '#1C7FA6', position: 50 },
     { color: '#ff0055', position: 100 },
   ],
 });
@@ -89,10 +89,10 @@ const conicGradient = createGradient({
   type: 'conic',
   angle: 0,
   stops: [
-    { color: '#00f6ff', position: 0 },
-    { color: '#7b61ff', position: 33 },
+    { color: '#29F2DF', position: 0 },
+    { color: '#1C7FA6', position: 33 },
     { color: '#ff0055', position: 66 },
-    { color: '#00f6ff', position: 100 },
+    { color: '#29F2DF', position: 100 },
   ],
 });
 console.log('\nConic gradient:');
@@ -105,15 +105,15 @@ console.log(`  ${conicGradient}`);
 console.log('\n=== Animated Color Transition Examples ===\n');
 
 console.log('Color interpolation:');
-console.log(`  0% progress: ${interpolateColor('#00f6ff', '#7b61ff', 0)}`);
-console.log(`  25% progress: ${interpolateColor('#00f6ff', '#7b61ff', 0.25)}`);
-console.log(`  50% progress: ${interpolateColor('#00f6ff', '#7b61ff', 0.5)}`);
-console.log(`  75% progress: ${interpolateColor('#00f6ff', '#7b61ff', 0.75)}`);
-console.log(`  100% progress: ${interpolateColor('#00f6ff', '#7b61ff', 1)}`);
+console.log(`  0% progress: ${interpolateColor('#29F2DF', '#1C7FA6', 0)}`);
+console.log(`  25% progress: ${interpolateColor('#29F2DF', '#1C7FA6', 0.25)}`);
+console.log(`  50% progress: ${interpolateColor('#29F2DF', '#1C7FA6', 0.5)}`);
+console.log(`  75% progress: ${interpolateColor('#29F2DF', '#1C7FA6', 0.75)}`);
+console.log(`  100% progress: ${interpolateColor('#29F2DF', '#1C7FA6', 1)}`);
 
 const keyframes = createColorTransitionKeyframes('primaryFade', {
-  from: '#00f6ff',
-  to: '#7b61ff',
+  from: '#29F2DF',
+  to: '#1C7FA6',
   duration: 1000,
   easing: 'ease-in-out',
 });
@@ -125,8 +125,8 @@ const gradientFrom = {
   type: 'linear' as const,
   angle: 0,
   stops: [
-    { color: '#00f6ff', position: 0 },
-    { color: '#7b61ff', position: 100 },
+    { color: '#29F2DF', position: 0 },
+    { color: '#1C7FA6', position: 100 },
   ],
 };
 
@@ -161,7 +161,7 @@ function generateThemePalette(baseColor: string) {
   };
 }
 
-const themePalette = generateThemePalette('#00f6ff');
+const themePalette = generateThemePalette('#29F2DF');
 console.log('Generated theme palette:');
 Object.entries(themePalette).forEach(([key, value]) => {
   console.log(`  ${key}: ${value}`);
@@ -173,7 +173,7 @@ Object.entries(themePalette).forEach(([key, value]) => {
 
 console.log('\n=== Practical Example: Button Hover Animation ===\n');
 
-const buttonColor = '#00f6ff';
+const buttonColor = '#29F2DF';
 const hoverColor = lighten(buttonColor, 15);
 
 const buttonHoverKeyframes = createColorTransitionKeyframes('buttonHover', {

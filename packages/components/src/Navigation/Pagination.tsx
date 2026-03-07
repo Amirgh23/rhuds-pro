@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Pagination Component
  * Page navigation with size selector
  */
@@ -23,9 +23,9 @@ export const Pagination: React.FC<PaginationProps> = ({
   const themeContext = useTheme();
   
   // Safe theme access with fallback
-  const primaryColor = themeContext?.currentMode?.tokens?.colors?.primary || '#00f6ff';
+  const primaryColor = themeContext?.currentMode?.tokens?.colors?.primary || '#29F2DF';
   const textColor = themeContext?.currentMode?.tokens?.colors?.text || '#ffffff';
-  const backgroundColor = themeContext?.currentMode?.tokens?.colors?.background || '#0a0a0a';
+  const backgroundColor = themeContext?.currentMode?.tokens?.colors?.background || '#0A1225';
   
   const [internalCurrentPage, setInternalCurrentPage] = useState(controlledCurrentPage);
   const [internalPerPage, setInternalPerPage] = useState(perPage);

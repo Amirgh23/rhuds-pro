@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Demo/Integration test for theme switching and persistence
  * 
  * This file demonstrates the theme switching and persistence functionality.
@@ -18,15 +18,15 @@ import { createAppTheme } from '../creators';
 const baseTheme = createAppTheme({
   name: 'base',
   version: '1.0.0',
-  primaryColor: '#00f6ff',
-  secondaryColor: '#7b61ff',
+  primaryColor: '#29F2DF',
+  secondaryColor: '#1C7FA6',
 });
 
 const darkTheme = createAppTheme({
   name: 'dark',
   version: '1.0.0',
-  primaryColor: '#00f6ff',
-  secondaryColor: '#7b61ff',
+  primaryColor: '#29F2DF',
+  secondaryColor: '#1C7FA6',
 });
 
 console.log('✓ Created base and dark themes');
@@ -81,11 +81,11 @@ manager.switchTheme('dark').then(() => {
     const colorFragment = {
       colors: {
         primary: {
-          main: '#00ff00',
+          main: '#29F2DF',
           light: '#66ff66',
-          dark: '#00cc00',
+          dark: '#1C7FA6',
           contrast: '#000000',
-          alpha: (opacity: number) => `rgba(0, 255, 0, ${opacity})`,
+          alpha: (opacity: number) => `rgba(41, 242, 223, ${opacity})`,
         },
       },
     };

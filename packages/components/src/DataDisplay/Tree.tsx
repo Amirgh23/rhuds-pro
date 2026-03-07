@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Tree Component
  * Hierarchical tree view with expand/collapse and lazy loading
  */
@@ -38,7 +38,7 @@ const TreeNodeComponent: React.FC<TreeNodeProps> = ({
   const [loading, setLoading] = useState(false);
 
   // Safe theme access with fallback
-  const primaryColor = theme?.currentMode?.tokens?.colors?.primary || theme?.colors?.primary || '#00f6ff';
+  const primaryColor = theme?.currentMode?.tokens?.colors?.primary || theme?.colors?.primary || '#29F2DF';
   const textColor = theme?.currentMode?.tokens?.colors?.text || theme?.colors?.text || '#ffffff';
 
   const handleToggle = async () => {
@@ -160,7 +160,7 @@ export const Tree: React.FC<TreeProps> = ({
   const themeContext = useTheme();
   
   // Safe theme access with fallback
-  const primaryColor = themeContext?.currentMode?.tokens?.colors?.primary || '#00f6ff';
+  const primaryColor = themeContext?.currentMode?.tokens?.colors?.primary || '#29F2DF';
   const textColor = themeContext?.currentMode?.tokens?.colors?.text || '#ffffff';
   const backgroundColor = themeContext?.currentMode?.tokens?.colors?.background || '#0a0a0a';
   

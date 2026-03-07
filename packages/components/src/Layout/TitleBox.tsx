@@ -1,4 +1,4 @@
-/**
+﻿/**
  * TitleBox Component
  * Title box with number badge for HUD frames
  */
@@ -83,7 +83,7 @@ export function TitleBox({
   tooltipText,
   className = '',
   style,
-  color = '#00f6ff',
+  color = '#29F2DF',
 }: TitleBoxProps) {
   const content = (
     <StyledTitleBox className={className} $color={color} style={style}>

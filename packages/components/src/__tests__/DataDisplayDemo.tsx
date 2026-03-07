@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Data Display Components Demo
  * Demonstrates Table, DataGrid, and Tree components
  */
@@ -44,7 +44,7 @@ export const DataDisplayDemo: React.FC = () => {
       width: 100,
       sortable: true,
       render: (value: string) => (
-        <span style={{ color: value === 'Active' ? '#00ff00' : '#ff0000' }}>
+        <span style={{ color: value === 'Active' ? '#29F2DF' : '#EF3EF1' }}>
           {value}
         </span>
       ),
@@ -63,7 +63,7 @@ export const DataDisplayDemo: React.FC = () => {
       sortable: true,
       editable: true,
       render: (value: string) => (
-        <span style={{ color: value === 'Active' ? '#00ff00' : '#ff0000' }}>
+        <span style={{ color: value === 'Active' ? '#29F2DF' : '#EF3EF1' }}>
           {value}
         </span>
       ),
@@ -113,7 +113,7 @@ export const DataDisplayDemo: React.FC = () => {
   ];
 
   return (
-    <div style={{ padding: '2rem', backgroundColor: '#0a0a0a', minHeight: '100vh', color: '#fff' }}>
+    <div style={{ padding: '2rem', backgroundColor: '#0A1225', minHeight: '100vh', color: '#fff' }}>
       <Text variant="h1" style={{ marginBottom: '2rem' }}>
         Data Display Components Demo
       </Text>
@@ -123,7 +123,7 @@ export const DataDisplayDemo: React.FC = () => {
         <Text variant="h2" style={{ marginBottom: '1rem' }}>
           Table Component
         </Text>
-        <div style={{ backgroundColor: '#1a1a1a', borderRadius: '4px', overflow: 'hidden' }}>
+        <div style={{ backgroundColor: '#0A1225', borderRadius: '4px', overflow: 'hidden' }}>
           <Table
             data={users}
             columns={tableColumns}
@@ -148,7 +148,7 @@ export const DataDisplayDemo: React.FC = () => {
         <Text variant="h2" style={{ marginBottom: '1rem' }}>
           DataGrid Component (with Virtual Scrolling)
         </Text>
-        <div style={{ backgroundColor: '#1a1a1a', borderRadius: '4px', overflow: 'hidden' }}>
+        <div style={{ backgroundColor: '#0A1225', borderRadius: '4px', overflow: 'hidden' }}>
           <DataGrid
             data={users}
             columns={dataGridColumns}
@@ -184,7 +184,7 @@ export const DataDisplayDemo: React.FC = () => {
         <Text variant="h2" style={{ marginBottom: '1rem' }}>
           Tree Component
         </Text>
-        <div style={{ backgroundColor: '#1a1a1a', borderRadius: '4px', padding: '1rem' }}>
+        <div style={{ backgroundColor: '#0A1225', borderRadius: '4px', padding: '1rem' }}>
           <Tree
             nodes={treeNodes}
             expandedNodes={expandedNodes}
@@ -239,7 +239,7 @@ export const DataDisplayDemo: React.FC = () => {
 
       {/* CyberCard Section */}
       <section style={{ marginBottom: '3rem' }}>
-        <Text variant="h2" color="#00ffff" style={{ marginBottom: '1rem' }}>
+        <Text variant="h2" color="#1C7FA6" style={{ marginBottom: '1rem' }}>
           CyberCard Component (Cyberpunk Style)
         </Text>
         <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', flexWrap: 'wrap' }}>

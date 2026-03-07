@@ -1,4 +1,4 @@
-/**
+﻿/**
  * HudFrame Component
  * Complex HUD frame with neon lines and title box
  */
@@ -88,7 +88,7 @@ export function HudFrame({
   className = '',
   innerClassName = '',
   header = {},
-  color = '#00f6ff',
+  color = '#29F2DF',
 }: HudFrameProps) {
   return (
     <StyledFrame className={className}>

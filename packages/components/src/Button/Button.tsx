@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Button Component
  * Interactive button with multiple variants and states
  */
@@ -16,29 +16,29 @@ function getVariantStyles(variant: string, theme: any): React.CSSProperties {
   
   const variants: Record<string, React.CSSProperties> = {
     primary: {
-      backgroundColor: colors.primary || '#00f6ff',
+      backgroundColor: colors.primary || '#29F2DF',
       color: colors.text || '#ffffff',
-      border: `2px solid ${colors.primary || '#00f6ff'}`,
+      border: `2px solid ${colors.primary || '#29F2DF'}`,
     },
     secondary: {
       backgroundColor: 'transparent',
-      color: colors.primary || '#00f6ff',
-      border: `2px solid ${colors.primary || '#00f6ff'}`,
+      color: colors.primary || '#29F2DF',
+      border: `2px solid ${colors.primary || '#29F2DF'}`,
     },
     danger: {
-      backgroundColor: colors.error || '#ff0000',
+      backgroundColor: colors.error || '#EF3EF1',
       color: '#ffffff',
-      border: `2px solid ${colors.error || '#ff0000'}`,
+      border: `2px solid ${colors.error || '#EF3EF1'}`,
     },
     success: {
-      backgroundColor: colors.success || '#00ff00',
+      backgroundColor: colors.success || '#29F2DF',
       color: '#000000',
-      border: `2px solid ${colors.success || '#00ff00'}`,
+      border: `2px solid ${colors.success || '#29F2DF'}`,
     },
     warning: {
-      backgroundColor: colors.warning || '#ffff00',
+      backgroundColor: colors.warning || '#29F2DF',
       color: '#000000',
-      border: `2px solid ${colors.warning || '#ffff00'}`,
+      border: `2px solid ${colors.warning || '#29F2DF'}`,
     },
   };
 

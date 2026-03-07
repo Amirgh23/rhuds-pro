@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Input Component
  * Text input with validation support
  */
@@ -30,7 +30,7 @@ export const Input: React.FC<InputProps> = ({
   const [focused, setFocused] = useState(false);
 
   const computedStyle = useMemo<React.CSSProperties>(() => {
-    const borderColor = error ? '#ff0000' : success ? '#00ff00' : focused ? theme.currentMode.tokens.colors.primary : '#666';
+    const borderColor = error ? '#EF3EF1' : success ? '#29F2DF' : focused ? theme.currentMode.tokens.colors.primary : '#666';
 
     return {
       width: '100%',
@@ -63,7 +63,7 @@ export const Input: React.FC<InputProps> = ({
       {label && (
         <label style={{ fontSize: '0.875rem', fontWeight: 600, color: theme.currentMode.tokens.colors.text }}>
           {label}
-          {required && <span style={{ color: '#ff0000' }}>*</span>}
+          {required && <span style={{ color: '#EF3EF1' }}>*</span>}
         </label>
       )}
       <input
@@ -80,12 +80,12 @@ export const Input: React.FC<InputProps> = ({
         {...props}
       />
       {error && (
-        <span style={{ fontSize: '0.75rem', color: '#ff0000' }}>
+        <span style={{ fontSize: '0.75rem', color: '#EF3EF1' }}>
           {error}
         </span>
       )}
       {success && (
-        <span style={{ fontSize: '0.75rem', color: '#00ff00' }}>
+        <span style={{ fontSize: '0.75rem', color: '#29F2DF' }}>
           {success}
         </span>
       )}

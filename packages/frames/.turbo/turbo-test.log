@@ -1,13 +1,18 @@
 
-> @rhuds/frames@0.1.0 test
-> vitest run --run
+> @rhuds/frames@0.1.0 test C:\Users\a.ghafarian\Desktop\Luminos HUD\packages\frames
+> vitest run "--run"
 
-'vitest' is not recognized as an internal or external command,
-operable program or batch file.
-npm error Lifecycle script `test` failed with error:
-npm error code 1
-npm error path C:\Users\a.ghafarian\Desktop\Luminos HUD\packages\frames
-npm error workspace @rhuds/frames@0.1.0
-npm error location C:\Users\a.ghafarian\Desktop\Luminos HUD\packages\frames
-npm error command failed
-npm error command C:\WINDOWS\system32\cmd.exe /d /s /c vitest run --run
+
+[31m⎯⎯⎯⎯⎯⎯[1m[7m Unhandled Error [27m[22m⎯⎯⎯⎯⎯⎯⎯[39m
+file:///C:/Users/a.ghafarian/Desktop/Luminos%20HUD/node_modules/.pnpm/vitest@1.6.1_@types+node@20.19.35_jsdom@23.2.0/node_modules/vitest/dist/vendor/index.-xs08BYx.js:24
+import { parseAstAsync } from 'vite';
+         ^^^^^^^^^^^^^
+SyntaxError: The requested module 'vite' does not provide an export named 'parseAstAsync'
+    at ModuleJob._instantiate (node:internal/modules/esm/module_job:213:21)
+    at async ModuleJob.run (node:internal/modules/esm/module_job:320:5)
+    at async ModuleLoader.import (node:internal/modules/esm/loader:606:24)
+    at async start (file:///C:/Users/a.ghafarian/Desktop/Luminos%20HUD/node_modules/.pnpm/vitest@1.6.1_@types+node@20.19.35_jsdom@23.2.0/node_modules/vitest/dist/vendor/cac.cdAtVkJZ.js:1414:29)
+    at async CAC.run (file:///C:/Users/a.ghafarian/Desktop/Luminos%20HUD/node_modules/.pnpm/vitest@1.6.1_@types+node@20.19.35_jsdom@23.2.0/node_modules/vitest/dist/vendor/cac.cdAtVkJZ.js:1395:3)
+
+
+

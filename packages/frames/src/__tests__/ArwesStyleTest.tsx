@@ -19,10 +19,10 @@ import {
 export const ClipPathTest: React.FC = () => {
   return (
     <div style={{ padding: 20, background: '#000' }}>
-      <h2 style={{ color: '#0ff', marginBottom: 20 }}>1. ClipPath Test (CSS)</h2>
+      <h2 style={{ color: '#29F2DF', marginBottom: 20 }}>1. ClipPath Test (CSS)</h2>
       
       <div style={{ marginBottom: 20 }}>
-        <h3 style={{ color: '#0ff', fontSize: '1rem', marginBottom: 10 }}>Octagon ClipPath</h3>
+        <h3 style={{ color: '#29F2DF', fontSize: '1rem', marginBottom: 10 }}>Octagon ClipPath</h3>
         <div
           style={{
             width: '200px',
@@ -39,7 +39,7 @@ export const ClipPathTest: React.FC = () => {
       </div>
 
       <div style={{ marginBottom: 20 }}>
-        <h3 style={{ color: '#0ff', fontSize: '1rem', marginBottom: 10 }}>Kranox ClipPath</h3>
+        <h3 style={{ color: '#29F2DF', fontSize: '1rem', marginBottom: 10 }}>Kranox ClipPath</h3>
         <div
           style={{
             width: '200px',
@@ -57,10 +57,10 @@ export const ClipPathTest: React.FC = () => {
 export const SVGFrameBasicTest: React.FC = () => {
   return (
     <div style={{ padding: 20, background: '#000' }}>
-      <h2 style={{ color: '#0ff', marginBottom: 20 }}>2. SVG Frame Basic (No Animation)</h2>
+      <h2 style={{ color: '#29F2DF', marginBottom: 20 }}>2. SVG Frame Basic (No Animation)</h2>
       
       <div style={{ marginBottom: 40 }}>
-        <h3 style={{ color: '#0ff', fontSize: '1rem', marginBottom: 10 }}>FrameSVGOctagon</h3>
+        <h3 style={{ color: '#29F2DF', fontSize: '1rem', marginBottom: 10 }}>FrameSVGOctagon</h3>
         <div
           style={{
             position: 'relative',
@@ -87,7 +87,7 @@ export const SVGFrameBasicTest: React.FC = () => {
       </div>
 
       <div style={{ marginBottom: 40 }}>
-        <h3 style={{ color: '#0ff', fontSize: '1rem', marginBottom: 10 }}>FrameSVGKranox</h3>
+        <h3 style={{ color: '#29F2DF', fontSize: '1rem', marginBottom: 10 }}>FrameSVGKranox</h3>
         <div
           style={{
             position: 'relative',
@@ -200,15 +200,15 @@ const AnimatedKranoxFrame: React.FC = () => {
 export const SVGFrameAnimatedTest: React.FC = () => {
   return (
     <div style={{ padding: 20, background: '#000' }}>
-      <h2 style={{ color: '#0ff', marginBottom: 20 }}>3. SVG Frame Animated (با انیمیشن)</h2>
+      <h2 style={{ color: '#29F2DF', marginBottom: 20 }}>3. SVG Frame Animated (با انیمیشن)</h2>
       
       <div style={{ marginBottom: 40 }}>
-        <h3 style={{ color: '#0ff', fontSize: '1rem', marginBottom: 10 }}>FrameSVGOctagon با انیمیشن</h3>
+        <h3 style={{ color: '#29F2DF', fontSize: '1rem', marginBottom: 10 }}>FrameSVGOctagon با انیمیشن</h3>
         <AnimatedOctagonFrame />
       </div>
 
       <div style={{ marginBottom: 40 }}>
-        <h3 style={{ color: '#0ff', fontSize: '1rem', marginBottom: 10 }}>FrameSVGKranox با انیمیشن</h3>
+        <h3 style={{ color: '#29F2DF', fontSize: '1rem', marginBottom: 10 }}>FrameSVGKranox با انیمیشن</h3>
         <AnimatedKranoxFrame />
       </div>
     </div>
@@ -219,7 +219,7 @@ export const SVGFrameAnimatedTest: React.FC = () => {
 export const AllFramesTest: React.FC = () => {
   return (
     <div style={{ padding: 40, background: '#000', minHeight: '100vh' }}>
-      <h1 style={{ color: '#0ff', marginBottom: 40, fontSize: '2rem' }}>
+      <h1 style={{ color: '#29F2DF', marginBottom: 40, fontSize: '2rem' }}>
         🎮 Arwes Frame Components - Complete Test
       </h1>
 
@@ -227,11 +227,11 @@ export const AllFramesTest: React.FC = () => {
       <SVGFrameBasicTest />
       <SVGFrameAnimatedTest />
 
-      <div style={{ marginTop: 60, padding: 20, border: '1px solid #0ff', borderRadius: 4 }}>
-        <p style={{ color: '#0ff', margin: 0, fontSize: '1.1rem' }}>
+      <div style={{ marginTop: 60, padding: 20, border: '1px solid #29F2DF', borderRadius: 4 }}>
+        <p style={{ color: '#29F2DF', margin: 0, fontSize: '1.1rem' }}>
           ✅ همه تست‌ها دقیقاً مثل Arwes پیاده‌سازی شدند
         </p>
-        <ul style={{ color: '#0ff', marginTop: 10, opacity: 0.8 }}>
+        <ul style={{ color: '#29F2DF', marginTop: 10, opacity: 0.8 }}>
           <li>ClipPath با CSS ✅</li>
           <li>SVG Rendering با paths ✅</li>
           <li>Assembling Animation ✅</li>

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Menu Component
  * Dropdown menu with nested items
  */
@@ -22,7 +22,7 @@ export const Menu: React.FC<MenuProps> = ({
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Safe theme access with fallback
-  const primaryColor = theme?.currentMode?.tokens?.colors?.primary || '#00f6ff';
+  const primaryColor = theme?.currentMode?.tokens?.colors?.primary || '#29F2DF';
   const textColor = theme?.currentMode?.tokens?.colors?.text || '#ffffff';
 
   // Close menu when clicking outside
@@ -49,7 +49,7 @@ export const Menu: React.FC<MenuProps> = ({
     position: 'absolute',
     top: '100%',
     left: 0,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#0A1225',
     border: `2px solid ${primaryColor}`,
     borderRadius: '4px',
     minWidth: '200px',

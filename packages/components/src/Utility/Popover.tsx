@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Popover Component
  * Popover with configurable position
  */
@@ -102,9 +102,9 @@ export const Popover: React.FC<PopoverProps> = ({
       position: 'fixed',
       top: popoverPos.top,
       left: popoverPos.left,
-      backgroundColor: tokens.colors?.background || '#1a1a1a',
+      backgroundColor: tokens.colors?.background || '#0A1225',
       color: tokens.colors?.text || '#ffffff',
-      border: `1px solid ${tokens.colors?.primary || '#00f6ff'}`,
+      border: `1px solid ${tokens.colors?.primary || '#29F2DF'}`,
       borderRadius: '8px',
       boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
       zIndex: 1001,
@@ -119,7 +119,7 @@ export const Popover: React.FC<PopoverProps> = ({
     const tokens = (theme as any)?.currentMode?.tokens || theme;
     return {
       padding: '0.75rem 1rem',
-      borderBottom: `1px solid ${tokens.colors?.primary || '#00f6ff'}`,
+      borderBottom: `1px solid ${tokens.colors?.primary || '#29F2DF'}`,
       fontWeight: 600,
     };
   }, [theme]);

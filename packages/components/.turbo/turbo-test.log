@@ -1,4 +1,4 @@
 
-> @rhuds/components@0.1.0 test
-> vitest run --run
+> @rhuds/components@0.1.0 test C:\Users\a.ghafarian\Desktop\Luminos HUD\packages\components
+> vitest run "--run"
 

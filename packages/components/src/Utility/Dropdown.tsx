@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Dropdown Component
  * Dropdown menu with items
  */
@@ -113,9 +113,9 @@ export const Dropdown: React.FC<DropdownProps> = ({
       position: 'fixed',
       top: dropdownPos.top,
       left: dropdownPos.left,
-      backgroundColor: tokens.colors?.background || '#1a1a1a',
+      backgroundColor: tokens.colors?.background || '#0A1225',
       color: tokens.colors?.text || '#ffffff',
-      border: `1px solid ${tokens.colors?.primary || '#00f6ff'}`,
+      border: `1px solid ${tokens.colors?.primary || '#29F2DF'}`,
       borderRadius: '4px',
       boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
       minWidth: '200px',
@@ -140,7 +140,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
     const tokens = (theme as any)?.currentMode?.tokens || theme;
     return {
       height: '1px',
-      backgroundColor: tokens.colors?.primary || '#00f6ff',
+      backgroundColor: tokens.colors?.primary || '#29F2DF',
       margin: '0.25rem 0',
     };
   }, [theme]);
@@ -172,7 +172,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
                   onMouseEnter={(e) => {
                     if (!item.disabled) {
                       const tokens = (theme as any)?.currentMode?.tokens || theme;
-                      (e.currentTarget as HTMLElement).style.backgroundColor = tokens.colors?.primary || '#00f6ff';
+                      (e.currentTarget as HTMLElement).style.backgroundColor = tokens.colors?.primary || '#29F2DF';
                       (e.currentTarget as HTMLElement).style.opacity = '0.1';
                     }
                   }}

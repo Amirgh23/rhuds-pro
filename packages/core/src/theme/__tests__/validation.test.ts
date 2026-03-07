@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Unit tests for RHUDS Pro theme validation
  * 
  * Tests Requirements: 1.7
@@ -271,7 +271,7 @@ describe('Theme creation with validation', () => {
     // Should not throw
     expect(() => createAppTheme({
       name: 'Test App',
-      primaryColor: '#00f6ff',
+      primaryColor: '#29F2DF',
     })).not.toThrow();
   });
 
@@ -466,7 +466,7 @@ describe('Edge cases', () => {
     const theme = createTheme({
       colors: {
         custom: {
-          brand: createThemeColor('#ff00ff'),
+          brand: createThemeColor('#29F2DF'),
         },
       },
     });

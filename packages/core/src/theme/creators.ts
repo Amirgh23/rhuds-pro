@@ -1,4 +1,4 @@
-/**
+﻿/**
  * RHUDS Pro Theme Creation Functions
  * 
  * This module provides convenient API functions for creating and composing
@@ -104,7 +104,7 @@ export function createThemeUnit(
  * 
  * @example
  * ```typescript
- * const primary = createThemeColor('#00f6ff');
+ * const primary = createThemeColor('#29F2DF');
  * // Returns palette with light/dark variations and alpha function
  * ```
  */
@@ -290,16 +290,16 @@ export function createCreateTheme() {
     animation?: Partial<AnimationDefaults>;
     zIndex?: Partial<ZIndexSystem>;
   }): RHUDSTheme {
-    // Default color system
+    // Default color system - HUD Palette (4 colors only)
     const defaultColors: ColorSystem = {
-      primary: createThemeColor('#00f6ff'),
-      secondary: createThemeColor('#7b61ff'),
-      success: createThemeColor('#00ff9f'),
-      warning: createThemeColor('#ffb800'),
-      error: createThemeColor('#ff0055'),
-      info: createThemeColor('#00b8ff'),
-      neutral: createThemeColor('#8b8b8b'),
-      background: createThemeColor('#0a0a0a'),
+      primary: createThemeColor('#29F2DF'),      // Cyan - Primary/brightest
+      secondary: createThemeColor('#1C7FA6'),    // Blue - Secondary
+      success: createThemeColor('#00ff9f'),      // Keep green for success
+      warning: createThemeColor('#ffb800'),      // Keep orange for warning
+      error: createThemeColor('#ff0055'),        // Keep red for error
+      info: createThemeColor('#29F2DF'),         // Cyan - info
+      neutral: createThemeColor('#EF3EF1'),      // Bright Pink - accent
+      background: createThemeColor('#0A1225'),   // Dark blue/black - primary background
       text: createThemeColor('#ffffff'),
     };
 
@@ -403,8 +403,8 @@ export function createCreateTheme() {
  * ```typescript
  * const appTheme = createAppTheme({
  *   name: 'My App Theme',
- *   primaryColor: '#00f6ff',
- *   secondaryColor: '#7b61ff',
+ *   primaryColor: '#29F2DF',
+ *   secondaryColor: '#1C7FA6',
  *   baseUnit: 8,
  *   fontFamily: 'Inter, sans-serif'
  * });

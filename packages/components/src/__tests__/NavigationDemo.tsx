@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Navigation Components Demo
  * Demonstrates all navigation components with interactive examples
  */
@@ -40,7 +40,7 @@ export const NavigationDemo: React.FC = () => {
   ];
 
   return (
-    <div style={{ padding: '2rem', backgroundColor: '#0a0a0a', minHeight: '100vh', color: '#fff' }}>
+    <div style={{ padding: '2rem', backgroundColor: '#0A1225', minHeight: '100vh', color: '#fff' }}>
       <Text variant="h1" style={{ marginBottom: '2rem' }}>
         Navigation Components Demo
       </Text>
@@ -83,7 +83,7 @@ export const NavigationDemo: React.FC = () => {
           onChange={(index) => setActiveTab(String(index))}
           variant="line"
         />
-        <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: '#1a1a1a', borderRadius: '4px' }}>
+        <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: '#0A1225', borderRadius: '4px' }}>
           <Text>Content for tab {activeTab}</Text>
         </div>
       </section>
@@ -142,7 +142,7 @@ export const NavigationDemo: React.FC = () => {
           showPageSize={true}
           pageSizeOptions={[10, 20, 50, 100]}
         />
-        <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: '#1a1a1a', borderRadius: '4px' }}>
+        <div style={{ marginTop: '1rem', padding: '1rem', backgroundColor: '#0A1225', borderRadius: '4px' }}>
           <Text>
             Showing items {(currentPage - 1) * 10 + 1} to {Math.min(currentPage * 10, 250)} of 250
           </Text>

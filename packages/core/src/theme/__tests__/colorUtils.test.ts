@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Unit tests for color manipulation utilities
  * Requirements: 2.1-2.4
  */
@@ -58,7 +58,7 @@ import {
 describe('Color Conversion Functions', () => {
   describe('hexToRgb', () => {
     it('should convert 6-digit hex to RGB', () => {
-      const result = hexToRgb('#00f6ff');
+      const result = hexToRgb('#29F2DF');
       expect(result).toEqual({ r: 0, g: 246, b: 255 });
     });
 
@@ -80,7 +80,7 @@ describe('Color Conversion Functions', () => {
   describe('rgbToHex', () => {
     it('should convert RGB to hex', () => {
       const result = rgbToHex({ r: 0, g: 246, b: 255 });
-      expect(result).toBe('#00f6ff');
+      expect(result).toBe('#29F2DF');
     });
 
     it('should handle edge values', () => {
@@ -118,7 +118,7 @@ describe('Color Conversion Functions', () => {
 });
 
 describe('Color Manipulation Functions (Requirement 2.1)', () => {
-  const testColor = '#00f6ff';
+  const testColor = '#29F2DF';
 
   describe('lighten', () => {
     it('should lighten a color', () => {
@@ -228,27 +228,27 @@ describe('Color Manipulation Functions (Requirement 2.1)', () => {
 });
 
 describe('Alpha Channel Manipulation (Requirement 2.2)', () => {
-  const testColor = '#00f6ff';
+  const testColor = '#29F2DF';
 
   describe('alpha', () => {
     it('should add alpha channel to color', () => {
       const result = alpha(testColor, 0.5);
-      expect(result).toBe('rgba(0, 246, 255, 0.5)');
+      expect(result).toBe('rgba(41, 242, 223, 0.5)');
     });
 
     it('should clamp opacity to 0-1 range', () => {
-      expect(alpha(testColor, -0.5)).toBe('rgba(0, 246, 255, 0)');
-      expect(alpha(testColor, 1.5)).toBe('rgba(0, 246, 255, 1)');
+      expect(alpha(testColor, -0.5)).toBe('rgba(41, 242, 223, 0)');
+      expect(alpha(testColor, 1.5)).toBe('rgba(41, 242, 223, 1)');
     });
 
     it('should handle full opacity', () => {
       const result = alpha(testColor, 1);
-      expect(result).toBe('rgba(0, 246, 255, 1)');
+      expect(result).toBe('rgba(41, 242, 223, 1)');
     });
 
     it('should handle zero opacity', () => {
       const result = alpha(testColor, 0);
-      expect(result).toBe('rgba(0, 246, 255, 0)');
+      expect(result).toBe('rgba(41, 242, 223, 0)');
     });
   });
 
@@ -256,13 +256,13 @@ describe('Alpha Channel Manipulation (Requirement 2.2)', () => {
     it('should create a function that adds alpha channel', () => {
       const alphaFn = createAlphaFunction(testColor);
       expect(typeof alphaFn).toBe('function');
-      expect(alphaFn(0.5)).toBe('rgba(0, 246, 255, 0.5)');
+      expect(alphaFn(0.5)).toBe('rgba(41, 242, 223, 0.5)');
     });
 
     it('should create reusable alpha function', () => {
       const alphaFn = createAlphaFunction(testColor);
-      expect(alphaFn(0.25)).toBe('rgba(0, 246, 255, 0.25)');
-      expect(alphaFn(0.75)).toBe('rgba(0, 246, 255, 0.75)');
+      expect(alphaFn(0.25)).toBe('rgba(41, 242, 223, 0.25)');
+      expect(alphaFn(0.75)).toBe('rgba(41, 242, 223, 0.75)');
     });
   });
 });
@@ -274,20 +274,20 @@ describe('Gradient Definitions (Requirement 2.3)', () => {
         type: 'linear',
         angle: 45,
         stops: [
-          { color: '#00f6ff', position: 0 },
-          { color: '#7b61ff', position: 100 },
+          { color: '#29F2DF', position: 0 },
+          { color: '#1C7FA6', position: 100 },
         ],
       });
       
-      expect(result).toBe('linear-gradient(45deg, #00f6ff 0%, #7b61ff 100%)');
+      expect(result).toBe('linear-gradient(45deg, #29F2DF 0%, #1C7FA6 100%)');
     });
 
     it('should default angle to 0 if not provided', () => {
       const result = createLinearGradient({
         type: 'linear',
         stops: [
-          { color: '#00f6ff', position: 0 },
-          { color: '#7b61ff', position: 100 },
+          { color: '#29F2DF', position: 0 },
+          { color: '#1C7FA6', position: 100 },
         ],
       });
       
@@ -299,13 +299,13 @@ describe('Gradient Definitions (Requirement 2.3)', () => {
         type: 'linear',
         angle: 90,
         stops: [
-          { color: '#00f6ff', position: 0 },
-          { color: '#7b61ff', position: 50 },
+          { color: '#29F2DF', position: 0 },
+          { color: '#1C7FA6', position: 50 },
           { color: '#ff0055', position: 100 },
         ],
       });
       
-      expect(result).toBe('linear-gradient(90deg, #00f6ff 0%, #7b61ff 50%, #ff0055 100%)');
+      expect(result).toBe('linear-gradient(90deg, #29F2DF 0%, #1C7FA6 50%, #ff0055 100%)');
     });
   });
 
@@ -314,12 +314,12 @@ describe('Gradient Definitions (Requirement 2.3)', () => {
       const result = createRadialGradient({
         type: 'radial',
         stops: [
-          { color: '#00f6ff', position: 0 },
-          { color: '#7b61ff', position: 100 },
+          { color: '#29F2DF', position: 0 },
+          { color: '#1C7FA6', position: 100 },
         ],
       });
       
-      expect(result).toBe('radial-gradient(circle, #00f6ff 0%, #7b61ff 100%)');
+      expect(result).toBe('radial-gradient(circle, #29F2DF 0%, #1C7FA6 100%)');
     });
   });
 
@@ -329,12 +329,12 @@ describe('Gradient Definitions (Requirement 2.3)', () => {
         type: 'conic',
         angle: 0,
         stops: [
-          { color: '#00f6ff', position: 0 },
-          { color: '#7b61ff', position: 100 },
+          { color: '#29F2DF', position: 0 },
+          { color: '#1C7FA6', position: 100 },
         ],
       });
       
-      expect(result).toBe('conic-gradient(from 0deg, #00f6ff 0%, #7b61ff 100%)');
+      expect(result).toBe('conic-gradient(from 0deg, #29F2DF 0%, #1C7FA6 100%)');
     });
   });
 
@@ -344,8 +344,8 @@ describe('Gradient Definitions (Requirement 2.3)', () => {
         type: 'linear',
         angle: 45,
         stops: [
-          { color: '#00f6ff', position: 0 },
-          { color: '#7b61ff', position: 100 },
+          { color: '#29F2DF', position: 0 },
+          { color: '#1C7FA6', position: 100 },
         ],
       });
       
@@ -376,13 +376,13 @@ describe('Animated Color Transitions (Requirement 2.4)', () => {
     });
 
     it('should return start color at progress 0', () => {
-      const result = interpolateColor('#00f6ff', '#7b61ff', 0);
-      expect(result).toBe('#00f6ff');
+      const result = interpolateColor('#29F2DF', '#1C7FA6', 0);
+      expect(result).toBe('#29F2DF');
     });
 
     it('should return end color at progress 1', () => {
-      const result = interpolateColor('#00f6ff', '#7b61ff', 1);
-      expect(result).toBe('#7b61ff');
+      const result = interpolateColor('#29F2DF', '#1C7FA6', 1);
+      expect(result).toBe('#1C7FA6');
     });
 
     it('should clamp progress to 0-1 range', () => {
@@ -397,20 +397,20 @@ describe('Animated Color Transitions (Requirement 2.4)', () => {
   describe('createColorTransitionKeyframes', () => {
     it('should create simple two-color transition', () => {
       const result = createColorTransitionKeyframes('fadeColor', {
-        from: '#00f6ff',
-        to: '#7b61ff',
+        from: '#29F2DF',
+        to: '#1C7FA6',
         duration: 1000,
       });
       
       expect(result).toContain('@keyframes fadeColor');
-      expect(result).toContain('0% { color: #00f6ff; }');
-      expect(result).toContain('100% { color: #7b61ff; }');
+      expect(result).toContain('0% { color: #29F2DF; }');
+      expect(result).toContain('100% { color: #1C7FA6; }');
     });
 
     it('should create multi-step transition with keyframes', () => {
       const result = createColorTransitionKeyframes('complexFade', {
-        from: '#00f6ff',
-        to: '#7b61ff',
+        from: '#29F2DF',
+        to: '#1C7FA6',
         duration: 1000,
         keyframes: [
           { time: 0.5, color: '#ff0055' },
@@ -424,8 +424,8 @@ describe('Animated Color Transitions (Requirement 2.4)', () => {
   describe('createColorTransitionAnimation', () => {
     it('should create animation property string', () => {
       const result = createColorTransitionAnimation('fadeColor', {
-        from: '#00f6ff',
-        to: '#7b61ff',
+        from: '#29F2DF',
+        to: '#1C7FA6',
         duration: 1000,
         easing: 'ease-in-out',
       });
@@ -435,8 +435,8 @@ describe('Animated Color Transitions (Requirement 2.4)', () => {
 
     it('should default to linear easing', () => {
       const result = createColorTransitionAnimation('fadeColor', {
-        from: '#00f6ff',
-        to: '#7b61ff',
+        from: '#29F2DF',
+        to: '#1C7FA6',
         duration: 500,
       });
       
@@ -511,7 +511,7 @@ describe('Animated Color Transitions (Requirement 2.4)', () => {
 describe('Utility Functions', () => {
   describe('isValidHexColor', () => {
     it('should validate 6-digit hex colors', () => {
-      expect(isValidHexColor('#00f6ff')).toBe(true);
+      expect(isValidHexColor('#29F2DF')).toBe(true);
       expect(isValidHexColor('#FFFFFF')).toBe(true);
     });
 
@@ -530,7 +530,7 @@ describe('Utility Functions', () => {
 
   describe('parseColor', () => {
     it('should parse hex colors', () => {
-      const result = parseColor('#00f6ff');
+      const result = parseColor('#29F2DF');
       expect(result).toEqual({ r: 0, g: 246, b: 255 });
     });
 
@@ -540,7 +540,7 @@ describe('Utility Functions', () => {
     });
 
     it('should parse rgba colors', () => {
-      const result = parseColor('rgba(0, 246, 255, 0.5)');
+      const result = parseColor('rgba(41, 242, 223, 0.5)');
       expect(result).toEqual({ r: 0, g: 246, b: 255 });
     });
 
@@ -566,19 +566,19 @@ describe('Color Accessibility Features (Requirement 2.6)', () => {
     });
 
     it('should calculate minimum contrast ratio for same colors', () => {
-      const ratio = getContrastRatio('#00f6ff', '#00f6ff');
+      const ratio = getContrastRatio('#29F2DF', '#29F2DF');
       expect(ratio).toBeCloseTo(1, 1);
     });
 
     it('should calculate contrast ratio for different colors', () => {
-      const ratio = getContrastRatio('#00f6ff', '#ffffff');
+      const ratio = getContrastRatio('#29F2DF', '#ffffff');
       expect(ratio).toBeGreaterThan(1);
       expect(ratio).toBeLessThan(21);
     });
 
     it('should be symmetric (order should not matter)', () => {
-      const ratio1 = getContrastRatio('#00f6ff', '#000000');
-      const ratio2 = getContrastRatio('#000000', '#00f6ff');
+      const ratio1 = getContrastRatio('#29F2DF', '#000000');
+      const ratio2 = getContrastRatio('#000000', '#29F2DF');
       expect(ratio1).toBeCloseTo(ratio2, 2);
     });
 
@@ -594,7 +594,7 @@ describe('Color Accessibility Features (Requirement 2.6)', () => {
     });
 
     it('should fail AA normal text for low contrast', () => {
-      expect(meetsWCAG('#00f6ff', '#ffffff', 'AA', 'normal')).toBe(false);
+      expect(meetsWCAG('#29F2DF', '#ffffff', 'AA', 'normal')).toBe(false);
     });
 
     it('should pass AA large text with lower contrast', () => {
@@ -623,12 +623,12 @@ describe('Color Accessibility Features (Requirement 2.6)', () => {
     });
 
     it('should darken light color on white background', () => {
-      const result = findAccessibleColor('#00f6ff', '#ffffff', 'AA', 'normal');
+      const result = findAccessibleColor('#29F2DF', '#ffffff', 'AA', 'normal');
       expect(result).not.toBeNull();
       if (result) {
         expect(meetsWCAG(result, '#ffffff', 'AA', 'normal')).toBe(true);
         // Should be darker than original
-        const originalL = rgbToHsl(hexToRgb('#00f6ff')).l;
+        const originalL = rgbToHsl(hexToRgb('#29F2DF')).l;
         const resultL = rgbToHsl(hexToRgb(result)).l;
         expect(resultL).toBeLessThan(originalL);
       }
@@ -647,8 +647,8 @@ describe('Color Accessibility Features (Requirement 2.6)', () => {
     });
 
     it('should work with different WCAG levels', () => {
-      const resultAA = findAccessibleColor('#00f6ff', '#ffffff', 'AA', 'normal');
-      const resultAAA = findAccessibleColor('#00f6ff', '#ffffff', 'AAA', 'normal');
+      const resultAA = findAccessibleColor('#29F2DF', '#ffffff', 'AA', 'normal');
+      const resultAAA = findAccessibleColor('#29F2DF', '#ffffff', 'AAA', 'normal');
       
       expect(resultAA).not.toBeNull();
       expect(resultAAA).not.toBeNull();
@@ -682,7 +682,7 @@ describe('Color Accessibility Features (Requirement 2.6)', () => {
     });
 
     it('should show failing criteria for low contrast', () => {
-      const info = getAccessibilityInfo('#00f6ff', '#ffffff');
+      const info = getAccessibilityInfo('#29F2DF', '#ffffff');
       
       expect(info.ratio).toBeLessThan(4.5);
       expect(info.AA.normal).toBe(false);
@@ -702,7 +702,7 @@ describe('Color Accessibility Features (Requirement 2.6)', () => {
 describe('Color Validation (Requirement 2.5)', () => {
   describe('detectColorFormat', () => {
     it('should detect hex format', () => {
-      expect(detectColorFormat('#00f6ff')).toBe('hex');
+      expect(detectColorFormat('#29F2DF')).toBe('hex');
       expect(detectColorFormat('#0ff')).toBe('hex');
     });
 
@@ -711,7 +711,7 @@ describe('Color Validation (Requirement 2.5)', () => {
     });
 
     it('should detect rgba format', () => {
-      expect(detectColorFormat('rgba(0, 246, 255, 0.5)')).toBe('rgba');
+      expect(detectColorFormat('rgba(41, 242, 223, 0.5)')).toBe('rgba');
     });
 
     it('should detect hsl format', () => {
@@ -730,7 +730,7 @@ describe('Color Validation (Requirement 2.5)', () => {
 
   describe('isValidColor', () => {
     it('should validate hex colors', () => {
-      expect(isValidColor('#00f6ff')).toBe(true);
+      expect(isValidColor('#29F2DF')).toBe(true);
       expect(isValidColor('#0ff')).toBe(true);
     });
 
@@ -739,7 +739,7 @@ describe('Color Validation (Requirement 2.5)', () => {
     });
 
     it('should validate rgba colors', () => {
-      expect(isValidColor('rgba(0, 246, 255, 0.5)')).toBe(true);
+      expect(isValidColor('rgba(41, 242, 223, 0.5)')).toBe(true);
     });
 
     it('should validate hsl colors', () => {
@@ -768,7 +768,7 @@ describe('Color Validation (Requirement 2.5)', () => {
     });
 
     it('should reject rgba format', () => {
-      expect(isValidRgbColor('rgba(0, 246, 255, 0.5)')).toBe(false);
+      expect(isValidRgbColor('rgba(41, 242, 223, 0.5)')).toBe(false);
     });
 
     it('should reject invalid format', () => {
@@ -779,13 +779,13 @@ describe('Color Validation (Requirement 2.5)', () => {
 
   describe('isValidRgbaColor', () => {
     it('should validate correct rgba colors', () => {
-      expect(isValidRgbaColor('rgba(0, 246, 255, 0.5)')).toBe(true);
+      expect(isValidRgbaColor('rgba(41, 242, 223, 0.5)')).toBe(true);
       expect(isValidRgbaColor('rgba(255, 255, 255, 1)')).toBe(true);
     });
 
     it('should reject alpha values outside 0-1 range', () => {
-      expect(isValidRgbaColor('rgba(0, 246, 255, 1.5)')).toBe(false);
-      expect(isValidRgbaColor('rgba(0, 246, 255, -0.5)')).toBe(false);
+      expect(isValidRgbaColor('rgba(41, 242, 223, 1.5)')).toBe(false);
+      expect(isValidRgbaColor('rgba(41, 242, 223, -0.5)')).toBe(false);
     });
 
     it('should reject rgb values outside 0-255 range', () => {
@@ -824,22 +824,22 @@ describe('Color Validation (Requirement 2.5)', () => {
 
   describe('normalizeColor', () => {
     it('should normalize to hex format', () => {
-      expect(normalizeColor('rgb(0, 246, 255)', 'hex')).toBe('#00f6ff');
-      expect(normalizeColor('hsl(184, 100%, 50%)', 'hex')).toBe('#00f6ff');
+      expect(normalizeColor('rgb(0, 246, 255)', 'hex')).toBe('#29F2DF');
+      expect(normalizeColor('hsl(184, 100%, 50%)', 'hex')).toBe('#29F2DF');
     });
 
     it('should normalize to rgb format', () => {
-      const result = normalizeColor('#00f6ff', 'rgb');
+      const result = normalizeColor('#29F2DF', 'rgb');
       expect(result).toBe('rgb(0, 246, 255)');
     });
 
     it('should normalize to hsl format', () => {
-      const result = normalizeColor('#00f6ff', 'hsl');
+      const result = normalizeColor('#29F2DF', 'hsl');
       expect(result).toMatch(/^hsl\(\d+, \d+%, \d+%\)$/);
     });
 
     it('should expand 3-digit hex to 6-digit', () => {
-      expect(normalizeColor('#0ff', 'hex')).toBe('#00ffff');
+      expect(normalizeColor('#0ff', 'hex')).toBe('#28125A');
     });
 
     it('should return null for invalid colors', () => {
@@ -849,7 +849,7 @@ describe('Color Validation (Requirement 2.5)', () => {
 
   describe('validateAndParseColor', () => {
     it('should validate and parse hex colors', () => {
-      const result = validateAndParseColor('#00f6ff');
+      const result = validateAndParseColor('#29F2DF');
       expect(result.valid).toBe(true);
       expect(result.format).toBe('hex');
       expect(result.rgb).toEqual({ r: 0, g: 246, b: 255 });
@@ -880,9 +880,9 @@ describe('Color Validation (Requirement 2.5)', () => {
 
     it('should handle all supported formats', () => {
       const formats = [
-        '#00f6ff',
+        '#29F2DF',
         'rgb(0, 246, 255)',
-        'rgba(0, 246, 255, 0.5)',
+        'rgba(41, 242, 223, 0.5)',
         'hsl(184, 100%, 50%)',
         'hsla(184, 100%, 50%, 0.5)',
       ];

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Unit tests for RHUDS Pro theme creation functions
  * 
  * Tests Requirements: 1.1-1.6
@@ -56,9 +56,9 @@ describe('createThemeUnit', () => {
 
 describe('createThemeColor', () => {
   it('should create a color palette from base color', () => {
-    const palette = createThemeColor('#00f6ff');
+    const palette = createThemeColor('#29F2DF');
     
-    expect(palette.main).toBe('#00f6ff');
+    expect(palette.main).toBe('#29F2DF');
     expect(palette.light).toBeDefined();
     expect(palette.dark).toBeDefined();
     expect(palette.contrast).toBe('#ffffff');
@@ -75,7 +75,7 @@ describe('createThemeColor', () => {
   });
 
   it('should allow custom light, dark, and contrast colors', () => {
-    const palette = createThemeColor('#00f6ff', {
+    const palette = createThemeColor('#29F2DF', {
       light: '#66f9ff',
       dark: '#00c4cc',
       contrast: '#000000',
@@ -87,7 +87,7 @@ describe('createThemeColor', () => {
   });
 
   it('should create alpha function that returns rgba', () => {
-    const palette = createThemeColor('#00f6ff');
+    const palette = createThemeColor('#29F2DF');
     const alpha50 = palette.alpha(0.5);
     
     expect(alpha50).toMatch(/^rgba\(\d+,\s*\d+,\s*\d+,\s*0\.5\)$/);
@@ -98,12 +98,12 @@ describe('createThemeColor', () => {
       type: 'linear' as const,
       angle: 45,
       stops: [
-        { color: '#00f6ff', position: 0 },
-        { color: '#7b61ff', position: 100 },
+        { color: '#29F2DF', position: 0 },
+        { color: '#1C7FA6', position: 100 },
       ],
     };
     
-    const palette = createThemeColor('#00f6ff', { gradient });
+    const palette = createThemeColor('#29F2DF', { gradient });
     
     expect(palette.gradient).toEqual(gradient);
   });
@@ -331,21 +331,21 @@ describe('createAppTheme', () => {
   it('should create a complete application theme', () => {
     const theme = createAppTheme({
       name: 'My App',
-      primaryColor: '#00f6ff',
+      primaryColor: '#29F2DF',
     });
     
     expect(theme.name).toBe('My App');
-    expect(theme.colors.primary.main).toBe('#00f6ff');
+    expect(theme.colors.primary.main).toBe('#29F2DF');
   });
 
   it('should support custom primary and secondary colors', () => {
     const theme = createAppTheme({
       primaryColor: '#ff0000',
-      secondaryColor: '#00ff00',
+      secondaryColor: '#29F2DF',
     });
     
     expect(theme.colors.primary.main).toBe('#ff0000');
-    expect(theme.colors.secondary.main).toBe('#00ff00');
+    expect(theme.colors.secondary.main).toBe('#29F2DF');
   });
 
   it('should support custom base unit', () => {
@@ -380,22 +380,22 @@ describe('createAppTheme', () => {
   it('should support custom colors', () => {
     const theme = createAppTheme({
       customColors: {
-        brand: '#ff00ff',
-        accent: '#00ffff',
+        brand: '#29F2DF',
+        accent: '#28125A',
       },
     });
     
     expect(theme.colors.custom).toBeDefined();
-    expect(theme.colors.custom?.brand.main).toBe('#ff00ff');
-    expect(theme.colors.custom?.accent.main).toBe('#00ffff');
+    expect(theme.colors.custom?.brand.main).toBe('#29F2DF');
+    expect(theme.colors.custom?.accent.main).toBe('#28125A');
   });
 
   it('should create a theme with all required properties', () => {
     const theme = createAppTheme({
       name: 'Complete Theme',
       version: '1.0.0',
-      primaryColor: '#00f6ff',
-      secondaryColor: '#7b61ff',
+      primaryColor: '#29F2DF',
+      secondaryColor: '#1C7FA6',
       baseUnit: 4,
       fontFamily: 'Inter, sans-serif',
     });
@@ -417,8 +417,8 @@ describe('Theme creation integration', () => {
     const theme = createTheme({
       name: 'Composed Theme',
       colors: {
-        primary: createThemeColor('#00f6ff'),
-        secondary: createThemeColor('#7b61ff'),
+        primary: createThemeColor('#29F2DF'),
+        secondary: createThemeColor('#1C7FA6'),
       },
       units: {
         space: createThemeUnit(8),
@@ -435,7 +435,7 @@ describe('Theme creation integration', () => {
       }),
     });
     
-    expect(theme.colors.primary.main).toBe('#00f6ff');
+    expect(theme.colors.primary.main).toBe('#29F2DF');
     expect(theme.units.space[1]).toBe(8);
     expect(theme.typography.fontFamily.primary).toBe('Inter, sans-serif');
     expect(theme.breakpoints.values.sm).toBe(600);

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Advanced Animation Features Demo
  * Demonstrates physics, gestures, and scroll animations
  */
@@ -38,7 +38,7 @@ export const SpringAnimationDemo: React.FC = () => {
             style={{
               marginTop: '20px',
               padding: '20px',
-              background: '#00ffff',
+              background: '#28125A',
               opacity: animator.flow.entered ? 1 : 0,
               transform: animator.flow.entered ? 'scale(1)' : 'scale(0.5)',
               transition: 'all 1s',
@@ -77,7 +77,7 @@ export const DragGestureDemo: React.FC = () => {
         style={{
           width: '100px',
           height: '100px',
-          background: '#ff00ff',
+          background: '#29F2DF',
           cursor: drag.isDragging ? 'grabbing' : 'grab',
           transform: `translate(${drag.deltaX}px, ${drag.deltaY}px)`,
           transition: drag.isDragging ? 'none' : 'transform 0.3s',
@@ -120,7 +120,7 @@ export const SwipeGestureDemo: React.FC = () => {
         style={{
           width: '300px',
           height: '200px',
-          background: '#ffff00',
+          background: '#29F2DF',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -158,7 +158,7 @@ export const PinchGestureDemo: React.FC = () => {
         style={{
           width: '200px',
           height: '200px',
-          background: '#00ff00',
+          background: '#29F2DF',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -196,7 +196,7 @@ export const ScrollTriggerDemo: React.FC = () => {
         ref={ref}
         style={{
           padding: '40px',
-          background: '#ff6600',
+          background: '#EF3EF1',
           opacity: isInView ? 1 : 0,
           transform: isInView ? 'translateY(0)' : 'translateY(50px)',
           transition: 'all 0.6s ease-out',
@@ -236,7 +236,7 @@ export const ScrollProgressDemo: React.FC = () => {
           <div
             style={{
               height: '20px',
-              background: '#00ffff',
+              background: '#29F2DF',
               width: `${progress * 100}%`,
               transition: 'width 0.1s',
             }}
@@ -265,7 +265,7 @@ export const ParallaxDemo: React.FC = () => {
         ref={ref}
         style={{
           padding: '40px',
-          background: '#9900ff',
+          background: '#EF3EF1',
           transform: `translateY(${offset.y}px)`,
         }}
       >

@@ -15,6 +15,8 @@ export { Nebula } from './Nebula';
 export { StarField } from './StarField';
 export { AnimatedGradient } from './AnimatedGradient';
 export { Plasma } from './Plasma';
+export { RainPattern } from './RainPattern';
+export { CircuitPattern } from './CircuitPattern';
 
 // Particle System
 export { Particle, ParticleEmitter, ParticleSystem } from './particles';

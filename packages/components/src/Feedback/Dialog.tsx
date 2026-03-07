@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Dialog Component
  * Dialog with action buttons
  */
@@ -78,7 +78,7 @@ export const Dialog: React.FC<DialogProps> = ({
       alignItems: 'center',
       justifyContent: 'space-between',
       padding: '1.5rem',
-      borderBottom: `1px solid ${tokens.colors?.primary || '#00f6ff'}`,
+      borderBottom: `1px solid ${tokens.colors?.primary || '#29F2DF'}`,
     };
   }, [theme]);
 
@@ -117,7 +117,7 @@ export const Dialog: React.FC<DialogProps> = ({
       justifyContent: 'flex-end',
       gap: '1rem',
       padding: '1.5rem',
-      borderTop: `1px solid ${tokens.colors?.primary || '#00f6ff'}`,
+      borderTop: `1px solid ${tokens.colors?.primary || '#29F2DF'}`,
     };
   }, [theme]);
 
@@ -136,21 +136,21 @@ export const Dialog: React.FC<DialogProps> = ({
       case 'primary':
         return {
           ...baseStyle,
-          backgroundColor: tokens.colors?.primary || '#00f6ff',
+          backgroundColor: tokens.colors?.primary || '#29F2DF',
           color: tokens.colors?.background || '#1a1a1a',
         };
       case 'danger':
         return {
           ...baseStyle,
-          backgroundColor: '#ff0000',
+          backgroundColor: '#EF3EF1',
           color: '#ffffff',
         };
       default:
         return {
           ...baseStyle,
           backgroundColor: 'transparent',
-          color: tokens.colors?.primary || '#00f6ff',
-          border: `2px solid ${tokens.colors?.primary || '#00f6ff'}`,
+          color: tokens.colors?.primary || '#29F2DF',
+          border: `2px solid ${tokens.colors?.primary || '#29F2DF'}`,
         };
     }
   };

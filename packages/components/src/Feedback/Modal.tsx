@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Modal Component
  * Modal dialog with animations
  */
@@ -78,7 +78,7 @@ export const Modal: React.FC<ModalProps> = ({
       alignItems: 'center',
       justifyContent: 'space-between',
       padding: '1.5rem',
-      borderBottom: `1px solid ${tokens.colors?.primary || '#00f6ff'}`,
+      borderBottom: `1px solid ${tokens.colors?.primary || '#29F2DF'}`,
     };
   }, [theme]);
 
@@ -117,7 +117,7 @@ export const Modal: React.FC<ModalProps> = ({
       justifyContent: 'flex-end',
       gap: '1rem',
       padding: '1.5rem',
-      borderTop: `1px solid ${tokens.colors?.primary || '#00f6ff'}`,
+      borderTop: `1px solid ${tokens.colors?.primary || '#29F2DF'}`,
     };
   }, [theme]);
 
@@ -125,7 +125,7 @@ export const Modal: React.FC<ModalProps> = ({
     const tokens = (theme as any)?.currentMode?.tokens || theme;
     return {
       padding: '0.5rem 1rem',
-      backgroundColor: tokens.colors?.primary || '#00f6ff',
+      backgroundColor: tokens.colors?.primary || '#29F2DF',
       color: tokens.colors?.background || '#1a1a1a',
       border: 'none',
       borderRadius: '4px',

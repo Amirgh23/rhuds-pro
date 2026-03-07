@@ -1,8 +1,8 @@
-import React from 'react';
+﻿import React from 'react';
 
 const App: React.FC = () => {
   return (
-    <div style={{ padding: '20px', background: '#0a0e1a', color: '#00f6ff', minHeight: '100vh' }}>
+    <div style={{ padding: '20px', background: '#0a0e1a', color: '#29F2DF', minHeight: '100vh' }}>
       <h1>RHUDS Pro - Test Page</h1>
       <p>If you see this, the app is working!</p>
     </div>

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Select Component
  * Dropdown select with search support
  */
@@ -95,9 +95,9 @@ export const Select: React.FC<SelectProps> = ({
   const selectStyle: React.CSSProperties = {
     padding: '0.75rem',
     fontSize: '1rem',
-    border: `2px solid ${error ? '#ff0000' : open ? theme.currentMode.tokens.colors.primary : '#666'}`,
+    border: `2px solid ${error ? '#EF3EF1' : open ? theme.currentMode.tokens.colors.primary : '#666'}`,
     borderRadius: '4px',
-    backgroundColor: disabled ? '#333' : '#1a1a1a',
+    backgroundColor: disabled ? '#333' : '#0A1225',
     color: theme.currentMode.tokens.colors.text,
     cursor: disabled ? 'not-allowed' : 'pointer',
     opacity: disabled ? 0.6 : 1,
@@ -110,7 +110,7 @@ export const Select: React.FC<SelectProps> = ({
     top: dropdownPos.top,
     left: dropdownPos.left,
     width: dropdownPos.width,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#0A1225',
     border: `2px solid ${theme.currentMode.tokens.colors.primary}`,
     borderRadius: '4px',
     maxHeight: '200px',
@@ -129,7 +129,7 @@ export const Select: React.FC<SelectProps> = ({
       {label && (
         <label style={{ fontSize: '0.875rem', fontWeight: 600, color: theme.currentMode.tokens.colors.text }}>
           {label}
-          {required && <span style={{ color: '#ff0000' }}>*</span>}
+          {required && <span style={{ color: '#EF3EF1' }}>*</span>}
         </label>
       )}
 
@@ -156,7 +156,7 @@ export const Select: React.FC<SelectProps> = ({
                     padding: '0.5rem',
                     border: 'none',
                     borderBottom: `1px solid ${theme.currentMode.tokens.colors.primary}`,
-                    backgroundColor: '#1a1a1a',
+                    backgroundColor: '#0A1225',
                     color: theme.currentMode.tokens.colors.text,
                     outline: 'none',
                   }}
@@ -193,7 +193,7 @@ export const Select: React.FC<SelectProps> = ({
       </div>
 
       {error && (
-        <span style={{ fontSize: '0.75rem', color: '#ff0000' }}>
+        <span style={{ fontSize: '0.75rem', color: '#EF3EF1' }}>
           {error}
         </span>
       )}

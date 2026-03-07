@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Frame Rendering System Demo
  */
 
@@ -24,14 +24,14 @@ export const FramesDemo: React.FC = () => {
           <FrameSVGOctagon
             width={300}
             height={200}
-            color="#00ffff"
+            color="#29F2DF"
             strokeWidth={2}
             cornerSize={20}
           >
             <div
               style={{
                 padding: '20px',
-                color: '#00ffff',
+                color: '#29F2DF',
                 fontSize: '14px',
               }}
             >
@@ -46,14 +46,14 @@ export const FramesDemo: React.FC = () => {
           <FrameSVGKranox
             width={300}
             height={200}
-            color="#ff00ff"
+            color="#29F2DF"
             strokeWidth={2}
             lineLength={20}
           >
             <div
               style={{
                 padding: '20px',
-                color: '#ff00ff',
+                color: '#29F2DF',
                 fontSize: '14px',
               }}
             >
@@ -68,7 +68,7 @@ export const FramesDemo: React.FC = () => {
           <FrameSVGCorners
             width={300}
             height={200}
-            color="#00ff00"
+            color="#29F2DF"
             strokeWidth={2}
             cornerSize={20}
             position="outside"
@@ -76,7 +76,7 @@ export const FramesDemo: React.FC = () => {
             <div
               style={{
                 padding: '20px',
-                color: '#00ff00',
+                color: '#29F2DF',
                 fontSize: '14px',
               }}
             >
@@ -91,14 +91,14 @@ export const FramesDemo: React.FC = () => {
           <FrameSVGLines
             width={300}
             height={200}
-            color="#ffff00"
+            color="#29F2DF"
             strokeWidth={2}
             dashArray="5,5"
           >
             <div
               style={{
                 padding: '20px',
-                color: '#ffff00',
+                color: '#29F2DF',
                 fontSize: '14px',
               }}
             >
@@ -113,14 +113,14 @@ export const FramesDemo: React.FC = () => {
           <FrameSVGUnderline
             width={300}
             height={200}
-            color="#ff6600"
+            color="#EF3EF1"
             strokeWidth={2}
             cornerSize={10}
           >
             <div
               style={{
                 padding: '20px',
-                color: '#ff6600',
+                color: '#EF3EF1',
                 fontSize: '14px',
               }}
             >
@@ -135,14 +135,14 @@ export const FramesDemo: React.FC = () => {
           <FrameSVGNefrex
             width={300}
             height={200}
-            color="#00ccff"
+            color="#1C7FA6"
             strokeWidth={2}
             lineLength={15}
           >
             <div
               style={{
                 padding: '20px',
-                color: '#00ccff',
+                color: '#1C7FA6',
                 fontSize: '14px',
               }}
             >
@@ -159,7 +159,7 @@ export const FramesDemo: React.FC = () => {
           <FrameSVGOctagon
             width={500}
             height={300}
-            color="#00ffff"
+            color="#29F2DF"
             strokeWidth={2}
             cornerSize={30}
             responsive={true}
@@ -167,7 +167,7 @@ export const FramesDemo: React.FC = () => {
             <div
               style={{
                 padding: '20px',
-                color: '#00ffff',
+                color: '#29F2DF',
                 fontSize: '14px',
               }}
             >

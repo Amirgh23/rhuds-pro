@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
   Text, Stack, Button, HudButton, GlitchButton, Input, HackerInput, Select, Checkbox, HoloCheckbox, Switch, Slider, Icon,
   Modal, Table, Tabs, Accordion, Radio, RadioGroup, Breadcrumb,
   Pagination, Grid, Container, Tooltip, Popover, Dropdown, Stepper,
-  ColorPicker, DatePicker, Navbar, Sidebar, Menu, DataGrid, Tree, CyberCard, GlitchProfileCard, HudBox, HudFrame,
+  ColorPicker, DatePicker, Navbar, Sidebar, Menu, DataGrid, Tree, CyberCard, GlitchProfileCard, AbstergoLoader, HeartRateLoader, HudBox, HudFrame,
   Dialog, Notification, Carousel, FileUpload, Chart
 } from '@rhuds/components';
 import { ComponentPlayground } from '../components/ComponentPlayground';
@@ -186,6 +186,9 @@ const docs: Record<string, { title: string; category: string; content: string }>
   'datagrid': { title: 'DataGrid', category: 'Data Display', content: 'Advanced data grid.' },
   'tree': { title: 'Tree', category: 'Data Display', content: 'Tree view component.' },
   'cybercard': { title: 'CyberCard', category: 'Data Display', content: 'Futuristic HUD-style card with glitch effects.' },
+  'glitchprofilecard': { title: 'GlitchProfileCard', category: 'Data Display', content: 'GitHub-style profile card with glitch effects.' },
+  'abstergoloader': { title: 'AbstergoLoader', category: 'Data Display', content: 'Triangular animated loader with synchronization text.' },
+  'heartrateloader': { title: 'HeartRateLoader', category: 'Data Display', content: 'ECG/heart rate style animated loader.' },
   // Feedback (4)
   'modal': { title: 'Modal', category: 'Feedback', content: 'Modal dialog with Portal.' },
   'dialog': { title: 'Dialog', category: 'Feedback', content: 'Dialog with actions.' },
@@ -231,7 +234,7 @@ export const DocsPage: React.FC = () => {
     'Layout (5)': ['grid', 'container', 'stack', 'hudbox', 'hudframe'],
     'Form (5)': ['checkbox', 'holocheckbox', 'radio', 'switch', 'useform'],
     'Navigation (6)': ['navbar', 'sidebar', 'breadcrumb', 'tabs', 'menu', 'pagination'],
-    'Data Display (4)': ['table', 'datagrid', 'tree', 'cybercard'],
+    'Data Display (6)': ['table', 'datagrid', 'tree', 'cybercard', 'glitchprofilecard', 'abstergoloader', 'heartrateloader'],
     'Feedback (4)': ['modal', 'dialog', 'notification', 'notificationprovider'],
     'Utility (4)': ['tooltip', 'popover', 'dropdown', 'portal'],
     'Advanced (5)': ['carousel', 'accordion', 'stepper', 'codeeditor', 'richtexteditor'],
@@ -244,14 +247,14 @@ export const DocsPage: React.FC = () => {
       <div style={{
         width: '280px',
         background: 'rgba(0, 0, 0, 0.5)',
-        borderRight: '1px solid rgba(0, 246, 255, 0.3)',
+        borderRight: '1px solid rgba(41, 242, 223, 0.3)',
         padding: '2rem 1rem',
         overflowY: 'auto',
         position: 'sticky',
         top: 0,
         height: '100vh',
       }}>
-        <Text variant="h3" style={{ color: '#00f6ff', marginBottom: '0.5rem', paddingLeft: '1rem' }}>
+        <Text variant="h3" style={{ color: '#29F2DF', marginBottom: '0.5rem', paddingLeft: '1rem' }}>
           Documentation
         </Text>
         <Text variant="caption" style={{ color: 'rgba(255, 255, 255, 0.5)', marginBottom: '1.5rem', paddingLeft: '1rem', display: 'block' }}>
@@ -279,9 +282,9 @@ export const DocsPage: React.FC = () => {
                     width: '100%',
                     textAlign: 'left',
                     padding: '0.6rem 1rem',
-                    background: selectedDoc === doc ? 'rgba(0, 246, 255, 0.2)' : 'transparent',
+                    background: selectedDoc === doc ? 'rgba(41, 242, 223, 0.2)' : 'transparent',
                     border: 'none',
-                    color: selectedDoc === doc ? '#00f6ff' : 'rgba(255, 255, 255, 0.7)',
+                    color: selectedDoc === doc ? '#29F2DF' : 'rgba(255, 255, 255, 0.7)',
                     cursor: 'pointer',
                     borderRadius: '4px',
                     transition: 'all 0.2s',
@@ -296,9 +299,9 @@ export const DocsPage: React.FC = () => {
         ))}
       </div>
 
-      <div style={{ flex: 1, overflowY: 'auto', background: '#0a0e27' }}>
+      <div style={{ flex: 1, overflowY: 'auto', background: '#0A1225' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '3rem 2rem' }}>
-          <h1 style={{ color: '#00f6ff', marginBottom: '0.5rem', fontSize: '2.5rem', fontWeight: 'bold' }}>
+          <h1 style={{ color: '#29F2DF', marginBottom: '0.5rem', fontSize: '2.5rem', fontWeight: 'bold' }}>
             {currentDoc.title}
           </h1>
           <Text variant="caption" style={{ color: 'rgba(255, 255, 255, 0.5)', marginBottom: '2rem', display: 'block' }}>
@@ -351,7 +354,7 @@ export const DocsPage: React.FC = () => {
               <div style={{ background: 'rgba(0, 0, 0, 0.5)', padding: '2rem', borderRadius: '8px' }}>
                 <Stack direction="column" gap="2rem">
                   <div>
-                    <Text variant="h4" style={{ color: '#1BFD9C', marginBottom: '1rem' }}>
+                    <Text variant="h4" style={{ color: '#29F2DF', marginBottom: '1rem' }}>
                       Basic Usage
                     </Text>
                     <Stack direction="row" gap="1rem" style={{ flexWrap: 'wrap' }}>
@@ -363,7 +366,7 @@ export const DocsPage: React.FC = () => {
                   </div>
                   
                   <div>
-                    <Text variant="h4" style={{ color: '#1BFD9C', marginBottom: '1rem' }}>
+                    <Text variant="h4" style={{ color: '#29F2DF', marginBottom: '1rem' }}>
                       Disabled State
                     </Text>
                     <Stack direction="row" gap="1rem" style={{ flexWrap: 'wrap' }}>
@@ -373,17 +376,17 @@ export const DocsPage: React.FC = () => {
                   </div>
 
                   <div>
-                    <Text variant="h4" style={{ color: '#1BFD9C', marginBottom: '1rem' }}>
+                    <Text variant="h4" style={{ color: '#29F2DF', marginBottom: '1rem' }}>
                       Usage Code
                     </Text>
                     <pre style={{
                       background: '#000',
                       padding: '1rem',
                       borderRadius: '4px',
-                      color: '#1BFD9C',
+                      color: '#29F2DF',
                       fontSize: '0.85rem',
                       overflow: 'auto',
-                      border: '1px solid rgba(27, 253, 156, 0.3)',
+                      border: '1px solid rgba(41, 242, 223, 0.3)',
                     }}>
 {`import { HudButton } from '@rhuds/components';
 
@@ -407,12 +410,12 @@ function MyComponent() {
                   </div>
 
                   <div>
-                    <Text variant="h4" style={{ color: '#1BFD9C', marginBottom: '1rem' }}>
+                    <Text variant="h4" style={{ color: '#29F2DF', marginBottom: '1rem' }}>
                       Features
                     </Text>
                     <Stack direction="column" gap="0.5rem">
                       <Text variant="body" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
-                        • Neon green (#1BFD9C) HUD aesthetic
+                        • Neon green (#29F2DF) HUD aesthetic
                       </Text>
                       <Text variant="body" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
                         • Glowing border and shadow effects
@@ -442,7 +445,7 @@ function MyComponent() {
               <div style={{ background: 'rgba(255, 255, 255, 0.1)', padding: '2rem', borderRadius: '8px' }}>
                 <Stack direction="column" gap="2rem">
                   <div>
-                    <Text variant="h4" style={{ color: '#ffff00', marginBottom: '1rem' }}>
+                    <Text variant="h4" style={{ color: '#29F2DF', marginBottom: '1rem' }}>
                       Basic Usage
                     </Text>
                     <Stack direction="row" gap="1rem" style={{ flexWrap: 'wrap' }}>
@@ -454,7 +457,7 @@ function MyComponent() {
                   </div>
                   
                   <div>
-                    <Text variant="h4" style={{ color: '#ffff00', marginBottom: '1rem' }}>
+                    <Text variant="h4" style={{ color: '#29F2DF', marginBottom: '1rem' }}>
                       Disabled State
                     </Text>
                     <Stack direction="row" gap="1rem" style={{ flexWrap: 'wrap' }}>
@@ -464,14 +467,14 @@ function MyComponent() {
                   </div>
 
                   <div>
-                    <Text variant="h4" style={{ color: '#ffff00', marginBottom: '1rem' }}>
+                    <Text variant="h4" style={{ color: '#29F2DF', marginBottom: '1rem' }}>
                       Usage Code
                     </Text>
                     <pre style={{
                       background: '#000',
                       padding: '1rem',
                       borderRadius: '4px',
-                      color: '#ffff00',
+                      color: '#29F2DF',
                       fontSize: '0.85rem',
                       overflow: 'auto',
                       border: '1px solid rgba(255, 255, 0, 0.3)',
@@ -498,7 +501,7 @@ function MyComponent() {
                   </div>
 
                   <div>
-                    <Text variant="h4" style={{ color: '#ffff00', marginBottom: '1rem' }}>
+                    <Text variant="h4" style={{ color: '#29F2DF', marginBottom: '1rem' }}>
                       Features
                     </Text>
                     <Stack direction="column" gap="0.5rem">
@@ -509,7 +512,7 @@ function MyComponent() {
                         • RGB glitch animation on hover (magenta, green, blue, cyan)
                       </Text>
                       <Text variant="body" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
-                        • HUD-style cyan color (#00f6ff) visible on any background
+                        • HUD-style cyan color (#29F2DF) visible on any background
                       </Text>
                       <Text variant="body" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
                         • Glowing border and shadow effects
@@ -559,7 +562,7 @@ function MyComponent() {
               <div style={{ background: 'rgba(0, 0, 0, 0.8)', padding: '2rem', borderRadius: '8px' }}>
                 <Stack direction="column" gap="2rem">
                   <div>
-                    <Text variant="h4" color="#00ff00" style={{ marginBottom: '1rem' }}>
+                    <Text variant="h4" color="#29F2DF" style={{ marginBottom: '1rem' }}>
                       Basic Usage
                     </Text>
                     <Stack direction="column" gap="1rem">
@@ -580,27 +583,27 @@ function MyComponent() {
                   </div>
 
                   <div>
-                    <Text variant="h4" color="#00ff00" style={{ marginBottom: '1rem' }}>
+                    <Text variant="h4" color="#29F2DF" style={{ marginBottom: '1rem' }}>
                       Features
                     </Text>
                     <Stack direction="column" gap="0.5rem">
-                      <Text variant="body" color="#00cc00">• Matrix green (#00ff00) color scheme</Text>
-                      <Text variant="body" color="#00cc00">• Glowing border with enhanced glow on focus</Text>
-                      <Text variant="body" color="#00cc00">• Scanline animation effect</Text>
-                      <Text variant="body" color="#00cc00">• Blinking cursor indicator</Text>
-                      <Text variant="body" color="#00cc00">• Glitch effect on hover</Text>
-                      <Text variant="body" color="#00cc00">• Floating label animation</Text>
-                      <Text variant="body" color="#00cc00">• Courier New monospace font</Text>
+                      <Text variant="body" color="#1C7FA6">• Matrix green (#29F2DF) color scheme</Text>
+                      <Text variant="body" color="#1C7FA6">• Glowing border with enhanced glow on focus</Text>
+                      <Text variant="body" color="#1C7FA6">• Scanline animation effect</Text>
+                      <Text variant="body" color="#1C7FA6">• Blinking cursor indicator</Text>
+                      <Text variant="body" color="#1C7FA6">• Glitch effect on hover</Text>
+                      <Text variant="body" color="#1C7FA6">• Floating label animation</Text>
+                      <Text variant="body" color="#1C7FA6">• Courier New monospace font</Text>
                     </Stack>
                   </div>
 
                   <div style={{
-                    background: 'rgba(0, 255, 0, 0.05)',
+                    background: 'rgba(41, 242, 223, 0.05)',
                     padding: '1.5rem',
                     borderRadius: '4px',
-                    border: '1px solid rgba(0, 255, 0, 0.3)',
+                    border: '1px solid rgba(41, 242, 223, 0.3)',
                   }}>
-                    <Text variant="code" color="#00ff00" style={{ whiteSpace: 'pre-wrap' }}>
+                    <Text variant="code" color="#29F2DF" style={{ whiteSpace: 'pre-wrap' }}>
 {`import { HackerInput } from '@rhuds/components';
 
 function MyComponent() {
@@ -643,7 +646,7 @@ function MyComponent() {
             >
               <Grid columns={3} gap="1rem">
                 {[1, 2, 3, 4, 5, 6].map(i => (
-                  <div key={i} style={{ padding: '2rem', background: 'rgba(0, 246, 255, 0.1)', borderRadius: '4px', textAlign: 'center' }}>
+                  <div key={i} style={{ padding: '2rem', background: 'rgba(41, 242, 223, 0.1)', borderRadius: '4px', textAlign: 'center' }}>
                     Item {i}
                   </div>
                 ))}
@@ -655,7 +658,7 @@ function MyComponent() {
             <ComponentPlayground title="Container Example" description="Max-width container"
               code={`<Container maxWidth="1200px">...</Container>`}
             >
-              <Container maxWidth="800px" style={{ background: 'rgba(0, 246, 255, 0.1)', padding: '2rem', borderRadius: '4px' }}>
+              <Container maxWidth="800px" style={{ background: 'rgba(41, 242, 223, 0.1)', padding: '2rem', borderRadius: '4px' }}>
                 <Text variant="body">Container content with max-width</Text>
               </Container>
             </ComponentPlayground>
@@ -666,9 +669,9 @@ function MyComponent() {
               code={`<Stack direction="row" gap="1rem">...</Stack>`}
             >
               <Stack direction="row" gap="1rem">
-                <div style={{ padding: '1rem', background: 'rgba(0, 246, 255, 0.1)', borderRadius: '4px' }}>Item 1</div>
-                <div style={{ padding: '1rem', background: 'rgba(0, 246, 255, 0.1)', borderRadius: '4px' }}>Item 2</div>
-                <div style={{ padding: '1rem', background: 'rgba(0, 246, 255, 0.1)', borderRadius: '4px' }}>Item 3</div>
+                <div style={{ padding: '1rem', background: 'rgba(41, 242, 223, 0.1)', borderRadius: '4px' }}>Item 1</div>
+                <div style={{ padding: '1rem', background: 'rgba(41, 242, 223, 0.1)', borderRadius: '4px' }}>Item 2</div>
+                <div style={{ padding: '1rem', background: 'rgba(41, 242, 223, 0.1)', borderRadius: '4px' }}>Item 3</div>
               </Stack>
             </ComponentPlayground>
           )}
@@ -677,108 +680,108 @@ function MyComponent() {
             <ComponentPlayground 
               title="HudBox Examples" 
               description="Asymmetrical HUD-style container with 18 unique geometric shapes including Portrait (vertical) and Landscape (horizontal) variants"
-              code={`<HudBox variant="octagon" color="#FF4500">Content</HudBox>
-<HudBox variant="portrait-card" color="#7FFF00">Vertical</HudBox>
-<HudBox variant="landscape-bar" color="#32CD32">Horizontal</HudBox>`}
+              code={`<HudBox variant="octagon" color="#EF3EF1">Content</HudBox>
+<HudBox variant="portrait-card" color="#1C7FA6">Vertical</HudBox>
+<HudBox variant="landscape-bar" color="#1C7FA6">Horizontal</HudBox>`}
             >
               <div style={{ background: 'rgba(0, 0, 0, 0.8)', padding: '2rem', borderRadius: '8px' }}>
                 <div style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
                   <HudButton onClick={() => setHudBoxAnimated(!hudBoxAnimated)}>
                     {hudBoxAnimated ? '⏸ Static Border' : '▶ Animated Border'}
                   </HudButton>
-                  <Text color="#00f6ff">
+                  <Text color="#29F2DF">
                     Mode: {hudBoxAnimated ? 'Animated' : 'Static'}
                   </Text>
                 </div>
                 <Stack direction="column" gap="2rem">
                   <div>
-                    <Text variant="body" color="#00f6ff" style={{ marginBottom: '1rem' }}>
+                    <Text variant="body" color="#29F2DF" style={{ marginBottom: '1rem' }}>
                       Standard Variants:
                     </Text>
                     <Stack direction="row" gap="2rem" style={{ justifyContent: 'center', flexWrap: 'wrap' }}>
-                      <HudBox variant="compact" color="#00f6ff" animated={hudBoxAnimated}>
-                        <Text color="#00f6ff">Compact</Text>
+                      <HudBox variant="compact" color="#29F2DF" animated={hudBoxAnimated}>
+                        <Text color="#29F2DF">Compact</Text>
                       </HudBox>
-                      <HudBox variant="default" color="#1BFD9C" animated={hudBoxAnimated}>
-                        <Text color="#1BFD9C">Default</Text>
+                      <HudBox variant="default" color="#29F2DF" animated={hudBoxAnimated}>
+                        <Text color="#29F2DF">Default</Text>
                       </HudBox>
-                      <HudBox variant="wide" color="#FF6B9D" animated={hudBoxAnimated}>
-                        <Text color="#FF6B9D">Wide</Text>
+                      <HudBox variant="wide" color="#29F2DF" animated={hudBoxAnimated}>
+                        <Text color="#29F2DF">Wide</Text>
                       </HudBox>
                     </Stack>
                   </div>
 
                   <div>
-                    <Text variant="body" color="#00f6ff" style={{ marginBottom: '1rem' }}>
+                    <Text variant="body" color="#29F2DF" style={{ marginBottom: '1rem' }}>
                       Geometric Variants:
                     </Text>
                     <Stack direction="row" gap="2rem" style={{ justifyContent: 'center', flexWrap: 'wrap' }}>
-                      <HudBox variant="hexagon" color="#FFD700" animated={hudBoxAnimated}>
-                        <Text color="#FFD700">Hexagon</Text>
+                      <HudBox variant="hexagon" color="#29F2DF" animated={hudBoxAnimated}>
+                        <Text color="#29F2DF">Hexagon</Text>
                       </HudBox>
-                      <HudBox variant="octagon" color="#FF4500" animated={hudBoxAnimated}>
-                        <Text color="#FF4500">Octagon</Text>
+                      <HudBox variant="octagon" color="#EF3EF1" animated={hudBoxAnimated}>
+                        <Text color="#EF3EF1">Octagon</Text>
                       </HudBox>
-                      <HudBox variant="diagonal" color="#9D00FF" animated={hudBoxAnimated}>
-                        <Text color="#9D00FF">Diagonal</Text>
+                      <HudBox variant="diagonal" color="#1C7FA6" animated={hudBoxAnimated}>
+                        <Text color="#1C7FA6">Diagonal</Text>
                       </HudBox>
-                      <HudBox variant="corner-cut" color="#00FFFF" animated={hudBoxAnimated}>
-                        <Text color="#00FFFF">Corner Cut</Text>
+                      <HudBox variant="corner-cut" color="#28125A" animated={hudBoxAnimated}>
+                        <Text color="#28125A">Corner Cut</Text>
                       </HudBox>
-                      <HudBox variant="tech-panel" color="#FF00FF" animated={hudBoxAnimated}>
-                        <Text color="#FF00FF">Tech Panel</Text>
+                      <HudBox variant="tech-panel" color="#29F2DF" animated={hudBoxAnimated}>
+                        <Text color="#29F2DF">Tech Panel</Text>
                       </HudBox>
-                      <HudBox variant="arrow-right" color="#00FF00" animated={hudBoxAnimated}>
-                        <Text color="#00FF00">Arrow →</Text>
+                      <HudBox variant="arrow-right" color="#29F2DF" animated={hudBoxAnimated}>
+                        <Text color="#29F2DF">Arrow →</Text>
                       </HudBox>
-                      <HudBox variant="chevron" color="#FFA500" animated={hudBoxAnimated}>
-                        <Text color="#FFA500">Chevron</Text>
+                      <HudBox variant="chevron" color="#29F2DF" animated={hudBoxAnimated}>
+                        <Text color="#29F2DF">Chevron</Text>
                       </HudBox>
                     </Stack>
                   </div>
 
                   <div>
-                    <Text variant="body" color="#00f6ff" style={{ marginBottom: '1rem' }}>
+                    <Text variant="body" color="#29F2DF" style={{ marginBottom: '1rem' }}>
                       Portrait Variants (Vertical - Height &gt; Width):
                     </Text>
                     <Stack direction="row" gap="2rem" style={{ justifyContent: 'center', flexWrap: 'wrap' }}>
-                      <HudBox variant="portrait-tall" color="#00CED1" animated={hudBoxAnimated}>
-                        <Text color="#00CED1" align="center">Portrait<br/>Tall<br/>250×400</Text>
+                      <HudBox variant="portrait-tall" color="#28125A" animated={hudBoxAnimated}>
+                        <Text color="#28125A" align="center">Portrait<br/>Tall<br/>250×400</Text>
                       </HudBox>
-                      <HudBox variant="portrait-slim" color="#FF1493" animated={hudBoxAnimated}>
-                        <Text color="#FF1493" align="center">Portrait<br/>Slim<br/>200×350</Text>
+                      <HudBox variant="portrait-slim" color="#29F2DF" animated={hudBoxAnimated}>
+                        <Text color="#29F2DF" align="center">Portrait<br/>Slim<br/>200×350</Text>
                       </HudBox>
-                      <HudBox variant="portrait-card" color="#7FFF00" animated={hudBoxAnimated}>
-                        <Text color="#7FFF00" align="center">Portrait<br/>Card<br/>280×380</Text>
+                      <HudBox variant="portrait-card" color="#1C7FA6" animated={hudBoxAnimated}>
+                        <Text color="#1C7FA6" align="center">Portrait<br/>Card<br/>280×380</Text>
                       </HudBox>
-                      <HudBox variant="portrait-banner" color="#FF69B4" animated={hudBoxAnimated}>
-                        <Text color="#FF69B4" align="center">Portrait<br/>Banner<br/>220×320</Text>
+                      <HudBox variant="portrait-banner" color="#29F2DF" animated={hudBoxAnimated}>
+                        <Text color="#29F2DF" align="center">Portrait<br/>Banner<br/>220×320</Text>
                       </HudBox>
                     </Stack>
                   </div>
 
                   <div>
-                    <Text variant="body" color="#00f6ff" style={{ marginBottom: '1rem' }}>
+                    <Text variant="body" color="#29F2DF" style={{ marginBottom: '1rem' }}>
                       Landscape Variants (Horizontal - Width &gt; Height):
                     </Text>
                     <Stack direction="column" gap="2rem" style={{ alignItems: 'center' }}>
-                      <HudBox variant="landscape-wide" color="#00BFFF" animated={hudBoxAnimated}>
-                        <Text color="#00BFFF">Landscape Wide - 450×180</Text>
+                      <HudBox variant="landscape-wide" color="#28125A" animated={hudBoxAnimated}>
+                        <Text color="#28125A">Landscape Wide - 450×180</Text>
                       </HudBox>
-                      <HudBox variant="landscape-ultra" color="#FF6347" animated={hudBoxAnimated}>
-                        <Text color="#FF6347">Landscape Ultra - 500×150</Text>
+                      <HudBox variant="landscape-ultra" color="#EF3EF1" animated={hudBoxAnimated}>
+                        <Text color="#EF3EF1">Landscape Ultra - 500×150</Text>
                       </HudBox>
-                      <HudBox variant="landscape-bar" color="#32CD32" animated={hudBoxAnimated}>
-                        <Text color="#32CD32">Landscape Bar - 550×120</Text>
+                      <HudBox variant="landscape-bar" color="#1C7FA6" animated={hudBoxAnimated}>
+                        <Text color="#1C7FA6">Landscape Bar - 550×120</Text>
                       </HudBox>
-                      <HudBox variant="landscape-ribbon" color="#BA55D3" animated={hudBoxAnimated}>
-                        <Text color="#BA55D3">Landscape Ribbon - 480×140</Text>
+                      <HudBox variant="landscape-ribbon" color="#1C7FA6" animated={hudBoxAnimated}>
+                        <Text color="#1C7FA6">Landscape Ribbon - 480×140</Text>
                       </HudBox>
                     </Stack>
                   </div>
                 </Stack>
                 <div style={{ marginTop: '2rem' }}>
-                  <Text variant="body" color="#00f6ff" style={{ marginBottom: '0.5rem' }}>
+                  <Text variant="body" color="#29F2DF" style={{ marginBottom: '0.5rem' }}>
                     Features:
                   </Text>
                   <Text variant="code" color="#00ccff" style={{ whiteSpace: 'pre-wrap' }}>
@@ -806,7 +809,7 @@ function MyComponent() {
     description: 'Real-time monitoring',
     number: 1,
   }}
-  color="#00f6ff"
+  color="#29F2DF"
 >
   <div style={{ padding: '2rem' }}>
     Your content here...
@@ -822,10 +825,10 @@ function MyComponent() {
                         description: 'Real-time system monitoring dashboard',
                         number: 1,
                       }}
-                      color="#00f6ff"
+                      color="#29F2DF"
                     >
                       <div style={{ padding: '2rem' }}>
-                        <Text color="#00f6ff" variant="h3" style={{ marginBottom: '1rem' }}>
+                        <Text color="#29F2DF" variant="h3" style={{ marginBottom: '1rem' }}>
                           HUD FRAME DEMO
                         </Text>
                         <Text color="#ffffff" variant="body">
@@ -842,10 +845,10 @@ function MyComponent() {
                         description: 'Analytics and metrics dashboard',
                         number: 2,
                       }}
-                      color="#1BFD9C"
+                      color="#29F2DF"
                     >
                       <div style={{ padding: '2rem' }}>
-                        <Text color="#1BFD9C" variant="h3" style={{ marginBottom: '1rem' }}>
+                        <Text color="#29F2DF" variant="h3" style={{ marginBottom: '1rem' }}>
                           GREEN THEME
                         </Text>
                         <Text color="#ffffff" variant="body">
@@ -857,7 +860,7 @@ function MyComponent() {
                   </div>
                 </Stack>
                 <div style={{ marginTop: '2rem' }}>
-                  <Text variant="body" color="#00f6ff" style={{ marginBottom: '0.5rem' }}>
+                  <Text variant="body" color="#29F2DF" style={{ marginBottom: '0.5rem' }}>
                     Features:
                   </Text>
                   <Text variant="code" color="#00ccff" style={{ whiteSpace: 'pre-wrap' }}>
@@ -895,7 +898,7 @@ function MyComponent() {
               <div style={{ background: 'rgba(0, 0, 0, 0.9)', padding: '2rem', borderRadius: '8px' }}>
                 <Stack direction="column" gap="2rem" style={{ alignItems: 'center' }}>
                   <div>
-                    <Text variant="h4" color="#00f6ff" style={{ marginBottom: '1rem', textAlign: 'center' }}>
+                    <Text variant="h4" color="#29F2DF" style={{ marginBottom: '1rem', textAlign: 'center' }}>
                       Interactive Holographic Checkbox
                     </Text>
                     <HoloCheckbox label="HOLOGRAPHIC SYSTEM" />
@@ -1037,9 +1040,9 @@ function MyComponent() {
 
           {selectedDoc === 'colorpicker' && (
             <ComponentPlayground title="Color Picker" description="Color selection"
-              code={`<ColorPicker value="#00f6ff" />`}
+              code={`<ColorPicker value="#29F2DF" />`}
             >
-              <ColorPicker value="#00f6ff" />
+              <ColorPicker value="#29F2DF" />
             </ComponentPlayground>
           )}
 
@@ -1216,6 +1219,38 @@ function MyComponent() {
             </ComponentPlayground>
           )}
 
+          {selectedDoc === 'abstergoloader' && (
+            <ComponentPlayground 
+              title="AbstergoLoader Examples" 
+              description="Triangular animated loader with synchronization text"
+              code={`<AbstergoLoader text="Loading" size={1} />`}
+            >
+              <div style={{ background: 'rgba(0, 0, 0, 0.8)', padding: '3rem', borderRadius: '8px' }}>
+                <Stack direction="row" gap="3rem" style={{ justifyContent: 'center', flexWrap: 'wrap' }}>
+                  <AbstergoLoader text="Loading" size={0.8} />
+                  <AbstergoLoader text="Synchronization" size={1} />
+                  <AbstergoLoader text="Processing" size={1.2} />
+                </Stack>
+              </div>
+            </ComponentPlayground>
+          )}
+
+          {selectedDoc === 'heartrateloader' && (
+            <ComponentPlayground 
+              title="HeartRateLoader Examples" 
+              description="ECG/heart rate style animated loader with customizable colors"
+              code={`<HeartRateLoader color="#29F2DF" width={400} height={150} />`}
+            >
+              <div style={{ background: 'rgba(0, 0, 0, 0.8)', padding: '3rem', borderRadius: '8px' }}>
+                <Stack direction="column" gap="2rem" style={{ alignItems: 'center' }}>
+                  <HeartRateLoader color="#EF3EF1" width={550} height={210} />
+                  <HeartRateLoader color="#29F2DF" width={400} height={150} />
+                  <HeartRateLoader color="#29F2DF" width={300} height={120} />
+                </Stack>
+              </div>
+            </ComponentPlayground>
+          )}
+
           {selectedDoc === 'dialog' && (
             <ComponentPlayground title="Dialog Example" description="Dialog with actions"
               code={`<Dialog isOpen={true} title="Confirm" />`}
@@ -1345,7 +1380,7 @@ function YourComponent() {
             >
               <Carousel
                 items={[
-                  { key: 'slide1', content: <div style={{ padding: '3rem', background: 'rgba(0, 246, 255, 0.1)', textAlign: 'center' }}>Slide 1</div> },
+                  { key: 'slide1', content: <div style={{ padding: '3rem', background: 'rgba(41, 242, 223, 0.1)', textAlign: 'center' }}>Slide 1</div> },
                   { key: 'slide2', content: <div style={{ padding: '3rem', background: 'rgba(255, 0, 246, 0.1)', textAlign: 'center' }}>Slide 2</div> },
                   { key: 'slide3', content: <div style={{ padding: '3rem', background: 'rgba(246, 255, 0, 0.1)', textAlign: 'center' }}>Slide 3</div> },
                 ]}

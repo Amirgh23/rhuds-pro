@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Tests for RHUDS Pro theme data models
  */
 
@@ -18,29 +18,29 @@ describe('Theme Data Models', () => {
   describe('ColorPalette', () => {
     it('should define a valid color palette structure', () => {
       const palette: ColorPalette = {
-        main: '#00f6ff',
+        main: '#29F2DF',
         light: '#66f9ff',
         dark: '#00c4cc',
         contrast: '#000000',
-        alpha: (opacity: number) => `rgba(0, 246, 255, ${opacity})`,
+        alpha: (opacity: number) => `rgba(41, 242, 223, ${opacity})`,
       };
 
-      expect(palette.main).toBe('#00f6ff');
-      expect(palette.alpha(0.5)).toBe('rgba(0, 246, 255, 0.5)');
+      expect(palette.main).toBe('#29F2DF');
+      expect(palette.alpha(0.5)).toBe('rgba(41, 242, 223, 0.5)');
     });
 
     it('should support optional gradient definition', () => {
       const palette: ColorPalette = {
-        main: '#00f6ff',
+        main: '#29F2DF',
         light: '#66f9ff',
         dark: '#00c4cc',
         contrast: '#000000',
-        alpha: (opacity: number) => `rgba(0, 246, 255, ${opacity})`,
+        alpha: (opacity: number) => `rgba(41, 242, 223, ${opacity})`,
         gradient: {
           type: 'linear',
           angle: 45,
           stops: [
-            { color: '#00f6ff', position: 0 },
+            { color: '#29F2DF', position: 0 },
             { color: '#00c4cc', position: 100 },
           ],
         },
@@ -80,11 +80,11 @@ describe('Theme Data Models', () => {
         version: '1.0.0',
         colors: {
           primary: {
-            main: '#00f6ff',
+            main: '#29F2DF',
             light: '#66f9ff',
             dark: '#00c4cc',
             contrast: '#000000',
-            alpha: (opacity: number) => `rgba(0, 246, 255, ${opacity})`,
+            alpha: (opacity: number) => `rgba(41, 242, 223, ${opacity})`,
           },
           secondary: {
             main: '#ff00f6',
@@ -94,11 +94,11 @@ describe('Theme Data Models', () => {
             alpha: (opacity: number) => `rgba(255, 0, 246, ${opacity})`,
           },
           success: {
-            main: '#00ff00',
+            main: '#29F2DF',
             light: '#66ff66',
-            dark: '#00cc00',
+            dark: '#1C7FA6',
             contrast: '#000000',
-            alpha: (opacity: number) => `rgba(0, 255, 0, ${opacity})`,
+            alpha: (opacity: number) => `rgba(41, 242, 223, ${opacity})`,
           },
           warning: {
             main: '#ffaa00',
@@ -308,7 +308,7 @@ describe('Theme Data Models', () => {
       };
 
       expect(theme.name).toBe('Test Theme');
-      expect(theme.colors.primary.main).toBe('#00f6ff');
+      expect(theme.colors.primary.main).toBe('#29F2DF');
       expect(theme.units.space[5]).toBe(24);
       expect(theme.typography.fontFamily.primary).toBe('Inter, system-ui, sans-serif');
       expect(theme.breakpoints.values.md).toBe(768);

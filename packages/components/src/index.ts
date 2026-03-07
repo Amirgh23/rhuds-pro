@@ -27,6 +27,18 @@ export type { InputProps } from './Input/types';
 export { HackerInput } from './Input/HackerInput';
 export type { HackerInputProps } from './Input/HackerInput';
 
+export { AiHudInput } from './Input/AiHudInput';
+export type { AiHudInputProps } from './Input/AiHudInput';
+
+export { HoloGlitchInput } from './Input/HoloGlitchInput';
+export type { HoloGlitchInputProps } from './Input/HoloGlitchInput';
+
+export { HoloInput } from './Input/HoloInput';
+export type { HoloInputProps } from './Input/HoloInput';
+
+export { FuturisticInput } from './Input/FuturisticInput';
+export type { FuturisticInputProps } from './Input/FuturisticInput';
+
 export { Select } from './Select/Select';
 export type { SelectProps } from './Select/types';
 
@@ -49,6 +61,9 @@ export type { HudFrameProps } from './Layout/HudFrame';
 export { NeonLine } from './Layout/NeonLine';
 export type { NeonLineProps } from './Layout/NeonLine';
 
+export { GlitchFrame } from './Layout/GlitchFrame';
+export type { GlitchFrameProps } from './Layout/GlitchFrame';
+
 export { TitleBox } from './Layout/TitleBox';
 export type { TitleBoxProps } from './Layout/TitleBox';
 
@@ -61,6 +76,15 @@ export type { HoloCheckboxProps } from './Form/HoloCheckbox';
 
 export { Radio, RadioGroup } from './Form/Radio';
 export type { RadioProps, RadioGroupProps } from './Form/types';
+
+export { GlitchRadio } from './Form/GlitchRadio';
+export type { GlitchRadioProps, GlitchRadioOption } from './Form/GlitchRadio';
+
+export { NeonRadio } from './Form/NeonRadio';
+export type { NeonRadioProps, NeonRadioOption } from './Form/NeonRadio';
+
+export { GlitchLoginForm } from './Form/GlitchLoginForm';
+export type { GlitchLoginFormProps } from './Form/GlitchLoginForm';
 
 export { Switch } from './Form/Switch';
 export type { SwitchProps } from './Form/types';
@@ -103,6 +127,24 @@ export type { CyberCardProps } from './DataDisplay/CyberCard';
 export { GlitchProfileCard } from './DataDisplay/GlitchProfileCard';
 export type { GlitchProfileCardProps } from './DataDisplay/GlitchProfileCard';
 
+export { RadarHud } from './DataDisplay/RadarHud';
+export type { RadarHudProps } from './DataDisplay/RadarHud';
+
+export { PipBoy } from './DataDisplay/PipBoy';
+export type { PipBoyProps } from './DataDisplay/PipBoy';
+
+export { PipBoySimple } from './DataDisplay/PipBoySimple';
+
+// Loader Components
+export { AbstergoLoader } from './Loader/AbstergoLoader';
+export type { AbstergoLoaderProps } from './Loader/AbstergoLoader';
+
+export { HeartRateLoader } from './Loader/HeartRateLoader';
+export type { HeartRateLoaderProps } from './Loader/HeartRateLoader';
+
+export { HackerLoader } from './Loader/HackerLoader';
+export type { HackerLoaderProps } from './Loader/HackerLoader';
+
 // Feedback Components
 export { Modal } from './Feedback/Modal';
 export type { ModalProps } from './Feedback/types';
@@ -115,6 +157,12 @@ export type { NotificationProps } from './Feedback/types';
 
 export { NotificationProvider, useNotification } from './Feedback/NotificationProvider';
 export type { NotificationContextValue } from './Feedback/types';
+
+export { GradientAlert } from './Feedback/GradientAlert';
+export type { GradientAlertProps, AlertType } from './Feedback/GradientAlert';
+
+export { HudToastProvider, useHudToast } from './Feedback/HudToastProvider';
+export type { HudToastProviderProps, ToastOptions } from './Feedback/HudToastProvider';
 
 // Utility Components
 export { Tooltip } from './Utility/Tooltip';

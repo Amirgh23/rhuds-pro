@@ -16,7 +16,7 @@ export const Grid: React.FC<GridProps> = ({
   className,
   style,
 }) => {
-  const computedStyle = useMemo<React.CSSProperties>(() => {
+  const computedStyle = useMemo(() => {
     const gridColumns = typeof columns === 'number' ? `repeat(${columns}, 1fr)` : columns;
 
     return {
@@ -24,7 +24,7 @@ export const Grid: React.FC<GridProps> = ({
       gridTemplateColumns: gridColumns,
       gap: typeof gap === 'number' ? `${gap}rem` : gap,
       ...style,
-    };
+    } as React.CSSProperties;
   }, [columns, gap, style]);
 
   return (

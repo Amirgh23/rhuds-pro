@@ -1,4 +1,4 @@
-/**
+﻿/**
  * CyberCard Component
  * Cyberpunk-style card with glitch effects and animated borders
  */
@@ -36,7 +36,7 @@ const StyledWrapper = styled.div`
   }
 
   .card-container {
-    filter: drop-shadow(46px 36px 24px rgba(0, 246, 255, 0.4)) drop-shadow(-55px -40px 25px rgba(0, 246, 255, 0.3));
+    filter: drop-shadow(46px 36px 24px rgba(41, 242, 223, 0.4)) drop-shadow(-55px -40px 25px rgba(41, 242, 223, 0.3));
     animation: cyberCardBlinkShadows 8s ease-in infinite;
   }
 
@@ -48,7 +48,7 @@ const StyledWrapper = styled.div`
     text-align: center;
     padding: 1em;
     grid-template-rows: 0.1fr 0.7fr 0.25fr;
-    background-color: rgba(0, 20, 40, 0.95);
+    background-color: rgba(10, 18, 37, 0.95);
     width: 10em;
     aspect-ratio: 9/16;
     -webkit-clip-path: polygon(0 0, 85% 0, 100% 14%, 100% 60%, 92% 65%, 93% 77%, 99% 80%, 99% 90%, 89% 100%, 0 100%);
@@ -61,8 +61,8 @@ const StyledWrapper = styled.div`
     width: 250%;
     aspect-ratio: 1/1;
     transform-origin: center;
-    background: linear-gradient(to bottom, transparent, transparent, #00f6ff, #00f6ff, #00ccff, #00ccff, transparent, transparent),
-      linear-gradient(to left, transparent, transparent, #00f6ff, #00f6ff, #00ccff, #00ccff, transparent, transparent);
+    background: linear-gradient(to bottom, transparent, transparent, #29F2DF, #29F2DF, #1C7FA6, #1C7FA6, transparent, transparent),
+      linear-gradient(to left, transparent, transparent, #29F2DF, #29F2DF, #1C7FA6, #1C7FA6, transparent, transparent);
     animation: cyberCardRotate 5s infinite linear;
   }
 
@@ -73,9 +73,9 @@ const StyledWrapper = styled.div`
     left: 1%;
     width: 98%;
     height: 98%;
-    background: repeating-linear-gradient(to bottom, transparent 0%, rgba(0, 246, 255, 0.3) 1px, rgb(0, 10, 20) 3px, rgba(0, 246, 255, 0.2) 5px, #001a2e 4px, transparent 0.5%),
-      repeating-linear-gradient(to left, rgba(0, 20, 40, 0.95) 100%, rgba(0, 20, 40, 0.99) 100%);
-    box-shadow: inset 0px 0px 30px 40px rgba(0, 20, 40, 0.95);
+    background: repeating-linear-gradient(to bottom, transparent 0%, rgba(41, 242, 223, 0.3) 1px, rgba(10, 18, 37, 1) 3px, rgba(41, 242, 223, 0.2) 5px, #0A1225 4px, transparent 0.5%),
+      repeating-linear-gradient(to left, rgba(10, 18, 37, 0.95) 100%, rgba(10, 18, 37, 0.99) 100%);
+    box-shadow: inset 0px 0px 30px 40px rgba(10, 18, 37, 0.95);
     -webkit-clip-path: polygon(0 0, 85% 0, 100% 14%, 100% 60%, 92% 65%, 93% 77%, 99% 80%, 99% 90%, 89% 100%, 0 100%);
     clip-path: polygon(0 0, 85% 0, 100% 14%, 100% 60%, 92% 65%, 93% 77%, 99% 80%, 99% 90%, 89% 100%, 0 100%);
     animation: cyberCardBackglitch 94ms linear infinite;
@@ -85,8 +85,8 @@ const StyledWrapper = styled.div`
     z-index: 80;
     -webkit-clip-path: polygon(90% 0, 100% 100%, 0% 100%, 0% 0%);
     clip-path: polygon(90% 0, 100% 100%, 0% 100%, 0% 0%);
-    background: linear-gradient(90deg, rgba(0, 246, 255, 0) 0%, rgba(0, 246, 255, 0.3) 27%, rgba(0, 246, 255, 0.3) 63%, rgba(0, 246, 255, 0) 100%),
-      linear-gradient(0deg, rgba(0, 246, 255, 0.3) 0%, rgba(0, 246, 255, 0) 10%, rgba(0, 246, 255, 0) 96%, rgba(0, 246, 255, 0.3) 100%);
+    background: linear-gradient(90deg, rgba(41, 242, 223, 0) 0%, rgba(41, 242, 223, 0.3) 27%, rgba(41, 242, 223, 0.3) 63%, rgba(41, 242, 223, 0) 100%),
+      linear-gradient(0deg, rgba(41, 242, 223, 0.3) 0%, rgba(41, 242, 223, 0) 10%, rgba(41, 242, 223, 0) 96%, rgba(41, 242, 223, 0.3) 100%);
     width: 98%;
     font-size: 1.2em;
   }
@@ -97,10 +97,10 @@ const StyledWrapper = styled.div`
     text-align: right;
     position: relative;
     z-index: 2;
-    color: #00f6ff;
+    color: #29F2DF;
     font-size: 1em;
     transition: all ease-in-out 2s linear;
-    text-shadow: 0 0 10px rgba(0, 246, 255, 0.8);
+    text-shadow: 0 0 10px rgba(41, 242, 223, 0.8);
   }
 
   .card-body {
@@ -117,8 +117,8 @@ const StyledWrapper = styled.div`
 
   .svg-card {
     text-decoration: none;
-    color: #00f6ff;
-    background: linear-gradient(90deg, transparent 0%, rgba(0, 246, 255, 0.2) 27%, rgba(0, 246, 255, 0.2) 63%, transparent 100%);
+    color: #29F2DF;
+    background: linear-gradient(90deg, transparent 0%, rgba(41, 242, 223, 0.2) 27%, rgba(41, 242, 223, 0.2) 63%, transparent 100%);
     fill: currentColor;
     width: 2em;
     aspect-ratio: 1/1;
@@ -127,7 +127,7 @@ const StyledWrapper = styled.div`
     align-items: center;
     transition: 0.5s;
     cursor: pointer;
-    border: 1px solid rgba(0, 246, 255, 0.3);
+    border: 1px solid rgba(41, 242, 223, 0.3);
   }
 
   .svg-card .face {
@@ -149,8 +149,8 @@ const StyledWrapper = styled.div`
   .svg-card:hover {
     cursor: pointer;
     color: #ffffff;
-    background: rgba(0, 246, 255, 0.3);
-    box-shadow: 0 0 15px rgba(0, 246, 255, 0.6);
+    background: rgba(41, 242, 223, 0.3);
+    box-shadow: 0 0 15px rgba(41, 242, 223, 0.6);
   }
 
   .card-footer {
@@ -159,13 +159,13 @@ const StyledWrapper = styled.div`
 
   @keyframes cyberCardBackglitch {
     0% {
-      box-shadow: inset 0px 20px 30px 40px rgba(0, 20, 40, 0.95);
+      box-shadow: inset 0px 20px 30px 40px rgba(10, 18, 37, 0.95);
     }
     50% {
-      box-shadow: inset 0px -20px 30px 40px rgba(0, 30, 50, 0.95);
+      box-shadow: inset 0px -20px 30px 40px rgba(10, 18, 37, 0.95);
     }
     to {
-      box-shadow: inset 0px 20px 30px 40px rgba(0, 20, 40, 0.95);
+      box-shadow: inset 0px 20px 30px 40px rgba(10, 18, 37, 0.95);
     }
   }
 
@@ -183,19 +183,19 @@ const StyledWrapper = styled.div`
 
   @keyframes cyberCardBlinkShadows {
     0% {
-      filter: drop-shadow(46px 36px 28px rgba(0, 246, 255, 0.4)) drop-shadow(-55px -40px 28px rgba(0, 246, 255, 0.3));
+      filter: drop-shadow(46px 36px 28px rgba(41, 242, 223, 0.4)) drop-shadow(-55px -40px 28px rgba(41, 242, 223, 0.3));
     }
     25% {
-      filter: drop-shadow(46px -36px 24px rgba(0, 246, 255, 0.6)) drop-shadow(-55px 40px 24px rgba(0, 204, 255, 0.4));
+      filter: drop-shadow(46px -36px 24px rgba(41, 242, 223, 0.6)) drop-shadow(-55px 40px 24px rgba(28, 127, 166, 0.4));
     }
     50% {
-      filter: drop-shadow(46px 36px 30px rgba(0, 246, 255, 0.5)) drop-shadow(-55px 40px 30px rgba(0, 204, 255, 0.3));
+      filter: drop-shadow(46px 36px 30px rgba(41, 242, 223, 0.5)) drop-shadow(-55px 40px 30px rgba(28, 127, 166, 0.3));
     }
     75% {
-      filter: drop-shadow(20px -18px 25px rgba(0, 246, 255, 0.6)) drop-shadow(-20px 20px 25px rgba(0, 204, 255, 0.4));
+      filter: drop-shadow(20px -18px 25px rgba(41, 242, 223, 0.6)) drop-shadow(-20px 20px 25px rgba(28, 127, 166, 0.4));
     }
     to {
-      filter: drop-shadow(46px 36px 28px rgba(0, 246, 255, 0.4)) drop-shadow(-55px -40px 28px rgba(0, 246, 255, 0.3));
+      filter: drop-shadow(46px 36px 28px rgba(41, 242, 223, 0.4)) drop-shadow(-55px -40px 28px rgba(41, 242, 223, 0.3));
     }
   }
 `;

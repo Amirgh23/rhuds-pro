@@ -1,4 +1,4 @@
-/**
+﻿/**
  * HudButton Component
  * Futuristic HUD-style button with glowing effects
  */
@@ -20,7 +20,7 @@ export interface HudButtonProps extends React.ButtonHTMLAttributes<HTMLButtonEle
 
 const StyledWrapper = styled.div`
   button {
-    --green: #1BFD9C;
+    --green: #29F2DF;
     font-size: 15px;
     padding: 0.7em 2.7em;
     letter-spacing: 0.06em;

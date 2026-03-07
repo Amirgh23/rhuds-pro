@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { ThemeProvider, BleepsProvider, createAppTheme } from '@rhuds/core';
-import { Text, Button, Stack } from '@rhuds/components';
+import { Text, Button, Stack, HudToastProvider } from '@rhuds/components';
 import { ShowcasePage } from './pages/ShowcasePage';
 import { PlaygroundPage } from './pages/PlaygroundPage';
 import { DocsPage } from './pages/DocsPage';
@@ -9,8 +9,8 @@ import { DocsPage } from './pages/DocsPage';
 // Create theme
 const appTheme = createAppTheme({
   name: 'demo-theme',
-  primaryColor: '#00f6ff',
-  secondaryColor: '#7b61ff',
+  primaryColor: '#29F2DF',
+  secondaryColor: '#1C7FA6',
 });
 
 // Create theme mode for ThemeProvider
@@ -26,7 +26,7 @@ const themeMode = {
       error: appTheme.colors.error.main,
       info: appTheme.colors.info.main,
       background: appTheme.colors.background.main,
-      surface: appTheme.colors.neutral.dark,
+      surface: '#28125A',
       text: appTheme.colors.text.main,
       border: appTheme.colors.primary.alpha(0.3),
     },
@@ -89,8 +89,8 @@ const Navigation: React.FC = () => {
 
   return (
     <div style={{
-      background: 'rgba(0, 0, 0, 0.5)',
-      borderBottom: '1px solid rgba(0, 246, 255, 0.3)',
+      background: 'rgba(10, 18, 37, 0.8)',
+      borderBottom: '1px solid rgba(41, 242, 223, 0.3)',
       padding: 'clamp(0.75rem, 2vw, 1rem) clamp(1rem, 3vw, 2rem)',
       display: 'flex',
       justifyContent: 'space-between',
@@ -132,7 +132,7 @@ const AppContent: React.FC = () => {
   return (
     <div style={{
       minHeight: '100vh',
-      background: appTheme.colors.background.main,
+      background: '#0A1225',
       color: appTheme.colors.text.main,
       width: '100%',
       maxWidth: '100vw',
@@ -155,7 +155,9 @@ const App: React.FC = () => {
     <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <ThemeProvider themes={[themeMode]} defaultTheme="dark">
         <BleepsProvider>
-          <AppContent />
+          <HudToastProvider maxToasts={5}>
+            <AppContent />
+          </HudToastProvider>
         </BleepsProvider>
       </ThemeProvider>
     </BrowserRouter>

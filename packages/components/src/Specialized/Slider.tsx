@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+﻿import React, { useState, useRef } from 'react';
 import { useTheme } from '@rhuds/core';
 
 // Helper to safely access theme tokens
@@ -119,7 +119,7 @@ export function Slider({
             [isHorizontal ? 'left' : 'bottom']: 0,
             [isHorizontal ? 'width' : 'height']: `${percentage}%`,
             [isHorizontal ? 'height' : 'width']: '100%',
-            backgroundColor: tokens.colors?.primary || '#00f6ff',
+            backgroundColor: tokens.colors?.primary || '#29F2DF',
             borderRadius: '4px',
             transition: isDragging ? 'none' : 'all 0.2s',
           }}
@@ -134,9 +134,9 @@ export function Slider({
             transform: isHorizontal ? 'translate(-50%, -50%)' : 'translate(-50%, 50%)',
             width: '20px',
             height: '20px',
-            backgroundColor: tokens.colors?.primary || '#00f6ff',
+            backgroundColor: tokens.colors?.primary || '#29F2DF',
             borderRadius: '50%',
-            border: `2px solid ${tokens.colors?.background || '#1a1a1a'}`,
+            border: `2px solid ${tokens.colors?.background || '#0A1225'}`,
             boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
             transition: isDragging ? 'none' : 'all 0.2s',
           }}

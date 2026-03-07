@@ -1,4 +1,4 @@
-/**
+﻿/**
  * HackerInput Component
  * Futuristic hacker-style input with glowing effects and animations
  */
@@ -18,7 +18,7 @@ export interface HackerInputProps {
 const StyledWrapper = styled.div`
   .hacker-input-container {
     position: relative;
-    width: 300px;
+    width: 100%;
     margin-top: 20px;
   }
 
@@ -26,25 +26,25 @@ const StyledWrapper = styled.div`
     width: 100%;
     padding: 12px 15px;
     background: #000000;
-    border: 2px solid #00f6ff;
-    color: #00f6ff;
+    border: 2px solid #29F2DF;
+    color: #29F2DF;
     font-family: "Courier New", monospace;
     font-size: 16px;
     outline: none;
-    box-shadow: 0 0 10px rgba(0, 246, 255, 0.5);
+    box-shadow: 0 0 10px rgba(41, 242, 223, 0.5);
     transition: all 0.3s ease;
   }
 
   /* Placeholder styling */
   .hacker-input::placeholder {
-    color: rgba(0, 246, 255, 0.6);
+    color: rgba(41, 242, 223, 0.6);
     opacity: 0.7;
   }
 
   /* Focus state with enhanced glow */
   .hacker-input:focus {
-    box-shadow: 0 0 20px rgba(0, 246, 255, 0.8), 0 0 30px rgba(0, 246, 255, 0.6);
-    background: rgba(0, 246, 255, 0.05);
+    box-shadow: 0 0 20px rgba(41, 242, 223, 0.8), 0 0 30px rgba(41, 242, 223, 0.6);
+    background: rgba(41, 242, 223, 0.05);
   }
 
   /* Label animation */
@@ -53,11 +53,11 @@ const StyledWrapper = styled.div`
     top: 50%;
     left: 15px;
     transform: translateY(-50%);
-    color: #00f6ff;
+    color: #29F2DF;
     font-size: 16px;
     pointer-events: none;
     transition: all 0.3s ease;
-    text-shadow: 0 0 5px rgba(0, 246, 255, 0.8);
+    text-shadow: 0 0 5px rgba(41, 242, 223, 0.8);
   }
 
   /* Move label up and scale when input is focused or filled */
@@ -77,7 +77,7 @@ const StyledWrapper = styled.div`
     right: 15px;
     top: 50%;
     transform: translateY(-50%);
-    color: #00f6ff;
+    color: #29F2DF;
     font-size: 20px;
     animation: hackerInputBlink 0.7s infinite;
   }
@@ -90,7 +90,7 @@ const StyledWrapper = styled.div`
     left: 0;
     width: 100%;
     height: 2px;
-    background: rgba(0, 246, 255, 0.3);
+    background: rgba(41, 242, 223, 0.3);
     animation: hackerInputScanline 2s infinite linear;
   }
 

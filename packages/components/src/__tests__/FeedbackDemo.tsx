@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Feedback Components Demo
  * Demonstrates Modal, Dialog, and Notification components
  */
@@ -15,7 +15,7 @@ const FeedbackDemoContent: React.FC = () => {
   const { success, error, warning, info } = useNotification();
 
   return (
-    <div style={{ padding: '2rem', backgroundColor: '#0a0a0a', minHeight: '100vh', color: '#fff' }}>
+    <div style={{ padding: '2rem', backgroundColor: '#0A1225', minHeight: '100vh', color: '#fff' }}>
       <Text variant="h1" style={{ marginBottom: '2rem' }}>
         Feedback Components Demo
       </Text>
@@ -160,7 +160,7 @@ const FeedbackDemoContent: React.FC = () => {
         <Text variant="h2" style={{ marginBottom: '1rem' }}>
           Features
         </Text>
-        <div style={{ backgroundColor: '#1a1a1a', borderRadius: '4px', padding: '1rem' }}>
+        <div style={{ backgroundColor: '#0A1225', borderRadius: '4px', padding: '1rem' }}>
           <Text style={{ marginBottom: '0.5rem' }}>✓ Modal with smooth animations</Text>
           <Text style={{ marginBottom: '0.5rem' }}>✓ Dialog with action buttons</Text>
           <Text style={{ marginBottom: '0.5rem' }}>✓ Notification with auto-dismiss</Text>

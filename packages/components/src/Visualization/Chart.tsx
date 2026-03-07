@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+﻿import React, { useRef, useEffect } from 'react';
 import { useTheme } from '@rhuds/core';
 
 export interface ChartDataPoint {
@@ -31,9 +31,9 @@ export function Chart({
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // Safe theme access with fallback
-  const primaryColor = theme?.currentMode?.tokens?.colors?.primary || '#00f6ff';
-  const secondaryColor = theme?.currentMode?.tokens?.colors?.secondary || '#7b61ff';
-  const accentColor = theme?.currentMode?.tokens?.colors?.accent || '#ff006e';
+  const primaryColor = theme?.currentMode?.tokens?.colors?.primary || '#29F2DF';
+  const secondaryColor = theme?.currentMode?.tokens?.colors?.secondary || '#1C7FA6';
+  const accentColor = theme?.currentMode?.tokens?.colors?.accent || '#EF3EF1';
   const textColor = theme?.currentMode?.tokens?.colors?.text || '#ffffff';
   const borderColor = theme?.currentMode?.tokens?.colors?.border || '#333333';
 

@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Accordion Component
  * Expandable accordion with multiple items
  */
@@ -23,7 +23,7 @@ export const Accordion: React.FC<AccordionProps> = ({
   const themeContext = useTheme();
   
   // Safe theme access with fallback
-  const primaryColor = themeContext?.currentMode?.tokens?.colors?.primary || '#00f6ff';
+  const primaryColor = themeContext?.currentMode?.tokens?.colors?.primary || '#29F2DF';
   const textColor = themeContext?.currentMode?.tokens?.colors?.text || '#ffffff';
   const backgroundColor = themeContext?.currentMode?.tokens?.colors?.background || '#0a0a0a';
   

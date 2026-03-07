@@ -1,13 +1,4 @@
 
-> @rhuds/webgl@0.1.0 test
-> vitest run --run
+> @rhuds/webgl@0.1.0 test C:\Users\a.ghafarian\Desktop\Luminos HUD\packages\webgl
+> vitest run "--run"
 
-'vitest' is not recognized as an internal or external command,
-operable program or batch file.
-npm error Lifecycle script `test` failed with error:
-npm error code 1
-npm error path C:\Users\a.ghafarian\Desktop\Luminos HUD\packages\webgl
-npm error workspace @rhuds/webgl@0.1.0
-npm error location C:\Users\a.ghafarian\Desktop\Luminos HUD\packages\webgl
-npm error command failed
-npm error command C:\WINDOWS\system32\cmd.exe /d /s /c vitest run --run
