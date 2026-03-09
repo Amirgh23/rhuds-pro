@@ -98,29 +98,34 @@ export const Popover: React.FC<PopoverProps> = ({
 
   const popoverStyle = useMemo<React.CSSProperties>(() => {
     const tokens = (theme as any)?.currentMode?.tokens || theme;
+    const primaryColor = tokens.colors?.primary || '#29F2DF';
     return {
       position: 'fixed',
       top: popoverPos.top,
       left: popoverPos.left,
-      backgroundColor: tokens.colors?.background || '#0A1225',
+      backgroundColor: `rgba(10, 18, 37, 0.5)`,
+      backdropFilter: 'blur(20px)',
+      WebkitBackdropFilter: 'blur(20px)',
       color: tokens.colors?.text || '#ffffff',
-      border: `1px solid ${tokens.colors?.primary || '#29F2DF'}`,
-      borderRadius: '8px',
-      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+      border: `2px solid ${primaryColor}`,
+      borderRadius: '0px',
+      boxShadow: `0 0 20px ${primaryColor}40, 0 0 40px ${primaryColor}20, inset 0 0 20px ${primaryColor}15, inset 0 0 40px rgba(41, 242, 223, 0.05)`,
       zIndex: 1001,
       opacity: isOpen ? 1 : 0,
       pointerEvents: isOpen ? 'auto' : 'none',
-      transition: `opacity ${animationDuration}ms ease-in-out`,
+      transition: `opacity ${animationDuration}ms ease-in-out, box-shadow ${animationDuration}ms ease-in-out`,
       ...style,
     };
   }, [popoverPos, isOpen, animationDuration, theme, style]);
 
   const headerStyle: React.CSSProperties = useMemo(() => {
     const tokens = (theme as any)?.currentMode?.tokens || theme;
+    const primaryColor = tokens.colors?.primary || '#29F2DF';
     return {
       padding: '0.75rem 1rem',
-      borderBottom: `1px solid ${tokens.colors?.primary || '#29F2DF'}`,
+      borderBottom: `1px solid ${primaryColor}`,
       fontWeight: 600,
+      boxShadow: `inset 0 0 10px ${primaryColor}20`,
     };
   }, [theme]);
 
@@ -150,4 +155,3 @@ export const Popover: React.FC<PopoverProps> = ({
 };
 
 Popover.displayName = 'Popover';
-

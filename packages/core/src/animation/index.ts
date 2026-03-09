@@ -3,9 +3,6 @@
  * Core animation system for RHUDS Pro
  */
 
-// Types
-export * from './types';
-
 // Easing functions
 export * from './easing';
 
@@ -20,13 +17,9 @@ export {
 
 export { createAnimation } from './createAnimation';
 
-// Core components
-export { Animator } from './Animator';
-
 // Animation managers
 export { Stagger } from './managers/Stagger';
 export { Sequence } from './managers/Sequence';
-export { Switch } from './managers/Switch';
 
 // Context and hooks
 export {
@@ -37,10 +30,7 @@ export {
 } from './AnimatorContext';
 
 // Global provider
-export {
-  AnimatorGeneralProvider,
-  useAnimatorGeneral,
-} from './AnimatorGeneralProvider';
+export { AnimatorGeneralProvider, useAnimatorGeneral } from './AnimatorGeneralProvider';
 
 // Physics-based animations
 export {
@@ -52,31 +42,8 @@ export {
 export type { SpringConfig, DecayConfig, InertiaConfig } from './physics';
 
 // Gesture-driven animations
-export {
-  useDrag,
-  useSwipe,
-  usePinch,
-  useRotate,
-} from './gestures';
-export type {
-  DragConfig,
-  SwipeConfig,
-  PinchConfig,
-  RotateConfig,
-} from './gestures';
-
-// Scroll-triggered animations
-export {
-  useInView,
-  useScrollProgress,
-  useParallax,
-  useScrollSnap,
-} from './scroll';
-export type {
-  ScrollTriggerConfig,
-  ParallaxConfig,
-  ScrollSnapConfig,
-} from './scroll';
+export { useDrag, useSwipe, usePinch, useRotate } from './gestures';
+export type { DragConfig, SwipeConfig, PinchConfig, RotateConfig } from './gestures';
 
 // Animation subsystems
 export {

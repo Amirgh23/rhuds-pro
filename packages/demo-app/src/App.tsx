@@ -2,9 +2,11 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { ThemeProvider, BleepsProvider, createAppTheme } from '@rhuds/core';
 import { Text, Button, Stack, HudToastProvider } from '@rhuds/components';
+import IntroPage from './pages/IntroPage';
 import { ShowcasePage } from './pages/ShowcasePage';
 import { PlaygroundPage } from './pages/PlaygroundPage';
 import { DocsPage } from './pages/DocsPage';
+import './styles/global.css';
 
 // Create theme
 const appTheme = createAppTheme({
@@ -84,44 +86,51 @@ const themeMode = {
 
 const Navigation: React.FC = () => {
   const location = useLocation();
-  
+
   const isActive = (path: string) => location.pathname === path;
 
+  // Don't show navigation on intro page
+  if (location.pathname === '/intro') {
+    return null;
+  }
+
   return (
-    <div style={{
-      background: 'rgba(10, 18, 37, 0.8)',
-      borderBottom: '1px solid rgba(41, 242, 223, 0.3)',
-      padding: 'clamp(0.75rem, 2vw, 1rem) clamp(1rem, 3vw, 2rem)',
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      width: '100%',
-      maxWidth: '100vw',
-      boxSizing: 'border-box',
-      overflowX: 'hidden',
-      flexWrap: 'wrap',
-      gap: '1rem',
-    }}>
+    <div
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 1000,
+        background: 'rgba(10, 18, 37, 0.8)',
+        backdropFilter: 'blur(10px)',
+        borderBottom: '1px solid rgba(41, 242, 223, 0.3)',
+        padding: 'clamp(0.75rem, 2vw, 1rem) clamp(1rem, 3vw, 2rem)',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: '100%',
+        maxWidth: '100vw',
+        boxSizing: 'border-box',
+        overflowX: 'hidden',
+        flexWrap: 'wrap',
+        gap: '1rem',
+      }}
+    >
       <Link to="/" style={{ textDecoration: 'none' }}>
         <Text variant="h2" style={{ color: appTheme.colors.primary.main }}>
           🎮 RHUDS Pro
         </Text>
       </Link>
       <Stack direction="row" gap="1rem" style={{ flexWrap: 'wrap', justifyContent: 'center' }}>
-        <Link to="/" style={{ textDecoration: 'none' }}>
-          <Button variant={isActive('/') ? 'primary' : 'secondary'}>
-            Showcase
-          </Button>
+        <Link to="/showcase" style={{ textDecoration: 'none' }}>
+          <Button variant={isActive('/showcase') ? 'primary' : 'secondary'}>Showcase</Button>
         </Link>
         <Link to="/playground" style={{ textDecoration: 'none' }}>
-          <Button variant={isActive('/playground') ? 'primary' : 'secondary'}>
-            Playground
-          </Button>
+          <Button variant={isActive('/playground') ? 'primary' : 'secondary'}>Playground</Button>
         </Link>
         <Link to="/docs" style={{ textDecoration: 'none' }}>
-          <Button variant={isActive('/docs') ? 'primary' : 'secondary'}>
-            Documentation
-          </Button>
+          <Button variant={isActive('/docs') ? 'primary' : 'secondary'}>Documentation</Button>
         </Link>
       </Stack>
     </div>
@@ -130,18 +139,21 @@ const Navigation: React.FC = () => {
 
 const AppContent: React.FC = () => {
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: '#0A1225',
-      color: appTheme.colors.text.main,
-      width: '100%',
-      maxWidth: '100vw',
-      overflowX: 'hidden',
-      boxSizing: 'border-box',
-    }}>
+    <div
+      style={{
+        minHeight: '100vh',
+        background: '#0A1225',
+        color: appTheme.colors.text.main,
+        width: '100%',
+        maxWidth: '100vw',
+        overflowX: 'hidden',
+        boxSizing: 'border-box',
+      }}
+    >
       <Navigation />
       <Routes>
-        <Route path="/" element={<ShowcasePage />} />
+        <Route path="/" element={<IntroPage />} />
+        <Route path="/showcase" element={<ShowcasePage />} />
         <Route path="/playground" element={<PlaygroundPage />} />
         <Route path="/docs" element={<DocsPage />} />
         <Route path="/docs/:section" element={<DocsPage />} />

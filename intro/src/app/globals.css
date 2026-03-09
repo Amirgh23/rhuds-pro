@@ -1,0 +1,408 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Cyberpunk HUD Color Palette */
+:root {
+  --neon-cyan: #29F2DF;
+  --electric-blue: #1C7FA6;
+  --deep-purple: #28125A;
+  --neon-magenta: #EF3EF1;
+  --deep-black: #0A1225;
+  
+  /* Derived colors */
+  --neon-cyan-dim: rgba(41, 242, 223, 0.3);
+  --neon-magenta-dim: rgba(239, 62, 241, 0.3);
+  --electric-blue-dim: rgba(28, 127, 166, 0.5);
+  --deep-purple-dim: rgba(40, 18, 90, 0.8);
+  
+  /* Glassmorphism */
+  --glass-bg: rgba(40, 18, 90, 0.15);
+  --glass-border: rgba(41, 242, 223, 0.2);
+  
+  /* Radius */
+  --radius: 0.625rem;
+  
+  /* Standard theme vars */
+  --background: var(--deep-black);
+  --foreground: var(--neon-cyan);
+  --card: var(--glass-bg);
+  --card-foreground: var(--neon-cyan);
+  --popover: var(--deep-black);
+  --popover-foreground: var(--neon-cyan);
+  --primary: var(--neon-cyan);
+  --primary-foreground: var(--deep-black);
+  --secondary: var(--deep-purple);
+  --secondary-foreground: var(--neon-cyan);
+  --muted: var(--deep-purple);
+  --muted-foreground: var(--electric-blue);
+  --accent: var(--neon-magenta);
+  --accent-foreground: var(--deep-black);
+  --destructive: var(--neon-magenta);
+  --border: var(--glass-border);
+  --input: var(--glass-border);
+  --ring: var(--neon-cyan);
+}
+
+/* Cyberpunk Animations */
+@keyframes scanLine {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100vh);
+  }
+}
+
+@keyframes scanCard {
+  0% {
+    top: -10%;
+  }
+  100% {
+    top: 110%;
+  }
+}
+
+@keyframes hexScroll {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(-50%);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.5;
+    filter: brightness(1);
+  }
+  50% {
+    opacity: 1;
+    filter: brightness(1.3);
+  }
+}
+
+@keyframes ringRotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ringRotateReverse {
+  0% {
+    transform: rotate(360deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes glitch {
+  0%, 90%, 100% {
+    transform: translate(0);
+  }
+  92% {
+    transform: translate(-2px, 1px);
+  }
+  94% {
+    transform: translate(2px, -1px);
+  }
+  96% {
+    transform: translate(-1px, 2px);
+  }
+  98% {
+    transform: translate(1px, -2px);
+  }
+}
+
+@keyframes dataStream {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh);
+    opacity: 0;
+  }
+}
+
+@keyframes borderPulse {
+  0%, 100% {
+    border-color: rgba(41, 242, 223, 0.3);
+    box-shadow: 0 0 10px rgba(41, 242, 223, 0.1);
+  }
+  50% {
+    border-color: rgba(41, 242, 223, 0.6);
+    box-shadow: 0 0 20px rgba(41, 242, 223, 0.3);
+  }
+}
+
+@keyframes textFlicker {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes bootPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+}
+
+@keyframes cornerBracket {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes dataBlink {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes floatParticle {
+  0%, 100% {
+    transform: translateY(0) translateX(0);
+  }
+  25% {
+    transform: translateY(-10px) translateX(5px);
+  }
+  50% {
+    transform: translateY(-5px) translateX(-5px);
+  }
+  75% {
+    transform: translateY(-15px) translateX(3px);
+  }
+}
+
+@keyframes gridPulse {
+  0%, 100% {
+    opacity: 0.1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+}
+
+@keyframes glowPulse {
+  0%, 100% {
+    box-shadow: 0 0 5px var(--neon-cyan), 0 0 10px var(--neon-cyan-dim);
+  }
+  50% {
+    box-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan), 0 0 30px var(--neon-cyan-dim);
+  }
+}
+
+/* Custom scrollbar for cyberpunk style */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--deep-black);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--electric-blue);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--neon-cyan);
+}
+
+/* Base styles */
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+  
+  body {
+    background: var(--deep-black);
+    color: var(--neon-cyan);
+    font-family: 'Rajdhani', sans-serif;
+    overflow-x: hidden;
+  }
+  
+  /* Font classes */
+  .font-orbitron {
+    font-family: 'Orbitron', monospace;
+  }
+  
+  .font-rajdhani {
+    font-family: 'Rajdhani', sans-serif;
+  }
+}
+
+/* Utility classes */
+@layer utilities {
+  .text-glow-cyan {
+    text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan), 0 0 30px var(--neon-cyan);
+  }
+  
+  .text-glow-magenta {
+    text-shadow: 0 0 10px var(--neon-magenta), 0 0 20px var(--neon-magenta), 0 0 30px var(--neon-magenta);
+  }
+  
+  .box-glow-cyan {
+    box-shadow: 0 0 10px var(--neon-cyan-dim), 0 0 20px var(--neon-cyan-dim), inset 0 0 10px var(--neon-cyan-dim);
+  }
+  
+  .box-glow-magenta {
+    box-shadow: 0 0 10px var(--neon-magenta-dim), 0 0 20px var(--neon-magenta-dim), inset 0 0 10px var(--neon-magenta-dim);
+  }
+  
+  .glass-effect {
+    background: linear-gradient(135deg, rgba(40, 18, 90, 0.2) 0%, rgba(10, 18, 37, 0.4) 100%);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(41, 242, 223, 0.2);
+  }
+  
+  .technical-border {
+    position: relative;
+    border: 1px solid rgba(41, 242, 223, 0.3);
+  }
+  
+  .technical-border::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border: 1px solid rgba(41, 242, 223, 0.1);
+    pointer-events: none;
+  }
+  
+  .neon-border {
+    border: 1px solid var(--neon-cyan);
+    box-shadow: 
+      0 0 5px var(--neon-cyan-dim),
+      0 0 10px var(--neon-cyan-dim),
+      inset 0 0 5px var(--neon-cyan-dim);
+  }
+  
+  .hex-text {
+    font-family: 'Orbitron', monospace;
+    letter-spacing: 0.05em;
+    color: var(--electric-blue);
+  }
+  
+  .cyber-title {
+    font-family: 'Orbitron', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--neon-cyan);
+    text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan);
+  }
+  
+  .animate-scan-line {
+    animation: scanLine 8s linear infinite;
+  }
+  
+  .animate-hex-scroll {
+    animation: hexScroll 20s linear infinite;
+  }
+  
+  .animate-pulse-glow {
+    animation: pulseGlow 2s ease-in-out infinite;
+  }
+  
+  .animate-ring-rotate {
+    animation: ringRotate 4s linear infinite;
+  }
+  
+  .animate-ring-rotate-slow {
+    animation: ringRotate 8s linear infinite;
+  }
+  
+  .animate-ring-rotate-reverse {
+    animation: ringRotateReverse 6s linear infinite;
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn 0.8s ease-out forwards;
+  }
+  
+  .animate-glitch {
+    animation: glitch 4s ease-in-out infinite;
+  }
+  
+  .animate-border-pulse {
+    animation: borderPulse 3s ease-in-out infinite;
+  }
+  
+  .animate-text-flicker {
+    animation: textFlicker 0.1s ease-in-out infinite;
+  }
+  
+  .animate-boot-pulse {
+    animation: bootPulse 1.5s ease-in-out infinite;
+  }
+  
+  .animate-corner-bracket {
+    animation: cornerBracket 2s ease-in-out infinite;
+  }
+  
+  .animate-data-blink {
+    animation: dataBlink 1.5s ease-in-out infinite;
+  }
+  
+  .animate-float-particle {
+    animation: floatParticle 4s ease-in-out infinite;
+  }
+  
+  .animate-grid-pulse {
+    animation: gridPulse 3s ease-in-out infinite;
+  }
+  
+  .animate-glow-pulse {
+    animation: glowPulse 2s ease-in-out infinite;
+  }
+}
+
+/* Full screen background gradient */
+.cyber-bg {
+  background: 
+    radial-gradient(ellipse at 50% 0%, rgba(40, 18, 90, 0.4) 0%, transparent 50%),
+    radial-gradient(ellipse at 0% 50%, rgba(28, 127, 166, 0.2) 0%, transparent 40%),
+    radial-gradient(ellipse at 100% 50%, rgba(239, 62, 241, 0.15) 0%, transparent 40%),
+    radial-gradient(ellipse at 50% 100%, rgba(40, 18, 90, 0.3) 0%, transparent 50%),
+    linear-gradient(180deg, var(--deep-black) 0%, #0d1a30 50%, var(--deep-black) 100%);
+}

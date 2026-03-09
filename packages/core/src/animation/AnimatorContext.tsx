@@ -1,11 +1,19 @@
-import React from 'react';
 /**
  * Animator Context
  * Provides parent-child animator relationships and state propagation
  */
 
 import React, { createContext, useContext, useMemo } from 'react';
-import { AnimatorControl, AnimatorState } from './types';
+
+/**
+ * Animator control interface
+ */
+interface AnimatorControl {
+  flow: {
+    entered: boolean;
+    entering: boolean;
+  };
+}
 
 /**
  * Animator context for parent-child relationships
@@ -43,10 +51,7 @@ interface AnimatorProviderProps {
   children: React.ReactNode;
 }
 
-export const AnimatorProvider: React.FC<AnimatorProviderProps> = ({
-  control,
-  children,
-}) => {
+export const AnimatorProvider: React.FC<AnimatorProviderProps> = ({ control, children }) => {
   const parentContext = useContext(AnimatorContext);
 
   const value = useMemo(
@@ -57,11 +62,7 @@ export const AnimatorProvider: React.FC<AnimatorProviderProps> = ({
     [control, parentContext.depth]
   );
 
-  return (
-    <AnimatorContext.Provider value={value}>
-      {children}
-    </AnimatorContext.Provider>
-  );
+  return <AnimatorContext.Provider value={value}>{children}</AnimatorContext.Provider>;
 };
 
 /**
@@ -78,9 +79,7 @@ export function useParentActivation(
   }
 
   // Child should only activate if parent is entered or entering
-  const parentActive =
-    parentControl.flow.entered || parentControl.flow.entering;
+  const parentActive = parentControl.flow.entered || parentControl.flow.entering;
 
   return localActivate && parentActive;
 }
-

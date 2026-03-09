@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Text, Stack } from '@rhuds/components';
 import { CodeBlock } from './CodeBlock';
 

@@ -1,19 +1,17 @@
-import React from 'react';
 /**
  * Sequence Manager
  * Runs animations in sequence
  */
 
 import React, { Children, useState, useEffect, cloneElement, isValidElement } from 'react';
-import { SequenceProps } from '../types';
 
 /**
  * Sequence component for running animations sequentially
- * 
+ *
  * Activates child Animator components one after another,
  * waiting for each to complete before starting the next.
  */
-export const Sequence: React.FC<SequenceProps> = ({
+export const Sequence: React.FC<{ children: React.ReactNode; onComplete?: () => void }> = ({
   children,
   onComplete,
 }) => {
@@ -73,4 +71,3 @@ export const Sequence: React.FC<SequenceProps> = ({
 };
 
 Sequence.displayName = 'Sequence';
-

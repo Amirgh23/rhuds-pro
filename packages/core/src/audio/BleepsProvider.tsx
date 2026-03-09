@@ -1,4 +1,3 @@
-import React from 'react';
 /**
  * Bleeps Provider
  * React context provider for bleep manager
@@ -38,9 +37,9 @@ export interface BleepsProviderProps {
 
 /**
  * Bleeps Provider
- * 
+ *
  * Provides bleep manager to all child components.
- * 
+ *
  * @example
  * ```tsx
  * <BleepsProvider
@@ -56,10 +55,7 @@ export interface BleepsProviderProps {
  * </BleepsProvider>
  * ```
  */
-export const BleepsProvider: React.FC<BleepsProviderProps> = ({
-  config,
-  children,
-}) => {
+export const BleepsProvider: React.FC<BleepsProviderProps> = ({ config, children }) => {
   const bleepManager = useMemo(() => createBleepManager(config), [config]);
 
   // Cleanup on unmount
@@ -77,11 +73,7 @@ export const BleepsProvider: React.FC<BleepsProviderProps> = ({
     [bleepManager]
   );
 
-  return (
-    <BleepsContext.Provider value={value}>
-      {children}
-    </BleepsContext.Provider>
-  );
+  return <BleepsContext.Provider value={value}>{children}</BleepsContext.Provider>;
 };
 
 BleepsProvider.displayName = 'BleepsProvider';
@@ -102,4 +94,3 @@ export function useBleep(id: string) {
     [bleepManager, id]
   );
 }
-

@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dropdown Neon Glass HUD Test</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background: #0a1225;
+        color: #ffffff;
+        font-family: 'Courier New', monospace;
+        padding: 2rem;
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      h1 {
+        color: #29f2df;
+        margin-bottom: 2rem;
+        text-shadow: 0 0 10px #29f2df;
+      }
+
+      .demo-section {
+        margin-bottom: 3rem;
+        padding: 2rem;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(41, 242, 223, 0.3);
+        border-radius: 8px;
+      }
+
+      .demo-section h2 {
+        color: #29f2df;
+        margin-bottom: 1rem;
+        font-size: 1.2rem;
+      }
+
+      /* Dropdown Neon Glass Style */
+      .dropdown-container {
+        position: relative;
+        display: inline-block;
+        margin: 1rem;
+      }
+
+      .dropdown-trigger {
+        padding: 0.75rem 1.5rem;
+        background: rgba(10, 18, 37, 0.8);
+        border: 2px solid #29f2df;
+        color: #29f2df;
+        cursor: pointer;
+        font-family: 'Courier New', monospace;
+        font-size: 1rem;
+        transition: all 0.3s ease-in-out;
+        box-shadow: 0 0 10px #29f2df40;
+      }
+
+      .dropdown-trigger:hover {
+        box-shadow:
+          0 0 20px #29f2df60,
+          inset 0 0 10px #29f2df20;
+      }
+
+      .dropdown-menu {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        margin-top: 0.5rem;
+        background: rgba(10, 18, 37, 0.5);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 2px solid #29f2df;
+        border-radius: 0px;
+        min-width: 200px;
+        z-index: 1001;
+        box-shadow:
+          0 0 20px #29f2df40,
+          0 0 40px #29f2df20,
+          inset 0 0 20px #29f2df15,
+          inset 0 0 40px rgba(41, 242, 223, 0.05);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(-10px);
+        transition: all 0.2s ease-in-out;
+      }
+
+      .dropdown-menu.active {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      .dropdown-item {
+        padding: 0.75rem 1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s ease-in-out;
+        border-left: 3px solid transparent;
+      }
+
+      .dropdown-item:hover {
+        background: #29f2df20;
+        box-shadow:
+          inset 0 0 15px #29f2df30,
+          0 0 10px #29f2df40;
+        border-left: 3px solid #29f2df;
+      }
+
+      .dropdown-divider {
+        height: 1px;
+        background: #29f2df;
+        margin: 0.25rem 0;
+        box-shadow: 0 0 10px #29f2df60;
+      }
+
+      .dropdown-item.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .dropdown-item.disabled:hover {
+        background: transparent;
+        box-shadow: none;
+        border-left: 3px solid transparent;
+      }
+
+      /* Tooltip Neon Glass Style */
+      .tooltip-container {
+        position: relative;
+        display: inline-block;
+        margin: 1rem;
+      }
+
+      .tooltip-trigger {
+        padding: 0.5rem 1rem;
+        background: rgba(10, 18, 37, 0.8);
+        border: 1px solid #29f2df;
+        color: #29f2df;
+        cursor: pointer;
+        font-family: 'Courier New', monospace;
+        border-radius: 4px;
+        transition: all 0.2s ease-in-out;
+      }
+
+      .tooltip-trigger:hover {
+        box-shadow: 0 0 15px #29f2df40;
+      }
+
+      .tooltip {
+        position: absolute;
+        bottom: 125%;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(10, 18, 37, 0.6);
+        backdrop-filter: blur(15px);
+        -webkit-backdrop-filter: blur(15px);
+        color: #29f2df;
+        padding: 0.5rem 0.75rem;
+        border-radius: 0px;
+        border: 1px solid #29f2df;
+        font-size: 0.85rem;
+        white-space: nowrap;
+        z-index: 1001;
+        opacity: 0;
+        visibility: hidden;
+        transform: translateX(-50%) translateY(10px);
+        transition: all 0.2s ease-in-out;
+        box-shadow:
+          0 0 15px #29f2df60,
+          inset 0 0 10px #29f2df20;
+      }
+
+      .tooltip-container:hover .tooltip {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(0);
+      }
+
+      .tooltip::after {
+        content: '';
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 5px solid transparent;
+        border-top-color: #29f2df;
+      }
+
+      .code-block {
+        background: #000;
+        border: 1px solid #29f2df;
+        padding: 1rem;
+        border-radius: 4px;
+        margin-top: 1rem;
+        overflow-x: auto;
+        font-size: 0.85rem;
+        color: #29f2df;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🎮 Dropdown Neon Glass HUD Test</h1>
+
+      <div class="demo-section">
+        <h2>Dropdown Menu</h2>
+        <div class="dropdown-container">
+          <button class="dropdown-trigger" onclick="toggleDropdown(event)">Open Menu ▼</button>
+          <div class="dropdown-menu" id="dropdown1">
+            <div class="dropdown-item">👤 Profile</div>
+            <div class="dropdown-item">⚙️ Settings</div>
+            <div class="dropdown-divider"></div>
+            <div class="dropdown-item">🚪 Logout</div>
+          </div>
+        </div>
+
+        <div class="dropdown-container">
+          <button class="dropdown-trigger" onclick="toggleDropdown(event)">Actions ▼</button>
+          <div class="dropdown-menu" id="dropdown2">
+            <div class="dropdown-item">✏️ Edit</div>
+            <div class="dropdown-item">📋 Copy</div>
+            <div class="dropdown-item">🗑️ Delete</div>
+            <div class="dropdown-item disabled">🔒 Archive (Disabled)</div>
+          </div>
+        </div>
+
+        <div class="code-block">
+          // Neon Glass Dropdown Styling background: rgba(10, 18, 37, 0.5) backdrop-filter:
+          blur(20px) border: 2px solid #29F2DF box-shadow: 0 0 20px #29F2DF40, 0 0 40px #29F2DF20,
+          inset 0 0 20px #29F2DF15
+        </div>
+      </div>
+
+      <div class="demo-section">
+        <h2>Tooltip</h2>
+        <div class="tooltip-container">
+          <button class="tooltip-trigger">Hover me</button>
+          <div class="tooltip">This is a neon glass tooltip</div>
+        </div>
+
+        <div class="code-block">
+          // Neon Glass Tooltip Styling background: rgba(10, 18, 37, 0.6) backdrop-filter:
+          blur(15px) border: 1px solid #29F2DF box-shadow: 0 0 15px #29F2DF60, inset 0 0 10px
+          #29F2DF20
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function toggleDropdown(event) {
+        event.stopPropagation();
+        const dropdown = event.target.nextElementSibling;
+
+        // Close all other dropdowns
+        document.querySelectorAll('.dropdown-menu').forEach((menu) => {
+          if (menu !== dropdown) {
+            menu.classList.remove('active');
+          }
+        });
+
+        dropdown.classList.toggle('active');
+      }
+
+      // Close dropdowns when clicking outside
+      document.addEventListener('click', () => {
+        document.querySelectorAll('.dropdown-menu').forEach((menu) => {
+          menu.classList.remove('active');
+        });
+      });
+    </script>
+  </body>
+</html>

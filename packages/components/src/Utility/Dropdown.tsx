@@ -109,20 +109,25 @@ export const Dropdown: React.FC<DropdownProps> = ({
 
   const dropdownStyle = useMemo<React.CSSProperties>(() => {
     const tokens = (theme as any)?.currentMode?.tokens || theme;
+    const primaryColor = tokens.colors?.primary || '#29F2DF';
     return {
       position: 'fixed',
       top: dropdownPos.top,
       left: dropdownPos.left,
-      backgroundColor: tokens.colors?.background || '#0A1225',
+      backgroundColor: `rgba(10, 18, 37, 0.5)`,
+      backdropFilter: 'blur(20px)',
+      WebkitBackdropFilter: 'blur(20px)',
       color: tokens.colors?.text || '#ffffff',
-      border: `1px solid ${tokens.colors?.primary || '#29F2DF'}`,
-      borderRadius: '4px',
-      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+      border: `2px solid ${primaryColor}`,
+      borderRadius: '0px',
+      boxShadow: `0 0 20px ${primaryColor}40, 0 0 40px ${primaryColor}20, inset 0 0 20px ${primaryColor}15, inset 0 0 40px rgba(41, 242, 223, 0.05)`,
       minWidth: '200px',
       zIndex: 1001,
       opacity: isOpen ? 1 : 0,
       pointerEvents: isOpen ? 'auto' : 'none',
-      transition: `opacity ${animationDuration}ms ease-in-out`,
+      transition: `opacity ${animationDuration}ms ease-in-out, box-shadow ${animationDuration}ms ease-in-out`,
+      maxHeight: '400px',
+      overflowY: 'auto',
       ...style,
     };
   }, [dropdownPos, isOpen, animationDuration, theme, style]);
@@ -133,15 +138,18 @@ export const Dropdown: React.FC<DropdownProps> = ({
     display: 'flex',
     alignItems: 'center',
     gap: '0.5rem',
-    transition: 'background-color 0.2s ease-in-out',
+    transition: 'all 0.2s ease-in-out',
+    borderLeft: '3px solid transparent',
   };
 
   const dividerStyle: React.CSSProperties = useMemo(() => {
     const tokens = (theme as any)?.currentMode?.tokens || theme;
+    const primaryColor = tokens.colors?.primary || '#29F2DF';
     return {
       height: '1px',
-      backgroundColor: tokens.colors?.primary || '#29F2DF',
+      backgroundColor: primaryColor,
       margin: '0.25rem 0',
+      boxShadow: `0 0 10px ${primaryColor}60`,
     };
   }, [theme]);
 
@@ -157,7 +165,7 @@ export const Dropdown: React.FC<DropdownProps> = ({
       {isOpen && (
         <Portal containerId="dropdown-root">
           <div ref={dropdownRef} style={dropdownStyle} className={className}>
-            {items.map((item, index) => (
+            {items.map((item, index) =>
               item.divider ? (
                 <div key={index} style={dividerStyle} />
               ) : (
@@ -172,19 +180,25 @@ export const Dropdown: React.FC<DropdownProps> = ({
                   onMouseEnter={(e) => {
                     if (!item.disabled) {
                       const tokens = (theme as any)?.currentMode?.tokens || theme;
-                      (e.currentTarget as HTMLElement).style.backgroundColor = tokens.colors?.primary || '#29F2DF';
-                      (e.currentTarget as HTMLElement).style.opacity = '0.1';
+                      const primaryColor = tokens.colors?.primary || '#29F2DF';
+                      (e.currentTarget as HTMLElement).style.backgroundColor = `${primaryColor}20`;
+                      (e.currentTarget as HTMLElement).style.boxShadow =
+                        `inset 0 0 15px ${primaryColor}30, 0 0 10px ${primaryColor}40`;
+                      (e.currentTarget as HTMLElement).style.borderLeft =
+                        `3px solid ${primaryColor}`;
                     }
                   }}
                   onMouseLeave={(e) => {
                     (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
+                    (e.currentTarget as HTMLElement).style.boxShadow = 'none';
+                    (e.currentTarget as HTMLElement).style.borderLeft = 'none';
                   }}
                 >
                   {item.icon && <span>{item.icon}</span>}
                   <span>{item.label}</span>
                 </div>
               )
-            ))}
+            )}
           </div>
         </Portal>
       )}
@@ -193,4 +207,3 @@ export const Dropdown: React.FC<DropdownProps> = ({
 };
 
 Dropdown.displayName = 'Dropdown';
-

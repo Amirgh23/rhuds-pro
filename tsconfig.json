@@ -46,10 +46,6 @@
     { "path": "./packages/frames" },
     { "path": "./packages/backgrounds" },
     { "path": "./packages/webgl" },
-    { "path": "./packages/hooks" },
-    { "path": "./packages/cli" },
-    { "path": "./packages/testing" },
-    { "path": "./packages/utils" },
-    { "path": "./packages/sfx" }
+    { "path": "./packages/hooks" }
   ]
 }

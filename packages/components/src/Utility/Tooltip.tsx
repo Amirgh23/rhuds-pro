@@ -76,20 +76,27 @@ export const Tooltip: React.FC<TooltipProps> = ({
 
   const tooltipStyle = useMemo<React.CSSProperties>(() => {
     const tokens = (theme as any)?.currentMode?.tokens || theme;
+    const primaryColor = tokens.colors?.primary || '#29F2DF';
     return {
       position: 'fixed',
       top: tooltipPos.top,
       left: tooltipPos.left,
-      backgroundColor: tokens.colors?.primary || '#29F2DF',
-      color: tokens.colors?.background || '#0A1225',
+      backgroundColor: `rgba(10, 18, 37, 0.6)`,
+      backdropFilter: 'blur(15px)',
+      WebkitBackdropFilter: 'blur(15px)',
+      color: primaryColor,
       padding: '0.5rem 0.75rem',
-      borderRadius: '4px',
+      borderRadius: '0px',
+      border: `1px solid ${primaryColor}`,
       fontSize: '0.85rem',
       whiteSpace: 'nowrap',
       zIndex: 1001,
       opacity: isVisible ? 1 : 0,
       pointerEvents: 'none',
-      transition: `opacity ${animationDuration}ms ease-in-out`,
+      transition: `opacity ${animationDuration}ms ease-in-out, box-shadow ${animationDuration}ms ease-in-out`,
+      boxShadow: isVisible
+        ? `0 0 15px ${primaryColor}60, inset 0 0 10px ${primaryColor}20`
+        : 'none',
       ...style,
     };
   }, [tooltipPos, isVisible, animationDuration, theme, style]);
@@ -115,4 +122,3 @@ export const Tooltip: React.FC<TooltipProps> = ({
 };
 
 Tooltip.displayName = 'Tooltip';
-

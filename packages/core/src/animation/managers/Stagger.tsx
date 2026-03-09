@@ -1,23 +1,21 @@
-import React from 'react';
 /**
  * Stagger Manager
  * Staggers child animations with configurable delays
  */
 
 import React, { Children, cloneElement, isValidElement } from 'react';
-import { StaggerProps } from '../types';
 
 /**
  * Stagger component for staggering child animations
- * 
+ *
  * Adds incremental delays to child Animator components
  * to create a cascading animation effect.
  */
-export const Stagger: React.FC<StaggerProps> = ({
-  stagger = 50,
-  direction = 'forward',
-  children,
-}) => {
+export const Stagger: React.FC<{
+  stagger?: number | 'auto';
+  direction?: 'forward' | 'reverse';
+  children: React.ReactNode;
+}> = ({ stagger = 50, direction = 'forward', children }) => {
   const childArray = Children.toArray(children);
   const count = childArray.length;
 
@@ -59,4 +57,3 @@ export const Stagger: React.FC<StaggerProps> = ({
 };
 
 Stagger.displayName = 'Stagger';
-

@@ -1,4 +1,3 @@
-import React from 'react';
 /**
  * Animator General Provider
  * Global animation configuration provider
@@ -39,11 +38,11 @@ export interface AnimatorGeneralProviderProps {
 
 /**
  * Animator General Provider
- * 
+ *
  * Provides global animation configuration to all child components.
  * This allows you to set default animation durations, easing functions,
  * and other settings that apply to all animators in the tree.
- * 
+ *
  * @example
  * ```tsx
  * <AnimatorGeneralProvider
@@ -99,11 +98,8 @@ export const AnimatorGeneralProvider: React.FC<AnimatorGeneralProviderProps> = (
   );
 
   return (
-    <AnimatorGeneralContext.Provider value={value}>
-      {children}
-    </AnimatorGeneralContext.Provider>
+    <AnimatorGeneralContext.Provider value={value}>{children}</AnimatorGeneralContext.Provider>
   );
 };
 
 AnimatorGeneralProvider.displayName = 'AnimatorGeneralProvider';
-

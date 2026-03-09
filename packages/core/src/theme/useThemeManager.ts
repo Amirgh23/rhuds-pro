@@ -1,6 +1,6 @@
 /**
  * React hook for using the ThemeManager
- * 
+ *
  * Provides runtime theme switching, persistence, and system preference support.
  */
 
@@ -10,18 +10,18 @@ import { ThemeManager, getSystemThemePreference, watchSystemThemePreference } fr
 
 /**
  * Hook for managing themes with runtime switching and persistence
- * 
+ *
  * @param themeManager - ThemeManager instance
  * @param options - Configuration options
  * @returns Theme management utilities
- * 
+ *
  * @example
  * ```typescript
  * const { currentTheme, switchTheme, availableThemes } = useThemeManager(manager);
- * 
+ *
  * // Switch theme
  * await switchTheme('dark');
- * 
+ *
  * // Or switch by theme object
  * await switchTheme(customTheme);
  * ```
@@ -33,9 +33,7 @@ export function useThemeManager(
     autoLoad?: boolean;
   }
 ) {
-  const [currentTheme, setCurrentTheme] = useState<RHUDSTheme>(
-    themeManager.getCurrentTheme()
-  );
+  const [currentTheme, setCurrentTheme] = useState<RHUDSTheme>(themeManager.getCurrentTheme());
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
@@ -45,12 +43,12 @@ export function useThemeManager(
       setIsLoading(true);
       themeManager
         .loadFromStorage()
-        .then(theme => {
+        .then((theme) => {
           if (theme) {
             setCurrentTheme(theme);
           }
         })
-        .catch(err => {
+        .catch((err) => {
           console.error('Failed to load theme from storage:', err);
           setError(err);
         })
@@ -62,7 +60,7 @@ export function useThemeManager(
 
   // Subscribe to theme changes
   useEffect(() => {
-    const unsubscribe = themeManager.subscribe(theme => {
+    const unsubscribe = themeManager.subscribe((theme) => {
       setCurrentTheme(theme);
     });
 
@@ -72,15 +70,13 @@ export function useThemeManager(
   // Watch system theme preference
   useEffect(() => {
     if (options?.respectSystemPreference) {
-      const unwatch = watchSystemThemePreference(preference => {
+      const unwatch = watchSystemThemePreference((preference) => {
         // Try to find a matching theme
         const themeNames = themeManager.getThemeNames();
-        const matchingTheme = themeNames.find(name => 
-          name.toLowerCase().includes(preference)
-        );
+        const matchingTheme = themeNames.find((name) => name.toLowerCase().includes(preference));
 
         if (matchingTheme) {
-          themeManager.switchTheme(matchingTheme).catch(err => {
+          themeManager.switchTheme(matchingTheme).catch((err) => {
             console.error('Failed to switch to system preference theme:', err);
           });
         }
