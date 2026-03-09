@@ -25,40 +25,20 @@ const radarHudRotate = keyframes`
   }
 `;
 
-const radarHudDotPulse = keyframes`
-  0% {
-    transform: scale(0.95);
-    box-shadow: 0 0 10px 5px rgba(24, 211, 33, 0.3),
-                0 0 10px 10px rgba(24, 211, 33, 0.3);
-  }
-  60% {
-    transform: scale(0.95);
-    box-shadow: 0 0 10px 5px rgba(24, 211, 33, 0.3),
-                0 0 10px 10px rgba(24, 211, 33, 0.3);
-  }
-  100% {
-    transform: scale(1);
-    box-shadow: 0 0 0 0 rgba(24, 211, 33, 0.7),
-                0 0 0 0 rgba(24, 211, 33, 0.5),
-                0 0 0 0 rgba(24, 211, 33, 0.3);
-    opacity: 0;
-  }
-`;
-
 const Container = styled.div<{ $size: number }>`
   width: ${props => props.$size}px;
   height: ${props => props.$size + 100}px;
-  background-color: #151716;
+  background-color: rgba(41, 242, 223, 0.08);
   border-radius: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  filter: hue-rotate(10deg);
   color: #2fbb39;
   gap: 20px;
   padding: 20px;
   box-sizing: border-box;
+  border: 1px solid rgba(41, 242, 223, 0.2);
 `;
 
 const DataDisplay = styled.div<{ $color: string }>`
@@ -66,7 +46,7 @@ const DataDisplay = styled.div<{ $color: string }>`
   border: 2px solid ${props => props.$color};
   padding: 15px;
   border-radius: 5px;
-  background: #000000;
+  background: rgba(10, 18, 37, 0.5);
   position: relative;
   font-family: 'Orbitron', 'Fira Code', monospace;
   font-size: 0.9rem;
@@ -75,7 +55,7 @@ const DataDisplay = styled.div<{ $color: string }>`
   color: ${props => props.$color};
 
   &::after {
-    background: #000000;
+    background: rgba(10, 18, 37, 0.5);
     content: attr(data-wind);
     position: absolute;
     bottom: -35px;
@@ -95,14 +75,14 @@ const DataDisplay = styled.div<{ $color: string }>`
     padding: 3px 8px;
     border-radius: 5px;
     font-size: 0.7em;
-    background: #000000;
+    background: rgba(10, 18, 37, 0.5);
   }
 `;
 
 const RadarCard = styled.div<{ $color: string; $size: number }>`
   width: ${props => props.$size - 80}px;
   height: ${props => props.$size - 80}px;
-  background: #000000;
+  background: rgba(10, 18, 37, 0.4);
   border-radius: 50%;
   position: relative;
   display: flex;
@@ -177,7 +157,28 @@ const Dot = styled.div<{ $color: string; $top: string; $left?: string; $right?: 
   background-color: ${props => props.$color};
   border-radius: 50%;
   position: absolute;
-  animation: ${radarHudDotPulse} 1.5s ${props => props.$delay}s ease infinite;
+  animation: ${props => {
+    const dotPulse = keyframes`
+      0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 10px 5px ${props.$color}4D,
+                    0 0 10px 10px ${props.$color}4D;
+      }
+      60% {
+        transform: scale(0.95);
+        box-shadow: 0 0 10px 5px ${props.$color}4D,
+                    0 0 10px 10px ${props.$color}4D;
+      }
+      100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 ${props.$color}B3,
+                    0 0 0 0 ${props.$color}80,
+                    0 0 0 0 ${props.$color}4D;
+        opacity: 0;
+      }
+    `;
+    return dotPulse;
+  }} 1.5s ${props => props.$delay}s ease infinite;
 `;
 
 export function RadarHud({

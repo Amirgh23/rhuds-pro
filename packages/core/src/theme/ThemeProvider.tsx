@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react'
+import React from 'react'
 import { ThemeContext } from './context'
 import { ThemeMode, ThemeContextValue } from './types'
 import { DEFAULT_THEMES } from './themes'
@@ -14,7 +14,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
   defaultTheme = 'dark',
   children,
 }) => {
-  const [currentMode, setCurrentMode] = useState<ThemeMode>(() => {
+  const [currentMode, setCurrentMode] = React.useState<ThemeMode>(() => {
     // Try to load from localStorage
     const saved = localStorage.getItem('rhuds-theme')
     if (saved) {
@@ -25,10 +25,10 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
     return themes.find((t) => t.name === defaultTheme) || themes[0]
   })
 
-  const [customTokens, setCustomTokens] = useState<Record<string, string>>({})
+  const [customTokens, setCustomTokens] = React.useState<Record<string, string>>({})
 
   // Inject CSS variables
-  useEffect(() => {
+  React.useEffect(() => {
     const root = document.documentElement
     const tokens = { ...currentMode.tokens }
 
@@ -39,7 +39,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
     injectCSSVariables(mergedTokens)
   }, [currentMode, customTokens])
 
-  const handleSetTheme = useCallback((themeName: ThemeMode['name']) => {
+  const handleSetTheme = React.useCallback((themeName: ThemeMode['name']) => {
     const theme = themes.find((t) => t.name === themeName)
     if (theme) {
       setCurrentMode(theme)
@@ -47,7 +47,7 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({
     }
   }, [themes])
 
-  const handleCustomizeToken = useCallback((path: string, value: string) => {
+  const handleCustomizeToken = React.useCallback((path: string, value: string) => {
     if (!isValidTokenValue(value)) {
       console.error(`Invalid token value for "${path}": ${value}`)
       return

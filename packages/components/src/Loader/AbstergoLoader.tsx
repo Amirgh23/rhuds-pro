@@ -14,8 +14,8 @@ export interface AbstergoLoaderProps {
 
 const StyledWrapper = styled.div<{ $size: number }>`
   .ui-abstergo {
-    --primary: #fff;
-    --secondary: rgba(255, 255, 255, 0.3);
+    --primary: #29F2DF;
+    --secondary: rgba(41, 242, 223, 0.3);
     --shadow-blur: 3px;
     --text-shadow-blur: 3px;
     --animation-duration: 2s;

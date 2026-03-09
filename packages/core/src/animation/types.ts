@@ -1,9 +1,10 @@
+import React from 'react';
 /**
  * Animation System Types
  * Core type definitions for the RHUDS Pro animation system
  */
 
-import { ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 
 /**
  * Animation state values
@@ -149,3 +150,4 @@ export interface SwitchProps {
   condition: boolean;
   children: [ReactNode, ReactNode];
 }
+

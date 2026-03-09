@@ -96,20 +96,24 @@ export const DataGrid: React.FC<DataGridProps> = ({
       height: visibleRows * rowHeight,
       overflowY: 'auto',
       overflowX: 'auto',
-      backgroundColor: backgroundColor,
+      backgroundColor: 'rgba(41, 242, 223, 0.03)',
+      border: `1px solid ${primaryColor}33`,
+      borderRadius: '4px',
       ...style,
     };
-  }, [visibleRows, rowHeight, backgroundColor, style]);
+  }, [visibleRows, rowHeight, primaryColor, style]);
 
   const tableStyle: React.CSSProperties = {
     width: '100%',
     borderCollapse: 'collapse',
     color: textColor,
+    border: `1px solid ${primaryColor}`,
+    boxShadow: `0 0 10px ${primaryColor}33, inset 0 0 10px ${primaryColor}1a`,
   };
 
   const headerStyle: React.CSSProperties = {
-    backgroundColor: primaryColor,
-    color: backgroundColor,
+    backgroundColor: `${primaryColor}1a`,
+    color: primaryColor,
     padding: '0.5rem',
     textAlign: 'left',
     fontWeight: 600,
@@ -118,12 +122,16 @@ export const DataGrid: React.FC<DataGridProps> = ({
     position: 'sticky',
     top: 0,
     zIndex: 10,
+    borderBottom: `2px solid ${primaryColor}`,
+    borderRight: `1px solid ${primaryColor}33`,
+    textShadow: `0 0 8px ${primaryColor}80`,
   };
 
   const cellStyle: React.CSSProperties = {
     padding: '0.5rem',
     textAlign: 'left',
-    borderBottom: `1px solid ${primaryColor}`,
+    borderBottom: `1px solid ${primaryColor}33`,
+    borderRight: `1px solid ${primaryColor}33`,
   };
 
   return (
@@ -179,8 +187,8 @@ export const DataGrid: React.FC<DataGridProps> = ({
               <tr
                 key={actualIndex}
                 style={{
-                  backgroundColor: isSelected ? primaryColor : 'transparent',
-                  opacity: isSelected ? 0.2 : 1,
+                  backgroundColor: isSelected ? `${primaryColor}1a` : 'transparent',
+                  boxShadow: isSelected ? `0 0 10px ${primaryColor}66` : 'none',
                   cursor: onRowClick ? 'pointer' : 'default',
                 }}
                 onClick={() => onRowClick?.(row, actualIndex)}

@@ -1,3 +1,4 @@
+import React from 'react';
 /**
  * Sequence Manager
  * Runs animations in sequence
@@ -16,9 +17,9 @@ export const Sequence: React.FC<SequenceProps> = ({
   children,
   onComplete,
 }) => {
-  const childArray = Children.toArray(children);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [completedIndices, setCompletedIndices] = useState<Set<number>>(new Set());
+  const childArray = React.Children.toArray(children);
+  const [activeIndex, setActiveIndex] = React.useState(0);
+  const [completedIndices, setCompletedIndices] = React.useState<Set<number>>(new Set());
 
   // Handle animation completion
   const handleAnimationComplete = (index: number) => {
@@ -38,7 +39,7 @@ export const Sequence: React.FC<SequenceProps> = ({
   };
 
   // Reset when children change
-  useEffect(() => {
+  React.useEffect(() => {
     setActiveIndex(0);
     setCompletedIndices(new Set());
   }, [children]);
@@ -72,3 +73,4 @@ export const Sequence: React.FC<SequenceProps> = ({
 };
 
 Sequence.displayName = 'Sequence';
+

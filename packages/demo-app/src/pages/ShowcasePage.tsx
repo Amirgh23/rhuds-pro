@@ -1,5 +1,7 @@
 ﻿import React, { useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@rhuds/core';
+import { AnimatedBackground } from '../components/AnimatedBackground';
 import {
   Text, Button, HudButton, GlitchButton, Icon, Input, HackerInput, AiHudInput, HoloGlitchInput, HoloInput, FuturisticInput, Select, Grid, Stack, HudBox, HudFrame, GlitchFrame,
   Checkbox, HoloCheckbox, RadioGroup, Switch, Tabs, Pagination, Table,
@@ -7,6 +9,9 @@ import {
   Accordion, Stepper, Carousel, Slider, DatePicker, ColorPicker,
   FileUpload, Chart, DataGrid, Tree, CyberCard, GlitchProfileCard, RadarHud, PipBoy, AbstergoLoader, HeartRateLoader, HackerLoader, GlitchRadio, Navbar, Sidebar, Breadcrumb,
   Menu, CodeEditor, RichTextEditor, GlitchLoginForm, NeonRadio,
+  HudTableBasic, HudTableBorderless, HudTableHoverable, HudTableStriped, HudTableDark, HudTableBordered, HudTableContextual, HudTableCaption, HudTableSmall, HudTableResponsive,
+  HudInput, HudTextarea, HudSelect, HudRange, HudCheckbox, HudRadio, HudSwitch, HudFile,
+  HudFormGrid, HudFormHelpText, HudInputGroup, HudFormFeedback, HudInputValidated, HudSelectValidated, HudTextareaValidated,
 } from '@rhuds/components';
 import {
   GridLines,
@@ -34,6 +39,7 @@ import {
 } from '@rhuds/frames';
 
 export const ShowcasePage: React.FC = () => {
+  const navigate = useNavigate();
   const theme = useTheme();
   const { showToast } = useHudToast();
   const [activeTab, setActiveTab] = useState(0);
@@ -260,66 +266,66 @@ export const ShowcasePage: React.FC = () => {
                   <HudBox variant="compact" color="#29F2DF" animated={hudBoxAnimated}>
                     <Text color="#29F2DF">Compact</Text>
                   </HudBox>
-                  <HudBox variant="default" color="#29F2DF" animated={hudBoxAnimated}>
-                    <Text color="#29F2DF">Default</Text>
+                  <HudBox variant="default" color="#EF3EF1" animated={hudBoxAnimated}>
+                    <Text color="#EF3EF1">Default</Text>
                   </HudBox>
                   <HudBox variant="wide" color="#29F2DF" animated={hudBoxAnimated}>
                     <Text color="#29F2DF">Wide</Text>
                   </HudBox>
-                  <HudBox variant="hexagon" color="#29F2DF" animated={hudBoxAnimated}>
-                    <Text color="#29F2DF">Hexagon</Text>
+                  <HudBox variant="hexagon" color="#EF3EF1" animated={hudBoxAnimated}>
+                    <Text color="#EF3EF1">Hexagon</Text>
                   </HudBox>
-                  <HudBox variant="octagon" color="#EF3EF1" animated={hudBoxAnimated}>
-                    <Text color="#EF3EF1">Octagon</Text>
+                  <HudBox variant="octagon" color="#29F2DF" animated={hudBoxAnimated}>
+                    <Text color="#29F2DF">Octagon</Text>
                   </HudBox>
-                  <HudBox variant="diagonal" color="#28125A" animated={hudBoxAnimated}>
-                    <Text color="#28125A">Diagonal</Text>
+                  <HudBox variant="diagonal" color="#EF3EF1" animated={hudBoxAnimated}>
+                    <Text color="#EF3EF1">Diagonal</Text>
                   </HudBox>
-                  <HudBox variant="corner-cut" color="#1C7FA6" animated={hudBoxAnimated}>
-                    <Text color="#1C7FA6">Corner Cut</Text>
+                  <HudBox variant="corner-cut" color="#29F2DF" animated={hudBoxAnimated}>
+                    <Text color="#29F2DF">Corner Cut</Text>
                   </HudBox>
-                  <HudBox variant="tech-panel" color="#29F2DF" animated={hudBoxAnimated}>
-                    <Text color="#29F2DF">Tech Panel</Text>
+                  <HudBox variant="tech-panel" color="#EF3EF1" animated={hudBoxAnimated}>
+                    <Text color="#EF3EF1">Tech Panel</Text>
                   </HudBox>
                   <HudBox variant="arrow-right" color="#29F2DF" animated={hudBoxAnimated}>
                     <Text color="#29F2DF">Arrow →</Text>
                   </HudBox>
-                  <HudBox variant="chevron" color="#29F2DF" animated={hudBoxAnimated}>
-                    <Text color="#29F2DF">Chevron</Text>
+                  <HudBox variant="chevron" color="#EF3EF1" animated={hudBoxAnimated}>
+                    <Text color="#EF3EF1">Chevron</Text>
                   </HudBox>
                 </div>
               </div>
               <div>
                 <Text color="#29F2DF" style={{ marginBottom: '1rem' }}>Portrait (Vertical):</Text>
                 <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'flex-start' }}>
-                  <HudBox variant="portrait-tall" color="#1C7FA6" animated={hudBoxAnimated}>
-                    <Text color="#1C7FA6" align="center">Portrait<br/>Tall</Text>
+                  <HudBox variant="portrait-tall" color="#29F2DF" animated={hudBoxAnimated}>
+                    <Text color="#29F2DF" align="center">Portrait<br/>Tall</Text>
                   </HudBox>
-                  <HudBox variant="portrait-slim" color="#29F2DF" animated={hudBoxAnimated}>
-                    <Text color="#29F2DF" align="center">Portrait<br/>Slim</Text>
+                  <HudBox variant="portrait-slim" color="#EF3EF1" animated={hudBoxAnimated}>
+                    <Text color="#EF3EF1" align="center">Portrait<br/>Slim</Text>
                   </HudBox>
-                  <HudBox variant="portrait-card" color="#28125A" animated={hudBoxAnimated}>
-                    <Text color="#28125A" align="center">Portrait<br/>Card</Text>
+                  <HudBox variant="portrait-card" color="#29F2DF" animated={hudBoxAnimated}>
+                    <Text color="#29F2DF" align="center">Portrait<br/>Card</Text>
                   </HudBox>
-                  <HudBox variant="portrait-banner" color="#29F2DF" animated={hudBoxAnimated}>
-                    <Text color="#29F2DF" align="center">Portrait<br/>Banner</Text>
+                  <HudBox variant="portrait-banner" color="#EF3EF1" animated={hudBoxAnimated}>
+                    <Text color="#EF3EF1" align="center">Portrait<br/>Banner</Text>
                   </HudBox>
                 </div>
               </div>
               <div>
                 <Text color="#29F2DF" style={{ marginBottom: '1rem' }}>Landscape (Horizontal):</Text>
                 <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
-                  <HudBox variant="landscape-wide" color="#1C7FA6" animated={hudBoxAnimated}>
-                    <Text color="#1C7FA6">Landscape Wide</Text>
+                  <HudBox variant="landscape-wide" color="#29F2DF" animated={hudBoxAnimated}>
+                    <Text color="#29F2DF">Landscape Wide</Text>
                   </HudBox>
                   <HudBox variant="landscape-ultra" color="#EF3EF1" animated={hudBoxAnimated}>
                     <Text color="#EF3EF1">Landscape Ultra</Text>
                   </HudBox>
-                  <HudBox variant="landscape-bar" color="#28125A" animated={hudBoxAnimated}>
-                    <Text color="#28125A">Landscape Bar</Text>
+                  <HudBox variant="landscape-bar" color="#29F2DF" animated={hudBoxAnimated}>
+                    <Text color="#29F2DF">Landscape Bar</Text>
                   </HudBox>
-                  <HudBox variant="landscape-ribbon" color="#28125A" animated={hudBoxAnimated}>
-                    <Text color="#28125A">Landscape Ribbon</Text>
+                  <HudBox variant="landscape-ribbon" color="#EF3EF1" animated={hudBoxAnimated}>
+                    <Text color="#EF3EF1">Landscape Ribbon</Text>
                   </HudBox>
                 </div>
               </div>
@@ -354,11 +360,11 @@ export const ShowcasePage: React.FC = () => {
                     description: 'Analytics and metrics dashboard',
                     number: 2,
                   }}
-                  color="#29F2DF"
+                  color="#EF3EF1"
                 >
                   <div style={{ padding: '2rem' }}>
-                    <Text color="#29F2DF" variant="h3" style={{ marginBottom: '1rem' }}>
-                      GREEN THEME
+                    <Text color="#EF3EF1" variant="h3" style={{ marginBottom: '1rem' }}>
+                      MAGENTA THEME
                     </Text>
                     <Text color="#ffffff" variant="body">
                       HudFrame supports custom colors for all neon lines and title box.
@@ -528,11 +534,258 @@ export const ShowcasePage: React.FC = () => {
       label: 'Form (10)',
       content: (
         <Stack direction="column" gap="2rem">
+          <ComponentSection title="HUD Form Elements - 14 Sections from Reference Site">
+            <Stack direction="column" gap="2.5rem">
+              {/* 1. Form Controls */}
+              <div>
+                <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 700, fontSize: '1.1rem', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+                  1. FORM CONTROLS
+                </Text>
+                <Stack direction="column" gap="1rem">
+                  <HudInput placeholder="Default input" />
+                  <HudTextarea placeholder="Textarea" rows={3} />
+                  <HudSelect />
+                </Stack>
+              </div>
+
+              {/* 2. Sizing */}
+              <div>
+                <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 700, fontSize: '1.1rem', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+                  2. SIZING
+                </Text>
+                <Stack direction="column" gap="1rem">
+                  <HudInput placeholder="Large input" size="lg" />
+                  <HudInput placeholder="Default input" size="default" />
+                  <HudInput placeholder="Small input" size="sm" />
+                </Stack>
+              </div>
+
+              {/* 3. Readonly */}
+              <div>
+                <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 700, fontSize: '1.1rem', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+                  3. READONLY
+                </Text>
+                <HudInput placeholder="Readonly input here..." readonly value="Readonly input here..." />
+              </div>
+
+              {/* 4. Readonly Plain Text */}
+              <div>
+                <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 700, fontSize: '1.1rem', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+                  4. READONLY PLAIN TEXT
+                </Text>
+                <HudInput plaintext readonly value="email@example.com" />
+              </div>
+
+              {/* 5. Range Inputs */}
+              <div>
+                <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 700, fontSize: '1.1rem', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+                  5. RANGE INPUTS
+                </Text>
+                <HudRange min={0} max={100} value={50} />
+              </div>
+
+              {/* 6. Checkboxes */}
+              <div>
+                <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 700, fontSize: '1.1rem', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+                  6. CHECKBOXES
+                </Text>
+                <Stack direction="column" gap="0.5rem">
+                  <HudCheckbox label="Default checkbox" checked={false} />
+                  <HudCheckbox label="Checked checkbox" checked={true} />
+                  <HudCheckbox label="Disabled checkbox" checked={false} disabled={true} />
+                </Stack>
+              </div>
+
+              {/* 7. Radios */}
+              <div>
+                <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 700, fontSize: '1.1rem', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+                  7. RADIOS
+                </Text>
+                <Stack direction="column" gap="0.5rem">
+                  <HudRadio label="Default radio button" name="radio1" checked={false} />
+                  <HudRadio label="Checked radio button" name="radio1" checked={true} />
+                  <HudRadio label="Disabled radio button" name="radio1" checked={false} disabled={true} />
+                </Stack>
+              </div>
+
+              {/* 8. Switches */}
+              <div>
+                <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 700, fontSize: '1.1rem', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+                  8. SWITCHES
+                </Text>
+                <Stack direction="column" gap="0.5rem">
+                  <HudSwitch label="Toggle this switch element" checked={false} />
+                  <HudSwitch label="Checked switch element" checked={true} />
+                  <HudSwitch label="Disabled switch element" checked={false} disabled={true} />
+                </Stack>
+              </div>
+
+              {/* 9. File Browser */}
+              <div>
+                <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 700, fontSize: '1.1rem', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+                  9. FILE BROWSER
+                </Text>
+                <Stack direction="column" gap="1rem">
+                  <div>
+                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>Default file input</Text>
+                    <HudFile />
+                  </div>
+                  <div>
+                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>Multiple files input</Text>
+                    <HudFile multiple />
+                  </div>
+                  <div>
+                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>Disabled file input</Text>
+                    <HudFile disabled />
+                  </div>
+                  <div>
+                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>Small file input</Text>
+                    <HudFile size="sm" />
+                  </div>
+                  <div>
+                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>Large file input</Text>
+                    <HudFile size="lg" />
+                  </div>
+                </Stack>
+              </div>
+
+              {/* 10. Form Grid */}
+              <div>
+                <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 700, fontSize: '1.1rem', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+                  10. FORM GRID
+                </Text>
+                <HudFormGrid>
+                  <div>
+                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>First Name</Text>
+                    <HudInput placeholder="First name" />
+                  </div>
+                  <div>
+                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>Last Name</Text>
+                    <HudInput placeholder="Last name" />
+                  </div>
+                  <div>
+                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>Email</Text>
+                    <HudInput type="email" placeholder="Email" />
+                  </div>
+                </HudFormGrid>
+              </div>
+
+              {/* 11. Help Text */}
+              <div>
+                <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 700, fontSize: '1.1rem', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+                  11. HELP TEXT
+                </Text>
+                <div>
+                  <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>Password</Text>
+                  <HudInput type="password" placeholder="Password" />
+                  <HudFormHelpText>
+                    Your password must be 8-20 characters long, contain letters and numbers, and must not contain spaces, special characters, or emoji.
+                  </HudFormHelpText>
+                </div>
+              </div>
+
+              {/* 12. Input Group */}
+              <div>
+                <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 700, fontSize: '1.1rem', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+                  12. INPUT GROUP
+                </Text>
+                <Stack direction="column" gap="1rem">
+                  <div>
+                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>Username</Text>
+                    <HudInputGroup prepend="@">
+                      <HudInput placeholder="Username" />
+                    </HudInputGroup>
+                  </div>
+                  <div>
+                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>Website</Text>
+                    <HudInputGroup append=".com">
+                      <HudInput placeholder="Website" />
+                    </HudInputGroup>
+                  </div>
+                  <div>
+                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>Price</Text>
+                    <HudInputGroup prepend="$" append=".00">
+                      <HudInput placeholder="0" type="number" />
+                    </HudInputGroup>
+                  </div>
+                </Stack>
+              </div>
+
+              {/* 13. Validation */}
+              <div>
+                <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 700, fontSize: '1.1rem', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+                  13. VALIDATION
+                </Text>
+                <Stack direction="column" gap="1rem">
+                  <div>
+                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>Invalid Input</Text>
+                    <HudInputValidated 
+                      placeholder="Enter name" 
+                      isInvalid={true} 
+                      feedback="Please provide a name"
+                    />
+                  </div>
+                  <div>
+                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>Valid Input</Text>
+                    <HudInputValidated 
+                      placeholder="Username" 
+                      value="john_doe"
+                      isValid={true} 
+                      feedback="Looks good!"
+                    />
+                  </div>
+                  <div>
+                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>Invalid Select</Text>
+                    <HudSelectValidated 
+                      isInvalid={true} 
+                      feedback="Please select a valid state"
+                    />
+                  </div>
+                  <div>
+                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>Invalid Textarea</Text>
+                    <HudTextareaValidated 
+                      placeholder="Enter message" 
+                      isInvalid={true} 
+                      feedback="Please enter a message in the textarea"
+                      rows={3}
+                    />
+                  </div>
+                </Stack>
+              </div>
+
+              {/* 14. Validation with Tooltips */}
+              <div>
+                <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 700, fontSize: '1.1rem', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+                  14. VALIDATION (TOOLTIP)
+                </Text>
+                <Stack direction="column" gap="1rem">
+                  <div>
+                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>Tooltip Valid</Text>
+                    <HudInputValidated 
+                      placeholder="Username" 
+                      value="valid_user"
+                      isValid={true} 
+                      feedback="Looks good!"
+                      feedbackTooltip={true}
+                    />
+                  </div>
+                  <div>
+                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>Tooltip Invalid</Text>
+                    <HudSelectValidated 
+                      isInvalid={true} 
+                      feedback="Please select a valid state"
+                      feedbackTooltip={true}
+                    />
+                  </div>
+                </Stack>
+              </div>
+            </Stack>
+          </ComponentSection>
           <ComponentSection title="9. Checkbox">
             <Checkbox checked={checkboxValue} onChange={setCheckboxValue} label="Accept" />
           </ComponentSection>
           <ComponentSection title="9b. HoloCheckbox (3D)">
-            <div style={{ display: 'flex', justifyContent: 'center', background: 'rgba(0, 0, 0, 0.9)', padding: '1rem', borderRadius: '8px' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', background: 'rgba(41, 242, 223, 0.08)', backdropFilter: 'blur(10px)', border: '1px solid rgba(41, 242, 223, 0.2)', padding: '1rem', borderRadius: '8px' }}>
               <HoloCheckbox checked={holoCheckboxValue} onChange={setHoloCheckboxValue} label="HOLOGRAPHIC" />
             </div>
           </ComponentSection>
@@ -577,7 +830,7 @@ export const ShowcasePage: React.FC = () => {
             <FileUpload onUpload={setUploadedFiles} accept=".jpg,.png" />
           </ComponentSection>
           <ComponentSection title="16. GlitchLoginForm (HUD Style)">
-            <div style={{ display: 'flex', justifyContent: 'center', background: '#28125A', padding: '2rem', borderRadius: '8px', minHeight: '400px' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', background: 'rgba(41, 242, 223, 0.08)', backdropFilter: 'blur(10px)', border: '1px solid rgba(41, 242, 223, 0.2)', padding: '2rem', borderRadius: '8px', minHeight: '400px' }}>
               <GlitchLoginForm
                 onSubmit={(username, password) => {
                   console.log('Login:', { username, password });
@@ -595,7 +848,7 @@ export const ShowcasePage: React.FC = () => {
             </div>
           </ComponentSection>
           <ComponentSection title="17. NeonRadio (HUD Style with Neon Effects)">
-            <div style={{ display: 'flex', justifyContent: 'center', background: 'rgba(0, 0, 0, 0.9)', padding: '3rem', borderRadius: '8px' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', background: 'rgba(41, 242, 223, 0.08)', backdropFilter: 'blur(10px)', border: '1px solid rgba(41, 242, 223, 0.2)', padding: '3rem', borderRadius: '8px' }}>
               <NeonRadio
                 options={[
                   { value: 'option1', label: 'OPTION 1' },
@@ -656,6 +909,92 @@ export const ShowcasePage: React.FC = () => {
               data={tableData}
             />
           </ComponentSection>
+          <ComponentSection title="23b. HUD Table Variants (10 Types)">
+            <Stack direction="column" gap="2rem">
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(500px, 1fr))', gap: '2rem' }}>
+                <div>
+                  <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 600, fontSize: '0.95rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                    1. Basic Table
+                  </Text>
+                  <div style={{ padding: '1rem', background: 'rgba(41, 242, 223, 0.05)', borderRadius: '4px', border: '1px solid rgba(41, 242, 223, 0.2)' }}>
+                    <HudTableBasic color="#29F2DF" />
+                  </div>
+                </div>
+                <div>
+                  <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 600, fontSize: '0.95rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                    2. Dark Table
+                  </Text>
+                  <div style={{ padding: '1rem', background: 'rgba(41, 242, 223, 0.05)', borderRadius: '4px', border: '1px solid rgba(41, 242, 223, 0.2)' }}>
+                    <HudTableDark color="#29F2DF" />
+                  </div>
+                </div>
+                <div>
+                  <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 600, fontSize: '0.95rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                    3. Bordered Table
+                  </Text>
+                  <div style={{ padding: '1rem', background: 'rgba(41, 242, 223, 0.05)', borderRadius: '4px', border: '1px solid rgba(41, 242, 223, 0.2)' }}>
+                    <HudTableBordered color="#29F2DF" />
+                  </div>
+                </div>
+                <div>
+                  <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 600, fontSize: '0.95rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                    4. Borderless Table
+                  </Text>
+                  <div style={{ padding: '1rem', background: 'rgba(41, 242, 223, 0.05)', borderRadius: '4px', border: '1px solid rgba(41, 242, 223, 0.2)' }}>
+                    <HudTableBorderless color="#29F2DF" />
+                  </div>
+                </div>
+                <div>
+                  <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 600, fontSize: '0.95rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                    5. Striped Table
+                  </Text>
+                  <div style={{ padding: '1rem', background: 'rgba(41, 242, 223, 0.05)', borderRadius: '4px', border: '1px solid rgba(41, 242, 223, 0.2)' }}>
+                    <HudTableStriped color="#29F2DF" />
+                  </div>
+                </div>
+                <div>
+                  <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 600, fontSize: '0.95rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                    6. Hoverable Table
+                  </Text>
+                  <div style={{ padding: '1rem', background: 'rgba(41, 242, 223, 0.05)', borderRadius: '4px', border: '1px solid rgba(41, 242, 223, 0.2)' }}>
+                    <HudTableHoverable color="#29F2DF" />
+                  </div>
+                </div>
+                <div>
+                  <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 600, fontSize: '0.95rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                    7. Small Table
+                  </Text>
+                  <div style={{ padding: '1rem', background: 'rgba(41, 242, 223, 0.05)', borderRadius: '4px', border: '1px solid rgba(41, 242, 223, 0.2)' }}>
+                    <HudTableSmall color="#29F2DF" />
+                  </div>
+                </div>
+                <div>
+                  <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 600, fontSize: '0.95rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                    8. Contextual Table
+                  </Text>
+                  <div style={{ padding: '1rem', background: 'rgba(41, 242, 223, 0.05)', borderRadius: '4px', border: '1px solid rgba(41, 242, 223, 0.2)' }}>
+                    <HudTableContextual color="#29F2DF" />
+                  </div>
+                </div>
+                <div>
+                  <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 600, fontSize: '0.95rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                    9. Table with Caption
+                  </Text>
+                  <div style={{ padding: '1rem', background: 'rgba(41, 242, 223, 0.05)', borderRadius: '4px', border: '1px solid rgba(41, 242, 223, 0.2)' }}>
+                    <HudTableCaption color="#29F2DF" />
+                  </div>
+                </div>
+                <div>
+                  <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 600, fontSize: '0.95rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                    10. Responsive Table
+                  </Text>
+                  <div style={{ padding: '1rem', background: 'rgba(41, 242, 223, 0.05)', borderRadius: '4px', border: '1px solid rgba(41, 242, 223, 0.2)' }}>
+                    <HudTableResponsive color="#29F2DF" />
+                  </div>
+                </div>
+              </div>
+            </Stack>
+          </ComponentSection>
           <ComponentSection title="24. DataGrid">
             <DataGrid
               columns={[
@@ -695,15 +1034,15 @@ export const ShowcasePage: React.FC = () => {
             </div>
           </ComponentSection>
           <ComponentSection title="25d. RadarHud (Military Radar Display)">
-            <Text variant="body" style={{ marginBottom: '1.5rem', color: '#18D322', textAlign: 'center' }}>
+            <Text variant="body" style={{ marginBottom: '1.5rem', color: '#EF3EF1', textAlign: 'center' }}>
               Military-style radar with rotating scanner, target dots, and coordinate display
             </Text>
-            <div style={{ display: 'flex', gap: '3rem', justifyContent: 'center', flexWrap: 'wrap', padding: '2rem', background: 'rgba(0, 0, 0, 0.8)', borderRadius: '8px' }}>
+            <div style={{ display: 'flex', gap: '3rem', justifyContent: 'center', flexWrap: 'wrap', padding: '2rem', background: 'rgba(41, 242, 223, 0.05)', borderRadius: '8px', border: '1px solid rgba(41, 242, 223, 0.2)' }}>
               <RadarHud 
                 coordinates={`34° 36' 30" S; 58° 22' 16" O`}
                 depth="DEPT - 600"
                 wind="WIND - 54.3"
-                color="#18D322"
+                color="#EF3EF1"
                 size={280}
               />
               <RadarHud 
@@ -716,13 +1055,13 @@ export const ShowcasePage: React.FC = () => {
             </div>
           </ComponentSection>
           <ComponentSection title="25e. PipBoy (Fallout Style Terminal)">
-            <Text variant="body" style={{ marginBottom: '1.5rem', color: '#1aff40', textAlign: 'center' }}>
+            <Text variant="body" style={{ marginBottom: '1.5rem', color: '#29F2DF', textAlign: 'center' }}>
               Pip-Boy inspired terminal with CRT effects, tabs (STAT/INV/DATA), and retro-futuristic design.
               All data is controlled via the data prop object.
             </Text>
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem', background: 'rgba(0, 0, 0, 0.9)', borderRadius: '8px' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem', background: 'rgba(41, 242, 223, 0.05)', borderRadius: '8px', border: '1px solid rgba(41, 242, 223, 0.2)' }}>
               <PipBoy 
-                color="#1aff40"
+                color="#29F2DF"
                 data={{
                   hp: { current: 420, max: 500 },
                   ap: { current: 85, max: 100 },
@@ -746,7 +1085,7 @@ export const ShowcasePage: React.FC = () => {
             <Text variant="h4" color="#29F2DF" style={{ marginBottom: '1rem' }}>
               AbstergoLoader (Triangular Animation)
             </Text>
-            <div style={{ display: 'flex', gap: '3rem', justifyContent: 'center', flexWrap: 'wrap', padding: '3rem', background: 'rgba(0, 0, 0, 0.5)', borderRadius: '8px', marginBottom: '2rem' }}>
+            <div style={{ display: 'flex', gap: '3rem', justifyContent: 'center', flexWrap: 'wrap', padding: '3rem', background: 'rgba(41, 242, 223, 0.08)', backdropFilter: 'blur(10px)', border: '1px solid rgba(41, 242, 223, 0.2)', borderRadius: '8px', marginBottom: '2rem' }}>
               <AbstergoLoader text="Loading" size={0.8} />
               <AbstergoLoader text="Synchronization" size={1} />
               <AbstergoLoader text="Processing" size={1.2} />
@@ -754,7 +1093,7 @@ export const ShowcasePage: React.FC = () => {
             <Text variant="h4" color="#29F2DF" style={{ marginBottom: '1rem' }}>
               HeartRateLoader (ECG Animation)
             </Text>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', alignItems: 'center', padding: '3rem', background: 'rgba(0, 0, 0, 0.5)', borderRadius: '8px', marginBottom: '2rem' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', alignItems: 'center', padding: '3rem', background: 'rgba(41, 242, 223, 0.08)', backdropFilter: 'blur(10px)', border: '1px solid rgba(41, 242, 223, 0.2)', borderRadius: '8px', marginBottom: '2rem' }}>
               <HeartRateLoader color="#EF3EF1" width={550} height={210} />
               <HeartRateLoader color="#29F2DF" width={400} height={150} />
               <HeartRateLoader color="#29F2DF" width={300} height={120} />
@@ -762,7 +1101,7 @@ export const ShowcasePage: React.FC = () => {
             <Text variant="h4" color="#29F2DF" style={{ marginBottom: '1rem' }}>
               HackerLoader (Progress Bar with Glitch)
             </Text>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', alignItems: 'center', padding: '3rem', background: 'rgba(0, 0, 0, 0.5)', borderRadius: '8px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', alignItems: 'center', padding: '3rem', background: 'rgba(41, 242, 223, 0.08)', backdropFilter: 'blur(10px)', border: '1px solid rgba(41, 242, 223, 0.2)', borderRadius: '8px' }}>
               <HackerLoader text="LOADING" color="#29F2DF" />
               <HackerLoader text="HACKING" color="#29F2DF" />
               <HackerLoader text="PROCESSING" color="#29F2DF" />
@@ -966,32 +1305,32 @@ export const ShowcasePage: React.FC = () => {
       content: (
         <Stack direction="column" gap="2rem">
           <ComponentSection title="38. GridLines">
-            <div style={{ position: 'relative', height: '200px', background: '#000' }}>
+            <div style={{ position: 'relative', height: '200px', background: 'rgba(41, 242, 223, 0.08)', backdropFilter: 'blur(10px)', border: '1px solid rgba(41, 242, 223, 0.2)', borderRadius: '8px' }}>
               <GridLines width={600} height={200} />
             </div>
           </ComponentSection>
           <ComponentSection title="39. Dots">
-            <div style={{ position: 'relative', height: '200px', background: '#000' }}>
+            <div style={{ position: 'relative', height: '200px', background: 'rgba(41, 242, 223, 0.08)', backdropFilter: 'blur(10px)', border: '1px solid rgba(41, 242, 223, 0.2)', borderRadius: '8px' }}>
               <Dots width={600} height={200} />
             </div>
           </ComponentSection>
           <ComponentSection title="40. Puffs">
-            <div style={{ position: 'relative', height: '200px', background: '#000' }}>
+            <div style={{ position: 'relative', height: '200px', background: 'rgba(41, 242, 223, 0.08)', backdropFilter: 'blur(10px)', border: '1px solid rgba(41, 242, 223, 0.2)', borderRadius: '8px' }}>
               <Puffs width={600} height={200} />
             </div>
           </ComponentSection>
           <ComponentSection title="41. MovingLines">
-            <div style={{ position: 'relative', height: '200px', background: '#000' }}>
+            <div style={{ position: 'relative', height: '200px', background: 'rgba(41, 242, 223, 0.08)', backdropFilter: 'blur(10px)', border: '1px solid rgba(41, 242, 223, 0.2)', borderRadius: '8px' }}>
               <MovingLines width={600} height={200} />
             </div>
           </ComponentSection>
           <ComponentSection title="42. Nebula">
-            <div style={{ position: 'relative', height: '200px', background: '#000' }}>
+            <div style={{ position: 'relative', height: '200px', background: 'rgba(41, 242, 223, 0.08)', backdropFilter: 'blur(10px)', border: '1px solid rgba(41, 242, 223, 0.2)', borderRadius: '8px' }}>
               <Nebula width={600} height={200} />
             </div>
           </ComponentSection>
           <ComponentSection title="43. StarField">
-            <div style={{ position: 'relative', height: '200px', background: '#000' }}>
+            <div style={{ position: 'relative', height: '200px', background: 'rgba(41, 242, 223, 0.08)', backdropFilter: 'blur(10px)', border: '1px solid rgba(41, 242, 223, 0.2)', borderRadius: '8px' }}>
               <StarField width={600} height={200} />
             </div>
           </ComponentSection>
@@ -1030,19 +1369,112 @@ export const ShowcasePage: React.FC = () => {
   return (
     <div style={{ 
       padding: 0,
-      background: 'linear-gradient(180deg, #0A1225 0%, #1C7FA6 50%, #0A1225 100%)',
+      background: '#0A1225',
       minHeight: '100vh',
       width: '100%',
       maxWidth: '100vw',
       overflowX: 'hidden',
       boxSizing: 'border-box',
+      position: 'relative',
     }}>
+      <AnimatedBackground />
+      
+      {/* Fixed Navigation Bar */}
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: '70px',
+        background: 'rgba(10, 18, 37, 0.9)',
+        backdropFilter: 'blur(20px)',
+        borderBottom: '2px solid rgba(41, 242, 223, 0.5)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '0 clamp(1rem, 3vw, 2rem)',
+        zIndex: 1000,
+        boxSizing: 'border-box',
+        boxShadow: '0 8px 32px rgba(41, 242, 223, 0.2)',
+      }}>
+        <Text
+          variant="h2"
+          style={{
+            color: '#29F2DF',
+            fontSize: '1.5rem',
+            fontWeight: 800,
+            textTransform: 'uppercase',
+            letterSpacing: '2px',
+            textShadow: '0 0 20px rgba(41, 242, 223, 0.8)',
+          }}
+        >
+          🎮 RHUDS Pro
+        </Text>
+        
+        <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+          <Button
+            onClick={() => navigate('/')}
+            style={{
+              background: '#29F2DF',
+              color: '#000',
+              border: `2px solid #29F2DF`,
+              padding: '10px 20px',
+              fontSize: '0.95rem',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              borderRadius: '4px',
+              boxShadow: '0 0 20px rgba(41, 242, 223, 0.6)',
+            }}
+          >
+            Showcase
+          </Button>
+          <Button
+            onClick={() => navigate('/playground')}
+            style={{
+              background: 'transparent',
+              color: '#29F2DF',
+              border: `2px solid #29F2DF`,
+              padding: '10px 20px',
+              fontSize: '0.95rem',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              borderRadius: '4px',
+              boxShadow: 'none',
+            }}
+          >
+            Playground
+          </Button>
+          <Button
+            onClick={() => navigate('/docs')}
+            style={{
+              background: 'transparent',
+              color: '#29F2DF',
+              border: `2px solid #29F2DF`,
+              padding: '10px 20px',
+              fontSize: '0.95rem',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              borderRadius: '4px',
+              boxShadow: 'none',
+            }}
+          >
+            Documentation
+          </Button>
+        </div>
+      </div>
+      
       <div style={{ 
         padding: 'clamp(1rem, 3vw, 2rem) clamp(0.5rem, 2vw, 1rem)',
         maxWidth: '1400px',
         margin: '0 auto',
         width: '100%',
         boxSizing: 'border-box',
+        position: 'relative',
+        zIndex: 1,
+        marginTop: '70px',
       }}>
         <div style={{ textAlign: 'center', marginBottom: 'clamp(2rem, 4vw, 3rem)' }}>
           <Text
@@ -1075,7 +1507,85 @@ export const ShowcasePage: React.FC = () => {
           maxWidth: '100%', 
           boxSizing: 'border-box',
         }}>
-          <Tabs items={tabItems} activeIndex={activeTab} onChange={setActiveTab} />
+          {/* Category Menu */}
+          <div style={{
+            display: 'flex',
+            gap: '0.75rem',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            padding: '1rem',
+            background: 'rgba(41, 242, 223, 0.05)',
+            borderRadius: '8px',
+            border: '1px solid rgba(41, 242, 223, 0.2)',
+            marginBottom: '2rem',
+          }}>
+            {tabItems.map((item, index) => (
+              <Button
+                key={index}
+                onClick={() => setActiveTab(index)}
+                style={{
+                  background: activeTab === index ? '#29F2DF' : 'transparent',
+                  color: activeTab === index ? '#000' : '#29F2DF',
+                  border: `1px solid #29F2DF`,
+                  padding: '8px 16px',
+                  fontSize: '0.9rem',
+                  fontWeight: activeTab === index ? 'bold' : 'normal',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  borderRadius: '4px',
+                  boxShadow: activeTab === index ? '0 0 15px rgba(41, 242, 223, 0.5)' : 'none',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                {item.label}
+              </Button>
+            ))}
+          </div>
+
+          {/* Content */}
+          <div style={{
+            padding: 'clamp(1rem, 3vw, 2rem)',
+            background: 'rgba(41, 242, 223, 0.03)',
+            borderRadius: '8px',
+            border: '1px solid rgba(41, 242, 223, 0.2)',
+            maxWidth: '100%',
+            boxSizing: 'border-box',
+            overflowX: 'hidden',
+          }}>
+            {activeTab === 0 && (
+              <div>{tabItems[0].content}</div>
+            )}
+            {activeTab === 1 && (
+              <div>{tabItems[1].content}</div>
+            )}
+            {activeTab === 2 && (
+              <div>{tabItems[2].content}</div>
+            )}
+            {activeTab === 3 && (
+              <div>{tabItems[3].content}</div>
+            )}
+            {activeTab === 4 && (
+              <div>{tabItems[4].content}</div>
+            )}
+            {activeTab === 5 && (
+              <div>{tabItems[5].content}</div>
+            )}
+            {activeTab === 6 && (
+              <div>{tabItems[6].content}</div>
+            )}
+            {activeTab === 7 && (
+              <div>{tabItems[7].content}</div>
+            )}
+            {activeTab === 8 && (
+              <div>{tabItems[8].content}</div>
+            )}
+            {activeTab === 9 && (
+              <div>{tabItems[9].content}</div>
+            )}
+            {activeTab === 10 && (
+              <div>{tabItems[10].content}</div>
+            )}
+          </div>
         </div>
 
         <div
@@ -1470,12 +1980,13 @@ const FramesTabContent: React.FC = () => {
             Frame with Animation:
           </Text>
           <pre style={{
-            background: '#000',
+            background: 'rgba(41, 242, 223, 0.08)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(41, 242, 223, 0.3)',
             padding: 'clamp(10px, 2vw, 15px)',
             borderRadius: '4px',
             overflowX: 'auto',
             fontSize: 'clamp(0.65rem, 1.5vw, 0.75rem)',
-            border: '1px solid rgba(41, 242, 223, 0.3)',
             color: '#29F2DF',
             lineHeight: '1.6',
             maxWidth: '100%',

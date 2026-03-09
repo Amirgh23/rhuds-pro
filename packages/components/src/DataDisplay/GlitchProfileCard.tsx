@@ -34,13 +34,14 @@ const StyledWrapper = styled.div`
   /* --- Card Structure --- */
   .glitch-card {
     position: relative;
-    background-color: var(--bg-color);
+    background-color: rgba(41, 242, 223, 0.08);
+    backdrop-filter: blur(10px);
     width: 19rem;
     border-radius: 1rem;
-    border: 1px solid rgba(0, 242, 234, 0.2);
+    border: 1px solid rgba(41, 242, 223, 0.3);
     box-shadow:
-      0 0 1.5rem rgba(0, 242, 234, 0.1),
-      inset 0 0 1rem rgba(0, 0, 0, 0.5);
+      0 0 1.5rem rgba(41, 242, 223, 0.2),
+      inset 0 0 1rem rgba(41, 242, 223, 0.05);
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -50,11 +51,11 @@ const StyledWrapper = styled.div`
     height: 3.5rem;
     background: linear-gradient(
         45deg,
-        rgba(0, 242, 234, 0.1),
-        rgba(13, 13, 13, 0.8)
+        rgba(41, 242, 223, 0.15),
+        rgba(41, 242, 223, 0.05)
       ),
-      radial-gradient(circle, rgba(168, 85, 247, 0.05) 0%, transparent 70%);
-    border-bottom: 1px solid rgba(0, 242, 234, 0.1);
+      radial-gradient(circle, rgba(239, 62, 241, 0.08) 0%, transparent 70%);
+    border-bottom: 1px solid rgba(41, 242, 223, 0.2);
   }
 
   /* --- Avatar --- */
@@ -66,11 +67,11 @@ const StyledWrapper = styled.div`
     z-index: 2;
     width: 5.5rem;
     height: 5.5rem;
-    background: var(--bg-color);
+    background: rgba(10, 18, 37, 0.7);
     border-radius: 50%;
     padding: 0.9rem;
-    box-shadow: 0 0 1.5rem rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(0, 242, 234, 0.3);
+    box-shadow: 0 0 1.5rem rgba(41, 242, 223, 0.2);
+    border: 1px solid rgba(41, 242, 223, 0.3);
     transition: background-color 0.5s ease-in-out;
   }
 
@@ -95,7 +96,7 @@ const StyledWrapper = styled.div`
   .card-body {
     padding: 1.1rem;
     padding-top: 0;
-    background-color: var(--bg-color);
+    background-color: rgba(41, 242, 223, 0.08);
     display: flex;
     flex-direction: column;
     flex-grow: 1;

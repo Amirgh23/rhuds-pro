@@ -1,3 +1,4 @@
+import React from 'react';
 /**
  * Bleeps Provider
  * React context provider for bleep manager
@@ -101,3 +102,4 @@ export function useBleep(id: string) {
     [bleepManager, id]
   );
 }
+

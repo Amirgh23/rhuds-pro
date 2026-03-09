@@ -92,6 +92,27 @@ export type { SwitchProps } from './Form/types';
 export { useForm } from './Form/useForm';
 export type { UseFormProps, FormState, FormValidationRule } from './Form/types';
 
+// HUD Form Elements - Complete collection from https://seantheme.com/hud/form_elements.html
+export {
+  HudInput,
+  HudTextarea,
+  HudSelect,
+  HudRange,
+  HudCheckbox,
+  HudRadio,
+  HudSwitch,
+  HudFile,
+  HudFormGrid,
+  HudFormHelpText,
+  HudInputGroup,
+  HudFormFeedback,
+  HudInputValidated,
+  HudSelectValidated,
+  HudTextareaValidated,
+} from './Form/HudFormElements';
+
+export { HudFormControl } from './Form/HudFormControl';
+
 // Navigation Components
 export { Navbar } from './Navigation/Navbar';
 export type { NavbarProps } from './Navigation/types';
@@ -134,6 +155,18 @@ export { PipBoy } from './DataDisplay/PipBoy';
 export type { PipBoyProps } from './DataDisplay/PipBoy';
 
 export { PipBoySimple } from './DataDisplay/PipBoySimple';
+
+// HUD Table Components (10 variants)
+export { HudTableBasic } from './DataDisplay/HudTableBasic';
+export { HudTableBorderless } from './DataDisplay/HudTableBorderless';
+export { HudTableHoverable } from './DataDisplay/HudTableHoverable';
+export { HudTableStriped } from './DataDisplay/HudTableStriped';
+export { HudTableDark } from './DataDisplay/HudTableDark';
+export { HudTableBordered } from './DataDisplay/HudTableBordered';
+export { HudTableContextual } from './DataDisplay/HudTableContextual';
+export { HudTableCaption } from './DataDisplay/HudTableCaption';
+export { HudTableSmall } from './DataDisplay/HudTableSmall';
+export { HudTableResponsive } from './DataDisplay/HudTableResponsive';
 
 // Loader Components
 export { AbstergoLoader } from './Loader/AbstergoLoader';

@@ -1,3 +1,4 @@
+import React from 'react';
 /**
  * Animator Context
  * Provides parent-child animator relationships and state propagation
@@ -82,3 +83,4 @@ export function useParentActivation(
 
   return localActivate && parentActive;
 }
+

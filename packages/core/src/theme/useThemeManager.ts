@@ -4,7 +4,7 @@
  * Provides runtime theme switching, persistence, and system preference support.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import type { RHUDSTheme } from './models';
 import { ThemeManager, getSystemThemePreference, watchSystemThemePreference } from './ThemeManager';
 

@@ -1,3 +1,4 @@
+import React from 'react';
 /**
  * Stagger Manager
  * Staggers child animations with configurable delays
@@ -58,3 +59,4 @@ export const Stagger: React.FC<StaggerProps> = ({
 };
 
 Stagger.displayName = 'Stagger';
+

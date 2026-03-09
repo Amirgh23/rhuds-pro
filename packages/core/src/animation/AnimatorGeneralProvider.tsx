@@ -1,3 +1,4 @@
+import React from 'react';
 /**
  * Animator General Provider
  * Global animation configuration provider
@@ -105,3 +106,4 @@ export const AnimatorGeneralProvider: React.FC<AnimatorGeneralProviderProps> = (
 };
 
 AnimatorGeneralProvider.displayName = 'AnimatorGeneralProvider';
+

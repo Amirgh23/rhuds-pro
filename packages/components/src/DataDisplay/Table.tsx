@@ -66,28 +66,34 @@ export const Table: React.FC<TableProps> = ({
   const tableStyle: React.CSSProperties = {
     width: '100%',
     borderCollapse: 'collapse',
-    backgroundColor: backgroundColor,
+    backgroundColor: 'transparent',
     color: textColor,
+    border: `1px solid ${primaryColor}`,
+    boxShadow: `0 0 10px ${primaryColor}33, inset 0 0 10px ${primaryColor}1a`,
   };
 
   const headerStyle: React.CSSProperties = {
-    backgroundColor: primaryColor,
-    color: backgroundColor,
+    backgroundColor: `${primaryColor}1a`,
+    color: primaryColor,
     padding: '0.75rem',
     textAlign: 'left',
     fontWeight: 600,
     cursor: 'pointer',
     userSelect: 'none',
-    transition: 'background-color 0.2s ease-in-out',
+    transition: 'all 0.2s ease-in-out',
+    borderBottom: `2px solid ${primaryColor}`,
+    borderRight: `1px solid ${primaryColor}33`,
+    textShadow: `0 0 8px ${primaryColor}80`,
   };
 
   const rowStyle: React.CSSProperties = {
-    borderBottom: `1px solid ${primaryColor}`,
+    borderBottom: `1px solid ${primaryColor}33`,
   };
 
   const cellStyle: React.CSSProperties = {
     padding: '0.75rem',
     textAlign: 'left',
+    borderRight: `1px solid ${primaryColor}33`,
   };
 
   return (
@@ -107,12 +113,14 @@ export const Table: React.FC<TableProps> = ({
                 onClick={() => column.sortable && handleSort(column.key)}
                 onMouseEnter={(e) => {
                   if (column.sortable) {
-                    (e.currentTarget as HTMLElement).style.opacity = '0.8';
+                    (e.currentTarget as HTMLElement).style.backgroundColor = `${primaryColor}33`;
+                    (e.currentTarget as HTMLElement).style.boxShadow = `0 0 15px ${primaryColor}66`;
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (column.sortable) {
-                    (e.currentTarget as HTMLElement).style.opacity = '1';
+                    (e.currentTarget as HTMLElement).style.backgroundColor = `${primaryColor}1a`;
+                    (e.currentTarget as HTMLElement).style.boxShadow = 'none';
                   }
                 }}
               >
@@ -137,13 +145,14 @@ export const Table: React.FC<TableProps> = ({
               onClick={() => onRowClick?.(row, rowIndex)}
               onMouseEnter={(e) => {
                 if (onRowClick) {
-                  (e.currentTarget as HTMLElement).style.backgroundColor = primaryColor;
-                  (e.currentTarget as HTMLElement).style.opacity = '0.1';
+                  (e.currentTarget as HTMLElement).style.backgroundColor = `${primaryColor}1a`;
+                  (e.currentTarget as HTMLElement).style.boxShadow = `0 0 15px ${primaryColor}66`;
                 }
               }}
               onMouseLeave={(e) => {
                 if (onRowClick) {
                   (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent';
+                  (e.currentTarget as HTMLElement).style.boxShadow = 'none';
                 }
               }}
             >

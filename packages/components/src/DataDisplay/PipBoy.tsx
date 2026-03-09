@@ -48,7 +48,7 @@ const defaultData: PipBoyData = {
 
 export const PipBoy: React.FC<PipBoyProps> = ({ 
   className,
-  color = '#1aff40',
+  color = '#29F2DF',
   data = defaultData,
 }) => {
   const [activeTab, setActiveTab] = useState<'stat' | 'inv' | 'data'>('stat');
@@ -175,7 +175,7 @@ export const PipBoy: React.FC<PipBoyProps> = ({
 const StyledWrapper = styled.div<{ $color: string }>`
   --pip-green: ${props => props.$color};
   --pip-glow: ${props => props.$color}99;
-  --bg-dark: #020a02;
+  --bg-dark: rgba(41, 242, 223, 0.05);
   
   width: 100%;
   max-width: 650px;
@@ -185,20 +185,21 @@ const StyledWrapper = styled.div<{ $color: string }>`
   .pipboy-chassis {
     position: relative;
     width: 100%;
-    background: linear-gradient(135deg, #28125A, #0A1225, #28125A);
+    background: linear-gradient(135deg, rgba(41, 242, 223, 0.08), rgba(10, 18, 37, 0.1), rgba(41, 242, 223, 0.08));
     padding: 2.5rem;
     border-radius: 2rem;
-    box-shadow: inset 0 0 20px #000, 0 20px 40px rgba(0, 0, 0, 0.8);
-    border: 2px solid #444;
+    box-shadow: inset 0 0 20px rgba(41, 242, 223, 0.1), 0 20px 40px rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(41, 242, 223, 0.3);
+    backdrop-filter: blur(10px);
   }
   
   .screw {
     position: absolute;
     width: 14px;
     height: 14px;
-    background: linear-gradient(45deg, #28125A, #0A1225);
+    background: linear-gradient(45deg, rgba(41, 242, 223, 0.2), rgba(10, 18, 37, 0.2));
     border-radius: 50%;
-    border: 1px solid #000;
+    border: 1px solid rgba(41, 242, 223, 0.2);
   }
   
   .screw::after {
@@ -208,7 +209,7 @@ const StyledWrapper = styled.div<{ $color: string }>`
     left: 50%;
     width: 10px;
     height: 2px;
-    background: #000;
+    background: rgba(41, 242, 223, 0.3);
     transform: translate(-50%, -50%) rotate(45deg);
   }
   
@@ -218,12 +219,13 @@ const StyledWrapper = styled.div<{ $color: string }>`
   .br { bottom: 15px; right: 15px; }
   
   .crt-screen {
-    background-color: var(--bg-dark);
+    background-color: rgba(41, 242, 223, 0.05);
     border-radius: 1.5rem;
     position: relative;
     overflow: hidden;
-    border: 8px solid #0a0a0a;
+    border: 8px solid rgba(41, 242, 223, 0.15);
     min-height: 450px;
+    backdrop-filter: blur(5px);
   }
   
   .screen-glass {
@@ -231,7 +233,7 @@ const StyledWrapper = styled.div<{ $color: string }>`
     inset: 0;
     z-index: 10;
     pointer-events: none;
-    background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.03) 0%, rgba(0, 0, 0, 0.4) 80%);
+    background: radial-gradient(circle at 50% 50%, rgba(41, 242, 223, 0.05) 0%, rgba(0, 0, 0, 0.2) 80%);
   }
   
   .scanlines {
@@ -239,7 +241,7 @@ const StyledWrapper = styled.div<{ $color: string }>`
     inset: 0;
     z-index: 9;
     pointer-events: none;
-    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+    background: linear-gradient(rgba(41, 242, 223, 0.02) 50%, rgba(0, 0, 0, 0.1) 50%);
     background-size: 100% 4px;
   }
 
@@ -288,12 +290,12 @@ const StyledWrapper = styled.div<{ $color: string }>`
   }
   
   .nav-item:hover {
-    background-color: rgba(26, 255, 64, 0.15);
+    background-color: rgba(41, 242, 223, 0.15);
   }
   
   .nav-item.active {
     background-color: var(--pip-green);
-    color: var(--bg-dark);
+    color: #0A1225;
     text-shadow: none;
     box-shadow: 0 0 10px var(--pip-glow);
   }
@@ -341,10 +343,10 @@ const StyledWrapper = styled.div<{ $color: string }>`
   }
   
   .terminal-block .time {
-    color: var(--bg-dark);
+    color: #0A1225;
     font-size: 4rem;
     font-weight: bold;
-    text-shadow: none;
+    text-shadow: 0 0 2px rgba(41, 242, 223, 0.5);
   }
   
   .date {
@@ -413,14 +415,14 @@ const StyledWrapper = styled.div<{ $color: string }>`
     display: flex;
     justify-content: space-between;
     padding: 6px;
-    border-bottom: 1px dashed rgba(26, 255, 64, 0.3);
+    border-bottom: 1px dashed rgba(41, 242, 223, 0.3);
     cursor: pointer;
   }
   
   .inventory-list li:hover,
   .active-line {
     background-color: var(--pip-green);
-    color: var(--bg-dark);
+    color: #0A1225;
     font-weight: bold;
     text-shadow: none;
     box-shadow: 0 0 10px var(--pip-glow);
@@ -438,7 +440,7 @@ const StyledWrapper = styled.div<{ $color: string }>`
     position: relative;
     width: 160px;
     height: 160px;
-    background: rgba(26, 255, 64, 0.1);
+    background: rgba(41, 242, 223, 0.1);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -452,9 +454,9 @@ const StyledWrapper = styled.div<{ $color: string }>`
     content: "";
     position: absolute;
     inset: 20px;
-    background: rgba(26, 255, 64, 0.15);
+    background: rgba(41, 242, 223, 0.15);
     border-radius: 50%;
-    border: 1px dashed rgba(26, 255, 64, 0.3);
+    border: 1px dashed rgba(41, 242, 223, 0.3);
   }
   
   .radar-sweep {
