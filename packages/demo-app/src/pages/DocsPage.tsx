@@ -362,47 +362,6 @@ export const DocsPage: React.FC = () => {
           boxSizing: 'border-box',
         }}
       >
-        {/* Fixed Navbar */}
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            background: 'rgba(10, 18, 37, 0.95)',
-            backdropFilter: 'blur(10px)',
-            borderBottom: '1px solid rgba(41, 242, 223, 0.3)',
-            padding: 'clamp(0.75rem, 2vw, 1rem) clamp(1rem, 3vw, 2rem)',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            width: '100%',
-            boxSizing: 'border-box',
-            flexWrap: 'wrap',
-            gap: '1rem',
-            zIndex: 1000,
-          }}
-        >
-          <Link to="/" style={{ textDecoration: 'none' }}>
-            <Text variant="h2" style={{ color: '#29F2DF' }}>
-              🎮 RHUDS Pro
-            </Text>
-          </Link>
-          <Stack direction="row" gap="1rem" style={{ flexWrap: 'wrap', justifyContent: 'center' }}>
-            <Link to="/" style={{ textDecoration: 'none' }}>
-              <Button variant={isActive('/') ? 'primary' : 'secondary'}>Showcase</Button>
-            </Link>
-            <Link to="/playground" style={{ textDecoration: 'none' }}>
-              <Button variant={isActive('/playground') ? 'primary' : 'secondary'}>
-                Playground
-              </Button>
-            </Link>
-            <Link to="/docs" style={{ textDecoration: 'none' }}>
-              <Button variant={isActive('/docs') ? 'primary' : 'secondary'}>Documentation</Button>
-            </Link>
-          </Stack>
-        </div>
-
         {/* Fixed Sidebar */}
         <div
           style={{

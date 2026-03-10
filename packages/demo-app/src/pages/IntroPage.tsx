@@ -1,37 +1,170 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+const FULL_TEXT = 'INITIALIZING RHUDS PRO SYSTEM...';
+
+interface Particle {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  size: number;
+  opacity: number;
+  color: string;
+  life: number;
+  maxLife: number;
+}
+
+interface Star {
+  x: number;
+  y: number;
+  z: number;
+  size: number;
+  speed: number;
+  opacity: number;
+}
 
 export default function IntroPage() {
   const navigate = useNavigate();
-  const [bootComplete, setBootComplete] = useState(false);
-  const [loadingText, setLoadingText] = useState('');
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [scrollY, setScrollY] = useState(0);
   const [glitchActive, setGlitchActive] = useState(false);
-  const [time, setTime] = useState(new Date());
+  const [typedText, setTypedText] = useState('');
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [audioEnabled, setAudioEnabled] = useState(false);
+  const [parallaxLayers, setParallaxLayers] = useState<number[]>([]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const starsCanvasRef = useRef<HTMLCanvasElement>(null);
+  const particlesRef = useRef<Particle[]>([]);
+  const starsRef = useRef<Star[]>([]);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const hoverSoundRef = useRef<OscillatorNode | null>(null);
 
+  // Initial load animation with progressive reveal
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTime(new Date());
-    }, 1000);
+    const timer = setTimeout(() => setIsLoaded(true), 100);
+
+    // Initialize parallax layers
+    const layers = Array.from({ length: 5 }, (_, i) => Math.random() * 0.3 + 0.1);
+    setParallaxLayers(layers);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Typing effect with variable speed
+  useEffect(() => {
+    let index = 0;
+    const timer = setInterval(
+      () => {
+        if (index <= FULL_TEXT.length) {
+          setTypedText(FULL_TEXT.slice(0, index));
+          index++;
+          // Variable typing speed for more natural feel
+          if (index % 5 === 0) {
+            clearInterval(timer);
+            setTimeout(() => {
+              const newTimer = setInterval(() => {
+                if (index <= FULL_TEXT.length) {
+                  setTypedText(FULL_TEXT.slice(0, index));
+                  index++;
+                } else {
+                  clearInterval(newTimer);
+                }
+              }, 80);
+            }, Math.random() * 200);
+          }
+        } else {
+          clearInterval(timer);
+        }
+      },
+      60 + Math.random() * 40
+    );
     return () => clearInterval(timer);
   }, []);
 
+  // Glitch effect with variable intensity
   useEffect(() => {
-    const duration = 1000;
-    const interval = duration / 20;
-    let progress = 0;
-    const progressTimer = setInterval(() => {
-      progress++;
-      setLoadingText(`${Math.min(progress * 5, 100)}%`);
-      if (progress >= 20) {
-        clearInterval(progressTimer);
+    const glitchInterval = setInterval(
+      () => {
+        const intensity = Math.random() * 0.5 + 0.5;
         setGlitchActive(true);
-        setTimeout(() => setBootComplete(true), 150);
-      }
-    }, interval);
-    return () => clearInterval(progressTimer);
+        setTimeout(() => setGlitchActive(false), 100 + intensity * 100);
+      },
+      2000 + Math.random() * 2000
+    );
+    return () => clearInterval(glitchInterval);
   }, []);
 
+  // Audio initialization
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.AudioContext) {
+      try {
+        audioContextRef.current = new AudioContext();
+        setAudioEnabled(true);
+      } catch (e) {
+        console.log('Audio not supported');
+      }
+    }
+  }, []);
+
+  // Play hover sound
+  const playHoverSound = useCallback(
+    (frequency: number = 440, duration: number = 0.1) => {
+      if (!audioEnabled || !audioContextRef.current) return;
+
+      try {
+        if (hoverSoundRef.current) {
+          hoverSoundRef.current.stop();
+        }
+
+        const oscillator = audioContextRef.current.createOscillator();
+        const gainNode = audioContextRef.current.createGain();
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContextRef.current.destination);
+
+        oscillator.frequency.setValueAtTime(frequency, audioContextRef.current.currentTime);
+        oscillator.type = 'sine';
+
+        gainNode.gain.setValueAtTime(0.1, audioContextRef.current.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(
+          0.01,
+          audioContextRef.current.currentTime + duration
+        );
+
+        oscillator.start();
+        oscillator.stop(audioContextRef.current.currentTime + duration);
+
+        hoverSoundRef.current = oscillator;
+      } catch (e) {
+        // Silent fail for audio errors
+      }
+    },
+    [audioEnabled]
+  );
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({
+        x: (e.clientX / window.innerWidth) * 2 - 1,
+        y: (e.clientY / window.innerHeight) * 2 - 1,
+      });
+    };
+
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('scroll', handleScroll);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  // Main canvas animation
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -39,655 +172,1555 @@ export default function IntroPage() {
     if (!ctx) return;
 
     let animationId: number;
-    let rotation = 0;
-    let pulsePhase = 0;
+    let time = 0;
+    let frameCount = 0;
+
+    // Initialize particles with enhanced physics
+    const initParticles = () => {
+      const particleCount = Math.floor((canvas.width * canvas.height) / 8000);
+      particlesRef.current = [];
+
+      for (let i = 0; i < particleCount; i++) {
+        const isSpecial = Math.random() < 0.1;
+        particlesRef.current.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          vx: (Math.random() - 0.5) * (isSpecial ? 1.5 : 0.8),
+          vy: (Math.random() - 0.5) * (isSpecial ? 1.5 : 0.8),
+          size: Math.random() * (isSpecial ? 4 : 2) + 0.5,
+          opacity: Math.random() * (isSpecial ? 0.8 : 0.5) + 0.2,
+          color: isSpecial ? '#FFFFFF' : Math.random() > 0.5 ? '#29F2DF' : '#EF3EF1',
+          life: 1,
+          maxLife: 1,
+        });
+      }
+    };
+
+    // Initialize starfield
+    const initStars = () => {
+      const starCount = Math.floor((canvas.width * canvas.height) / 2000);
+      starsRef.current = [];
+
+      for (let i = 0; i < starCount; i++) {
+        starsRef.current.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          z: Math.random() * 1000,
+          size: Math.random() * 1.5 + 0.5,
+          speed: Math.random() * 2 + 0.5,
+          opacity: Math.random() * 0.8 + 0.2,
+        });
+      }
+    };
 
     const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      canvas.width = window.innerWidth * window.devicePixelRatio;
+      canvas.height = window.innerHeight * window.devicePixelRatio;
+      canvas.style.width = `${window.innerWidth}px`;
+      canvas.style.height = `${window.innerHeight}px`;
+      ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+      initParticles();
+      initStars();
     };
     resize();
     window.addEventListener('resize', resize);
+    initParticles();
+    initStars();
 
     const draw = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const centerX = canvas.width / 2;
-      const centerY = canvas.height / 2;
-      const radius = Math.min(canvas.width, canvas.height) * 0.25;
+      time += 0.005;
 
-      ctx.strokeStyle = 'rgba(41, 242, 223, 0.15)';
-      ctx.lineWidth = 0.5;
-
-      for (let lat = -80; lat <= 80; lat += 20) {
-        const latRad = (lat * Math.PI) / 180;
-        const y = centerY + radius * Math.sin(latRad) * 0.5;
-        const r = radius * Math.cos(latRad);
-        ctx.beginPath();
-        for (let lng = 0; lng <= 360; lng += 5) {
-          const lngRad = ((lng + rotation) * Math.PI) / 180;
-          const x = centerX + r * Math.sin(lngRad);
-          const z = r * Math.cos(lngRad);
-          if (lng === 0) ctx.moveTo(x, y + z * 0.3);
-          else ctx.lineTo(x, y + z * 0.3);
-        }
-        ctx.closePath();
-        ctx.stroke();
-      }
-
-      for (let lng = 0; lng < 360; lng += 30) {
-        const lngRad = ((lng + rotation) * Math.PI) / 180;
-        ctx.beginPath();
-        for (let lat = -90; lat <= 90; lat += 5) {
-          const latRad = (lat * Math.PI) / 180;
-          const x = centerX + radius * Math.cos(latRad) * Math.sin(lngRad);
-          const y = centerY + radius * Math.sin(latRad) * 0.5;
-          const z = radius * Math.cos(latRad) * Math.cos(lngRad);
-          if (lat === -90) ctx.moveTo(x, y + z * 0.3);
-          else ctx.lineTo(x, y + z * 0.3);
-        }
-        ctx.stroke();
-      }
-
-      const pulse = Math.sin(pulsePhase) * 0.3 + 0.7;
-      const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
-      gradient.addColorStop(0, `rgba(41, 242, 223, ${0.08 * pulse})`);
-      gradient.addColorStop(1, 'transparent');
-      ctx.fillStyle = gradient;
+      // Clear with dark background
+      ctx.fillStyle = '#000000';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      rotation += 0.15;
-      pulsePhase += 0.05;
+      // Draw and update particles
+      particlesRef.current.forEach((particle) => {
+        // Update position
+        particle.x += particle.vx;
+        particle.y += particle.vy;
+
+        // Wrap around edges
+        if (particle.x < 0) particle.x = canvas.width;
+        if (particle.x > canvas.width) particle.x = 0;
+        if (particle.y < 0) particle.y = canvas.height;
+        if (particle.y > canvas.height) particle.y = 0;
+
+        // Draw particle with glow
+        const gradient = ctx.createRadialGradient(
+          particle.x,
+          particle.y,
+          0,
+          particle.x,
+          particle.y,
+          particle.size * 4
+        );
+        gradient.addColorStop(
+          0,
+          `${particle.color}${Math.floor(particle.opacity * 255)
+            .toString(16)
+            .padStart(2, '0')}`
+        );
+        gradient.addColorStop(1, 'transparent');
+
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, particle.size * 4, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // Draw elegant grid
+      const gridSize = 80;
+      ctx.strokeStyle = 'rgba(41, 242, 223, 0.05)';
+      ctx.lineWidth = 1;
+
+      for (let x = 0; x < canvas.width; x += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
+      }
+
+      for (let y = 0; y < canvas.height; y += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+      }
+
+      // Draw flowing energy lines
+      ctx.strokeStyle = 'rgba(41, 242, 223, 0.12)';
+      ctx.lineWidth = 2;
+
+      for (let i = 0; i < 4; i++) {
+        ctx.beginPath();
+        const yOffset = (canvas.height / 5) * (i + 1);
+
+        for (let x = 0; x <= canvas.width; x += 8) {
+          const y =
+            yOffset +
+            Math.sin(time * 0.8 + x * 0.008 + i * 0.5) * 40 +
+            Math.cos(time * 0.5 + x * 0.005) * 20;
+          if (x === 0) {
+            ctx.moveTo(x, y);
+          } else {
+            ctx.lineTo(x, y);
+          }
+        }
+        ctx.stroke();
+      }
+
+      // Draw accent circles
+      const circleCount = 5;
+      for (let i = 0; i < circleCount; i++) {
+        const angle = time * 0.3 + (i * (Math.PI * 2)) / circleCount;
+        const x = canvas.width / 2 + Math.cos(angle) * (canvas.width * 0.3);
+        const y = canvas.height / 2 + Math.sin(angle) * (canvas.height * 0.3);
+
+        const gradient = ctx.createRadialGradient(x, y, 0, x, y, 100);
+        gradient.addColorStop(0, 'rgba(239, 62, 241, 0.08)');
+        gradient.addColorStop(1, 'transparent');
+
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(x, y, 100, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
       animationId = requestAnimationFrame(draw);
     };
     draw();
+
     return () => {
       window.removeEventListener('resize', resize);
       cancelAnimationFrame(animationId);
     };
   }, []);
 
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('en-US', {
-      hour12: false,
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-    });
-  };
-
-  if (!bootComplete) {
-    return (
-      <div
-        style={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: '#0A1225',
-          position: 'relative',
-          overflow: 'hidden',
-        }}
-      >
-        <canvas ref={canvasRef} style={{ position: 'fixed', inset: 0, zIndex: 0, opacity: 0.6 }} />
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            zIndex: 10,
-            pointerEvents: 'none',
-            background:
-              'radial-gradient(ellipse at center, transparent 0%, rgba(10, 18, 37, 0.9) 100%)',
-          }}
-        />
-        <div
-          style={{
-            position: 'relative',
-            zIndex: 20,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <div style={{ position: 'relative', width: '200px', height: '200px' }}>
-            <svg
-              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
-              viewBox="0 0 200 200"
-            >
-              <defs>
-                <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#29F2DF" />
-                  <stop offset="50%" stopColor="#EF3EF1" />
-                  <stop offset="100%" stopColor="#1C7FA6" />
-                </linearGradient>
-              </defs>
-              <circle
-                cx="100"
-                cy="100"
-                r="90"
-                fill="none"
-                stroke="rgba(40, 18, 90, 0.5)"
-                strokeWidth="2"
-              />
-              <circle
-                cx="100"
-                cy="100"
-                r="90"
-                fill="none"
-                stroke="url(#gradient1)"
-                strokeWidth="3"
-                strokeLinecap="round"
-                strokeDasharray={glitchActive ? 565 : `${parseInt(loadingText) * 5.65} 565`}
-                transform="rotate(-90 100 100)"
-                style={{
-                  filter: 'drop-shadow(0 0 10px #29F2DF)',
-                  transition: 'stroke-dasharray 0.1s ease-out',
-                }}
-              />
-            </svg>
-            <div
-              style={{
-                position: 'absolute',
-                inset: 0,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <div
-                style={{
-                  fontSize: '48px',
-                  fontWeight: 'bold',
-                  background: 'linear-gradient(135deg, #29F2DF, #EF3EF1)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  filter: 'drop-shadow(0 0 20px rgba(41, 242, 223, 0.5))',
-                }}
-              >
-                {loadingText}
-              </div>
-              <div
-                style={{
-                  fontSize: '12px',
-                  letterSpacing: '3px',
-                  marginTop: '8px',
-                  color: '#1C7FA6',
-                  textShadow: '0 0 10px rgba(28, 127, 166, 0.5)',
-                }}
-              >
-                {glitchActive ? 'SYSTEM READY' : 'INITIALIZING'}
-              </div>
-            </div>
-          </div>
-          <h1
-            style={{
-              marginTop: '32px',
-              fontSize: '24px',
-              letterSpacing: '2px',
-              fontWeight: 'bold',
-              background: 'linear-gradient(135deg, #29F2DF 0%, #1C7FA6 50%, #EF3EF1 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              filter: 'drop-shadow(0 0 15px rgba(41, 242, 223, 0.3))',
-            }}
-          >
-            RHUDS PRO
-          </h1>
-        </div>
-      </div>
-    );
-  }
+  const features = [
+    {
+      id: 'playground',
+      title: 'PLAYGROUND',
+      subtitle: 'Interactive Sandbox',
+      description: '51+ components ready to test and customize in real-time',
+      icon: '⚡',
+      color: '#29F2DF',
+      gradient: 'linear-gradient(135deg, #29F2DF 0%, #1C7FA6 100%)',
+      route: '/playground',
+    },
+    {
+      id: 'showcase',
+      title: 'SHOWCASE',
+      subtitle: 'Component Gallery',
+      description: 'Browse the complete library with live examples and guides',
+      icon: '✨',
+      color: '#EF3EF1',
+      gradient: 'linear-gradient(135deg, #EF3EF1 0%, #C878D8 100%)',
+      route: '/showcase',
+    },
+    {
+      id: 'docs',
+      title: 'DOCUMENTATION',
+      subtitle: 'API Reference',
+      description: 'Complete guides and integration examples for your projects',
+      icon: '📚',
+      color: '#1C7FA6',
+      gradient: 'linear-gradient(135deg, #1C7FA6 0%, #5BA8C8 100%)',
+      route: '/docs',
+    },
+  ];
 
   return (
     <div
       style={{
         minHeight: '100vh',
-        background: '#0A1225',
+        background: 'linear-gradient(180deg, #000000 0%, #0a0a0f 50%, #000000 100%)',
         position: 'relative',
         overflow: 'hidden',
       }}
     >
-      <canvas ref={canvasRef} style={{ position: 'fixed', inset: 0, zIndex: 0, opacity: 0.8 }} />
+      {/* Animated Background */}
+      <canvas
+        ref={canvasRef}
+        style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 0,
+        }}
+      />
+
+      {/* Subtle gradient overlay */}
       <div
         style={{
           position: 'fixed',
           inset: 0,
-          zIndex: 10,
+          zIndex: 1,
           pointerEvents: 'none',
-          background:
-            'radial-gradient(ellipse at 50% 0%, rgba(40, 18, 90, 0.5) 0%, transparent 50%), radial-gradient(ellipse at 0% 50%, rgba(28, 127, 166, 0.3) 0%, transparent 40%), radial-gradient(ellipse at 100% 50%, rgba(239, 62, 241, 0.2) 0%, transparent 40%), radial-gradient(ellipse at 50% 100%, rgba(40, 18, 90, 0.4) 0%, transparent 50%)',
+          background: `
+            radial-gradient(circle at ${50 + mousePosition.x * 15}% ${50 + mousePosition.y * 15}%, rgba(41, 242, 223, 0.06) 0%, transparent 60%),
+            radial-gradient(circle at ${50 - mousePosition.x * 15}% ${50 - mousePosition.y * 15}%, rgba(239, 62, 241, 0.04) 0%, transparent 60%)
+          `,
         }}
       />
 
-      <header
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: '16px 24px',
-          zIndex: 50,
-        }}
-      >
-        <div
-          style={{
-            padding: '8px 16px',
-            borderRadius: '4px',
-            background: 'rgba(40, 18, 90, 0.4)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(41, 242, 223, 0.3)',
-          }}
-        >
-          <div
-            style={{
-              fontSize: '14px',
-              letterSpacing: '1px',
-              fontWeight: 'bold',
-              color: '#29F2DF',
-              textShadow: '0 0 10px rgba(41, 242, 223, 0.3)',
-            }}
-          >
-            RHUDS PRO
-          </div>
-        </div>
-        <div
-          style={{
-            padding: '8px 16px',
-            borderRadius: '4px',
-            textAlign: 'right',
-            background: 'rgba(40, 18, 90, 0.4)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(41, 242, 223, 0.3)',
-          }}
-        >
-          <div
-            style={{
-              fontSize: '16px',
-              letterSpacing: '1px',
-              fontWeight: 'bold',
-              color: '#29F2DF',
-              textShadow: '0 0 15px rgba(41, 242, 223, 0.5)',
-            }}
-          >
-            {formatTime(time)}
-          </div>
-        </div>
-      </header>
-
-      <div
+      {/* Hero Section with advanced parallax */}
+      <section
         style={{
           minHeight: '100vh',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          padding: '80px 16px 16px',
-          zIndex: 40,
           position: 'relative',
+          zIndex: 20,
+          padding: '40px 20px',
+          transform: `translateY(${scrollY * 0.3}px)`,
+          perspective: '1000px',
         }}
       >
-        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-          <h1
-            style={{
-              fontSize: '48px',
-              letterSpacing: '2px',
-              marginBottom: '16px',
-              fontWeight: 'bold',
-              background: 'linear-gradient(135deg, #29F2DF 0%, #1C7FA6 50%, #EF3EF1 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              filter: 'drop-shadow(0 0 20px rgba(41, 242, 223, 0.3))',
-            }}
-          >
-            COMPONENT LIBRARY
-          </h1>
-          <p
-            style={{
-              fontSize: '14px',
-              letterSpacing: '2px',
-              color: '#29F2DF',
-              textShadow: '0 0 10px rgba(41, 242, 223, 0.3)',
-            }}
-          >
-            Explore • Experiment • Integrate
-          </p>
-        </div>
-
+        {/* Terminal-style header */}
         <div
           style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-            gap: '24px',
-            width: '100%',
-            maxWidth: '1200px',
-            padding: '0 16px',
-          }}
-        >
-          {/* PLAYGROUND */}
-          <div
-            onClick={() => navigate('/playground')}
-            style={{
-              position: 'relative',
-              borderRadius: '8px',
-              padding: '24px',
-              cursor: 'pointer',
-              transition: 'all 0.3s',
-              background:
-                'linear-gradient(135deg, rgba(40, 18, 90, 0.5) 0%, rgba(10, 18, 37, 0.7) 100%)',
-              backdropFilter: 'blur(20px)',
-              border: '2px solid rgba(41, 242, 223, 0.5)',
-              boxShadow:
-                '0 0 30px rgba(41, 242, 223, 0.15), inset 0 0 30px rgba(41, 242, 223, 0.05)',
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.transform = 'scale(1.05)';
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.transform = 'scale(1)';
-            }}
-          >
-            <div
-              style={{
-                fontSize: '12px',
-                letterSpacing: '1px',
-                color: '#29F2DF',
-                textShadow: '0 0 8px rgba(41, 242, 223, 0.4)',
-                position: 'absolute',
-                top: '8px',
-                right: '8px',
-              }}
-            >
-              0x7F3A
-            </div>
-            <h3
-              style={{
-                fontSize: '20px',
-                marginBottom: '12px',
-                letterSpacing: '2px',
-                fontWeight: 'bold',
-                color: '#29F2DF',
-                textShadow: '0 0 15px rgba(41, 242, 223, 0.4)',
-              }}
-            >
-              PLAYGROUND
-            </h3>
-            <p style={{ fontSize: '14px', lineHeight: '1.6', color: '#8EC8D8' }}>
-              Test and experiment with 51+ UI components. Interactive sandbox for building and
-              customizing your interfaces with real-time preview.
-            </p>
-            <div
-              style={{
-                marginTop: '16px',
-                paddingTop: '16px',
-                borderTop: '1px solid rgba(41, 242, 223, 0.2)',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span
-                  style={{
-                    width: '8px',
-                    height: '8px',
-                    borderRadius: '50%',
-                    background: '#29F2DF',
-                    boxShadow: '0 0 8px #29F2DF',
-                    animation: 'pulse 2s infinite',
-                  }}
-                />
-                <span style={{ fontSize: '12px', letterSpacing: '1px', color: '#29F2DF' }}>
-                  System Online
-                </span>
-              </div>
-              <span
-                style={{
-                  fontSize: '12px',
-                  letterSpacing: '1px',
-                  color: '#29F2DF',
-                  textShadow: '0 0 8px rgba(41, 242, 223, 0.5)',
-                }}
-              >
-                ACCESS →
-              </span>
-            </div>
-          </div>
-
-          {/* SHOWCASE */}
-          <div
-            onClick={() => navigate('/showcase')}
-            style={{
-              position: 'relative',
-              borderRadius: '8px',
-              padding: '24px',
-              cursor: 'pointer',
-              transition: 'all 0.3s',
-              background:
-                'linear-gradient(135deg, rgba(40, 18, 90, 0.5) 0%, rgba(10, 18, 37, 0.7) 100%)',
-              backdropFilter: 'blur(20px)',
-              border: '2px solid rgba(239, 62, 241, 0.5)',
-              boxShadow:
-                '0 0 30px rgba(239, 62, 241, 0.15), inset 0 0 30px rgba(239, 62, 241, 0.05)',
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.transform = 'scale(1.05)';
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.transform = 'scale(1)';
-            }}
-          >
-            <div
-              style={{
-                fontSize: '12px',
-                letterSpacing: '1px',
-                color: '#EF3EF1',
-                textShadow: '0 0 8px rgba(239, 62, 241, 0.4)',
-                position: 'absolute',
-                top: '8px',
-                right: '8px',
-              }}
-            >
-              0xDEAD
-            </div>
-            <h3
-              style={{
-                fontSize: '20px',
-                marginBottom: '12px',
-                letterSpacing: '2px',
-                fontWeight: 'bold',
-                color: '#EF3EF1',
-                textShadow: '0 0 15px rgba(239, 62, 241, 0.4)',
-              }}
-            >
-              SHOWCASE
-            </h3>
-            <p style={{ fontSize: '14px', lineHeight: '1.6', color: '#C878D8' }}>
-              Browse the complete component library. See all 51+ components in action with live
-              examples, variations, and implementation guides.
-            </p>
-            <div
-              style={{
-                marginTop: '16px',
-                paddingTop: '16px',
-                borderTop: '1px solid rgba(239, 62, 241, 0.2)',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span
-                  style={{
-                    width: '8px',
-                    height: '8px',
-                    borderRadius: '50%',
-                    background: '#EF3EF1',
-                    boxShadow: '0 0 8px #EF3EF1',
-                    animation: 'pulse 2s infinite',
-                  }}
-                />
-                <span style={{ fontSize: '12px', letterSpacing: '1px', color: '#EF3EF1' }}>
-                  System Online
-                </span>
-              </div>
-              <span
-                style={{
-                  fontSize: '12px',
-                  letterSpacing: '1px',
-                  color: '#EF3EF1',
-                  textShadow: '0 0 8px rgba(239, 62, 241, 0.5)',
-                }}
-              >
-                ACCESS →
-              </span>
-            </div>
-          </div>
-
-          {/* DOCUMENTATION */}
-          <div
-            onClick={() => navigate('/docs')}
-            style={{
-              position: 'relative',
-              borderRadius: '8px',
-              padding: '24px',
-              cursor: 'pointer',
-              transition: 'all 0.3s',
-              background:
-                'linear-gradient(135deg, rgba(40, 18, 90, 0.5) 0%, rgba(10, 18, 37, 0.7) 100%)',
-              backdropFilter: 'blur(20px)',
-              border: '2px solid rgba(28, 127, 166, 0.5)',
-              boxShadow:
-                '0 0 30px rgba(28, 127, 166, 0.15), inset 0 0 30px rgba(28, 127, 166, 0.05)',
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLElement).style.transform = 'scale(1.05)';
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLElement).style.transform = 'scale(1)';
-            }}
-          >
-            <div
-              style={{
-                fontSize: '12px',
-                letterSpacing: '1px',
-                color: '#1C7FA6',
-                textShadow: '0 0 8px rgba(28, 127, 166, 0.4)',
-                position: 'absolute',
-                top: '8px',
-                right: '8px',
-              }}
-            >
-              0xBEEF
-            </div>
-            <h3
-              style={{
-                fontSize: '20px',
-                marginBottom: '12px',
-                letterSpacing: '2px',
-                fontWeight: 'bold',
-                color: '#1C7FA6',
-                textShadow: '0 0 15px rgba(28, 127, 166, 0.4)',
-              }}
-            >
-              DOCUMENTATION
-            </h3>
-            <p style={{ fontSize: '14px', lineHeight: '1.6', color: '#5BA8C8' }}>
-              Complete API documentation, component guides, and integration examples. Learn how to
-              use RHUDS Pro in your projects.
-            </p>
-            <div
-              style={{
-                marginTop: '16px',
-                paddingTop: '16px',
-                borderTop: '1px solid rgba(28, 127, 166, 0.2)',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span
-                  style={{
-                    width: '8px',
-                    height: '8px',
-                    borderRadius: '50%',
-                    background: '#1C7FA6',
-                    boxShadow: '0 0 8px #1C7FA6',
-                    animation: 'pulse 2s infinite',
-                  }}
-                />
-                <span style={{ fontSize: '12px', letterSpacing: '1px', color: '#1C7FA6' }}>
-                  System Online
-                </span>
-              </div>
-              <span
-                style={{
-                  fontSize: '12px',
-                  letterSpacing: '1px',
-                  color: '#1C7FA6',
-                  textShadow: '0 0 8px rgba(28, 127, 166, 0.5)',
-                }}
-              >
-                ACCESS →
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <footer
-        style={{
-          position: 'fixed',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: '16px 24px',
-          zIndex: 50,
-        }}
-      >
-        <div
-          style={{
-            padding: '8px 16px',
-            borderRadius: '4px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '16px',
-            background: 'rgba(40, 18, 90, 0.4)',
+            position: 'absolute',
+            top: '80px',
+            left: '50%',
+            transform: `translateX(-50%) ${isLoaded ? 'translateY(0)' : 'translateY(-20px)'}`,
+            fontFamily: 'monospace',
+            fontSize: '15px',
+            color: '#29F2DF',
+            opacity: isLoaded ? 0.8 : 0,
+            transition: 'all 1s cubic-bezier(0.4, 0, 0.2, 1)',
+            padding: '12px 24px',
+            background: 'rgba(41, 242, 223, 0.05)',
             backdropFilter: 'blur(10px)',
             border: '1px solid rgba(41, 242, 223, 0.2)',
+            borderRadius: '8px',
+            boxShadow: '0 4px 20px rgba(41, 242, 223, 0.15)',
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span
+          <span style={{ color: '#EF3EF1', fontWeight: 'bold' }}>{'>'}</span> {typedText}
+          <span style={{ animation: 'blink 1s infinite', marginLeft: '2px' }}>▊</span>
+        </div>
+
+        {/* Logo/Brand with advanced 3D glassmorphism */}
+        <div
+          style={{
+            marginBottom: '60px',
+            animation: 'fadeInUp 1s ease-out 0.3s backwards',
+            position: 'relative',
+            padding: '60px 100px',
+            background:
+              'linear-gradient(135deg, rgba(41, 242, 223, 0.12) 0%, rgba(239, 62, 241, 0.12) 100%)',
+            backdropFilter: 'blur(60px) saturate(200%)',
+            border: '2px solid transparent',
+            borderRadius: '40px',
+            boxShadow: `
+              0 30px 80px rgba(0, 0, 0, 0.6),
+              0 0 150px rgba(41, 242, 223, 0.3),
+              0 0 250px rgba(239, 62, 241, 0.2),
+              0 0 350px rgba(28, 127, 166, 0.1),
+              inset 0 4px 0 rgba(255, 255, 255, 0.3),
+              inset 0 -4px 0 rgba(0, 0, 0, 0.4)
+            `,
+            transform: `
+              perspective(1200px) 
+              rotateX(${mousePosition.y * 3}deg) 
+              rotateY(${mousePosition.x * 3}deg)
+              translateZ(${scrollY * 0.05}px)
+            `,
+            transition: 'transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease',
+            willChange: 'transform, box-shadow',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderImage =
+              'linear-gradient(135deg, #29F2DF, #EF3EF1, #1C7FA6) 1';
+            e.currentTarget.style.boxShadow = `
+              0 40px 100px rgba(0, 0, 0, 0.7),
+              0 0 200px rgba(41, 242, 223, 0.5),
+              0 0 300px rgba(239, 62, 241, 0.3),
+              0 0 400px rgba(28, 127, 166, 0.2),
+              inset 0 4px 0 rgba(255, 255, 255, 0.4),
+              inset 0 -4px 0 rgba(0, 0, 0, 0.5)
+            `;
+            playHoverSound(523.25, 0.15); // C5 note
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.borderImage = 'none';
+            e.currentTarget.style.boxShadow = `
+              0 30px 80px rgba(0, 0, 0, 0.6),
+              0 0 150px rgba(41, 242, 223, 0.3),
+              0 0 250px rgba(239, 62, 241, 0.2),
+              0 0 350px rgba(28, 127, 166, 0.1),
+              inset 0 4px 0 rgba(255, 255, 255, 0.3),
+              inset 0 -4px 0 rgba(0, 0, 0, 0.4)
+            `;
+          }}
+        >
+          {/* Logo container with overflow hidden for holographic layers */}
+          <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '24px' }}>
+            {/* Holographic layers */}
+            <div
               style={{
-                width: '8px',
-                height: '8px',
-                borderRadius: '50%',
-                background: '#29F2DF',
-                boxShadow: '0 0 6px #29F2DF',
-                animation: 'pulse 2s infinite',
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                fontSize: '80px',
+                fontWeight: '900',
+                letterSpacing: '8px',
+                color: '#29F2DF',
+                textAlign: 'center',
+                opacity: 0.3,
+                filter: 'blur(8px)',
+                transform: glitchActive ? 'translate(4px, -4px)' : 'translate(2px, -2px)',
+                transition: 'transform 0.1s',
+                pointerEvents: 'none',
               }}
-            />
-            <span style={{ fontSize: '12px', letterSpacing: '1px', color: '#29F2DF' }}>
-              Connected
-            </span>
+            >
+              RHUDS
+            </div>
+            <div
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                fontSize: '80px',
+                fontWeight: '900',
+                letterSpacing: '8px',
+                color: '#EF3EF1',
+                textAlign: 'center',
+                opacity: 0.3,
+                filter: 'blur(8px)',
+                transform: glitchActive ? 'translate(-4px, 4px)' : 'translate(-2px, 2px)',
+                transition: 'transform 0.1s',
+                pointerEvents: 'none',
+              }}
+            >
+              RHUDS
+            </div>
+
+            {/* Main logo with advanced effects */}
+            <div
+              style={{
+                position: 'relative',
+                fontSize: '96px',
+                fontWeight: '900',
+                letterSpacing: '12px',
+                background: 'linear-gradient(135deg, #29F2DF 0%, #EF3EF1 50%, #1C7FA6 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundSize: '300% 300%',
+                textAlign: 'center',
+                filter: `
+                  drop-shadow(0 0 60px rgba(41, 242, 223, 0.9))
+                  drop-shadow(0 0 100px rgba(239, 62, 241, 0.6))
+                  drop-shadow(0 0 150px rgba(28, 127, 166, 0.3))
+                `,
+                marginBottom: '24px',
+                animation: `
+                  glow 3s ease-in-out infinite,
+                  gradientShift 6s ease infinite,
+                  float3D 5s ease-in-out infinite
+                `,
+                transform: glitchActive ? 'skew(-3deg) translate(4px, -4px)' : 'skew(0deg)',
+                transition: 'transform 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
+                fontFamily: 'system-ui, -apple-system, sans-serif',
+                textShadow: `
+                  0 0 30px rgba(41, 242, 223, 0.5),
+                  0 0 60px rgba(239, 62, 241, 0.3),
+                  0 0 90px rgba(28, 127, 166, 0.2)
+                `,
+              }}
+            >
+              RHUDS
+            </div>
+          </div>
+
+          {/* PRO badge with scan line */}
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              position: 'relative',
+              overflow: 'hidden',
+            }}
+          >
+            <div
+              style={{
+                fontSize: '28px',
+                fontWeight: 'bold',
+                letterSpacing: '16px',
+                color: '#29F2DF',
+                textAlign: 'center',
+                opacity: 0.95,
+                textShadow: '0 0 40px rgba(41, 242, 223, 1), 0 0 80px rgba(41, 242, 223, 0.6)',
+                padding: '12px 32px',
+                border: '3px solid #29F2DF',
+                borderRadius: '8px',
+                position: 'relative',
+                background: 'rgba(41, 242, 223, 0.08)',
+                boxShadow:
+                  '0 0 30px rgba(41, 242, 223, 0.4), inset 0 0 20px rgba(41, 242, 223, 0.1)',
+              }}
+            >
+              PRO
+              {/* Scan line effect */}
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: '-100%',
+                  width: '100%',
+                  height: '100%',
+                  background:
+                    'linear-gradient(90deg, transparent, rgba(41, 242, 223, 0.6), transparent)',
+                  animation: 'scan 2.5s linear infinite',
+                }}
+              />
+            </div>
           </div>
         </div>
-      </footer>
 
-      <style>{`
-        @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.5; }
+        {/* Tagline with advanced glassmorphism and parallax */}
+        <div
+          style={{
+            maxWidth: '1000px',
+            textAlign: 'center',
+            marginBottom: '80px',
+            animation: 'fadeInUp 1s ease-out 0.5s backwards',
+            position: 'relative',
+            padding: '60px',
+            background:
+              'linear-gradient(135deg, rgba(41, 242, 223, 0.1) 0%, rgba(239, 62, 241, 0.1) 100%)',
+            backdropFilter: 'blur(40px) saturate(200%)',
+            border: '2px solid rgba(41, 242, 223, 0.4)',
+            borderRadius: '32px',
+            boxShadow: `
+              0 25px 70px rgba(0, 0, 0, 0.5),
+              0 0 100px rgba(41, 242, 223, 0.25),
+              0 0 150px rgba(239, 62, 241, 0.15),
+              0 0 200px rgba(28, 127, 166, 0.1),
+              inset 0 3px 0 rgba(255, 255, 255, 0.2),
+              inset 0 -3px 0 rgba(0, 0, 0, 0.3)
+            `,
+            transform: `
+              translateY(${scrollY * -0.15}px)
+              rotateX(${mousePosition.y * 1}deg)
+              rotateY(${mousePosition.x * 1}deg)
+            `,
+            transition: 'transform 0.3s ease-out, box-shadow 0.3s ease',
+            willChange: 'transform',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.boxShadow = `
+              0 35px 90px rgba(0, 0, 0, 0.6),
+              0 0 150px rgba(41, 242, 223, 0.4),
+              0 0 200px rgba(239, 62, 241, 0.25),
+              0 0 250px rgba(28, 127, 166, 0.15),
+              inset 0 3px 0 rgba(255, 255, 255, 0.25),
+              inset 0 -3px 0 rgba(0, 0, 0, 0.4)
+            `;
+            playHoverSound(440, 0.1); // A4 note
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.boxShadow = `
+              0 25px 70px rgba(0, 0, 0, 0.5),
+              0 0 100px rgba(41, 242, 223, 0.25),
+              0 0 150px rgba(239, 62, 241, 0.15),
+              0 0 200px rgba(28, 127, 166, 0.1),
+              inset 0 3px 0 rgba(255, 255, 255, 0.2),
+              inset 0 -3px 0 rgba(0, 0, 0, 0.3)
+            `;
+          }}
+        >
+          {/* Decorative brackets */}
+          <div
+            style={{
+              position: 'absolute',
+              top: '-20px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              fontSize: '24px',
+              color: '#29F2DF',
+              opacity: 0.4,
+              letterSpacing: '20px',
+            }}
+          >
+            {'[ ]'}
+          </div>
+
+          <h1
+            style={{
+              fontSize: '58px',
+              fontWeight: '800',
+              color: '#fff',
+              marginBottom: '28px',
+              lineHeight: '1.2',
+              textShadow: `
+                0 4px 20px rgba(0, 0, 0, 0.7),
+                0 0 50px rgba(41, 242, 223, 0.5),
+                0 0 80px rgba(239, 62, 241, 0.3)
+              `,
+              position: 'relative',
+              letterSpacing: '1px',
+              animation: 'textGlow 3s ease-in-out infinite',
+            }}
+          >
+            <span
+              style={{
+                background: 'linear-gradient(135deg, #fff 0%, #29F2DF 50%, #EF3EF1 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                fontWeight: '900',
+                backgroundSize: '200% 200%',
+                animation: 'gradientShift 4s ease infinite',
+              }}
+            >
+              Next-Gen HUD
+            </span>{' '}
+            <span
+              style={{
+                color: '#8EC8D8',
+                fontWeight: '700',
+                textShadow: '0 0 30px rgba(142, 200, 216, 0.5)',
+              }}
+            >
+              Design System
+            </span>
+          </h1>
+
+          <p
+            style={{
+              fontSize: '22px',
+              color: '#C8D8E8',
+              lineHeight: '1.8',
+              maxWidth: '800px',
+              margin: '0 auto 40px',
+              textShadow: `
+                0 2px 12px rgba(0, 0, 0, 0.8),
+                0 0 20px rgba(41, 242, 223, 0.2)
+              `,
+              fontWeight: '400',
+              animation: 'fadeInUp 1s ease-out 0.7s backwards',
+            }}
+          >
+            Build stunning sci-fi interfaces with{' '}
+            <span
+              style={{
+                color: '#29F2DF',
+                fontWeight: '700',
+                textShadow: '0 0 20px rgba(41, 242, 223, 0.8)',
+                animation: 'pulse 2s ease-in-out infinite',
+                position: 'relative',
+                display: 'inline-block',
+              }}
+            >
+              51+ premium components
+            </span>
+            . Powered by React, TypeScript, and cutting-edge animations.
+          </p>
+
+          {/* Tech badges with advanced effects */}
+          <div
+            style={{
+              display: 'flex',
+              gap: '20px',
+              justifyContent: 'center',
+              flexWrap: 'wrap',
+              marginTop: '40px',
+              perspective: '1000px',
+            }}
+          >
+            {['React 18', 'TypeScript', 'WebGL', 'Canvas API', 'Framer Motion'].map((tech, i) => (
+              <div
+                key={tech}
+                style={{
+                  padding: '12px 28px',
+                  background:
+                    'linear-gradient(135deg, rgba(41, 242, 223, 0.2) 0%, rgba(239, 62, 241, 0.2) 100%)',
+                  backdropFilter: 'blur(25px) saturate(200%)',
+                  border: '2px solid rgba(41, 242, 223, 0.6)',
+                  borderRadius: '30px',
+                  fontSize: '15px',
+                  color: '#29F2DF',
+                  fontWeight: '700',
+                  letterSpacing: '0.5px',
+                  animation: `fadeInUp 0.8s ease-out ${0.6 + i * 0.1}s backwards, float 3s ease-in-out ${i * 0.2}s infinite`,
+                  boxShadow: `
+                    0 10px 30px rgba(41, 242, 223, 0.3),
+                    0 0 50px rgba(41, 242, 223, 0.2),
+                    0 0 70px rgba(239, 62, 241, 0.1),
+                    inset 0 2px 0 rgba(255, 255, 255, 0.25),
+                    inset 0 -2px 0 rgba(0, 0, 0, 0.3)
+                  `,
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  cursor: 'default',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  willChange: 'transform, box-shadow',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = `
+                    translateY(-6px) 
+                    scale(1.08) 
+                    rotateX(${mousePosition.y * 5}deg) 
+                    rotateY(${mousePosition.x * 5}deg)
+                  `;
+                  e.currentTarget.style.boxShadow = `
+                    0 15px 40px rgba(41, 242, 223, 0.5),
+                    0 0 80px rgba(41, 242, 223, 0.4),
+                    0 0 100px rgba(239, 62, 241, 0.2),
+                    inset 0 2px 0 rgba(255, 255, 255, 0.35)
+                  `;
+                  e.currentTarget.style.borderColor = '#FFFFFF';
+                  e.currentTarget.style.color = '#FFFFFF';
+                  playHoverSound(523.25 + i * 50, 0.1); // Ascending notes
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0) scale(1) rotateX(0) rotateY(0)';
+                  e.currentTarget.style.boxShadow = `
+                    0 10px 30px rgba(41, 242, 223, 0.3),
+                    0 0 50px rgba(41, 242, 223, 0.2),
+                    0 0 70px rgba(239, 62, 241, 0.1),
+                    inset 0 2px 0 rgba(255, 255, 255, 0.25),
+                    inset 0 -2px 0 rgba(0, 0, 0, 0.3)
+                  `;
+                  e.currentTarget.style.borderColor = 'rgba(41, 242, 223, 0.6)';
+                  e.currentTarget.style.color = '#29F2DF';
+                }}
+              >
+                {tech}
+                {/* Glow effect */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: '100%',
+                    height: '100%',
+                    background:
+                      'radial-gradient(circle, rgba(41, 242, 223, 0.1) 0%, transparent 70%)',
+                    filter: 'blur(10px)',
+                    opacity: 0,
+                    transition: 'opacity 0.3s ease',
+                    pointerEvents: 'none',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.opacity = '1';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.opacity = '0';
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* CTA Buttons with advanced 3D effects */}
+        <div
+          style={{
+            display: 'flex',
+            gap: '28px',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            animation: 'fadeInUp 1s ease-out 0.8s backwards',
+            perspective: '1000px',
+          }}
+        >
+          <button
+            onClick={() => {
+              playHoverSound(659.25, 0.2); // E5 note
+              navigate('/playground');
+            }}
+            style={{
+              position: 'relative',
+              padding: '22px 64px',
+              fontSize: '19px',
+              fontWeight: '800',
+              letterSpacing: '4px',
+              color: '#000',
+              background: 'linear-gradient(135deg, #29F2DF 0%, #1C7FA6 100%)',
+              border: 'none',
+              borderRadius: '16px',
+              cursor: 'pointer',
+              transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+              boxShadow: `
+                0 0 60px rgba(41, 242, 223, 0.8),
+                0 12px 40px rgba(0, 0, 0, 0.5),
+                0 0 100px rgba(41, 242, 223, 0.3),
+                inset 0 3px 0 rgba(255, 255, 255, 0.5),
+                inset 0 -3px 0 rgba(0, 0, 0, 0.4)
+              `,
+              overflow: 'hidden',
+              fontFamily: 'system-ui, -apple-system, sans-serif',
+              transformStyle: 'preserve-3d',
+              willChange: 'transform, box-shadow',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = `
+                translateY(-10px) 
+                scale(1.08)
+                rotateX(${mousePosition.y * 3}deg)
+                rotateY(${mousePosition.x * 3}deg)
+              `;
+              e.currentTarget.style.boxShadow = `
+                0 0 100px rgba(41, 242, 223, 1),
+                0 25px 80px rgba(41, 242, 223, 0.8),
+                0 0 150px rgba(41, 242, 223, 0.5),
+                inset 0 3px 0 rgba(255, 255, 255, 0.6)
+              `;
+              playHoverSound(587.33, 0.15); // D5 note
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'translateY(0) scale(1) rotateX(0) rotateY(0)';
+              e.currentTarget.style.boxShadow = `
+                0 0 60px rgba(41, 242, 223, 0.8),
+                0 12px 40px rgba(0, 0, 0, 0.5),
+                0 0 100px rgba(41, 242, 223, 0.3),
+                inset 0 3px 0 rgba(255, 255, 255, 0.5),
+                inset 0 -3px 0 rgba(0, 0, 0, 0.4)
+              `;
+            }}
+          >
+            <span style={{ position: 'relative', zIndex: 1 }}>GET STARTED</span>
+            {/* Advanced shine effect */}
+            <div
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: '-100%',
+                width: '100%',
+                height: '100%',
+                background:
+                  'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent)',
+                animation: 'shine 2s infinite',
+                filter: 'blur(5px)',
+              }}
+            />
+            {/* Particle burst on click */}
+            <div
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                width: '0',
+                height: '0',
+                background: 'radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, transparent 70%)',
+                borderRadius: '50%',
+                transition: 'width 0.3s ease, height 0.3s ease',
+                pointerEvents: 'none',
+              }}
+              onClick={(e) => {
+                e.currentTarget.style.width = '200px';
+                e.currentTarget.style.height = '200px';
+                setTimeout(() => {
+                  e.currentTarget.style.width = '0';
+                  e.currentTarget.style.height = '0';
+                }, 300);
+              }}
+            />
+          </button>
+
+          <button
+            onClick={() => {
+              playHoverSound(523.25, 0.2); // C5 note
+              navigate('/docs');
+            }}
+            style={{
+              position: 'relative',
+              padding: '22px 64px',
+              fontSize: '19px',
+              fontWeight: '800',
+              letterSpacing: '4px',
+              color: '#29F2DF',
+              background: 'rgba(41, 242, 223, 0.15)',
+              backdropFilter: 'blur(30px) saturate(200%)',
+              border: '3px solid #29F2DF',
+              borderRadius: '16px',
+              cursor: 'pointer',
+              transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+              overflow: 'hidden',
+              boxShadow: `
+                0 0 50px rgba(41, 242, 223, 0.5),
+                0 0 80px rgba(41, 242, 223, 0.2),
+                inset 0 3px 0 rgba(255, 255, 255, 0.2),
+                inset 0 -3px 0 rgba(0, 0, 0, 0.3)
+              `,
+              fontFamily: 'system-ui, -apple-system, sans-serif',
+              transformStyle: 'preserve-3d',
+              willChange: 'transform, box-shadow, background',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = 'rgba(41, 242, 223, 0.25)';
+              e.currentTarget.style.transform = `
+                translateY(-10px)
+                rotateX(${mousePosition.y * 2}deg)
+                rotateY(${mousePosition.x * 2}deg)
+              `;
+              e.currentTarget.style.boxShadow = `
+                0 25px 60px rgba(41, 242, 223, 0.8),
+                0 0 120px rgba(41, 242, 223, 0.6),
+                0 0 180px rgba(41, 242, 223, 0.3),
+                inset 0 3px 0 rgba(255, 255, 255, 0.3)
+              `;
+              e.currentTarget.style.borderColor = '#FFFFFF';
+              e.currentTarget.style.color = '#FFFFFF';
+              playHoverSound(493.88, 0.15); // B4 note
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'rgba(41, 242, 223, 0.15)';
+              e.currentTarget.style.transform = 'translateY(0) rotateX(0) rotateY(0)';
+              e.currentTarget.style.boxShadow = `
+                0 0 50px rgba(41, 242, 223, 0.5),
+                0 0 80px rgba(41, 242, 223, 0.2),
+                inset 0 3px 0 rgba(255, 255, 255, 0.2),
+                inset 0 -3px 0 rgba(0, 0, 0, 0.3)
+              `;
+              e.currentTarget.style.borderColor = '#29F2DF';
+              e.currentTarget.style.color = '#29F2DF';
+            }}
+          >
+            <span style={{ position: 'relative', zIndex: 1 }}>VIEW DOCS</span>
+            {/* Animated corner accents */}
+            <div
+              style={{
+                position: 'absolute',
+                top: '8px',
+                left: '8px',
+                width: '20px',
+                height: '20px',
+                borderTop: '3px solid currentColor',
+                borderLeft: '3px solid currentColor',
+                opacity: 0.7,
+                animation: 'pulse 2s ease-in-out infinite',
+              }}
+            />
+            <div
+              style={{
+                position: 'absolute',
+                bottom: '8px',
+                right: '8px',
+                width: '20px',
+                height: '20px',
+                borderBottom: '3px solid currentColor',
+                borderRight: '3px solid currentColor',
+                opacity: 0.7,
+                animation: 'pulse 2s ease-in-out infinite 1s',
+              }}
+            />
+            {/* Holographic grid overlay */}
+            <div
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: `
+                  linear-gradient(90deg, transparent 49%, rgba(41, 242, 223, 0.1) 50%, transparent 51%),
+                  linear-gradient(0deg, transparent 49%, rgba(41, 242, 223, 0.1) 50%, transparent 51%)
+                `,
+                backgroundSize: '20px 20px',
+                opacity: 0.3,
+                pointerEvents: 'none',
+                animation: 'gridMove 10s linear infinite',
+              }}
+            />
+          </button>
+        </div>
+
+        {/* Advanced Scroll Indicator */}
+        <div
+          style={{
+            position: 'absolute',
+            bottom: '40px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            animation: 'bounce 2s infinite, pulse 3s ease-in-out infinite',
+          }}
+        >
+          <div
+            style={{
+              width: '3px',
+              height: '50px',
+              background: 'linear-gradient(to bottom, transparent, #29F2DF, #EF3EF1, transparent)',
+              margin: '0 auto',
+              filter: 'drop-shadow(0 0 10px rgba(41, 242, 223, 0.5))',
+              position: 'relative',
+            }}
+          >
+            {/* Pulsing orb */}
+            <div
+              style={{
+                position: 'absolute',
+                bottom: '0',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: '12px',
+                height: '12px',
+                background: 'radial-gradient(circle, #29F2DF 0%, #EF3EF1 100%)',
+                borderRadius: '50%',
+                filter: 'blur(2px)',
+                animation: 'pulse 1.5s ease-in-out infinite',
+              }}
+            />
+          </div>
+          <div
+            style={{
+              marginTop: '10px',
+              fontSize: '12px',
+              color: '#8EC8D8',
+              letterSpacing: '2px',
+              textAlign: 'center',
+              opacity: 0.7,
+              animation: 'fadeInOut 3s ease-in-out infinite',
+            }}
+          >
+            SCROLL
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section
+        style={{
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          position: 'relative',
+          zIndex: 20,
+          padding: '120px 20px',
+        }}
+      >
+        <div style={{ maxWidth: '1400px', width: '100%' }}>
+          <h2
+            style={{
+              fontSize: '56px',
+              fontWeight: '900',
+              textAlign: 'center',
+              marginBottom: '100px',
+              background: 'linear-gradient(135deg, #29F2DF 0%, #EF3EF1 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              letterSpacing: '2px',
+              textShadow: '0 0 60px rgba(41, 242, 223, 0.3)',
+              position: 'relative',
+            }}
+          >
+            Explore the System
+            {/* Underline decoration */}
+            <div
+              style={{
+                position: 'absolute',
+                bottom: '-20px',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: '200px',
+                height: '4px',
+                background: 'linear-gradient(90deg, transparent, #29F2DF, #EF3EF1, transparent)',
+                borderRadius: '2px',
+                boxShadow: '0 0 20px rgba(41, 242, 223, 0.6)',
+              }}
+            />
+          </h2>
+
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))',
+              gap: '50px',
+              padding: '0 20px',
+            }}
+          >
+            {features.map((feature, index) => (
+              <div
+                key={feature.id}
+                onClick={() => navigate(feature.route)}
+                style={{
+                  position: 'relative',
+                  padding: '50px',
+                  background:
+                    'linear-gradient(135deg, rgba(41, 242, 223, 0.08) 0%, rgba(239, 62, 241, 0.08) 100%)',
+                  backdropFilter: 'blur(40px) saturate(200%)',
+                  border: `2px solid ${feature.color}50`,
+                  borderRadius: '32px',
+                  cursor: 'pointer',
+                  transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+                  animation: `fadeInUp 0.8s ease-out ${0.2 + index * 0.2}s backwards`,
+                  overflow: 'hidden',
+                  boxShadow: `
+                    0 20px 60px rgba(0, 0, 0, 0.4),
+                    0 0 80px ${feature.color}20,
+                    inset 0 2px 0 rgba(255, 255, 255, 0.15),
+                    inset 0 -2px 0 rgba(0, 0, 0, 0.3)
+                  `,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-16px) scale(1.03)';
+                  e.currentTarget.style.borderColor = feature.color;
+                  e.currentTarget.style.background = `linear-gradient(135deg, rgba(41, 242, 223, 0.12) 0%, rgba(239, 62, 241, 0.12) 100%)`;
+                  e.currentTarget.style.boxShadow = `
+                    0 30px 80px ${feature.color}60,
+                    0 0 120px ${feature.color}40,
+                    0 20px 60px rgba(0, 0, 0, 0.5),
+                    inset 0 2px 0 rgba(255, 255, 255, 0.2)
+                  `;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                  e.currentTarget.style.borderColor = `${feature.color}50`;
+                  e.currentTarget.style.background = `linear-gradient(135deg, rgba(41, 242, 223, 0.08) 0%, rgba(239, 62, 241, 0.08) 100%)`;
+                  e.currentTarget.style.boxShadow = `
+                    0 20px 60px rgba(0, 0, 0, 0.4),
+                    0 0 80px ${feature.color}20,
+                    inset 0 2px 0 rgba(255, 255, 255, 0.15),
+                    inset 0 -2px 0 rgba(0, 0, 0, 0.3)
+                  `;
+                }}
+              >
+                {/* Gradient Overlay */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: '6px',
+                    background: feature.gradient,
+                    boxShadow: `0 0 20px ${feature.color}80`,
+                  }}
+                />
+
+                {/* Icon with glow */}
+                <div
+                  style={{
+                    fontSize: '64px',
+                    marginBottom: '32px',
+                    filter: `drop-shadow(0 0 20px ${feature.color}80)`,
+                    animation: 'float 3s ease-in-out infinite',
+                  }}
+                >
+                  {feature.icon}
+                </div>
+
+                {/* Title */}
+                <h3
+                  style={{
+                    fontSize: '32px',
+                    fontWeight: '900',
+                    letterSpacing: '3px',
+                    color: feature.color,
+                    marginBottom: '12px',
+                    textShadow: `0 0 30px ${feature.color}90`,
+                    fontFamily: 'system-ui, -apple-system, sans-serif',
+                  }}
+                >
+                  {feature.title}
+                </h3>
+
+                {/* Subtitle */}
+                <div
+                  style={{
+                    fontSize: '15px',
+                    letterSpacing: '1.5px',
+                    color: '#8EC8D8',
+                    marginBottom: '24px',
+                    opacity: 0.9,
+                    fontWeight: '600',
+                  }}
+                >
+                  {feature.subtitle}
+                </div>
+
+                {/* Description */}
+                <p
+                  style={{
+                    fontSize: '17px',
+                    lineHeight: '1.7',
+                    color: '#C8D8E8',
+                    marginBottom: '32px',
+                    textShadow: '0 2px 8px rgba(0, 0, 0, 0.6)',
+                  }}
+                >
+                  {feature.description}
+                </p>
+
+                {/* Arrow with animation */}
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    color: feature.color,
+                    fontSize: '16px',
+                    fontWeight: '800',
+                    letterSpacing: '2px',
+                    transition: 'gap 0.3s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.gap = '20px';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.gap = '12px';
+                  }}
+                >
+                  EXPLORE
+                  <span style={{ fontSize: '24px', transition: 'transform 0.3s ease' }}>→</span>
+                </div>
+
+                {/* Corner decorations */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '20px',
+                    right: '20px',
+                    width: '40px',
+                    height: '40px',
+                    borderTop: `3px solid ${feature.color}60`,
+                    borderRight: `3px solid ${feature.color}60`,
+                    borderRadius: '0 8px 0 0',
+                  }}
+                />
+                <div
+                  style={{
+                    position: 'absolute',
+                    bottom: '20px',
+                    left: '20px',
+                    width: '40px',
+                    height: '40px',
+                    borderBottom: `3px solid ${feature.color}60`,
+                    borderLeft: `3px solid ${feature.color}60`,
+                    borderRadius: '0 0 0 8px',
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section */}
+      <section
+        style={{
+          padding: '120px 20px',
+          position: 'relative',
+          zIndex: 20,
+        }}
+      >
+        <div
+          style={{
+            maxWidth: '1400px',
+            margin: '0 auto',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+            gap: '60px',
+            textAlign: 'center',
+          }}
+        >
+          {[
+            { value: '51+', label: 'Components', color: '#29F2DF', icon: '⚡' },
+            { value: '100%', label: 'TypeScript', color: '#EF3EF1', icon: '🔷' },
+            { value: '∞', label: 'Possibilities', color: '#1C7FA6', icon: '✨' },
+          ].map((stat, index) => (
+            <div
+              key={index}
+              style={{
+                animation: `fadeInUp 0.8s ease-out ${0.2 + index * 0.15}s backwards`,
+                padding: '40px',
+                background:
+                  'linear-gradient(135deg, rgba(41, 242, 223, 0.06) 0%, rgba(239, 62, 241, 0.06) 100%)',
+                backdropFilter: 'blur(30px) saturate(180%)',
+                border: `2px solid ${stat.color}40`,
+                borderRadius: '28px',
+                transition: 'all 0.4s ease',
+                cursor: 'default',
+                boxShadow: `
+                  0 10px 40px rgba(0, 0, 0, 0.3),
+                  0 0 60px ${stat.color}15,
+                  inset 0 2px 0 rgba(255, 255, 255, 0.1)
+                `,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-10px) scale(1.05)';
+                e.currentTarget.style.borderColor = stat.color;
+                e.currentTarget.style.boxShadow = `
+                  0 20px 60px ${stat.color}40,
+                  0 0 100px ${stat.color}30,
+                  inset 0 2px 0 rgba(255, 255, 255, 0.15)
+                `;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                e.currentTarget.style.borderColor = `${stat.color}40`;
+                e.currentTarget.style.boxShadow = `
+                  0 10px 40px rgba(0, 0, 0, 0.3),
+                  0 0 60px ${stat.color}15,
+                  inset 0 2px 0 rgba(255, 255, 255, 0.1)
+                `;
+              }}
+            >
+              <div
+                style={{
+                  fontSize: '48px',
+                  marginBottom: '20px',
+                  filter: `drop-shadow(0 0 20px ${stat.color}80)`,
+                }}
+              >
+                {stat.icon}
+              </div>
+              <div
+                style={{
+                  fontSize: '72px',
+                  fontWeight: '900',
+                  color: stat.color,
+                  marginBottom: '20px',
+                  textShadow: `0 0 40px ${stat.color}90, 0 0 80px ${stat.color}50`,
+                  fontFamily: 'system-ui, -apple-system, sans-serif',
+                  letterSpacing: '2px',
+                }}
+              >
+                {stat.value}
+              </div>
+              <div
+                style={{
+                  fontSize: '20px',
+                  letterSpacing: '3px',
+                  color: '#8EC8D8',
+                  fontWeight: '700',
+                  textTransform: 'uppercase',
+                }}
+              >
+                {stat.label}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Animations */}
+      <style>
+        {`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(40px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
-      `}</style>
+
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+
+        @keyframes bounce {
+          0%, 100% {
+            transform: translateX(-50%) translateY(0);
+          }
+          50% {
+            transform: translateX(-50%) translateY(15px);
+          }
+        }
+
+        @keyframes glow {
+          0%, 100% {
+            filter: drop-shadow(0 0 50px rgba(41, 242, 223, 0.7)) drop-shadow(0 0 80px rgba(239, 62, 241, 0.4));
+          }
+          50% {
+            filter: drop-shadow(0 0 70px rgba(41, 242, 223, 1)) drop-shadow(0 0 120px rgba(239, 62, 241, 0.6));
+          }
+        }
+
+        @keyframes gradientShift {
+          0%, 100% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+        }
+
+        @keyframes scan {
+          0% {
+            left: -100%;
+          }
+          100% {
+            left: 200%;
+          }
+        }
+
+        @keyframes shine {
+          0% {
+            left: -100%;
+          }
+          50%, 100% {
+            left: 200%;
+          }
+        }
+
+        @keyframes blink {
+          0%, 49% {
+            opacity: 1;
+          }
+          50%, 100% {
+            opacity: 0;
+          }
+        }
+
+        @keyframes float {
+          0%, 100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(-15px);
+          }
+        }
+
+        @keyframes float3D {
+          0%, 100% {
+            transform: translateY(0) rotateX(0) rotateY(0);
+          }
+          25% {
+            transform: translateY(-10px) rotateX(2deg) rotateY(2deg);
+          }
+          50% {
+            transform: translateY(-5px) rotateX(-1deg) rotateY(-1deg);
+          }
+          75% {
+            transform: translateY(-8px) rotateX(1deg) rotateY(-2deg);
+          }
+        }
+
+        @keyframes textGlow {
+          0%, 100% {
+            text-shadow: 
+              0 4px 20px rgba(0, 0, 0, 0.7),
+              0 0 50px rgba(41, 242, 223, 0.5),
+              0 0 80px rgba(239, 62, 241, 0.3);
+          }
+          50% {
+            text-shadow: 
+              0 4px 25px rgba(0, 0, 0, 0.8),
+              0 0 70px rgba(41, 242, 223, 0.7),
+              0 0 110px rgba(239, 62, 241, 0.5),
+              0 0 150px rgba(28, 127, 166, 0.3);
+          }
+        }
+
+        @keyframes gridMove {
+          0% {
+            background-position: 0 0;
+          }
+          100% {
+            background-position: 20px 20px;
+          }
+        }
+
+        @keyframes fadeInOut {
+          0%, 100% {
+            opacity: 0.5;
+          }
+          50% {
+            opacity: 1;
+          }
+        }
+
+        @keyframes pulse {
+          0%, 100% {
+            opacity: 1;
+            transform: scale(1);
+          }
+          50% {
+            opacity: 0.85;
+            transform: scale(1.08);
+          }
+        }
+
+        @keyframes rotate {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
+          }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+          .logo-container {
+            padding: 40px 50px !important;
+          }
+          
+          .logo-text {
+            font-size: 64px !important;
+          }
+          
+          .tagline-container {
+            padding: 40px !important;
+          }
+          
+          .tagline-title {
+            font-size: 42px !important;
+          }
+          
+          .tagline-description {
+            font-size: 18px !important;
+          }
+          
+          .cta-button {
+            padding: 18px 48px !important;
+            font-size: 17px !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .logo-container {
+            padding: 30px 40px !important;
+          }
+          
+          .logo-text {
+            font-size: 48px !important;
+            letter-spacing: 6px !important;
+          }
+          
+          .pro-badge {
+            font-size: 20px !important;
+            letter-spacing: 10px !important;
+          }
+          
+          .tagline-container {
+            padding: 30px !important;
+          }
+          
+          .tagline-title {
+            font-size: 32px !important;
+          }
+          
+          .tagline-description {
+            font-size: 16px !important;
+          }
+        }
+
+        @keyframes pulse {
+          0%, 100% {
+            opacity: 1;
+            transform: scale(1);
+          }
+          50% {
+            opacity: 0.8;
+            transform: scale(1.05);
+          }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+          .logo-container {
+            padding: 30px 40px !important;
+          }
+          
+          .logo-text {
+            font-size: 48px !important;
+          }
+          
+          .tagline-container {
+            padding: 30px !important;
+          }
+          
+          .tagline-title {
+            font-size: 36px !important;
+          }
+          
+          .tagline-description {
+            font-size: 16px !important;
+          }
+          
+          .cta-button {
+            padding: 16px 40px !important;
+            font-size: 16px !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .logo-container {
+            padding: 20px 30px !important;
+          }
+          
+          .logo-text {
+            font-size: 36px !important;
+            letter-spacing: 4px !important;
+          }
+          
+          .pro-badge {
+            font-size: 18px !important;
+            letter-spacing: 8px !important;
+          }
+          
+          .tagline-container {
+            padding: 20px !important;
+          }
+          
+          .tagline-title {
+            font-size: 28px !important;
+          }
+          
+          .tagline-description {
+            font-size: 14px !important;
+          }
+        }
+      `}
+      </style>
     </div>
   );
 }

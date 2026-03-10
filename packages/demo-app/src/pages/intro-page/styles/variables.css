@@ -1,0 +1,74 @@
+/* CSS Custom Properties for Arwes Color Palette and Design System */
+
+:root {
+  /* Color Palette - Arwes Theme */
+  --color-background: #000000;
+  --color-primary: rgba(41, 242, 223, 1); /* Cyan */
+  --color-secondary: rgba(239, 62, 241, 1); /* Magenta */
+  --color-accent-blue: rgba(0, 150, 255, 1);
+  --color-accent-green: rgba(0, 255, 150, 1);
+
+  /* Text Colors */
+  --color-text-primary: rgba(41, 242, 223, 1); /* Cyan */
+  --color-text-secondary: rgba(41, 242, 223, 0.8); /* Cyan 80% */
+  --color-text-tertiary: rgba(41, 242, 223, 0.6); /* Cyan 60% */
+
+  /* Glow Colors */
+  --color-glow-cyan: rgba(41, 242, 223, 0.8);
+  --color-glow-magenta: rgba(239, 62, 241, 0.8);
+
+  /* Font Family */
+  --font-family-mono: 'Courier New', 'Consolas', 'Monaco', monospace;
+
+  /* Spacing Scale - Mobile First */
+  --spacing-xs: 8px;
+  --spacing-sm: 12px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+  --spacing-2xl: 48px;
+  --spacing-3xl: 64px;
+
+  /* Container Padding - Mobile */
+  --container-padding: var(--spacing-md);
+  --section-gap: var(--spacing-md);
+  --card-gap: var(--spacing-sm);
+
+  /* Z-Index Layers */
+  --z-background: 0;
+  --z-content: 10;
+  --z-navigation: 100;
+  --z-modal: 1000;
+
+  /* Animation Timings */
+  --animation-duration-fast: 200ms;
+  --animation-duration-normal: 300ms;
+  --animation-duration-slow: 500ms;
+  --animation-easing-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --animation-easing-ease-out: cubic-bezier(0, 0, 0.2, 1);
+
+  /* Breakpoints */
+  --breakpoint-mobile: 320px;
+  --breakpoint-tablet: 768px;
+  --breakpoint-desktop: 1024px;
+  --breakpoint-wide: 1440px;
+  --breakpoint-ultra: 2560px;
+}
+
+/* Tablet Breakpoint */
+@media (min-width: 768px) {
+  :root {
+    --container-padding: var(--spacing-lg);
+    --section-gap: var(--spacing-lg);
+    --card-gap: 20px;
+  }
+}
+
+/* Desktop Breakpoint */
+@media (min-width: 1024px) {
+  :root {
+    --container-padding: var(--spacing-xl);
+    --section-gap: var(--spacing-xl);
+    --card-gap: var(--spacing-lg);
+  }
+}

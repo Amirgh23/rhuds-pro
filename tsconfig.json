@@ -25,6 +25,7 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "baseUrl": ".",
+    "skipDefaultLibCheck": true,
     "paths": {
       "@rhuds/core": ["packages/core/src"],
       "@rhuds/components": ["packages/components/src"],

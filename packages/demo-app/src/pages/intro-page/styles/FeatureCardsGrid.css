@@ -1,0 +1,233 @@
+/**
+ * FeatureCardsGrid Component Styles
+ *
+ * Styles for responsive grid container with:
+ * - Responsive column layout (3 desktop, 2 tablet, 1 mobile)
+ * - Consistent spacing and alignment
+ * - Staggered animation sequencing
+ * - GPU-accelerated animations
+ * - Accessibility features
+ */
+
+/* ============================================================================
+   Grid Container
+   ========================================================================== */
+
+.feature-cards-grid {
+  /* Layout */
+  display: grid;
+  grid-template-columns: repeat(var(--grid-columns, 1), 1fr);
+  gap: var(--gap-size, 16px);
+  width: 100%;
+  max-width: 100%;
+
+  /* Spacing */
+  padding: 0;
+  margin: 0;
+
+  /* Responsive padding */
+  @media (max-width: 767px) {
+    padding: 0 var(--mobile-padding, 16px);
+    gap: 16px;
+  }
+
+  @media (min-width: 768px) and (max-width: 1023px) {
+    padding: 0 var(--tablet-padding, 24px);
+    gap: 20px;
+  }
+
+  @media (min-width: 1024px) {
+    padding: 0 var(--desktop-padding, 32px);
+    gap: 24px;
+  }
+
+  /* GPU acceleration */
+  will-change: contents;
+  contain: layout style paint;
+}
+
+/* ============================================================================
+   Grid Item (Card Wrapper)
+   ========================================================================== */
+
+.feature-cards-grid__item {
+  /* Layout */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: stretch;
+  width: 100%;
+  height: 100%;
+  min-height: 280px;
+
+  /* Responsive minimum height */
+  @media (max-width: 767px) {
+    min-height: 260px;
+  }
+
+  @media (min-width: 768px) and (max-width: 1023px) {
+    min-height: 280px;
+  }
+
+  @media (min-width: 1024px) {
+    min-height: 300px;
+  }
+
+  /* GPU acceleration */
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+/* ============================================================================
+   Responsive Grid Layout
+   ========================================================================== */
+
+/* Mobile: 1 column */
+@media (max-width: 767px) {
+  .feature-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .feature-cards-grid__item {
+    min-height: 260px;
+  }
+}
+
+/* Tablet: 2 columns */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .feature-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .feature-cards-grid__item {
+    min-height: 280px;
+  }
+}
+
+/* Desktop: 3 columns */
+@media (min-width: 1024px) {
+  .feature-cards-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+
+  .feature-cards-grid__item {
+    min-height: 300px;
+  }
+}
+
+/* Large Desktop: 3 columns with max-width */
+@media (min-width: 1440px) {
+  .feature-cards-grid {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+}
+
+/* ============================================================================
+   Animation Sequencing
+   ========================================================================== */
+
+.feature-cards-grid__item {
+  /* Staggered animation */
+  animation: gridItemFadeIn 0.6s ease-out forwards;
+  opacity: 0;
+
+  /* Transitions */
+  transition: all 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* GPU acceleration */
+  will-change: opacity, transform;
+}
+
+/* Stagger animation for each item */
+.feature-cards-grid__item:nth-child(1) {
+  animation-delay: var(--card-delay-1, 0ms);
+}
+
+.feature-cards-grid__item:nth-child(2) {
+  animation-delay: var(--card-delay-2, 150ms);
+}
+
+.feature-cards-grid__item:nth-child(3) {
+  animation-delay: var(--card-delay-3, 300ms);
+}
+
+.feature-cards-grid__item:nth-child(4) {
+  animation-delay: var(--card-delay-4, 450ms);
+}
+
+.feature-cards-grid__item:nth-child(5) {
+  animation-delay: var(--card-delay-5, 600ms);
+}
+
+.feature-cards-grid__item:nth-child(6) {
+  animation-delay: var(--card-delay-6, 750ms);
+}
+
+/* ============================================================================
+   Animations
+   ========================================================================== */
+
+@keyframes gridItemFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ============================================================================
+   Accessibility
+   ========================================================================== */
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .feature-cards-grid__item {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .feature-cards-grid__item {
+    transition: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: more) {
+  .feature-cards-grid {
+    gap: calc(var(--gap-size, 16px) + 4px);
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .feature-cards-grid {
+    gap: calc(var(--gap-size, 16px) + 4px);
+  }
+
+  .feature-cards-grid__item {
+    min-height: 280px;
+  }
+}
+
+/* ============================================================================
+   Print Styles
+   ========================================================================== */
+
+@media print {
+  .feature-cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .feature-cards-grid__item {
+    page-break-inside: avoid;
+  }
+}

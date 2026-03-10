@@ -1,6 +1,6 @@
 
 > @rhuds/frames@0.1.0 test C:\Users\a.ghafarian\Desktop\Luminos HUD\packages\frames
-> vitest run "--run"
+> vitest run
 
 
 [31m⎯⎯⎯⎯⎯⎯[1m[7m Unhandled Error [27m[22m⎯⎯⎯⎯⎯⎯⎯[39m
@@ -16,3 +16,4 @@ SyntaxError: The requested module 'vite' does not provide an export named 'parse
 
 
 
+ ELIFECYCLE  Test failed. See above for more details.

@@ -3,7 +3,7 @@
  * Provides parent-child animator relationships and state propagation
  */
 
-import React, { createContext, useContext, useMemo } from 'react';
+import React, { createContext, useContext, useMemo, type ReactNode } from 'react';
 
 /**
  * Animator control interface
@@ -48,7 +48,7 @@ export function useAnimatorDepth(): number {
  */
 interface AnimatorProviderProps {
   control: AnimatorControl;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export const AnimatorProvider: React.FC<AnimatorProviderProps> = ({ control, children }) => {

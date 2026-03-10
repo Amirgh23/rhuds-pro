@@ -38,13 +38,7 @@ export interface SpatialConfig {
 /**
  * Audio effect types
  */
-export type AudioEffectType =
-  | 'reverb'
-  | 'delay'
-  | 'distortion'
-  | 'filter'
-  | 'compressor'
-  | 'eq';
+export type AudioEffectType = 'reverb' | 'delay' | 'distortion' | 'filter' | 'compressor' | 'eq';
 
 /**
  * Filter types
@@ -89,7 +83,7 @@ export interface DelayEffect extends AudioEffect {
  */
 export interface FilterEffect extends AudioEffect {
   type: 'filter';
-  params: {
+  params?: {
     filterType?: FilterType;
     frequency?: number;
     Q?: number;

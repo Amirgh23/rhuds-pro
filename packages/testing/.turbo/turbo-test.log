@@ -1,6 +1,6 @@
 
 > @rhuds/testing@0.1.0 test C:\Users\a.ghafarian\Desktop\Luminos HUD\packages\testing
-> vitest run "--run"
+> vitest run
 
 
 [31m⎯⎯⎯⎯⎯⎯[1m[7m Unhandled Error [27m[22m⎯⎯⎯⎯⎯⎯⎯[39m

@@ -3,7 +3,7 @@
  * React context provider for bleep manager
  */
 
-import React, { createContext, useContext, useMemo, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useMemo, type ReactNode, useEffect } from 'react';
 import { BleepManager, BleepManagerConfig } from './types';
 import { createBleepManager } from './BleepManager';
 

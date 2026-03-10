@@ -1,0 +1,179 @@
+/* Typography System - Monospace with Responsive Scaling */
+
+/* Base Typography */
+body {
+  font-family: var(--font-family-mono);
+  font-size: clamp(14px, 2vw, 18px);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  background-color: var(--color-background);
+}
+
+/* Headings */
+h1 {
+  font-family: var(--font-family-mono);
+  font-size: clamp(40px, 8vw, 72px);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  line-height: 1.2;
+  margin: 0;
+  text-shadow: 0 0 20px rgba(41, 242, 223, 0.6);
+  filter: drop-shadow(0 0 20px var(--color-glow-cyan));
+}
+
+h2 {
+  font-family: var(--font-family-mono);
+  font-size: clamp(28px, 5vw, 48px);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  line-height: 1.3;
+  margin: 0;
+  filter: drop-shadow(0 0 15px var(--color-glow-cyan));
+}
+
+h3 {
+  font-family: var(--font-family-mono);
+  font-size: clamp(20px, 3vw, 32px);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  line-height: 1.4;
+  margin: 0;
+  filter: drop-shadow(0 0 10px var(--color-glow-cyan));
+}
+
+h4 {
+  font-family: var(--font-family-mono);
+  font-size: clamp(16px, 2.5vw, 24px);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  line-height: 1.4;
+  margin: 0;
+}
+
+h5 {
+  font-family: var(--font-family-mono);
+  font-size: clamp(14px, 2vw, 20px);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+h6 {
+  font-family: var(--font-family-mono);
+  font-size: clamp(12px, 1.5vw, 16px);
+  font-weight: 600;
+  color: var(--color-text-tertiary);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Paragraph */
+p {
+  font-family: var(--font-family-mono);
+  font-size: clamp(14px, 2vw, 18px);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Small Text */
+small {
+  font-family: var(--font-family-mono);
+  font-size: clamp(12px, 1.5vw, 14px);
+  color: var(--color-text-tertiary);
+  line-height: 1.5;
+}
+
+/* Caption */
+.caption {
+  font-family: var(--font-family-mono);
+  font-size: clamp(12px, 1.5vw, 14px);
+  color: var(--color-text-tertiary);
+  line-height: 1.5;
+}
+
+/* Links */
+a {
+  font-family: var(--font-family-mono);
+  color: var(--color-text-primary);
+  text-decoration: none;
+  transition: all var(--animation-duration-normal) var(--animation-easing-ease-in-out);
+}
+
+a:hover {
+  color: var(--color-secondary);
+  filter: drop-shadow(0 0 10px var(--color-glow-magenta));
+}
+
+a:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Code */
+code {
+  font-family: var(--font-family-mono);
+  font-size: 0.9em;
+  color: var(--color-accent-green);
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+pre {
+  font-family: var(--font-family-mono);
+  font-size: clamp(12px, 1.5vw, 14px);
+  color: var(--color-text-secondary);
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: var(--spacing-md);
+  border-radius: 4px;
+  overflow-x: auto;
+  line-height: 1.5;
+}
+
+/* Strong */
+strong {
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+/* Emphasis */
+em {
+  font-style: italic;
+  color: var(--color-text-secondary);
+}
+
+/* Blockquote */
+blockquote {
+  font-family: var(--font-family-mono);
+  font-size: clamp(14px, 2vw, 18px);
+  color: var(--color-text-tertiary);
+  border-left: 3px solid var(--color-primary);
+  padding-left: var(--spacing-md);
+  margin: 0;
+  font-style: italic;
+}
+
+/* List Items */
+li {
+  font-family: var(--font-family-mono);
+  font-size: clamp(14px, 2vw, 18px);
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+}
+
+/* Responsive Typography Adjustments */
+@media (max-width: 767px) {
+  h1 {
+    text-shadow: 0 0 15px rgba(41, 242, 223, 0.5);
+  }
+
+  h2 {
+    filter: drop-shadow(0 0 12px var(--color-glow-cyan));
+  }
+
+  h3 {
+    filter: drop-shadow(0 0 8px var(--color-glow-cyan));
+  }
+}

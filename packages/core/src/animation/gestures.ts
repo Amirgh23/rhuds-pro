@@ -3,7 +3,7 @@
  * Drag, swipe, pinch, and rotate gesture support
  */
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 
 /**
  * Drag gesture configuration
@@ -309,10 +309,7 @@ export function useRotate(config: RotateConfig = {}) {
       if (event.touches.length === 2) {
         const touch1 = event.touches[0];
         const touch2 = event.touches[1];
-        const angle = Math.atan2(
-          touch2.clientY - touch1.clientY,
-          touch2.clientX - touch1.clientX
-        );
+        const angle = Math.atan2(touch2.clientY - touch1.clientY, touch2.clientX - touch1.clientX);
         initialAngleRef.current = angle;
         setIsRotating(true);
         config.onRotateStart?.();

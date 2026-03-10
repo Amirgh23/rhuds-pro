@@ -1,0 +1,334 @@
+/**
+ * FeatureCard Component Styles
+ * 
+ * Styles for individual feature cards with:
+ * - Animated frames with glow effects
+ * - Hover effects (scale, glow intensity increase)
+ * - Responsive design for mobile/tablet/desktop
+ * - Accessibility features (focus indicators, contrast)
+ */
+
+/* ============================================================================
+   Feature Card Container
+   ========================================================================== */
+
+.feature-card {
+  /* Layout */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-height: 280px;
+
+  /* Animation */
+  animation: fadeInScale 0.8s ease-out forwards;
+  opacity: 0;
+
+  /* Transitions */
+  transition:
+    transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1),
+    filter 300ms ease-out;
+
+  /* GPU acceleration */
+  will-change: transform, filter;
+  transform: translateZ(0);
+
+  /* Accessibility */
+  outline: none;
+}
+
+/* Hover state */
+.feature-card:hover {
+  transform: scale(1.05);
+  filter: drop-shadow(0 0 30px rgba(41, 242, 223, 1));
+}
+
+/* Focus state for keyboard navigation */
+.feature-card:focus-within {
+  outline: 2px solid rgba(41, 242, 223, 1);
+  outline-offset: 4px;
+}
+
+/* ============================================================================
+   Frame Wrapper
+   ========================================================================== */
+
+.feature-card__frame-wrapper {
+  /* Layout */
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  /* Padding for frame content */
+  padding: 24px 20px;
+
+  /* Responsive padding */
+  @media (max-width: 767px) {
+    padding: 16px 12px;
+  }
+
+  @media (min-width: 768px) and (max-width: 1023px) {
+    padding: 20px 16px;
+  }
+
+  @media (min-width: 1024px) {
+    padding: 24px 20px;
+  }
+}
+
+/* ============================================================================
+   Frame SVG
+   ========================================================================== */
+
+.feature-card__frame {
+  /* Layout */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  /* Styling */
+  color: rgba(41, 242, 223, 1);
+
+  /* Glow effect */
+  filter: drop-shadow(0 0 12px rgba(41, 242, 223, 0.6));
+
+  /* Transitions */
+  transition:
+    color 300ms ease-out,
+    filter 300ms ease-out;
+
+  /* GPU acceleration */
+  will-change: filter;
+}
+
+/* Hover state - increase glow */
+.feature-card:hover .feature-card__frame {
+  color: rgba(41, 242, 223, 1);
+  filter: drop-shadow(0 0 20px rgba(41, 242, 223, 0.9));
+}
+
+/* ============================================================================
+   Content Container
+   ========================================================================== */
+
+.feature-card__content {
+  /* Layout */
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+
+  /* Spacing */
+  gap: 12px;
+
+  /* Text alignment */
+  text-align: center;
+
+  /* Responsive gap */
+  @media (max-width: 767px) {
+    gap: 8px;
+  }
+
+  @media (min-width: 768px) {
+    gap: 12px;
+  }
+}
+
+/* ============================================================================
+   Icon/Badge
+   ========================================================================== */
+
+.feature-card__icon {
+  /* Layout */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+
+  /* Styling */
+  color: rgba(41, 242, 223, 1);
+  font-size: 24px;
+
+  /* Responsive sizing */
+  @media (max-width: 767px) {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+
+  @media (min-width: 768px) and (max-width: 1023px) {
+    width: 44px;
+    height: 44px;
+    font-size: 22px;
+  }
+
+  @media (min-width: 1024px) {
+    width: 48px;
+    height: 48px;
+    font-size: 24px;
+  }
+}
+
+/* ============================================================================
+   Title
+   ========================================================================== */
+
+.feature-card__title {
+  /* Typography */
+  font-family: monospace;
+  font-size: clamp(18px, 3vw, 22px);
+  font-weight: 600;
+  color: rgba(41, 242, 223, 1);
+
+  /* Spacing */
+  margin: 0;
+  padding: 0;
+
+  /* Glow effect */
+  text-shadow: 0 0 10px rgba(41, 242, 223, 0.4);
+
+  /* Transitions */
+  transition:
+    text-shadow 300ms ease-out,
+    color 300ms ease-out;
+
+  /* Responsive sizing */
+  @media (max-width: 767px) {
+    font-size: clamp(16px, 2.5vw, 20px);
+  }
+
+  @media (min-width: 768px) and (max-width: 1023px) {
+    font-size: clamp(18px, 2.8vw, 21px);
+  }
+
+  @media (min-width: 1024px) {
+    font-size: clamp(18px, 3vw, 22px);
+  }
+}
+
+/* Hover state - enhance glow */
+.feature-card:hover .feature-card__title {
+  text-shadow: 0 0 15px rgba(41, 242, 223, 0.7);
+}
+
+/* ============================================================================
+   Description
+   ========================================================================== */
+
+.feature-card__description {
+  /* Typography */
+  font-family: monospace;
+  font-size: clamp(14px, 2vw, 16px);
+  font-weight: 400;
+  color: rgba(41, 242, 223, 0.7);
+  line-height: 1.5;
+
+  /* Spacing */
+  margin: 0;
+  padding: 0;
+
+  /* Responsive sizing */
+  @media (max-width: 767px) {
+    font-size: clamp(13px, 1.8vw, 15px);
+    line-height: 1.4;
+  }
+
+  @media (min-width: 768px) and (max-width: 1023px) {
+    font-size: clamp(14px, 1.9vw, 16px);
+    line-height: 1.5;
+  }
+
+  @media (min-width: 1024px) {
+    font-size: clamp(14px, 2vw, 16px);
+    line-height: 1.5;
+  }
+}
+
+/* ============================================================================
+   Animations
+   ========================================================================== */
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ============================================================================
+   Accessibility
+   ========================================================================== */
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .feature-card {
+    animation: none;
+    opacity: 1;
+  }
+
+  .feature-card,
+  .feature-card__frame,
+  .feature-card__title,
+  .feature-card__description {
+    transition: none;
+  }
+
+  .feature-card:hover {
+    transform: none;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: more) {
+  .feature-card__title {
+    text-shadow: 0 0 8px rgba(41, 242, 223, 0.8);
+  }
+
+  .feature-card:hover .feature-card__title {
+    text-shadow: 0 0 12px rgba(41, 242, 223, 1);
+  }
+
+  .feature-card__frame {
+    filter: drop-shadow(0 0 16px rgba(41, 242, 223, 0.8));
+  }
+
+  .feature-card:hover .feature-card__frame {
+    filter: drop-shadow(0 0 24px rgba(41, 242, 223, 1));
+  }
+}
+
+/* Dark mode (already dark by default, but explicit for clarity) */
+@media (prefers-color-scheme: dark) {
+  .feature-card {
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .feature-card {
+    /* Slightly larger touch targets */
+    min-height: 300px;
+  }
+
+  .feature-card:active {
+    transform: scale(1.03);
+  }
+}

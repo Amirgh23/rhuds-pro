@@ -1,6 +1,6 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import { resolve } from 'path'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import { resolve } from 'path';
 
 export default defineConfig({
   plugins: [react()],
@@ -13,15 +13,20 @@ export default defineConfig({
       '@rhuds/backgrounds': resolve(__dirname, '../backgrounds/src'),
       '@rhuds/frames': resolve(__dirname, '../frames/src'),
       '@rhuds/webgl': resolve(__dirname, '../webgl/src'),
-    }
+    },
   },
   server: {
     port: 3001,
     strictPort: false,
-    host: true
+    host: true,
   },
   build: {
     outDir: 'dist',
-    sourcemap: true
-  }
-})
+    sourcemap: true,
+  },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: ['./vitest.setup.ts'],
+  },
+});

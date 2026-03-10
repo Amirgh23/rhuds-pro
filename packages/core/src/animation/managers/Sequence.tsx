@@ -15,9 +15,9 @@ export const Sequence: React.FC<{ children: React.ReactNode; onComplete?: () => 
   children,
   onComplete,
 }) => {
-  const childArray = React.Children.toArray(children);
-  const [activeIndex, setActiveIndex] = React.useState(0);
-  const [completedIndices, setCompletedIndices] = React.useState<Set<number>>(new Set());
+  const childArray = Children.toArray(children);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [completedIndices, setCompletedIndices] = useState<Set<number>>(new Set());
 
   // Handle animation completion
   const handleAnimationComplete = (index: number) => {
@@ -37,7 +37,7 @@ export const Sequence: React.FC<{ children: React.ReactNode; onComplete?: () => 
   };
 
   // Reset when children change
-  React.useEffect(() => {
+  useEffect(() => {
     setActiveIndex(0);
     setCompletedIndices(new Set());
   }, [children]);

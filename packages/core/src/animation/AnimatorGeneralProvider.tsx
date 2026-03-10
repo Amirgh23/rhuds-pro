@@ -3,7 +3,7 @@
  * Global animation configuration provider
  */
 
-import React, { createContext, useContext, useMemo, ReactNode } from 'react';
+import React, { createContext, useContext, useMemo, type ReactNode } from 'react';
 import { AnimatorSystemConfig } from './types';
 import { createAnimatorSystem, getAnimatorSystemConfig } from './createAnimatorSystem';
 

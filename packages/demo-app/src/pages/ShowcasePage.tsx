@@ -1,17 +1,89 @@
 ﻿import React, { useState, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@rhuds/core';
 import { AnimatedBackground } from '../components/AnimatedBackground';
 import {
-  Text, Button, HudButton, GlitchButton, Icon, Input, HackerInput, AiHudInput, HoloGlitchInput, HoloInput, FuturisticInput, Select, Grid, Stack, HudBox, HudFrame, GlitchFrame,
-  Checkbox, HoloCheckbox, RadioGroup, Switch, Tabs, Pagination, Table,
-  Modal, Dialog, Notification, GradientAlert, useHudToast, Tooltip, Popover, Dropdown,
-  Accordion, Stepper, Carousel, Slider, DatePicker, ColorPicker,
-  FileUpload, Chart, DataGrid, Tree, CyberCard, GlitchProfileCard, RadarHud, PipBoy, AbstergoLoader, HeartRateLoader, HackerLoader, GlitchRadio, Navbar, Sidebar, Breadcrumb,
-  Menu, CodeEditor, RichTextEditor, GlitchLoginForm, NeonRadio,
-  HudTableBasic, HudTableBorderless, HudTableHoverable, HudTableStriped, HudTableDark, HudTableBordered, HudTableContextual, HudTableCaption, HudTableSmall, HudTableResponsive,
-  HudInput, HudTextarea, HudSelect, HudRange, HudCheckbox, HudRadio, HudSwitch, HudFile,
-  HudFormGrid, HudFormHelpText, HudInputGroup, HudFormFeedback, HudInputValidated, HudSelectValidated, HudTextareaValidated,
+  Text,
+  Button,
+  HudButton,
+  GlitchButton,
+  Icon,
+  Input,
+  HackerInput,
+  AiHudInput,
+  HoloGlitchInput,
+  HoloInput,
+  FuturisticInput,
+  Select,
+  Grid,
+  Stack,
+  HudBox,
+  HudFrame,
+  GlitchFrame,
+  Checkbox,
+  HoloCheckbox,
+  RadioGroup,
+  Switch,
+  Tabs,
+  Pagination,
+  Table,
+  Modal,
+  Dialog,
+  Notification,
+  GradientAlert,
+  useHudToast,
+  Tooltip,
+  Popover,
+  Dropdown,
+  Accordion,
+  Stepper,
+  Carousel,
+  Slider,
+  DatePicker,
+  ColorPicker,
+  FileUpload,
+  Chart,
+  DataGrid,
+  Tree,
+  CyberCard,
+  GlitchProfileCard,
+  RadarHud,
+  PipBoy,
+  AbstergoLoader,
+  HeartRateLoader,
+  HackerLoader,
+  GlitchRadio,
+  Sidebar,
+  Breadcrumb,
+  Menu,
+  CodeEditor,
+  RichTextEditor,
+  GlitchLoginForm,
+  NeonRadio,
+  HudTableBasic,
+  HudTableBorderless,
+  HudTableHoverable,
+  HudTableStriped,
+  HudTableDark,
+  HudTableBordered,
+  HudTableContextual,
+  HudTableCaption,
+  HudTableSmall,
+  HudTableResponsive,
+  HudInput,
+  HudTextarea,
+  HudSelect,
+  HudRange,
+  HudCheckbox,
+  HudRadio,
+  HudSwitch,
+  HudFile,
+  HudFormGrid,
+  HudFormHelpText,
+  HudInputGroup,
+  HudFormFeedback,
+  HudInputValidated,
+  HudSelectValidated,
+  HudTextareaValidated,
 } from '@rhuds/components';
 import {
   GridLines,
@@ -39,11 +111,10 @@ import {
 } from '@rhuds/frames';
 
 export const ShowcasePage: React.FC = () => {
-  const navigate = useNavigate();
   const theme = useTheme();
   const { showToast } = useHudToast();
   const [activeTab, setActiveTab] = useState(0);
-  
+
   // Form states
   const [inputValue, setInputValue] = useState('');
   const [selectValue, setSelectValue] = useState('');
@@ -57,7 +128,7 @@ export const ShowcasePage: React.FC = () => {
   const [dateValue, setDateValue] = useState(new Date());
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [hudBoxAnimated, setHudBoxAnimated] = useState(true);
-  
+
   // UI states
   const [currentPage, setCurrentPage] = useState(1);
   const [modalOpen, setModalOpen] = useState(false);
@@ -88,9 +159,12 @@ export const ShowcasePage: React.FC = () => {
       label: 'Root',
       children: [
         { key: '1-1', id: '1-1', label: 'Child 1' },
-        { key: '1-2', id: '1-2', label: 'Child 2', children: [
-          { key: '1-2-1', id: '1-2-1', label: 'Grandchild' },
-        ]},
+        {
+          key: '1-2',
+          id: '1-2',
+          label: 'Child 2',
+          children: [{ key: '1-2-1', id: '1-2-1', label: 'Grandchild' }],
+        },
       ],
     },
   ];
@@ -125,7 +199,10 @@ export const ShowcasePage: React.FC = () => {
               <Button variant="success">Success</Button>
             </Stack>
             <div style={{ marginTop: '1rem' }}>
-              <Text variant="caption" style={{ display: 'block', marginBottom: '0.5rem', color: '#29F2DF' }}>
+              <Text
+                variant="caption"
+                style={{ display: 'block', marginBottom: '0.5rem', color: '#29F2DF' }}
+              >
                 HUD Button Style:
               </Text>
               <Stack direction="row" gap="1rem" style={{ flexWrap: 'wrap' }}>
@@ -135,7 +212,10 @@ export const ShowcasePage: React.FC = () => {
               </Stack>
             </div>
             <div style={{ marginTop: '1rem' }}>
-              <Text variant="caption" style={{ display: 'block', marginBottom: '0.5rem', color: '#29F2DF' }}>
+              <Text
+                variant="caption"
+                style={{ display: 'block', marginBottom: '0.5rem', color: '#29F2DF' }}
+              >
                 Glitch Button Style:
               </Text>
               <Stack direction="row" gap="1rem" style={{ flexWrap: 'wrap' }}>
@@ -154,62 +234,72 @@ export const ShowcasePage: React.FC = () => {
           <ComponentSection title="4. Input">
             <Stack direction="column" gap="2rem" style={{ alignItems: 'flex-start' }}>
               <div style={{ width: '100%', maxWidth: '500px' }}>
-                <Text variant="caption" style={{ display: 'block', marginBottom: '0.5rem', color: '#ffffff' }}>
+                <Text
+                  variant="caption"
+                  style={{ display: 'block', marginBottom: '0.5rem', color: '#ffffff' }}
+                >
                   Standard Input:
                 </Text>
-                <Input placeholder="Enter text..." value={inputValue} onChange={(e) => setInputValue(e.target.value)} />
+                <Input
+                  placeholder="Enter text..."
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                />
               </div>
-              
+
               <div style={{ width: '100%', maxWidth: '500px' }}>
-                <Text variant="caption" style={{ display: 'block', marginBottom: '0.5rem', color: '#29F2DF' }}>
+                <Text
+                  variant="caption"
+                  style={{ display: 'block', marginBottom: '0.5rem', color: '#29F2DF' }}
+                >
                   Hacker Input (terminal style):
                 </Text>
                 <HackerInput label="Input Command" placeholder="Enter command..." />
               </div>
-              
+
               <div style={{ width: '100%', maxWidth: '500px' }}>
-                <Text variant="caption" style={{ display: 'block', marginBottom: '0.5rem', color: '#1C7FA6' }}>
+                <Text
+                  variant="caption"
+                  style={{ display: 'block', marginBottom: '0.5rem', color: '#1C7FA6' }}
+                >
                   AI HUD Input (with animated grid):
                 </Text>
-                <AiHudInput 
-                  placeholder="Ask AI anything..." 
+                <AiHudInput
+                  placeholder="Ask AI anything..."
                   color="#1C7FA6"
                   onSubmit={(value) => console.log('Submitted:', value)}
                 />
               </div>
-              
+
               <div style={{ marginTop: '3rem', width: '100%', maxWidth: '500px' }}>
-                <Text variant="caption" style={{ display: 'block', marginBottom: '2rem', color: '#29F2DF' }}>
+                <Text
+                  variant="caption"
+                  style={{ display: 'block', marginBottom: '2rem', color: '#29F2DF' }}
+                >
                   Holo Glitch Input (holographic with glitch effects):
                 </Text>
-                <HoloGlitchInput 
-                  label="ACCESS_CODE"
-                  color="#29F2DF"
-                  secondaryColor="#EF3EF1"
-                />
+                <HoloGlitchInput label="ACCESS_CODE" color="#29F2DF" secondaryColor="#EF3EF1" />
               </div>
-              
+
               <div style={{ marginTop: '3rem', width: '100%', maxWidth: '500px' }}>
-                <Text variant="caption" style={{ display: 'block', marginBottom: '2rem', color: '#29F2DF' }}>
+                <Text
+                  variant="caption"
+                  style={{ display: 'block', marginBottom: '2rem', color: '#29F2DF' }}
+                >
                   HoloInput (advanced holographic interface with HUD colors):
                 </Text>
-                <HoloInput 
-                  label="First Name"
-                  placeholder="John"
-                  status="Ready for input"
-                />
+                <HoloInput label="First Name" placeholder="John" status="Ready for input" />
               </div>
-              
+
               <div style={{ marginTop: '3rem', width: '100%', maxWidth: '500px' }}>
-                <Text variant="caption" style={{ display: 'block', marginBottom: '2rem', color: '#29F2DF' }}>
+                <Text
+                  variant="caption"
+                  style={{ display: 'block', marginBottom: '2rem', color: '#29F2DF' }}
+                >
                   FuturisticInput (geometric HUD design with animated borders):
                 </Text>
                 <div style={{ display: 'flex', justifyContent: 'center' }}>
-                  <FuturisticInput 
-                    enterLabel="ENTER"
-                    nameLabel="DATA"
-                    placeholder=""
-                  />
+                  <FuturisticInput enterLabel="ENTER" nameLabel="DATA" placeholder="" />
                 </div>
               </div>
             </Stack>
@@ -239,7 +329,14 @@ export const ShowcasePage: React.FC = () => {
             </Grid>
           </ComponentSection>
           <ComponentSection title="7. Container">
-            <div style={{ maxWidth: '600px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
+            <div
+              style={{
+                maxWidth: '600px',
+                margin: '0 auto',
+                width: '100%',
+                boxSizing: 'border-box',
+              }}
+            >
               <Text>Content in container</Text>
             </div>
           </ComponentSection>
@@ -252,17 +349,26 @@ export const ShowcasePage: React.FC = () => {
           </ComponentSection>
           <ComponentSection title="8b. HudBox (Asymmetrical) - 18 Variants with Colors">
             <Stack direction="column" gap="2rem">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+              <div
+                style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}
+              >
                 <HudButton onClick={() => setHudBoxAnimated(!hudBoxAnimated)}>
                   {hudBoxAnimated ? '⏸ Static Border' : '▶ Animated Border'}
                 </HudButton>
-                <Text color="#29F2DF">
-                  Mode: {hudBoxAnimated ? 'Animated' : 'Static'}
-                </Text>
+                <Text color="#29F2DF">Mode: {hudBoxAnimated ? 'Animated' : 'Static'}</Text>
               </div>
               <div>
-                <Text color="#29F2DF" style={{ marginBottom: '1rem' }}>Standard & Geometric:</Text>
-                <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+                <Text color="#29F2DF" style={{ marginBottom: '1rem' }}>
+                  Standard & Geometric:
+                </Text>
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: '2rem',
+                    flexWrap: 'wrap',
+                    justifyContent: 'center',
+                  }}
+                >
                   <HudBox variant="compact" color="#29F2DF" animated={hudBoxAnimated}>
                     <Text color="#29F2DF">Compact</Text>
                   </HudBox>
@@ -296,25 +402,62 @@ export const ShowcasePage: React.FC = () => {
                 </div>
               </div>
               <div>
-                <Text color="#29F2DF" style={{ marginBottom: '1rem' }}>Portrait (Vertical):</Text>
-                <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'flex-start' }}>
+                <Text color="#29F2DF" style={{ marginBottom: '1rem' }}>
+                  Portrait (Vertical):
+                </Text>
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: '2rem',
+                    flexWrap: 'wrap',
+                    justifyContent: 'center',
+                    alignItems: 'flex-start',
+                  }}
+                >
                   <HudBox variant="portrait-tall" color="#29F2DF" animated={hudBoxAnimated}>
-                    <Text color="#29F2DF" align="center">Portrait<br/>Tall</Text>
+                    <Text color="#29F2DF" align="center">
+                      Portrait
+                      <br />
+                      Tall
+                    </Text>
                   </HudBox>
                   <HudBox variant="portrait-slim" color="#EF3EF1" animated={hudBoxAnimated}>
-                    <Text color="#EF3EF1" align="center">Portrait<br/>Slim</Text>
+                    <Text color="#EF3EF1" align="center">
+                      Portrait
+                      <br />
+                      Slim
+                    </Text>
                   </HudBox>
                   <HudBox variant="portrait-card" color="#29F2DF" animated={hudBoxAnimated}>
-                    <Text color="#29F2DF" align="center">Portrait<br/>Card</Text>
+                    <Text color="#29F2DF" align="center">
+                      Portrait
+                      <br />
+                      Card
+                    </Text>
                   </HudBox>
                   <HudBox variant="portrait-banner" color="#EF3EF1" animated={hudBoxAnimated}>
-                    <Text color="#EF3EF1" align="center">Portrait<br/>Banner</Text>
+                    <Text color="#EF3EF1" align="center">
+                      Portrait
+                      <br />
+                      Banner
+                    </Text>
                   </HudBox>
                 </div>
               </div>
               <div>
-                <Text color="#29F2DF" style={{ marginBottom: '1rem' }}>Landscape (Horizontal):</Text>
-                <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
+                <Text color="#29F2DF" style={{ marginBottom: '1rem' }}>
+                  Landscape (Horizontal):
+                </Text>
+                <div
+                  style={{
+                    display: 'flex',
+                    gap: '2rem',
+                    flexWrap: 'wrap',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    flexDirection: 'column',
+                  }}
+                >
                   <HudBox variant="landscape-wide" color="#29F2DF" animated={hudBoxAnimated}>
                     <Text color="#29F2DF">Landscape Wide</Text>
                   </HudBox>
@@ -332,8 +475,17 @@ export const ShowcasePage: React.FC = () => {
             </Stack>
           </ComponentSection>
           <ComponentSection title="8c. HudFrame (Complex Frame with Neon Lines)">
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', alignItems: 'center' }}>
-              <div style={{ width: '100%', maxWidth: '800px', height: '400px', position: 'relative' }}>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '2rem',
+                alignItems: 'center',
+              }}
+            >
+              <div
+                style={{ width: '100%', maxWidth: '800px', height: '400px', position: 'relative' }}
+              >
                 <HudFrame
                   header={{
                     title: 'SYSTEM STATUS',
@@ -347,13 +499,15 @@ export const ShowcasePage: React.FC = () => {
                       HUD FRAME DEMO
                     </Text>
                     <Text color="#ffffff" variant="body">
-                      Complex HUD frame with 18 decorative neon lines around the edges.
-                      Perfect for dashboards and monitoring interfaces.
+                      Complex HUD frame with 18 decorative neon lines around the edges. Perfect for
+                      dashboards and monitoring interfaces.
                     </Text>
                   </div>
                 </HudFrame>
               </div>
-              <div style={{ width: '100%', maxWidth: '800px', height: '400px', position: 'relative' }}>
+              <div
+                style={{ width: '100%', maxWidth: '800px', height: '400px', position: 'relative' }}
+              >
                 <HudFrame
                   header={{
                     title: 'DATA ANALYSIS',
@@ -367,8 +521,8 @@ export const ShowcasePage: React.FC = () => {
                       MAGENTA THEME
                     </Text>
                     <Text color="#ffffff" variant="body">
-                      HudFrame supports custom colors for all neon lines and title box.
-                      Includes animated glow effects.
+                      HudFrame supports custom colors for all neon lines and title box. Includes
+                      animated glow effects.
                     </Text>
                   </div>
                 </HudFrame>
@@ -376,19 +530,33 @@ export const ShowcasePage: React.FC = () => {
             </div>
           </ComponentSection>
           <ComponentSection title="8d. GlitchFrame (Glitch Style Frame)">
-            <div style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '1rem', justifyContent: 'center' }}>
+            <div
+              style={{
+                marginBottom: '2rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '1rem',
+                justifyContent: 'center',
+              }}
+            >
               <HudButton onClick={() => setHudBoxAnimated(!hudBoxAnimated)}>
                 {hudBoxAnimated ? '⏸ Static Frame' : '▶ Animated Frame'}
               </HudButton>
-              <Text color="#29F2DF">
-                Mode: {hudBoxAnimated ? 'Animated' : 'Static'}
-              </Text>
+              <Text color="#29F2DF">Mode: {hudBoxAnimated ? 'Animated' : 'Static'}</Text>
             </div>
-            
+
             <Text color="#29F2DF" style={{ marginBottom: '1rem', textAlign: 'center' }}>
               Large Size (600px):
             </Text>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', alignItems: 'center', marginBottom: '3rem' }}>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '2rem',
+                alignItems: 'center',
+                marginBottom: '3rem',
+              }}
+            >
               <div style={{ width: '100%', maxWidth: '600px', minHeight: '300px' }}>
                 <GlitchFrame animated={hudBoxAnimated}>
                   <div style={{ padding: '2rem', textAlign: 'center' }}>
@@ -396,8 +564,8 @@ export const ShowcasePage: React.FC = () => {
                       GLITCH FRAME
                     </Text>
                     <Text color="#ffffff" variant="body" style={{ marginBottom: '1rem' }}>
-                      Asymmetrical frame with glitch effects and animated shadows.
-                      Perfect for login forms and authentication interfaces.
+                      Asymmetrical frame with glitch effects and animated shadows. Perfect for login
+                      forms and authentication interfaces.
                     </Text>
                     <Text color="#29F2DF" variant="body">
                       Toggle animation on/off with the button above.
@@ -410,7 +578,15 @@ export const ShowcasePage: React.FC = () => {
             <Text color="#29F2DF" style={{ marginBottom: '1rem', textAlign: 'center' }}>
               Medium Size (450px):
             </Text>
-            <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '3rem' }}>
+            <div
+              style={{
+                display: 'flex',
+                gap: '2rem',
+                justifyContent: 'center',
+                flexWrap: 'wrap',
+                marginBottom: '3rem',
+              }}
+            >
               <div style={{ width: '100%', maxWidth: '450px', minHeight: '250px' }}>
                 <GlitchFrame animated={hudBoxAnimated} width="450px" height="250px">
                   <div style={{ padding: '1.5rem', textAlign: 'center' }}>
@@ -440,7 +616,15 @@ export const ShowcasePage: React.FC = () => {
             <Text color="#29F2DF" style={{ marginBottom: '1rem', textAlign: 'center' }}>
               Small Size (300px):
             </Text>
-            <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '3rem' }}>
+            <div
+              style={{
+                display: 'flex',
+                gap: '2rem',
+                justifyContent: 'center',
+                flexWrap: 'wrap',
+                marginBottom: '3rem',
+              }}
+            >
               <div style={{ width: '100%', maxWidth: '300px', minHeight: '200px' }}>
                 <GlitchFrame animated={hudBoxAnimated} width="300px" height="200px">
                   <div style={{ padding: '1rem', textAlign: 'center' }}>
@@ -482,7 +666,15 @@ export const ShowcasePage: React.FC = () => {
             <Text color="#29F2DF" style={{ marginBottom: '1rem', textAlign: 'center' }}>
               Tall/Portrait Layout (300px × 500px):
             </Text>
-            <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center', flexWrap: 'wrap', marginBottom: '3rem' }}>
+            <div
+              style={{
+                display: 'flex',
+                gap: '2rem',
+                justifyContent: 'center',
+                flexWrap: 'wrap',
+                marginBottom: '3rem',
+              }}
+            >
               <div style={{ width: '100%', maxWidth: '300px', minHeight: '500px' }}>
                 <GlitchFrame animated={hudBoxAnimated} width="300px" height="500px">
                   <div style={{ padding: '1.5rem', textAlign: 'center' }}>
@@ -535,10 +727,23 @@ export const ShowcasePage: React.FC = () => {
       content: (
         <Stack direction="column" gap="2rem">
           <ComponentSection title="HUD Form Elements - 14 Sections from Reference Site">
-            <Stack direction="column" gap="2.5rem">
+            <Stack
+              direction="column"
+              gap="2.5rem"
+              style={{ minHeight: '3500px', overflow: 'visible', maxHeight: 'none' }}
+            >
               {/* 1. Form Controls */}
               <div>
-                <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 700, fontSize: '1.1rem', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+                <Text
+                  color="#29F2DF"
+                  style={{
+                    marginBottom: '1rem',
+                    fontWeight: 700,
+                    fontSize: '1.1rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '1.5px',
+                  }}
+                >
                   1. FORM CONTROLS
                 </Text>
                 <Stack direction="column" gap="1rem">
@@ -550,7 +755,16 @@ export const ShowcasePage: React.FC = () => {
 
               {/* 2. Sizing */}
               <div>
-                <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 700, fontSize: '1.1rem', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+                <Text
+                  color="#29F2DF"
+                  style={{
+                    marginBottom: '1rem',
+                    fontWeight: 700,
+                    fontSize: '1.1rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '1.5px',
+                  }}
+                >
                   2. SIZING
                 </Text>
                 <Stack direction="column" gap="1rem">
@@ -562,15 +776,37 @@ export const ShowcasePage: React.FC = () => {
 
               {/* 3. Readonly */}
               <div>
-                <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 700, fontSize: '1.1rem', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+                <Text
+                  color="#29F2DF"
+                  style={{
+                    marginBottom: '1rem',
+                    fontWeight: 700,
+                    fontSize: '1.1rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '1.5px',
+                  }}
+                >
                   3. READONLY
                 </Text>
-                <HudInput placeholder="Readonly input here..." readonly value="Readonly input here..." />
+                <HudInput
+                  placeholder="Readonly input here..."
+                  readonly
+                  value="Readonly input here..."
+                />
               </div>
 
               {/* 4. Readonly Plain Text */}
               <div>
-                <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 700, fontSize: '1.1rem', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+                <Text
+                  color="#29F2DF"
+                  style={{
+                    marginBottom: '1rem',
+                    fontWeight: 700,
+                    fontSize: '1.1rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '1.5px',
+                  }}
+                >
                   4. READONLY PLAIN TEXT
                 </Text>
                 <HudInput plaintext readonly value="email@example.com" />
@@ -578,7 +814,16 @@ export const ShowcasePage: React.FC = () => {
 
               {/* 5. Range Inputs */}
               <div>
-                <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 700, fontSize: '1.1rem', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+                <Text
+                  color="#29F2DF"
+                  style={{
+                    marginBottom: '1rem',
+                    fontWeight: 700,
+                    fontSize: '1.1rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '1.5px',
+                  }}
+                >
                   5. RANGE INPUTS
                 </Text>
                 <HudRange min={0} max={100} value={50} />
@@ -586,7 +831,16 @@ export const ShowcasePage: React.FC = () => {
 
               {/* 6. Checkboxes */}
               <div>
-                <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 700, fontSize: '1.1rem', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+                <Text
+                  color="#29F2DF"
+                  style={{
+                    marginBottom: '1rem',
+                    fontWeight: 700,
+                    fontSize: '1.1rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '1.5px',
+                  }}
+                >
                   6. CHECKBOXES
                 </Text>
                 <Stack direction="column" gap="0.5rem">
@@ -598,19 +852,42 @@ export const ShowcasePage: React.FC = () => {
 
               {/* 7. Radios */}
               <div>
-                <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 700, fontSize: '1.1rem', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+                <Text
+                  color="#29F2DF"
+                  style={{
+                    marginBottom: '1rem',
+                    fontWeight: 700,
+                    fontSize: '1.1rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '1.5px',
+                  }}
+                >
                   7. RADIOS
                 </Text>
                 <Stack direction="column" gap="0.5rem">
                   <HudRadio label="Default radio button" name="radio1" checked={false} />
                   <HudRadio label="Checked radio button" name="radio1" checked={true} />
-                  <HudRadio label="Disabled radio button" name="radio1" checked={false} disabled={true} />
+                  <HudRadio
+                    label="Disabled radio button"
+                    name="radio1"
+                    checked={false}
+                    disabled={true}
+                  />
                 </Stack>
               </div>
 
               {/* 8. Switches */}
               <div>
-                <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 700, fontSize: '1.1rem', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+                <Text
+                  color="#29F2DF"
+                  style={{
+                    marginBottom: '1rem',
+                    fontWeight: 700,
+                    fontSize: '1.1rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '1.5px',
+                  }}
+                >
                   8. SWITCHES
                 </Text>
                 <Stack direction="column" gap="0.5rem">
@@ -622,28 +899,47 @@ export const ShowcasePage: React.FC = () => {
 
               {/* 9. File Browser */}
               <div>
-                <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 700, fontSize: '1.1rem', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+                <Text
+                  color="#29F2DF"
+                  style={{
+                    marginBottom: '1rem',
+                    fontWeight: 700,
+                    fontSize: '1.1rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '1.5px',
+                  }}
+                >
                   9. FILE BROWSER
                 </Text>
                 <Stack direction="column" gap="1rem">
                   <div>
-                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>Default file input</Text>
+                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>
+                      Default file input
+                    </Text>
                     <HudFile />
                   </div>
                   <div>
-                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>Multiple files input</Text>
+                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>
+                      Multiple files input
+                    </Text>
                     <HudFile multiple />
                   </div>
                   <div>
-                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>Disabled file input</Text>
+                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>
+                      Disabled file input
+                    </Text>
                     <HudFile disabled />
                   </div>
                   <div>
-                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>Small file input</Text>
+                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>
+                      Small file input
+                    </Text>
                     <HudFile size="sm" />
                   </div>
                   <div>
-                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>Large file input</Text>
+                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>
+                      Large file input
+                    </Text>
                     <HudFile size="lg" />
                   </div>
                 </Stack>
@@ -651,20 +947,35 @@ export const ShowcasePage: React.FC = () => {
 
               {/* 10. Form Grid */}
               <div>
-                <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 700, fontSize: '1.1rem', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+                <Text
+                  color="#29F2DF"
+                  style={{
+                    marginBottom: '1rem',
+                    fontWeight: 700,
+                    fontSize: '1.1rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '1.5px',
+                  }}
+                >
                   10. FORM GRID
                 </Text>
                 <HudFormGrid>
                   <div>
-                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>First Name</Text>
+                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>
+                      First Name
+                    </Text>
                     <HudInput placeholder="First name" />
                   </div>
                   <div>
-                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>Last Name</Text>
+                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>
+                      Last Name
+                    </Text>
                     <HudInput placeholder="Last name" />
                   </div>
                   <div>
-                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>Email</Text>
+                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>
+                      Email
+                    </Text>
                     <HudInput type="email" placeholder="Email" />
                   </div>
                 </HudFormGrid>
@@ -672,38 +983,65 @@ export const ShowcasePage: React.FC = () => {
 
               {/* 11. Help Text */}
               <div>
-                <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 700, fontSize: '1.1rem', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+                <Text
+                  color="#29F2DF"
+                  style={{
+                    marginBottom: '1rem',
+                    fontWeight: 700,
+                    fontSize: '1.1rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '1.5px',
+                  }}
+                >
                   11. HELP TEXT
                 </Text>
                 <div>
-                  <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>Password</Text>
+                  <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>
+                    Password
+                  </Text>
                   <HudInput type="password" placeholder="Password" />
                   <HudFormHelpText>
-                    Your password must be 8-20 characters long, contain letters and numbers, and must not contain spaces, special characters, or emoji.
+                    Your password must be 8-20 characters long, contain letters and numbers, and
+                    must not contain spaces, special characters, or emoji.
                   </HudFormHelpText>
                 </div>
               </div>
 
               {/* 12. Input Group */}
               <div>
-                <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 700, fontSize: '1.1rem', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+                <Text
+                  color="#29F2DF"
+                  style={{
+                    marginBottom: '1rem',
+                    fontWeight: 700,
+                    fontSize: '1.1rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '1.5px',
+                  }}
+                >
                   12. INPUT GROUP
                 </Text>
                 <Stack direction="column" gap="1rem">
                   <div>
-                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>Username</Text>
+                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>
+                      Username
+                    </Text>
                     <HudInputGroup prepend="@">
                       <HudInput placeholder="Username" />
                     </HudInputGroup>
                   </div>
                   <div>
-                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>Website</Text>
+                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>
+                      Website
+                    </Text>
                     <HudInputGroup append=".com">
                       <HudInput placeholder="Website" />
                     </HudInputGroup>
                   </div>
                   <div>
-                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>Price</Text>
+                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>
+                      Price
+                    </Text>
                     <HudInputGroup prepend="$" append=".00">
                       <HudInput placeholder="0" type="number" />
                     </HudInputGroup>
@@ -713,39 +1051,53 @@ export const ShowcasePage: React.FC = () => {
 
               {/* 13. Validation */}
               <div>
-                <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 700, fontSize: '1.1rem', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+                <Text
+                  color="#29F2DF"
+                  style={{
+                    marginBottom: '1rem',
+                    fontWeight: 700,
+                    fontSize: '1.1rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '1.5px',
+                  }}
+                >
                   13. VALIDATION
                 </Text>
                 <Stack direction="column" gap="1rem">
                   <div>
-                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>Invalid Input</Text>
-                    <HudInputValidated 
-                      placeholder="Enter name" 
-                      isInvalid={true} 
+                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>
+                      Invalid Input
+                    </Text>
+                    <HudInputValidated
+                      placeholder="Enter name"
+                      isInvalid={true}
                       feedback="Please provide a name"
                     />
                   </div>
                   <div>
-                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>Valid Input</Text>
-                    <HudInputValidated 
-                      placeholder="Username" 
+                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>
+                      Valid Input
+                    </Text>
+                    <HudInputValidated
+                      placeholder="Username"
                       value="john_doe"
-                      isValid={true} 
+                      isValid={true}
                       feedback="Looks good!"
                     />
                   </div>
                   <div>
-                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>Invalid Select</Text>
-                    <HudSelectValidated 
-                      isInvalid={true} 
-                      feedback="Please select a valid state"
-                    />
+                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>
+                      Invalid Select
+                    </Text>
+                    <HudSelectValidated isInvalid={true} feedback="Please select a valid state" />
                   </div>
                   <div>
-                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>Invalid Textarea</Text>
-                    <HudTextareaValidated 
-                      placeholder="Enter message" 
-                      isInvalid={true} 
+                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>
+                      Invalid Textarea
+                    </Text>
+                    <HudTextareaValidated
+                      placeholder="Enter message"
+                      isInvalid={true}
                       feedback="Please enter a message in the textarea"
                       rows={3}
                     />
@@ -755,24 +1107,37 @@ export const ShowcasePage: React.FC = () => {
 
               {/* 14. Validation with Tooltips */}
               <div>
-                <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 700, fontSize: '1.1rem', textTransform: 'uppercase', letterSpacing: '1.5px' }}>
+                <Text
+                  color="#29F2DF"
+                  style={{
+                    marginBottom: '1rem',
+                    fontWeight: 700,
+                    fontSize: '1.1rem',
+                    textTransform: 'uppercase',
+                    letterSpacing: '1.5px',
+                  }}
+                >
                   14. VALIDATION (TOOLTIP)
                 </Text>
-                <Stack direction="column" gap="1rem">
+                <Stack direction="column" gap="2rem">
                   <div>
-                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>Tooltip Valid</Text>
-                    <HudInputValidated 
-                      placeholder="Username" 
+                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>
+                      Tooltip Valid
+                    </Text>
+                    <HudInputValidated
+                      placeholder="Username"
                       value="valid_user"
-                      isValid={true} 
+                      isValid={true}
                       feedback="Looks good!"
                       feedbackTooltip={true}
                     />
                   </div>
                   <div>
-                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>Tooltip Invalid</Text>
-                    <HudSelectValidated 
-                      isInvalid={true} 
+                    <Text color="#fff" style={{ marginBottom: '0.5rem', fontSize: '0.9rem' }}>
+                      Tooltip Invalid
+                    </Text>
+                    <HudSelectValidated
+                      isInvalid={true}
                       feedback="Please select a valid state"
                       feedbackTooltip={true}
                     />
@@ -785,8 +1150,22 @@ export const ShowcasePage: React.FC = () => {
             <Checkbox checked={checkboxValue} onChange={setCheckboxValue} label="Accept" />
           </ComponentSection>
           <ComponentSection title="9b. HoloCheckbox (3D)">
-            <div style={{ display: 'flex', justifyContent: 'center', background: 'rgba(41, 242, 223, 0.08)', backdropFilter: 'blur(10px)', border: '1px solid rgba(41, 242, 223, 0.2)', padding: '1rem', borderRadius: '8px' }}>
-              <HoloCheckbox checked={holoCheckboxValue} onChange={setHoloCheckboxValue} label="HOLOGRAPHIC" />
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                background: 'rgba(41, 242, 223, 0.08)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(41, 242, 223, 0.2)',
+                padding: '1rem',
+                borderRadius: '8px',
+              }}
+            >
+              <HoloCheckbox
+                checked={holoCheckboxValue}
+                onChange={setHoloCheckboxValue}
+                label="HOLOGRAPHIC"
+              />
             </div>
           </ComponentSection>
           <ComponentSection title="10. RadioGroup">
@@ -830,7 +1209,18 @@ export const ShowcasePage: React.FC = () => {
             <FileUpload onUpload={setUploadedFiles} accept=".jpg,.png" />
           </ComponentSection>
           <ComponentSection title="16. GlitchLoginForm (HUD Style)">
-            <div style={{ display: 'flex', justifyContent: 'center', background: 'rgba(41, 242, 223, 0.08)', backdropFilter: 'blur(10px)', border: '1px solid rgba(41, 242, 223, 0.2)', padding: '2rem', borderRadius: '8px', minHeight: '400px' }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                background: 'rgba(41, 242, 223, 0.08)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(41, 242, 223, 0.2)',
+                padding: '2rem',
+                borderRadius: '8px',
+                minHeight: '400px',
+              }}
+            >
               <GlitchLoginForm
                 onSubmit={(username, password) => {
                   console.log('Login:', { username, password });
@@ -848,7 +1238,17 @@ export const ShowcasePage: React.FC = () => {
             </div>
           </ComponentSection>
           <ComponentSection title="17. NeonRadio (HUD Style with Neon Effects)">
-            <div style={{ display: 'flex', justifyContent: 'center', background: 'rgba(41, 242, 223, 0.08)', backdropFilter: 'blur(10px)', border: '1px solid rgba(41, 242, 223, 0.2)', padding: '3rem', borderRadius: '8px' }}>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                background: 'rgba(41, 242, 223, 0.08)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(41, 242, 223, 0.2)',
+                padding: '3rem',
+                borderRadius: '8px',
+              }}
+            >
               <NeonRadio
                 options={[
                   { value: 'option1', label: 'OPTION 1' },
@@ -865,32 +1265,48 @@ export const ShowcasePage: React.FC = () => {
       ),
     },
     {
-      label: 'Navigation (6)',
+      label: 'Navigation (5)',
       content: (
         <Stack direction="column" gap="2rem">
-          <ComponentSection title="18. Navbar">
-            <div style={{ position: 'relative', border: '1px solid rgba(41, 242, 223, 0.3)', borderRadius: '4px', overflow: 'hidden' }}>
-              <Navbar items={navItems} position="static" />
-            </div>
-          </ComponentSection>
-          <ComponentSection title="19. Sidebar">
-            <div style={{ height: '300px', position: 'relative', border: '1px solid rgba(41, 242, 223, 0.3)', borderRadius: '4px', overflow: 'hidden' }}>
+          <ComponentSection title="18. Sidebar">
+            <div
+              style={{
+                height: '300px',
+                position: 'relative',
+                border: '1px solid rgba(41, 242, 223, 0.3)',
+                borderRadius: '4px',
+                overflow: 'hidden',
+              }}
+            >
               <Sidebar items={navItems} position="relative" />
             </div>
           </ComponentSection>
-          <ComponentSection title="20. Breadcrumb">
+          <ComponentSection title="19. Breadcrumb">
             <Breadcrumb items={breadcrumbItems} />
           </ComponentSection>
           <ComponentSection title="20. Tabs">
             <Text>Tabs component (you're using it now!)</Text>
           </ComponentSection>
           <ComponentSection title="21. Menu">
-            <div style={{ position: 'relative', minHeight: '200px', padding: '1rem', border: '1px solid rgba(41, 242, 223, 0.3)', borderRadius: '4px' }}>
+            <div
+              style={{
+                position: 'relative',
+                minHeight: '200px',
+                padding: '1rem',
+                border: '1px solid rgba(41, 242, 223, 0.3)',
+                borderRadius: '4px',
+              }}
+            >
               <Menu items={navItems} />
             </div>
           </ComponentSection>
           <ComponentSection title="22. Pagination">
-            <Pagination total={100} perPage={10} currentPage={currentPage} onPageChange={setCurrentPage} />
+            <Pagination
+              total={100}
+              perPage={10}
+              currentPage={currentPage}
+              onPageChange={setCurrentPage}
+            />
           </ComponentSection>
         </Stack>
       ),
@@ -911,84 +1327,250 @@ export const ShowcasePage: React.FC = () => {
           </ComponentSection>
           <ComponentSection title="23b. HUD Table Variants (10 Types)">
             <Stack direction="column" gap="2rem">
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(500px, 1fr))', gap: '2rem' }}>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(500px, 1fr))',
+                  gap: '2rem',
+                }}
+              >
                 <div>
-                  <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 600, fontSize: '0.95rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                  <Text
+                    color="#29F2DF"
+                    style={{
+                      marginBottom: '1rem',
+                      fontWeight: 600,
+                      fontSize: '0.95rem',
+                      textTransform: 'uppercase',
+                      letterSpacing: '1px',
+                    }}
+                  >
                     1. Basic Table
                   </Text>
-                  <div style={{ padding: '1rem', background: 'rgba(41, 242, 223, 0.05)', borderRadius: '4px', border: '1px solid rgba(41, 242, 223, 0.2)' }}>
+                  <div
+                    style={{
+                      padding: '1rem',
+                      background: 'rgba(41, 242, 223, 0.05)',
+                      borderRadius: '4px',
+                      border: '1px solid rgba(41, 242, 223, 0.2)',
+                    }}
+                  >
                     <HudTableBasic color="#29F2DF" />
                   </div>
                 </div>
                 <div>
-                  <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 600, fontSize: '0.95rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                  <Text
+                    color="#29F2DF"
+                    style={{
+                      marginBottom: '1rem',
+                      fontWeight: 600,
+                      fontSize: '0.95rem',
+                      textTransform: 'uppercase',
+                      letterSpacing: '1px',
+                    }}
+                  >
                     2. Dark Table
                   </Text>
-                  <div style={{ padding: '1rem', background: 'rgba(41, 242, 223, 0.05)', borderRadius: '4px', border: '1px solid rgba(41, 242, 223, 0.2)' }}>
+                  <div
+                    style={{
+                      padding: '1rem',
+                      background: 'rgba(41, 242, 223, 0.05)',
+                      borderRadius: '4px',
+                      border: '1px solid rgba(41, 242, 223, 0.2)',
+                    }}
+                  >
                     <HudTableDark color="#29F2DF" />
                   </div>
                 </div>
                 <div>
-                  <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 600, fontSize: '0.95rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                  <Text
+                    color="#29F2DF"
+                    style={{
+                      marginBottom: '1rem',
+                      fontWeight: 600,
+                      fontSize: '0.95rem',
+                      textTransform: 'uppercase',
+                      letterSpacing: '1px',
+                    }}
+                  >
                     3. Bordered Table
                   </Text>
-                  <div style={{ padding: '1rem', background: 'rgba(41, 242, 223, 0.05)', borderRadius: '4px', border: '1px solid rgba(41, 242, 223, 0.2)' }}>
+                  <div
+                    style={{
+                      padding: '1rem',
+                      background: 'rgba(41, 242, 223, 0.05)',
+                      borderRadius: '4px',
+                      border: '1px solid rgba(41, 242, 223, 0.2)',
+                    }}
+                  >
                     <HudTableBordered color="#29F2DF" />
                   </div>
                 </div>
                 <div>
-                  <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 600, fontSize: '0.95rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                  <Text
+                    color="#29F2DF"
+                    style={{
+                      marginBottom: '1rem',
+                      fontWeight: 600,
+                      fontSize: '0.95rem',
+                      textTransform: 'uppercase',
+                      letterSpacing: '1px',
+                    }}
+                  >
                     4. Borderless Table
                   </Text>
-                  <div style={{ padding: '1rem', background: 'rgba(41, 242, 223, 0.05)', borderRadius: '4px', border: '1px solid rgba(41, 242, 223, 0.2)' }}>
+                  <div
+                    style={{
+                      padding: '1rem',
+                      background: 'rgba(41, 242, 223, 0.05)',
+                      borderRadius: '4px',
+                      border: '1px solid rgba(41, 242, 223, 0.2)',
+                    }}
+                  >
                     <HudTableBorderless color="#29F2DF" />
                   </div>
                 </div>
                 <div>
-                  <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 600, fontSize: '0.95rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                  <Text
+                    color="#29F2DF"
+                    style={{
+                      marginBottom: '1rem',
+                      fontWeight: 600,
+                      fontSize: '0.95rem',
+                      textTransform: 'uppercase',
+                      letterSpacing: '1px',
+                    }}
+                  >
                     5. Striped Table
                   </Text>
-                  <div style={{ padding: '1rem', background: 'rgba(41, 242, 223, 0.05)', borderRadius: '4px', border: '1px solid rgba(41, 242, 223, 0.2)' }}>
+                  <div
+                    style={{
+                      padding: '1rem',
+                      background: 'rgba(41, 242, 223, 0.05)',
+                      borderRadius: '4px',
+                      border: '1px solid rgba(41, 242, 223, 0.2)',
+                    }}
+                  >
                     <HudTableStriped color="#29F2DF" />
                   </div>
                 </div>
                 <div>
-                  <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 600, fontSize: '0.95rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                  <Text
+                    color="#29F2DF"
+                    style={{
+                      marginBottom: '1rem',
+                      fontWeight: 600,
+                      fontSize: '0.95rem',
+                      textTransform: 'uppercase',
+                      letterSpacing: '1px',
+                    }}
+                  >
                     6. Hoverable Table
                   </Text>
-                  <div style={{ padding: '1rem', background: 'rgba(41, 242, 223, 0.05)', borderRadius: '4px', border: '1px solid rgba(41, 242, 223, 0.2)' }}>
+                  <div
+                    style={{
+                      padding: '1rem',
+                      background: 'rgba(41, 242, 223, 0.05)',
+                      borderRadius: '4px',
+                      border: '1px solid rgba(41, 242, 223, 0.2)',
+                    }}
+                  >
                     <HudTableHoverable color="#29F2DF" />
                   </div>
                 </div>
                 <div>
-                  <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 600, fontSize: '0.95rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                  <Text
+                    color="#29F2DF"
+                    style={{
+                      marginBottom: '1rem',
+                      fontWeight: 600,
+                      fontSize: '0.95rem',
+                      textTransform: 'uppercase',
+                      letterSpacing: '1px',
+                    }}
+                  >
                     7. Small Table
                   </Text>
-                  <div style={{ padding: '1rem', background: 'rgba(41, 242, 223, 0.05)', borderRadius: '4px', border: '1px solid rgba(41, 242, 223, 0.2)' }}>
+                  <div
+                    style={{
+                      padding: '1rem',
+                      background: 'rgba(41, 242, 223, 0.05)',
+                      borderRadius: '4px',
+                      border: '1px solid rgba(41, 242, 223, 0.2)',
+                    }}
+                  >
                     <HudTableSmall color="#29F2DF" />
                   </div>
                 </div>
                 <div>
-                  <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 600, fontSize: '0.95rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                  <Text
+                    color="#29F2DF"
+                    style={{
+                      marginBottom: '1rem',
+                      fontWeight: 600,
+                      fontSize: '0.95rem',
+                      textTransform: 'uppercase',
+                      letterSpacing: '1px',
+                    }}
+                  >
                     8. Contextual Table
                   </Text>
-                  <div style={{ padding: '1rem', background: 'rgba(41, 242, 223, 0.05)', borderRadius: '4px', border: '1px solid rgba(41, 242, 223, 0.2)' }}>
+                  <div
+                    style={{
+                      padding: '1rem',
+                      background: 'rgba(41, 242, 223, 0.05)',
+                      borderRadius: '4px',
+                      border: '1px solid rgba(41, 242, 223, 0.2)',
+                    }}
+                  >
                     <HudTableContextual color="#29F2DF" />
                   </div>
                 </div>
                 <div>
-                  <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 600, fontSize: '0.95rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                  <Text
+                    color="#29F2DF"
+                    style={{
+                      marginBottom: '1rem',
+                      fontWeight: 600,
+                      fontSize: '0.95rem',
+                      textTransform: 'uppercase',
+                      letterSpacing: '1px',
+                    }}
+                  >
                     9. Table with Caption
                   </Text>
-                  <div style={{ padding: '1rem', background: 'rgba(41, 242, 223, 0.05)', borderRadius: '4px', border: '1px solid rgba(41, 242, 223, 0.2)' }}>
+                  <div
+                    style={{
+                      padding: '1rem',
+                      background: 'rgba(41, 242, 223, 0.05)',
+                      borderRadius: '4px',
+                      border: '1px solid rgba(41, 242, 223, 0.2)',
+                    }}
+                  >
                     <HudTableCaption color="#29F2DF" />
                   </div>
                 </div>
                 <div>
-                  <Text color="#29F2DF" style={{ marginBottom: '1rem', fontWeight: 600, fontSize: '0.95rem', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                  <Text
+                    color="#29F2DF"
+                    style={{
+                      marginBottom: '1rem',
+                      fontWeight: 600,
+                      fontSize: '0.95rem',
+                      textTransform: 'uppercase',
+                      letterSpacing: '1px',
+                    }}
+                  >
                     10. Responsive Table
                   </Text>
-                  <div style={{ padding: '1rem', background: 'rgba(41, 242, 223, 0.05)', borderRadius: '4px', border: '1px solid rgba(41, 242, 223, 0.2)' }}>
+                  <div
+                    style={{
+                      padding: '1rem',
+                      background: 'rgba(41, 242, 223, 0.05)',
+                      borderRadius: '4px',
+                      border: '1px solid rgba(41, 242, 223, 0.2)',
+                    }}
+                  >
                     <HudTableResponsive color="#29F2DF" />
                   </div>
                 </div>
@@ -1010,13 +1592,17 @@ export const ShowcasePage: React.FC = () => {
             <Tree nodes={treeData} onNodeClick={(node) => console.log(node)} />
           </ComponentSection>
           <ComponentSection title="25b. CyberCard (HUD Style)">
-            <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <div
+              style={{ display: 'flex', gap: '2rem', justifyContent: 'center', flexWrap: 'wrap' }}
+            >
               <CyberCard title="PROFILE" footer="Social Links" />
               <CyberCard title="CONTACT" footer="Connect" />
             </div>
           </ComponentSection>
           <ComponentSection title="25c. GlitchProfileCard (GitHub Style)">
-            <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <div
+              style={{ display: 'flex', gap: '2rem', justifyContent: 'center', flexWrap: 'wrap' }}
+            >
               <GlitchProfileCard
                 username="octo_cat"
                 title="UI DEVELOPER"
@@ -1034,18 +1620,32 @@ export const ShowcasePage: React.FC = () => {
             </div>
           </ComponentSection>
           <ComponentSection title="25d. RadarHud (Military Radar Display)">
-            <Text variant="body" style={{ marginBottom: '1.5rem', color: '#EF3EF1', textAlign: 'center' }}>
+            <Text
+              variant="body"
+              style={{ marginBottom: '1.5rem', color: '#EF3EF1', textAlign: 'center' }}
+            >
               Military-style radar with rotating scanner, target dots, and coordinate display
             </Text>
-            <div style={{ display: 'flex', gap: '3rem', justifyContent: 'center', flexWrap: 'wrap', padding: '2rem', background: 'rgba(41, 242, 223, 0.05)', borderRadius: '8px', border: '1px solid rgba(41, 242, 223, 0.2)' }}>
-              <RadarHud 
+            <div
+              style={{
+                display: 'flex',
+                gap: '3rem',
+                justifyContent: 'center',
+                flexWrap: 'wrap',
+                padding: '2rem',
+                background: 'rgba(41, 242, 223, 0.05)',
+                borderRadius: '8px',
+                border: '1px solid rgba(41, 242, 223, 0.2)',
+              }}
+            >
+              <RadarHud
                 coordinates={`34° 36' 30" S; 58° 22' 16" O`}
                 depth="DEPT - 600"
                 wind="WIND - 54.3"
                 color="#EF3EF1"
                 size={280}
               />
-              <RadarHud 
+              <RadarHud
                 coordinates={`51° 30' 26" N; 0° 7' 39" W`}
                 depth="DEPT - 1200"
                 wind="WIND - 32.8"
@@ -1055,12 +1655,24 @@ export const ShowcasePage: React.FC = () => {
             </div>
           </ComponentSection>
           <ComponentSection title="25e. PipBoy (Fallout Style Terminal)">
-            <Text variant="body" style={{ marginBottom: '1.5rem', color: '#29F2DF', textAlign: 'center' }}>
-              Pip-Boy inspired terminal with CRT effects, tabs (STAT/INV/DATA), and retro-futuristic design.
-              All data is controlled via the data prop object.
+            <Text
+              variant="body"
+              style={{ marginBottom: '1.5rem', color: '#29F2DF', textAlign: 'center' }}
+            >
+              Pip-Boy inspired terminal with CRT effects, tabs (STAT/INV/DATA), and retro-futuristic
+              design. All data is controlled via the data prop object.
             </Text>
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem', background: 'rgba(41, 242, 223, 0.05)', borderRadius: '8px', border: '1px solid rgba(41, 242, 223, 0.2)' }}>
-              <PipBoy 
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                padding: '2rem',
+                background: 'rgba(41, 242, 223, 0.05)',
+                borderRadius: '8px',
+                border: '1px solid rgba(41, 242, 223, 0.2)',
+              }}
+            >
+              <PipBoy
                 color="#29F2DF"
                 data={{
                   hp: { current: 420, max: 500 },
@@ -1085,7 +1697,20 @@ export const ShowcasePage: React.FC = () => {
             <Text variant="h4" color="#29F2DF" style={{ marginBottom: '1rem' }}>
               AbstergoLoader (Triangular Animation)
             </Text>
-            <div style={{ display: 'flex', gap: '3rem', justifyContent: 'center', flexWrap: 'wrap', padding: '3rem', background: 'rgba(41, 242, 223, 0.08)', backdropFilter: 'blur(10px)', border: '1px solid rgba(41, 242, 223, 0.2)', borderRadius: '8px', marginBottom: '2rem' }}>
+            <div
+              style={{
+                display: 'flex',
+                gap: '3rem',
+                justifyContent: 'center',
+                flexWrap: 'wrap',
+                padding: '3rem',
+                background: 'rgba(41, 242, 223, 0.08)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(41, 242, 223, 0.2)',
+                borderRadius: '8px',
+                marginBottom: '2rem',
+              }}
+            >
               <AbstergoLoader text="Loading" size={0.8} />
               <AbstergoLoader text="Synchronization" size={1} />
               <AbstergoLoader text="Processing" size={1.2} />
@@ -1093,7 +1718,20 @@ export const ShowcasePage: React.FC = () => {
             <Text variant="h4" color="#29F2DF" style={{ marginBottom: '1rem' }}>
               HeartRateLoader (ECG Animation)
             </Text>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', alignItems: 'center', padding: '3rem', background: 'rgba(41, 242, 223, 0.08)', backdropFilter: 'blur(10px)', border: '1px solid rgba(41, 242, 223, 0.2)', borderRadius: '8px', marginBottom: '2rem' }}>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '2rem',
+                alignItems: 'center',
+                padding: '3rem',
+                background: 'rgba(41, 242, 223, 0.08)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(41, 242, 223, 0.2)',
+                borderRadius: '8px',
+                marginBottom: '2rem',
+              }}
+            >
               <HeartRateLoader color="#EF3EF1" width={550} height={210} />
               <HeartRateLoader color="#29F2DF" width={400} height={150} />
               <HeartRateLoader color="#29F2DF" width={300} height={120} />
@@ -1101,12 +1739,27 @@ export const ShowcasePage: React.FC = () => {
             <Text variant="h4" color="#29F2DF" style={{ marginBottom: '1rem' }}>
               HackerLoader (Progress Bar with Glitch)
             </Text>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', alignItems: 'center', padding: '3rem', background: 'rgba(41, 242, 223, 0.08)', backdropFilter: 'blur(10px)', border: '1px solid rgba(41, 242, 223, 0.2)', borderRadius: '8px' }}>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '2rem',
+                alignItems: 'center',
+                padding: '3rem',
+                background: 'rgba(41, 242, 223, 0.08)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(41, 242, 223, 0.2)',
+                borderRadius: '8px',
+              }}
+            >
               <HackerLoader text="LOADING" color="#29F2DF" />
               <HackerLoader text="HACKING" color="#29F2DF" />
               <HackerLoader text="PROCESSING" color="#29F2DF" />
               <div style={{ marginTop: '1rem' }}>
-                <Text variant="caption" style={{ color: '#29F2DF', marginBottom: '0.5rem', display: 'block' }}>
+                <Text
+                  variant="caption"
+                  style={{ color: '#29F2DF', marginBottom: '0.5rem', display: 'block' }}
+                >
                   Static Progress (50%):
                 </Text>
                 <HackerLoader text="UPLOADING" color="#29F2DF" progress={50} />
@@ -1165,56 +1818,87 @@ export const ShowcasePage: React.FC = () => {
             </Stack>
           </ComponentSection>
           <ComponentSection title="28c. HUD Toast Notifications">
-            <Text variant="body" style={{ marginBottom: '1rem', color: '#29F2DF', textAlign: 'center' }}>
+            <Text
+              variant="body"
+              style={{ marginBottom: '1rem', color: '#29F2DF', textAlign: 'center' }}
+            >
               Click buttons to trigger toast notifications at bottom-left with HUD effects
             </Text>
-            <Stack direction="row" gap="1rem" style={{ flexWrap: 'wrap', justifyContent: 'center' }}>
-              <HudButton onClick={() => showToast({
-                type: 'success',
-                message: 'Operation Successful',
-                description: 'Your request has been processed successfully.',
-                duration: 4000,
-              })}>
+            <Stack
+              direction="row"
+              gap="1rem"
+              style={{ flexWrap: 'wrap', justifyContent: 'center' }}
+            >
+              <HudButton
+                onClick={() =>
+                  showToast({
+                    type: 'success',
+                    message: 'Operation Successful',
+                    description: 'Your request has been processed successfully.',
+                    duration: 4000,
+                  })
+                }
+              >
                 SUCCESS TOAST
               </HudButton>
-              <HudButton onClick={() => showToast({
-                type: 'warning',
-                message: 'Warning Alert',
-                description: 'Please review your settings before continuing.',
-                duration: 4000,
-              })}>
+              <HudButton
+                onClick={() =>
+                  showToast({
+                    type: 'warning',
+                    message: 'Warning Alert',
+                    description: 'Please review your settings before continuing.',
+                    duration: 4000,
+                  })
+                }
+              >
                 WARNING TOAST
               </HudButton>
-              <HudButton onClick={() => showToast({
-                type: 'error',
-                message: 'Error Occurred',
-                description: 'An error was detected during processing.',
-                duration: 4000,
-              })}>
+              <HudButton
+                onClick={() =>
+                  showToast({
+                    type: 'error',
+                    message: 'Error Occurred',
+                    description: 'An error was detected during processing.',
+                    duration: 4000,
+                  })
+                }
+              >
                 ERROR TOAST
               </HudButton>
-              <HudButton onClick={() => showToast({
-                type: 'danger',
-                message: 'Critical Alert',
-                description: 'Immediate action required to prevent system failure.',
-                duration: 4000,
-              })}>
+              <HudButton
+                onClick={() =>
+                  showToast({
+                    type: 'danger',
+                    message: 'Critical Alert',
+                    description: 'Immediate action required to prevent system failure.',
+                    duration: 4000,
+                  })
+                }
+              >
                 DANGER TOAST
               </HudButton>
-              <HudButton onClick={() => showToast({
-                type: 'info',
-                message: 'System Information',
-                description: 'New updates are available for your system.',
-                duration: 4000,
-              })}>
+              <HudButton
+                onClick={() =>
+                  showToast({
+                    type: 'info',
+                    message: 'System Information',
+                    description: 'New updates are available for your system.',
+                    duration: 4000,
+                  })
+                }
+              >
                 INFO TOAST
               </HudButton>
-              <HudButton onClick={() => showToast({
-                type: 'success',
-                message: 'Persistent Toast',
-                description: 'This toast will not auto-dismiss. Click X to close.',
-                duration: 0,
-              })}>
+              <HudButton
+                onClick={() =>
+                  showToast({
+                    type: 'success',
+                    message: 'Persistent Toast',
+                    description: 'This toast will not auto-dismiss. Click X to close.',
+                    duration: 0,
+                  })
+                }
+              >
                 PERSISTENT TOAST
               </HudButton>
             </Stack>
@@ -1274,8 +1958,22 @@ export const ShowcasePage: React.FC = () => {
           <ComponentSection title="34. Carousel">
             <Carousel
               items={[
-                { key: '1', content: <div style={{ padding: '2rem', background: 'rgba(41, 242, 223, 0.1)' }}>Slide 1</div> },
-                { key: '2', content: <div style={{ padding: '2rem', background: 'rgba(239, 62, 241, 0.1)' }}>Slide 2</div> },
+                {
+                  key: '1',
+                  content: (
+                    <div style={{ padding: '2rem', background: 'rgba(41, 242, 223, 0.1)' }}>
+                      Slide 1
+                    </div>
+                  ),
+                },
+                {
+                  key: '2',
+                  content: (
+                    <div style={{ padding: '2rem', background: 'rgba(239, 62, 241, 0.1)' }}>
+                      Slide 2
+                    </div>
+                  ),
+                },
               ]}
               currentIndex={carouselIndex}
               onIndexChange={setCarouselIndex}
@@ -1305,32 +2003,86 @@ export const ShowcasePage: React.FC = () => {
       content: (
         <Stack direction="column" gap="2rem">
           <ComponentSection title="38. GridLines">
-            <div style={{ position: 'relative', height: '200px', background: 'rgba(41, 242, 223, 0.08)', backdropFilter: 'blur(10px)', border: '1px solid rgba(41, 242, 223, 0.2)', borderRadius: '8px' }}>
+            <div
+              style={{
+                position: 'relative',
+                height: '200px',
+                background: 'rgba(41, 242, 223, 0.08)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(41, 242, 223, 0.2)',
+                borderRadius: '8px',
+              }}
+            >
               <GridLines width={600} height={200} />
             </div>
           </ComponentSection>
           <ComponentSection title="39. Dots">
-            <div style={{ position: 'relative', height: '200px', background: 'rgba(41, 242, 223, 0.08)', backdropFilter: 'blur(10px)', border: '1px solid rgba(41, 242, 223, 0.2)', borderRadius: '8px' }}>
+            <div
+              style={{
+                position: 'relative',
+                height: '200px',
+                background: 'rgba(41, 242, 223, 0.08)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(41, 242, 223, 0.2)',
+                borderRadius: '8px',
+              }}
+            >
               <Dots width={600} height={200} />
             </div>
           </ComponentSection>
           <ComponentSection title="40. Puffs">
-            <div style={{ position: 'relative', height: '200px', background: 'rgba(41, 242, 223, 0.08)', backdropFilter: 'blur(10px)', border: '1px solid rgba(41, 242, 223, 0.2)', borderRadius: '8px' }}>
+            <div
+              style={{
+                position: 'relative',
+                height: '200px',
+                background: 'rgba(41, 242, 223, 0.08)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(41, 242, 223, 0.2)',
+                borderRadius: '8px',
+              }}
+            >
               <Puffs width={600} height={200} />
             </div>
           </ComponentSection>
           <ComponentSection title="41. MovingLines">
-            <div style={{ position: 'relative', height: '200px', background: 'rgba(41, 242, 223, 0.08)', backdropFilter: 'blur(10px)', border: '1px solid rgba(41, 242, 223, 0.2)', borderRadius: '8px' }}>
+            <div
+              style={{
+                position: 'relative',
+                height: '200px',
+                background: 'rgba(41, 242, 223, 0.08)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(41, 242, 223, 0.2)',
+                borderRadius: '8px',
+              }}
+            >
               <MovingLines width={600} height={200} />
             </div>
           </ComponentSection>
           <ComponentSection title="42. Nebula">
-            <div style={{ position: 'relative', height: '200px', background: 'rgba(41, 242, 223, 0.08)', backdropFilter: 'blur(10px)', border: '1px solid rgba(41, 242, 223, 0.2)', borderRadius: '8px' }}>
+            <div
+              style={{
+                position: 'relative',
+                height: '200px',
+                background: 'rgba(41, 242, 223, 0.08)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(41, 242, 223, 0.2)',
+                borderRadius: '8px',
+              }}
+            >
               <Nebula width={600} height={200} />
             </div>
           </ComponentSection>
           <ComponentSection title="43. StarField">
-            <div style={{ position: 'relative', height: '200px', background: 'rgba(41, 242, 223, 0.08)', backdropFilter: 'blur(10px)', border: '1px solid rgba(41, 242, 223, 0.2)', borderRadius: '8px' }}>
+            <div
+              style={{
+                position: 'relative',
+                height: '200px',
+                background: 'rgba(41, 242, 223, 0.08)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(41, 242, 223, 0.2)',
+                borderRadius: '8px',
+              }}
+            >
               <StarField width={600} height={200} />
             </div>
           </ComponentSection>
@@ -1345,15 +2097,39 @@ export const ShowcasePage: React.FC = () => {
             </div>
           </ComponentSection>
           <ComponentSection title="44b. RainPattern (Matrix Rain)">
-            <div style={{ position: 'relative', height: '400px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <div
+              style={{
+                position: 'relative',
+                height: '400px',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
               <RainPattern width={600} height={400} color="#09f" speed={150} />
             </div>
           </ComponentSection>
           <ComponentSection title="44c. CircuitPattern (Circuit Board)">
-            <div style={{ position: 'relative', height: '400px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              <CircuitPattern width={600} height={400} color="rgba(34, 197, 94, 0.15)" opacity={1} />
+            <div
+              style={{
+                position: 'relative',
+                height: '400px',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}
+            >
+              <CircuitPattern
+                width={600}
+                height={400}
+                color="rgba(34, 197, 94, 0.15)"
+                opacity={1}
+              />
             </div>
-            <Text variant="caption" style={{ marginTop: '1rem', color: '#22c55e', textAlign: 'center' }}>
+            <Text
+              variant="caption"
+              style={{ marginTop: '1rem', color: '#22c55e', textAlign: 'center' }}
+            >
               Dark circuit board pattern with grid lines and connection dots
             </Text>
           </ComponentSection>
@@ -1367,115 +2143,32 @@ export const ShowcasePage: React.FC = () => {
   ];
 
   return (
-    <div style={{ 
-      padding: 0,
-      background: '#0A1225',
-      minHeight: '100vh',
-      width: '100%',
-      maxWidth: '100vw',
-      overflowX: 'hidden',
-      boxSizing: 'border-box',
-      position: 'relative',
-    }}>
-      <AnimatedBackground />
-      
-      {/* Fixed Navigation Bar */}
-      <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        height: '70px',
-        background: 'rgba(10, 18, 37, 0.9)',
-        backdropFilter: 'blur(20px)',
-        borderBottom: '2px solid rgba(41, 242, 223, 0.5)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '0 clamp(1rem, 3vw, 2rem)',
-        zIndex: 1000,
-        boxSizing: 'border-box',
-        boxShadow: '0 8px 32px rgba(41, 242, 223, 0.2)',
-      }}>
-        <Text
-          variant="h2"
-          style={{
-            color: '#29F2DF',
-            fontSize: '1.5rem',
-            fontWeight: 800,
-            textTransform: 'uppercase',
-            letterSpacing: '2px',
-            textShadow: '0 0 20px rgba(41, 242, 223, 0.8)',
-          }}
-        >
-          🎮 RHUDS Pro
-        </Text>
-        
-        <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
-          <Button
-            onClick={() => navigate('/')}
-            style={{
-              background: '#29F2DF',
-              color: '#000',
-              border: `2px solid #29F2DF`,
-              padding: '10px 20px',
-              fontSize: '0.95rem',
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              borderRadius: '4px',
-              boxShadow: '0 0 20px rgba(41, 242, 223, 0.6)',
-            }}
-          >
-            Showcase
-          </Button>
-          <Button
-            onClick={() => navigate('/playground')}
-            style={{
-              background: 'transparent',
-              color: '#29F2DF',
-              border: `2px solid #29F2DF`,
-              padding: '10px 20px',
-              fontSize: '0.95rem',
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              borderRadius: '4px',
-              boxShadow: 'none',
-            }}
-          >
-            Playground
-          </Button>
-          <Button
-            onClick={() => navigate('/docs')}
-            style={{
-              background: 'transparent',
-              color: '#29F2DF',
-              border: `2px solid #29F2DF`,
-              padding: '10px 20px',
-              fontSize: '0.95rem',
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              transition: 'all 0.3s ease',
-              borderRadius: '4px',
-              boxShadow: 'none',
-            }}
-          >
-            Documentation
-          </Button>
-        </div>
-      </div>
-      
-      <div style={{ 
-        padding: 'clamp(1rem, 3vw, 2rem) clamp(0.5rem, 2vw, 1rem)',
-        maxWidth: '1400px',
-        margin: '0 auto',
+    <div
+      style={{
+        padding: 0,
+        background: '#0A1225',
+        minHeight: '100vh',
         width: '100%',
+        maxWidth: '100vw',
+        overflowX: 'hidden',
         boxSizing: 'border-box',
         position: 'relative',
-        zIndex: 1,
-        marginTop: '70px',
-      }}>
+      }}
+    >
+      <AnimatedBackground />
+
+      <div
+        style={{
+          padding: 'clamp(1rem, 3vw, 2rem) clamp(0.5rem, 2vw, 1rem)',
+          maxWidth: '1400px',
+          margin: '0 auto',
+          width: '100%',
+          boxSizing: 'border-box',
+          position: 'relative',
+          zIndex: 1,
+          marginTop: '70px',
+        }}
+      >
         <div style={{ textAlign: 'center', marginBottom: 'clamp(2rem, 4vw, 3rem)' }}>
           <Text
             variant="h1"
@@ -1491,34 +2184,41 @@ export const ShowcasePage: React.FC = () => {
           >
             🎮 COMPONENT SHOWCASE
           </Text>
-          <Text variant="body" style={{ 
-            fontSize: 'clamp(1rem, 2vw, 1.2rem)', 
-            opacity: 0.9,
-            color: '#29F2DF',
-            textTransform: 'uppercase',
-            letterSpacing: '2px',
-          }}>
+          <Text
+            variant="body"
+            style={{
+              fontSize: 'clamp(1rem, 2vw, 1.2rem)',
+              opacity: 0.9,
+              color: '#29F2DF',
+              textTransform: 'uppercase',
+              letterSpacing: '2px',
+            }}
+          >
             51 Production-Ready Components
           </Text>
         </div>
 
-        <div style={{ 
-          width: '100%', 
-          maxWidth: '100%', 
-          boxSizing: 'border-box',
-        }}>
+        <div
+          style={{
+            width: '100%',
+            maxWidth: '100%',
+            boxSizing: 'border-box',
+          }}
+        >
           {/* Category Menu */}
-          <div style={{
-            display: 'flex',
-            gap: '0.75rem',
-            flexWrap: 'wrap',
-            justifyContent: 'center',
-            padding: '1rem',
-            background: 'rgba(41, 242, 223, 0.05)',
-            borderRadius: '8px',
-            border: '1px solid rgba(41, 242, 223, 0.2)',
-            marginBottom: '2rem',
-          }}>
+          <div
+            style={{
+              display: 'flex',
+              gap: '0.75rem',
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+              padding: '1rem',
+              background: 'rgba(41, 242, 223, 0.05)',
+              borderRadius: '8px',
+              border: '1px solid rgba(41, 242, 223, 0.2)',
+              marginBottom: '2rem',
+            }}
+          >
             {tabItems.map((item, index) => (
               <Button
                 key={index}
@@ -1543,48 +2243,28 @@ export const ShowcasePage: React.FC = () => {
           </div>
 
           {/* Content */}
-          <div style={{
-            padding: 'clamp(1rem, 3vw, 2rem)',
-            background: 'rgba(41, 242, 223, 0.03)',
-            borderRadius: '8px',
-            border: '1px solid rgba(41, 242, 223, 0.2)',
-            maxWidth: '100%',
-            boxSizing: 'border-box',
-            overflowX: 'hidden',
-          }}>
-            {activeTab === 0 && (
-              <div>{tabItems[0].content}</div>
-            )}
-            {activeTab === 1 && (
-              <div>{tabItems[1].content}</div>
-            )}
-            {activeTab === 2 && (
-              <div>{tabItems[2].content}</div>
-            )}
-            {activeTab === 3 && (
-              <div>{tabItems[3].content}</div>
-            )}
-            {activeTab === 4 && (
-              <div>{tabItems[4].content}</div>
-            )}
-            {activeTab === 5 && (
-              <div>{tabItems[5].content}</div>
-            )}
-            {activeTab === 6 && (
-              <div>{tabItems[6].content}</div>
-            )}
-            {activeTab === 7 && (
-              <div>{tabItems[7].content}</div>
-            )}
-            {activeTab === 8 && (
-              <div>{tabItems[8].content}</div>
-            )}
-            {activeTab === 9 && (
-              <div>{tabItems[9].content}</div>
-            )}
-            {activeTab === 10 && (
-              <div>{tabItems[10].content}</div>
-            )}
+          <div
+            style={{
+              padding: 'clamp(1rem, 3vw, 2rem)',
+              background: 'rgba(41, 242, 223, 0.03)',
+              borderRadius: '8px',
+              border: '1px solid rgba(41, 242, 223, 0.2)',
+              maxWidth: '100%',
+              boxSizing: 'border-box',
+              overflowX: 'hidden',
+            }}
+          >
+            {activeTab === 0 && <div>{tabItems[0].content}</div>}
+            {activeTab === 1 && <div>{tabItems[1].content}</div>}
+            {activeTab === 2 && <div>{tabItems[2].content}</div>}
+            {activeTab === 3 && <div>{tabItems[3].content}</div>}
+            {activeTab === 4 && <div>{tabItems[4].content}</div>}
+            {activeTab === 5 && <div>{tabItems[5].content}</div>}
+            {activeTab === 6 && <div>{tabItems[6].content}</div>}
+            {activeTab === 7 && <div>{tabItems[7].content}</div>}
+            {activeTab === 8 && <div>{tabItems[8].content}</div>}
+            {activeTab === 9 && <div>{tabItems[9].content}</div>}
+            {activeTab === 10 && <div>{tabItems[10].content}</div>}
           </div>
         </div>
 
@@ -1605,8 +2285,8 @@ export const ShowcasePage: React.FC = () => {
         >
           <Text
             variant="h2"
-            style={{ 
-              color: '#29F2DF', 
+            style={{
+              color: '#29F2DF',
               marginBottom: '1.5rem',
               textTransform: 'uppercase',
               letterSpacing: '2px',
@@ -1615,21 +2295,49 @@ export const ShowcasePage: React.FC = () => {
           >
             📦 COMPLETE COMPONENT LIBRARY
           </Text>
-          <Grid columns={4} gap={2} style={{ 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(min(100px, 100%), 1fr))',
-            maxWidth: '100%',
-            width: '100%',
-          }}>
+          <Grid
+            columns={4}
+            gap={2}
+            style={{
+              gridTemplateColumns: 'repeat(auto-fit, minmax(min(100px, 100%), 1fr))',
+              maxWidth: '100%',
+              width: '100%',
+            }}
+          >
             <StatCard title="5" subtitle="Basic" color={theme.currentMode.tokens.colors.primary} />
             <StatCard title="3" subtitle="Layout" color={theme.currentMode.tokens.colors.success} />
             <StatCard title="7" subtitle="Form" color={theme.currentMode.tokens.colors.secondary} />
-            <StatCard title="6" subtitle="Navigation" color={theme.currentMode.tokens.colors.warning} />
-            <StatCard title="3" subtitle="Data Display" color={theme.currentMode.tokens.colors.error} />
+            <StatCard
+              title="6"
+              subtitle="Navigation"
+              color={theme.currentMode.tokens.colors.warning}
+            />
+            <StatCard
+              title="3"
+              subtitle="Data Display"
+              color={theme.currentMode.tokens.colors.error}
+            />
             <StatCard title="4" subtitle="Feedback" color={theme.currentMode.tokens.colors.info} />
-            <StatCard title="3" subtitle="Utility" color={theme.currentMode.tokens.colors.primary} />
-            <StatCard title="5" subtitle="Advanced" color={theme.currentMode.tokens.colors.success} />
-            <StatCard title="1" subtitle="Visualization" color={theme.currentMode.tokens.colors.secondary} />
-            <StatCard title="9" subtitle="Backgrounds" color={theme.currentMode.tokens.colors.warning} />
+            <StatCard
+              title="3"
+              subtitle="Utility"
+              color={theme.currentMode.tokens.colors.primary}
+            />
+            <StatCard
+              title="5"
+              subtitle="Advanced"
+              color={theme.currentMode.tokens.colors.success}
+            />
+            <StatCard
+              title="1"
+              subtitle="Visualization"
+              color={theme.currentMode.tokens.colors.secondary}
+            />
+            <StatCard
+              title="9"
+              subtitle="Backgrounds"
+              color={theme.currentMode.tokens.colors.warning}
+            />
             <StatCard title="7" subtitle="Frames" color="#29F2DF" />
           </Grid>
           <Text
@@ -1674,8 +2382,8 @@ const ComponentSection: React.FC<{ title: string; children: React.ReactNode }> =
     >
       <Text
         variant="h3"
-        style={{ 
-          marginBottom: '1.5rem', 
+        style={{
+          marginBottom: '1.5rem',
           color: '#29F2DF',
           textTransform: 'uppercase',
           letterSpacing: '2px',
@@ -1696,33 +2404,41 @@ const StatCard: React.FC<{ title: string; subtitle: string; color: string }> = (
   subtitle,
   color,
 }) => (
-  <div style={{
-    padding: 'clamp(0.75rem, 2vw, 1.5rem)',
-    background: `linear-gradient(135deg, ${color}15, ${color}05)`,
-    border: `1px solid ${color}40`,
-    borderRadius: '4px',
-    textAlign: 'center',
-    backdropFilter: 'blur(10px)',
-    boxShadow: `0 4px 20px ${color}20`,
-    transition: 'all 0.3s ease',
-  }}>
-    <Text variant="h3" style={{ 
-      color,
-      fontSize: 'clamp(1.5rem, 3vw, 2.5rem)',
-      fontWeight: 800,
-      marginBottom: '0.5rem',
-      textShadow: `0 0 15px ${color}80`,
-    }}>
+  <div
+    style={{
+      padding: 'clamp(0.75rem, 2vw, 1.5rem)',
+      background: `linear-gradient(135deg, ${color}15, ${color}05)`,
+      border: `1px solid ${color}40`,
+      borderRadius: '4px',
+      textAlign: 'center',
+      backdropFilter: 'blur(10px)',
+      boxShadow: `0 4px 20px ${color}20`,
+      transition: 'all 0.3s ease',
+    }}
+  >
+    <Text
+      variant="h3"
+      style={{
+        color,
+        fontSize: 'clamp(1.5rem, 3vw, 2.5rem)',
+        fontWeight: 800,
+        marginBottom: '0.5rem',
+        textShadow: `0 0 15px ${color}80`,
+      }}
+    >
       {title}
     </Text>
-    <Text variant="body" style={{ 
-      color: color,
-      opacity: 0.9,
-      fontSize: 'clamp(0.75rem, 1.5vw, 1rem)',
-      textTransform: 'uppercase',
-      letterSpacing: '1px',
-      fontWeight: 600,
-    }}>
+    <Text
+      variant="body"
+      style={{
+        color: color,
+        opacity: 0.9,
+        fontSize: 'clamp(0.75rem, 1.5vw, 1rem)',
+        textTransform: 'uppercase',
+        letterSpacing: '1px',
+        fontWeight: 600,
+      }}
+    >
       {subtitle}
     </Text>
   </div>
@@ -1738,31 +2454,36 @@ const FrameCard: React.FC<{
   onReplay: () => void;
 }> = ({ title, color, children, onReplay }) => {
   return (
-    <div style={{
-      background: 'rgba(0, 10, 20, 0.6)',
-      border: `1px solid ${color}33`,
-      borderRadius: '4px',
-      padding: 'clamp(0.75rem, 2vw, 1rem)',
-      backdropFilter: 'blur(10px)',
-      boxShadow: `0 4px 20px ${color}15`,
-    }}>
-      <Text variant="caption" style={{ 
-        marginBottom: '10px', 
-        display: 'block',
-        color: color,
-        textTransform: 'uppercase',
-        letterSpacing: '1px',
-        fontSize: 'clamp(0.65rem, 1.5vw, 0.75rem)',
-        fontWeight: 600,
-      }}>
+    <div
+      style={{
+        background: 'rgba(0, 10, 20, 0.6)',
+        border: `1px solid ${color}33`,
+        borderRadius: '4px',
+        padding: 'clamp(0.75rem, 2vw, 1rem)',
+        backdropFilter: 'blur(10px)',
+        boxShadow: `0 4px 20px ${color}15`,
+      }}
+    >
+      <Text
+        variant="caption"
+        style={{
+          marginBottom: '10px',
+          display: 'block',
+          color: color,
+          textTransform: 'uppercase',
+          letterSpacing: '1px',
+          fontSize: 'clamp(0.65rem, 1.5vw, 0.75rem)',
+          fontWeight: 600,
+        }}
+      >
         {title}
       </Text>
       {children}
-      <Button 
-        onClick={onReplay} 
-        variant="secondary" 
-        style={{ 
-          width: '100%', 
+      <Button
+        onClick={onReplay}
+        variant="secondary"
+        style={{
+          width: '100%',
           fontSize: 'clamp(0.75rem, 1.8vw, 0.85rem)',
           background: `${color}1A`,
           border: `1px solid ${color}4D`,
@@ -1793,22 +2514,45 @@ const FrameCard: React.FC<{
 
 const FramesTabContent: React.FC = () => {
   return (
-    <Stack direction="column" gap="2rem" style={{ width: '100%', maxWidth: '100%', overflowX: 'hidden', boxSizing: 'border-box' }}>
+    <Stack
+      direction="column"
+      gap="2rem"
+      style={{ width: '100%', maxWidth: '100%', overflowX: 'hidden', boxSizing: 'border-box' }}
+    >
       {/* ClipPath Examples */}
       <ComponentSection title="CSS ClipPath Frames">
-        <Text variant="body" style={{ marginBottom: '1rem', opacity: 0.8, color: '#29F2DF', fontSize: 'clamp(0.85rem, 2vw, 1rem)' }}>
+        <Text
+          variant="body"
+          style={{
+            marginBottom: '1rem',
+            opacity: 0.8,
+            color: '#29F2DF',
+            fontSize: 'clamp(0.85rem, 2vw, 1rem)',
+          }}
+        >
           Using CSS clip-path for lightweight frame shapes (faster rendering)
         </Text>
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(min(180px, 100%), 1fr))',
-          gap: 'clamp(10px, 2vw, 20px)',
-          width: '100%',
-          maxWidth: '100%',
-          boxSizing: 'border-box',
-        }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(180px, 100%), 1fr))',
+            gap: 'clamp(10px, 2vw, 20px)',
+            width: '100%',
+            maxWidth: '100%',
+            boxSizing: 'border-box',
+          }}
+        >
           <div>
-            <Text variant="caption" style={{ marginBottom: '10px', display: 'block', color: '#29F2DF', textTransform: 'uppercase', fontSize: 'clamp(0.65rem, 1.5vw, 0.7rem)' }}>
+            <Text
+              variant="caption"
+              style={{
+                marginBottom: '10px',
+                display: 'block',
+                color: '#29F2DF',
+                textTransform: 'uppercase',
+                fontSize: 'clamp(0.65rem, 1.5vw, 0.7rem)',
+              }}
+            >
               Octagon (All Corners)
             </Text>
             <div
@@ -1816,7 +2560,8 @@ const FramesTabContent: React.FC = () => {
                 width: '100%',
                 height: 'clamp(80px, 15vw, 100px)',
                 clipPath: createFrameOctagonClip({ squareSize: 16 }),
-                background: 'linear-gradient(135deg, rgba(41, 242, 223, 0.2), rgba(41, 242, 223, 0.05))',
+                background:
+                  'linear-gradient(135deg, rgba(41, 242, 223, 0.2), rgba(41, 242, 223, 0.05))',
                 border: '1px solid rgba(41, 242, 223, 0.3)',
                 display: 'flex',
                 alignItems: 'center',
@@ -1833,7 +2578,16 @@ const FramesTabContent: React.FC = () => {
           </div>
 
           <div>
-            <Text variant="caption" style={{ marginBottom: '10px', display: 'block', color: '#e91e63', textTransform: 'uppercase', fontSize: 'clamp(0.65rem, 1.5vw, 0.7rem)' }}>
+            <Text
+              variant="caption"
+              style={{
+                marginBottom: '10px',
+                display: 'block',
+                color: '#e91e63',
+                textTransform: 'uppercase',
+                fontSize: 'clamp(0.65rem, 1.5vw, 0.7rem)',
+              }}
+            >
               Octagon (Selective)
             </Text>
             <div
@@ -1847,7 +2601,8 @@ const FramesTabContent: React.FC = () => {
                   rightBottom: true,
                   leftBottom: false,
                 }),
-                background: 'linear-gradient(135deg, rgba(233, 30, 99, 0.2), rgba(233, 30, 99, 0.05))',
+                background:
+                  'linear-gradient(135deg, rgba(233, 30, 99, 0.2), rgba(233, 30, 99, 0.05))',
                 border: '1px solid rgba(233, 30, 99, 0.3)',
                 display: 'flex',
                 alignItems: 'center',
@@ -1864,7 +2619,16 @@ const FramesTabContent: React.FC = () => {
           </div>
 
           <div>
-            <Text variant="caption" style={{ marginBottom: '10px', display: 'block', color: '#ffeb3b', textTransform: 'uppercase', fontSize: 'clamp(0.65rem, 1.5vw, 0.7rem)' }}>
+            <Text
+              variant="caption"
+              style={{
+                marginBottom: '10px',
+                display: 'block',
+                color: '#ffeb3b',
+                textTransform: 'uppercase',
+                fontSize: 'clamp(0.65rem, 1.5vw, 0.7rem)',
+              }}
+            >
               Kranox
             </Text>
             <div
@@ -1872,7 +2636,8 @@ const FramesTabContent: React.FC = () => {
                 width: '100%',
                 height: 'clamp(80px, 15vw, 100px)',
                 clipPath: createFrameKranoxClip({ squareSize: 16 }),
-                background: 'linear-gradient(135deg, rgba(255, 235, 59, 0.2), rgba(255, 235, 59, 0.05))',
+                background:
+                  'linear-gradient(135deg, rgba(255, 235, 59, 0.2), rgba(255, 235, 59, 0.05))',
                 border: '1px solid rgba(255, 235, 59, 0.3)',
                 display: 'flex',
                 alignItems: 'center',
@@ -1892,44 +2657,73 @@ const FramesTabContent: React.FC = () => {
 
       {/* HUD Frame Generator */}
       <ComponentSection title="46. HUD Frame Generator">
-        <Text variant="body" style={{ marginBottom: '1rem', opacity: 0.8, color: '#29F2DF', fontSize: 'clamp(0.85rem, 2vw, 1rem)' }}>
+        <Text
+          variant="body"
+          style={{
+            marginBottom: '1rem',
+            opacity: 0.8,
+            color: '#29F2DF',
+            fontSize: 'clamp(0.85rem, 2vw, 1rem)',
+          }}
+        >
           Procedural HUD frame with randomized sci-fi borders
         </Text>
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'center',
-          width: '100%',
-          maxWidth: '100%',
-          overflowX: 'hidden',
-          boxSizing: 'border-box',
-        }}>
-          <div style={{ 
-            width: '100%', 
-            maxWidth: 'min(500px, 100%)',
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            width: '100%',
+            maxWidth: '100%',
+            overflowX: 'hidden',
             boxSizing: 'border-box',
-          }}>
-            <div style={{ 
+          }}
+        >
+          <div
+            style={{
               width: '100%',
-              maxWidth: '100%',
-              margin: '0 auto',
-              overflow: 'hidden',
-              display: 'flex',
-              justifyContent: 'center',
-            }}>
-              <div style={{
+              maxWidth: 'min(500px, 100%)',
+              boxSizing: 'border-box',
+            }}
+          >
+            <div
+              style={{
                 width: '100%',
-                maxWidth: '384px',
-                transform: 'scale(1)',
-                transformOrigin: 'center',
-              }}>
+                maxWidth: '100%',
+                margin: '0 auto',
+                overflow: 'hidden',
+                display: 'flex',
+                justifyContent: 'center',
+              }}
+            >
+              <div
+                style={{
+                  width: '100%',
+                  maxWidth: '384px',
+                  transform: 'scale(1)',
+                  transformOrigin: 'center',
+                }}
+              >
                 <HudFrameWithControls
                   width={384}
                   height={150}
                   showControls={true}
                   showSeedInput={true}
                 >
-                  <div style={{ fontSize: 'clamp(0.7rem, 2vw, 0.85rem)', lineHeight: '1.4', color: '#29F2DF' }}>
-                    <p style={{ margin: '0 0 0.5rem 0', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px' }}>
+                  <div
+                    style={{
+                      fontSize: 'clamp(0.7rem, 2vw, 0.85rem)',
+                      lineHeight: '1.4',
+                      color: '#29F2DF',
+                    }}
+                  >
+                    <p
+                      style={{
+                        margin: '0 0 0.5rem 0',
+                        fontWeight: 600,
+                        textTransform: 'uppercase',
+                        letterSpacing: '1px',
+                      }}
+                    >
                       🎯 PROCEDURAL HUD FRAME
                     </p>
                     <p style={{ margin: '0', opacity: 0.8 }}>
@@ -1945,17 +2739,27 @@ const FramesTabContent: React.FC = () => {
 
       {/* Animated Frames */}
       <ComponentSection title="SVG Frames with Assembling Animation">
-        <Text variant="body" style={{ marginBottom: '1rem', opacity: 0.8, color: '#29F2DF', fontSize: 'clamp(0.85rem, 2vw, 1rem)' }}>
+        <Text
+          variant="body"
+          style={{
+            marginBottom: '1rem',
+            opacity: 0.8,
+            color: '#29F2DF',
+            fontSize: 'clamp(0.85rem, 2vw, 1rem)',
+          }}
+        >
           All frames feature stroke-dasharray animation - lines appear gradually
         </Text>
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(min(220px, 100%), 1fr))', 
-          gap: 'clamp(10px, 2vw, 20px)',
-          width: '100%',
-          maxWidth: '100%',
-          boxSizing: 'border-box',
-        }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(min(220px, 100%), 1fr))',
+            gap: 'clamp(10px, 2vw, 20px)',
+            width: '100%',
+            maxWidth: '100%',
+            boxSizing: 'border-box',
+          }}
+        >
           <AnimatedOctagonFrame />
           <AnimatedKranoxFrame />
           <AnimatedCornersFrame />
@@ -1967,34 +2771,47 @@ const FramesTabContent: React.FC = () => {
 
       {/* Usage Guide */}
       <ComponentSection title="📚 Usage Guide">
-        <div style={{ 
-          background: 'rgba(41, 242, 223, 0.05)', 
-          padding: 'clamp(1rem, 3vw, 1.5rem)', 
-          borderRadius: '4px',
-          border: '1px solid rgba(41, 242, 223, 0.2)',
-          maxWidth: '100%',
-          boxSizing: 'border-box',
-          overflowX: 'auto',
-        }}>
-          <Text variant="h4" style={{ marginBottom: '1rem', color: '#29F2DF', textTransform: 'uppercase', letterSpacing: '1px', fontSize: 'clamp(0.9rem, 2vw, 1.1rem)' }}>
-            Frame with Animation:
-          </Text>
-          <pre style={{
-            background: 'rgba(41, 242, 223, 0.08)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(41, 242, 223, 0.3)',
-            padding: 'clamp(10px, 2vw, 15px)',
+        <div
+          style={{
+            background: 'rgba(41, 242, 223, 0.05)',
+            padding: 'clamp(1rem, 3vw, 1.5rem)',
             borderRadius: '4px',
-            overflowX: 'auto',
-            fontSize: 'clamp(0.65rem, 1.5vw, 0.75rem)',
-            color: '#29F2DF',
-            lineHeight: '1.6',
+            border: '1px solid rgba(41, 242, 223, 0.2)',
             maxWidth: '100%',
             boxSizing: 'border-box',
-            whiteSpace: 'pre-wrap',
-            wordBreak: 'break-word',
-          }}>
-{`import { FrameSVGOctagon, useFrameSVGAssemblingAnimation } from '@rhuds/frames';
+            overflowX: 'auto',
+          }}
+        >
+          <Text
+            variant="h4"
+            style={{
+              marginBottom: '1rem',
+              color: '#29F2DF',
+              textTransform: 'uppercase',
+              letterSpacing: '1px',
+              fontSize: 'clamp(0.9rem, 2vw, 1.1rem)',
+            }}
+          >
+            Frame with Animation:
+          </Text>
+          <pre
+            style={{
+              background: 'rgba(41, 242, 223, 0.08)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(41, 242, 223, 0.3)',
+              padding: 'clamp(10px, 2vw, 15px)',
+              borderRadius: '4px',
+              overflowX: 'auto',
+              fontSize: 'clamp(0.65rem, 1.5vw, 0.75rem)',
+              color: '#29F2DF',
+              lineHeight: '1.6',
+              maxWidth: '100%',
+              boxSizing: 'border-box',
+              whiteSpace: 'pre-wrap',
+              wordBreak: 'break-word',
+            }}
+          >
+            {`import { FrameSVGOctagon, useFrameSVGAssemblingAnimation } from '@rhuds/frames';
 
 const MyFrame = () => {
   const svgRef = useRef<SVGSVGElement>(null);
@@ -2040,16 +2857,19 @@ const AnimatedOctagonFrame: React.FC = () => {
   const { onRender } = useFrameSVGAssemblingAnimation(svgRef, { duration: 1500 });
 
   React.useEffect(() => {
-    setKey(prev => prev + 1);
+    setKey((prev) => prev + 1);
   }, []);
 
   return (
-    <FrameCard 
-      title="46. FrameSVGOctagon" 
+    <FrameCard
+      title="46. FrameSVGOctagon"
       color="#29F2DF"
-      onReplay={() => setKey(prev => prev + 1)}
+      onReplay={() => setKey((prev) => prev + 1)}
     >
-      <div key={key} style={{ position: 'relative', width: '100%', height: 'clamp(150px, 30vw, 200px)' }}>
+      <div
+        key={key}
+        style={{ position: 'relative', width: '100%', height: 'clamp(150px, 30vw, 200px)' }}
+      >
         <style>
           {`
             .frame-octagon-animated svg [data-name=bg] {
@@ -2067,34 +2887,42 @@ const AnimatedOctagonFrame: React.FC = () => {
         <div className="frame-octagon-animated">
           <FrameSVGOctagon elementRef={svgRef} onRender={onRender} padding={4} squareSize={16} />
         </div>
-        <div style={{
-          position: 'absolute',
-          inset: 'clamp(20px, 5vw, 30px)',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          textAlign: 'center',
-          pointerEvents: 'none',
-        }}>
-          <Text variant="body" style={{ 
-            color: '#29F2DF', 
-            marginBottom: '5px',
-            fontWeight: 600,
-            textShadow: '0 0 10px rgba(41, 242, 223, 0.8)',
-            textTransform: 'uppercase',
-            letterSpacing: 'clamp(1px, 0.3vw, 2px)',
-            fontSize: 'clamp(0.85rem, 2vw, 1rem)',
-          }}>
+        <div
+          style={{
+            position: 'absolute',
+            inset: 'clamp(20px, 5vw, 30px)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            textAlign: 'center',
+            pointerEvents: 'none',
+          }}
+        >
+          <Text
+            variant="body"
+            style={{
+              color: '#29F2DF',
+              marginBottom: '5px',
+              fontWeight: 600,
+              textShadow: '0 0 10px rgba(41, 242, 223, 0.8)',
+              textTransform: 'uppercase',
+              letterSpacing: 'clamp(1px, 0.3vw, 2px)',
+              fontSize: 'clamp(0.85rem, 2vw, 1rem)',
+            }}
+          >
             OCTAGON
           </Text>
-          <Text variant="caption" style={{ 
-            opacity: 0.8, 
-            color: '#29F2DF',
-            fontSize: 'clamp(0.65rem, 1.5vw, 0.7rem)',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px',
-          }}>
+          <Text
+            variant="caption"
+            style={{
+              opacity: 0.8,
+              color: '#29F2DF',
+              fontSize: 'clamp(0.65rem, 1.5vw, 0.7rem)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px',
+            }}
+          >
             Basic Style
           </Text>
         </div>
@@ -2109,16 +2937,19 @@ const AnimatedKranoxFrame: React.FC = () => {
   const { onRender } = useFrameSVGAssemblingAnimation(svgRef, { duration: 2000 });
 
   React.useEffect(() => {
-    setKey(prev => prev + 1);
+    setKey((prev) => prev + 1);
   }, []);
 
   return (
-    <FrameCard 
-      title="47. FrameSVGKranox" 
+    <FrameCard
+      title="47. FrameSVGKranox"
       color="#ffeb3b"
-      onReplay={() => setKey(prev => prev + 1)}
+      onReplay={() => setKey((prev) => prev + 1)}
     >
-      <div key={key} style={{ position: 'relative', width: '100%', height: 'clamp(150px, 30vw, 200px)' }}>
+      <div
+        key={key}
+        style={{ position: 'relative', width: '100%', height: 'clamp(150px, 30vw, 200px)' }}
+      >
         <style>
           {`
             .frame-kranox-animated svg [data-name=bg] {
@@ -2144,34 +2975,42 @@ const AnimatedKranoxFrame: React.FC = () => {
             largeLineLength={48}
           />
         </div>
-        <div style={{
-          position: 'absolute',
-          inset: 'clamp(20px, 5vw, 30px)',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          textAlign: 'center',
-          pointerEvents: 'none',
-        }}>
-          <Text variant="body" style={{ 
-            color: '#ffeb3b', 
-            marginBottom: '5px',
-            fontWeight: 600,
-            textShadow: '0 0 10px rgba(255, 235, 59, 0.8)',
-            textTransform: 'uppercase',
-            letterSpacing: 'clamp(1px, 0.3vw, 2px)',
-            fontSize: 'clamp(0.85rem, 2vw, 1rem)',
-          }}>
+        <div
+          style={{
+            position: 'absolute',
+            inset: 'clamp(20px, 5vw, 30px)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            textAlign: 'center',
+            pointerEvents: 'none',
+          }}
+        >
+          <Text
+            variant="body"
+            style={{
+              color: '#ffeb3b',
+              marginBottom: '5px',
+              fontWeight: 600,
+              textShadow: '0 0 10px rgba(255, 235, 59, 0.8)',
+              textTransform: 'uppercase',
+              letterSpacing: 'clamp(1px, 0.3vw, 2px)',
+              fontSize: 'clamp(0.85rem, 2vw, 1rem)',
+            }}
+          >
             KRANOX
           </Text>
-          <Text variant="caption" style={{ 
-            opacity: 0.8, 
-            color: '#ffeb3b',
-            fontSize: 'clamp(0.65rem, 1.5vw, 0.7rem)',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px',
-          }}>
+          <Text
+            variant="caption"
+            style={{
+              opacity: 0.8,
+              color: '#ffeb3b',
+              fontSize: 'clamp(0.65rem, 1.5vw, 0.7rem)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px',
+            }}
+          >
             Assembling Style
           </Text>
         </div>
@@ -2186,16 +3025,19 @@ const AnimatedCornersFrame: React.FC = () => {
   const { onRender } = useFrameSVGAssemblingAnimation(svgRef, { duration: 1500 });
 
   React.useEffect(() => {
-    setKey(prev => prev + 1);
+    setKey((prev) => prev + 1);
   }, []);
 
   return (
-    <FrameCard 
-      title="48. FrameSVGCorners" 
+    <FrameCard
+      title="48. FrameSVGCorners"
       color="#4caf50"
-      onReplay={() => setKey(prev => prev + 1)}
+      onReplay={() => setKey((prev) => prev + 1)}
     >
-      <div key={key} style={{ position: 'relative', width: '100%', height: 'clamp(150px, 30vw, 200px)' }}>
+      <div
+        key={key}
+        style={{ position: 'relative', width: '100%', height: 'clamp(150px, 30vw, 200px)' }}
+      >
         <style>
           {`
             .frame-corners-animated svg [data-name=line] {
@@ -2209,34 +3051,42 @@ const AnimatedCornersFrame: React.FC = () => {
         <div className="frame-corners-animated">
           <FrameSVGCorners elementRef={svgRef} onRender={onRender} padding={4} cornerLength={32} />
         </div>
-        <div style={{
-          position: 'absolute',
-          inset: 'clamp(20px, 5vw, 30px)',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          textAlign: 'center',
-          pointerEvents: 'none',
-        }}>
-          <Text variant="body" style={{ 
-            color: '#4caf50', 
-            marginBottom: '5px',
-            fontWeight: 600,
-            textShadow: '0 0 10px rgba(76, 175, 80, 0.8)',
-            textTransform: 'uppercase',
-            letterSpacing: 'clamp(1px, 0.3vw, 2px)',
-            fontSize: 'clamp(0.85rem, 2vw, 1rem)',
-          }}>
+        <div
+          style={{
+            position: 'absolute',
+            inset: 'clamp(20px, 5vw, 30px)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            textAlign: 'center',
+            pointerEvents: 'none',
+          }}
+        >
+          <Text
+            variant="body"
+            style={{
+              color: '#4caf50',
+              marginBottom: '5px',
+              fontWeight: 600,
+              textShadow: '0 0 10px rgba(76, 175, 80, 0.8)',
+              textTransform: 'uppercase',
+              letterSpacing: 'clamp(1px, 0.3vw, 2px)',
+              fontSize: 'clamp(0.85rem, 2vw, 1rem)',
+            }}
+          >
             CORNERS
           </Text>
-          <Text variant="caption" style={{ 
-            opacity: 0.8, 
-            color: '#4caf50',
-            fontSize: 'clamp(0.65rem, 1.5vw, 0.7rem)',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px',
-          }}>
+          <Text
+            variant="caption"
+            style={{
+              opacity: 0.8,
+              color: '#4caf50',
+              fontSize: 'clamp(0.65rem, 1.5vw, 0.7rem)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px',
+            }}
+          >
             Corners Only
           </Text>
         </div>
@@ -2251,16 +3101,19 @@ const AnimatedLinesFrame: React.FC = () => {
   const { onRender } = useFrameSVGAssemblingAnimation(svgRef, { duration: 1500 });
 
   React.useEffect(() => {
-    setKey(prev => prev + 1);
+    setKey((prev) => prev + 1);
   }, []);
 
   return (
-    <FrameCard 
-      title="49. FrameSVGLines" 
+    <FrameCard
+      title="49. FrameSVGLines"
       color="#e91e63"
-      onReplay={() => setKey(prev => prev + 1)}
+      onReplay={() => setKey((prev) => prev + 1)}
     >
-      <div key={key} style={{ position: 'relative', width: '100%', height: 'clamp(150px, 30vw, 200px)' }}>
+      <div
+        key={key}
+        style={{ position: 'relative', width: '100%', height: 'clamp(150px, 30vw, 200px)' }}
+      >
         <style>
           {`
             .frame-lines-animated svg [data-name=line] {
@@ -2275,34 +3128,42 @@ const AnimatedLinesFrame: React.FC = () => {
         <div className="frame-lines-animated">
           <FrameSVGLines elementRef={svgRef} onRender={onRender} padding={4} strokeWidth={2} />
         </div>
-        <div style={{
-          position: 'absolute',
-          inset: 'clamp(20px, 5vw, 30px)',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          textAlign: 'center',
-          pointerEvents: 'none',
-        }}>
-          <Text variant="body" style={{ 
-            color: '#e91e63', 
-            marginBottom: '5px',
-            fontWeight: 600,
-            textShadow: '0 0 10px rgba(233, 30, 99, 0.8)',
-            textTransform: 'uppercase',
-            letterSpacing: 'clamp(1px, 0.3vw, 2px)',
-            fontSize: 'clamp(0.85rem, 2vw, 1rem)',
-          }}>
+        <div
+          style={{
+            position: 'absolute',
+            inset: 'clamp(20px, 5vw, 30px)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            textAlign: 'center',
+            pointerEvents: 'none',
+          }}
+        >
+          <Text
+            variant="body"
+            style={{
+              color: '#e91e63',
+              marginBottom: '5px',
+              fontWeight: 600,
+              textShadow: '0 0 10px rgba(233, 30, 99, 0.8)',
+              textTransform: 'uppercase',
+              letterSpacing: 'clamp(1px, 0.3vw, 2px)',
+              fontSize: 'clamp(0.85rem, 2vw, 1rem)',
+            }}
+          >
             LINES
           </Text>
-          <Text variant="caption" style={{ 
-            opacity: 0.8, 
-            color: '#e91e63',
-            fontSize: 'clamp(0.65rem, 1.5vw, 0.7rem)',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px',
-          }}>
+          <Text
+            variant="caption"
+            style={{
+              opacity: 0.8,
+              color: '#e91e63',
+              fontSize: 'clamp(0.65rem, 1.5vw, 0.7rem)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px',
+            }}
+          >
             Dashed Lines
           </Text>
         </div>
@@ -2317,16 +3178,19 @@ const AnimatedUnderlineFrame: React.FC = () => {
   const { onRender } = useFrameSVGAssemblingAnimation(svgRef, { duration: 1500 });
 
   React.useEffect(() => {
-    setKey(prev => prev + 1);
+    setKey((prev) => prev + 1);
   }, []);
 
   return (
-    <FrameCard 
-      title="50. FrameSVGUnderline" 
+    <FrameCard
+      title="50. FrameSVGUnderline"
       color="#ff9800"
-      onReplay={() => setKey(prev => prev + 1)}
+      onReplay={() => setKey((prev) => prev + 1)}
     >
-      <div key={key} style={{ position: 'relative', width: '100%', height: 'clamp(150px, 30vw, 200px)' }}>
+      <div
+        key={key}
+        style={{ position: 'relative', width: '100%', height: 'clamp(150px, 30vw, 200px)' }}
+      >
         <style>
           {`
             .frame-underline-animated svg [data-name=bg] {
@@ -2343,34 +3207,42 @@ const AnimatedUnderlineFrame: React.FC = () => {
         <div className="frame-underline-animated">
           <FrameSVGUnderline elementRef={svgRef} onRender={onRender} padding={4} squareSize={8} />
         </div>
-        <div style={{
-          position: 'absolute',
-          inset: 'clamp(20px, 5vw, 30px)',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          textAlign: 'center',
-          pointerEvents: 'none',
-        }}>
-          <Text variant="body" style={{ 
-            color: '#ff9800', 
-            marginBottom: '5px',
-            fontWeight: 600,
-            textShadow: '0 0 10px rgba(255, 152, 0, 0.8)',
-            textTransform: 'uppercase',
-            letterSpacing: 'clamp(1px, 0.3vw, 2px)',
-            fontSize: 'clamp(0.85rem, 2vw, 1rem)',
-          }}>
+        <div
+          style={{
+            position: 'absolute',
+            inset: 'clamp(20px, 5vw, 30px)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            textAlign: 'center',
+            pointerEvents: 'none',
+          }}
+        >
+          <Text
+            variant="body"
+            style={{
+              color: '#ff9800',
+              marginBottom: '5px',
+              fontWeight: 600,
+              textShadow: '0 0 10px rgba(255, 152, 0, 0.8)',
+              textTransform: 'uppercase',
+              letterSpacing: 'clamp(1px, 0.3vw, 2px)',
+              fontSize: 'clamp(0.85rem, 2vw, 1rem)',
+            }}
+          >
             UNDERLINE
           </Text>
-          <Text variant="caption" style={{ 
-            opacity: 0.8, 
-            color: '#ff9800',
-            fontSize: 'clamp(0.65rem, 1.5vw, 0.7rem)',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px',
-          }}>
+          <Text
+            variant="caption"
+            style={{
+              opacity: 0.8,
+              color: '#ff9800',
+              fontSize: 'clamp(0.65rem, 1.5vw, 0.7rem)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px',
+            }}
+          >
             With Underline
           </Text>
         </div>
@@ -2385,16 +3257,19 @@ const AnimatedNefrexFrame: React.FC = () => {
   const { onRender } = useFrameSVGAssemblingAnimation(svgRef, { duration: 2000 });
 
   React.useEffect(() => {
-    setKey(prev => prev + 1);
+    setKey((prev) => prev + 1);
   }, []);
 
   return (
-    <FrameCard 
-      title="51. FrameSVGNefrex" 
+    <FrameCard
+      title="51. FrameSVGNefrex"
       color="#03a9f4"
-      onReplay={() => setKey(prev => prev + 1)}
+      onReplay={() => setKey((prev) => prev + 1)}
     >
-      <div key={key} style={{ position: 'relative', width: '100%', height: 'clamp(150px, 30vw, 200px)' }}>
+      <div
+        key={key}
+        style={{ position: 'relative', width: '100%', height: 'clamp(150px, 30vw, 200px)' }}
+      >
         <style>
           {`
             .frame-nefrex-animated svg [data-name=bg] {
@@ -2420,34 +3295,42 @@ const AnimatedNefrexFrame: React.FC = () => {
             largeLineLength={128}
           />
         </div>
-        <div style={{
-          position: 'absolute',
-          inset: 'clamp(30px, 8vw, 50px)',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          textAlign: 'center',
-          pointerEvents: 'none',
-        }}>
-          <Text variant="body" style={{ 
-            color: '#03a9f4', 
-            marginBottom: '5px',
-            fontWeight: 600,
-            textShadow: '0 0 10px rgba(3, 169, 244, 0.8)',
-            textTransform: 'uppercase',
-            letterSpacing: 'clamp(1px, 0.3vw, 2px)',
-            fontSize: 'clamp(0.85rem, 2vw, 1rem)',
-          }}>
+        <div
+          style={{
+            position: 'absolute',
+            inset: 'clamp(30px, 8vw, 50px)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            textAlign: 'center',
+            pointerEvents: 'none',
+          }}
+        >
+          <Text
+            variant="body"
+            style={{
+              color: '#03a9f4',
+              marginBottom: '5px',
+              fontWeight: 600,
+              textShadow: '0 0 10px rgba(3, 169, 244, 0.8)',
+              textTransform: 'uppercase',
+              letterSpacing: 'clamp(1px, 0.3vw, 2px)',
+              fontSize: 'clamp(0.85rem, 2vw, 1rem)',
+            }}
+          >
             NEFREX
           </Text>
-          <Text variant="caption" style={{ 
-            opacity: 0.8, 
-            color: '#03a9f4',
-            fontSize: 'clamp(0.65rem, 1.5vw, 0.7rem)',
-            textTransform: 'uppercase',
-            letterSpacing: '0.5px',
-          }}>
+          <Text
+            variant="caption"
+            style={{
+              opacity: 0.8,
+              color: '#03a9f4',
+              fontSize: 'clamp(0.65rem, 1.5vw, 0.7rem)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px',
+            }}
+          >
             Complex Style
           </Text>
         </div>
