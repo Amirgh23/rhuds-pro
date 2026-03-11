@@ -6,6 +6,7 @@ import IntroPageFuturistic from './pages/IntroPageFuturistic';
 import { ShowcasePage } from './pages/ShowcasePage';
 import { PlaygroundPage } from './pages/PlaygroundPage';
 import { DocsPage } from './pages/DocsPage';
+import PortfolioPage from './pages/PortfolioPage';
 import { Navbar } from './components/Navbar';
 import './styles/global.css';
 
@@ -105,6 +106,7 @@ const AppContent: React.FC = () => {
         <Route path="/playground" element={<PlaygroundPage />} />
         <Route path="/docs" element={<DocsPage />} />
         <Route path="/docs/:section" element={<DocsPage />} />
+        <Route path="/portfolio" element={<PortfolioPage />} />
       </Routes>
     </div>
   );

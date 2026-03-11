@@ -1,5 +1,7 @@
 ﻿import React, { useState } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
+import { useContextMenu } from '../hooks/useContextMenu';
+import { GlassContextMenu } from '../components/GlassContextMenu';
 import {
   Text,
   Stack,
@@ -302,6 +304,7 @@ const docs: Record<string, { title: string; category: string; content: string }>
 export const DocsPage: React.FC = () => {
   const { section } = useParams<{ section?: string }>();
   const location = useLocation();
+  const { position, visible, closeMenu, handleNavigation, handleCopyInstall } = useContextMenu();
   const validSection = section && section in docs ? section : 'getting-started';
   const [selectedDoc, setSelectedDoc] = useState(validSection);
   const [hudBoxAnimated, setHudBoxAnimated] = useState(true);
@@ -1928,6 +1931,15 @@ return (
           </div>
         </div>
       </div>
+      {visible && position && (
+        <GlassContextMenu
+          x={position.x}
+          y={position.y}
+          onClose={closeMenu}
+          onNavigate={handleNavigation}
+          onCopyInstall={handleCopyInstall}
+        />
+      )}
     </>
   );
 };

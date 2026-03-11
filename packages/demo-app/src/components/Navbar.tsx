@@ -150,6 +150,39 @@ export const Navbar: React.FC = () => {
         >
           Documentation
         </button>
+
+        <button
+          onClick={handleClick('/portfolio')}
+          style={{
+            padding: '0.5rem 1.5rem',
+            fontSize: '14px',
+            fontWeight: '600',
+            border: isActive('/portfolio')
+              ? '2px solid #EF3EF1'
+              : '2px solid rgba(239, 62, 241, 0.3)',
+            borderRadius: '4px',
+            background: isActive('/portfolio') ? 'rgba(239, 62, 241, 0.1)' : 'transparent',
+            color: isActive('/portfolio') ? '#EF3EF1' : '#8EC8D8',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            textShadow: isActive('/portfolio') ? '0 0 10px rgba(239, 62, 241, 0.5)' : 'none',
+            boxShadow: isActive('/portfolio') ? '0 0 20px rgba(239, 62, 241, 0.3)' : 'none',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = '#EF3EF1';
+            e.currentTarget.style.color = '#EF3EF1';
+            e.currentTarget.style.background = 'rgba(239, 62, 241, 0.1)';
+          }}
+          onMouseLeave={(e) => {
+            if (!isActive('/portfolio')) {
+              e.currentTarget.style.borderColor = 'rgba(239, 62, 241, 0.3)';
+              e.currentTarget.style.color = '#8EC8D8';
+              e.currentTarget.style.background = 'transparent';
+            }
+          }}
+        >
+          👤 Portfolio
+        </button>
       </div>
     </div>
   );

@@ -2,8 +2,17 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Navigation } from './intro-page/components/Navigation';
 import { CTAButtons } from './intro-page/components/CTAButtons';
+import { GlassContextMenu } from '../components/GlassContextMenu';
 
 const FULL_TEXT = 'INITIALIZING RHUDS PRO SYSTEM...';
+
+// GitHub Stats (Real data - project not yet published)
+const GITHUB_STATS = {
+  stars: 0,
+  downloads: 0,
+  contributors: 1,
+  version: 'v0.1.0',
+};
 
 interface Particle {
   x: number;
@@ -34,6 +43,14 @@ export default function IntroPage() {
   const [typedText, setTypedText] = useState('');
   const [isLoaded, setIsLoaded] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(false);
+  const [currentTheme, setCurrentTheme] = useState<'cyan' | 'purple' | 'blue'>('cyan');
+  const [showContextMenu, setShowContextMenu] = useState(false);
+  const [contextMenuPos, setContextMenuPos] = useState({ x: 0, y: 0 });
+  const [animatedStats, setAnimatedStats] = useState({
+    stars: 0,
+    downloads: 0,
+    contributors: 0,
+  });
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const particlesRef = useRef<Particle[]>([]);
   const starsRef = useRef<Star[]>([]);
@@ -100,6 +117,52 @@ export default function IntroPage() {
         console.log('Audio not supported');
       }
     }
+  }, []);
+
+  // Animate GitHub stats
+  useEffect(() => {
+    const duration = 2000;
+    const steps = 60;
+    const stepDuration = duration / steps;
+    let currentStep = 0;
+
+    const interval = setInterval(() => {
+      currentStep++;
+      const progress = currentStep / steps;
+
+      setAnimatedStats({
+        stars: Math.floor(GITHUB_STATS.stars * progress),
+        downloads: Math.floor(GITHUB_STATS.downloads * progress),
+        contributors: Math.floor(GITHUB_STATS.contributors * progress),
+      });
+
+      if (currentStep >= steps) {
+        clearInterval(interval);
+      }
+    }, stepDuration);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Context menu handler
+  useEffect(() => {
+    const handleContextMenu = (e: MouseEvent) => {
+      e.preventDefault();
+      setContextMenuPos({ x: e.clientX, y: e.clientY });
+      setShowContextMenu(true);
+    };
+
+    const handleClick = () => {
+      setShowContextMenu(false);
+    };
+
+    document.addEventListener('contextmenu', handleContextMenu);
+    document.addEventListener('click', handleClick);
+
+    return () => {
+      document.removeEventListener('contextmenu', handleContextMenu);
+      document.removeEventListener('click', handleClick);
+    };
   }, []);
 
   // Play hover sound
@@ -331,6 +394,12 @@ export default function IntroPage() {
     };
   }, []);
 
+  const themes = {
+    cyan: { primary: '#29F2DF', secondary: '#1C7FA6', name: 'Cyan' },
+    purple: { primary: '#EF3EF1', secondary: '#9D4EDD', name: 'Purple' },
+    blue: { primary: '#4CC9F0', secondary: '#4361EE', name: 'Blue' },
+  };
+
   const features = [
     {
       id: 'playground',
@@ -338,8 +407,8 @@ export default function IntroPage() {
       subtitle: 'Interactive Sandbox',
       description: '51+ components ready to test and customize in real-time',
       icon: '⚡',
-      color: '#29F2DF',
-      gradient: 'linear-gradient(135deg, #29F2DF 0%, #1C7FA6 100%)',
+      color: themes[currentTheme].primary,
+      gradient: `linear-gradient(135deg, ${themes[currentTheme].primary} 0%, ${themes[currentTheme].secondary} 100%)`,
       route: '/playground',
     },
     {
@@ -348,8 +417,8 @@ export default function IntroPage() {
       subtitle: 'Component Gallery',
       description: 'Browse the complete library with live examples and guides',
       icon: '✨',
-      color: '#EF3EF1',
-      gradient: 'linear-gradient(135deg, #EF3EF1 0%, #C878D8 100%)',
+      color: themes[currentTheme].primary,
+      gradient: `linear-gradient(135deg, ${themes[currentTheme].primary} 0%, ${themes[currentTheme].secondary} 100%)`,
       route: '/showcase',
     },
     {
@@ -358,9 +427,36 @@ export default function IntroPage() {
       subtitle: 'API Reference',
       description: 'Complete guides and integration examples for your projects',
       icon: '📚',
-      color: '#1C7FA6',
-      gradient: 'linear-gradient(135deg, #1C7FA6 0%, #5BA8C8 100%)',
+      color: themes[currentTheme].primary,
+      gradient: `linear-gradient(135deg, ${themes[currentTheme].primary} 0%, ${themes[currentTheme].secondary} 100%)`,
       route: '/docs',
+    },
+  ];
+
+  const contextMenuItems = [
+    { icon: '⚡', label: 'Open Playground', action: () => navigate('/playground') },
+    { icon: '✨', label: 'View Showcase', action: () => navigate('/showcase') },
+    { icon: '📚', label: 'Read Docs', action: () => navigate('/docs') },
+    { icon: '👤', label: 'View Portfolio', action: () => navigate('/portfolio') },
+    { divider: true },
+    {
+      icon: '🔗',
+      label: 'GitHub',
+      action: () => window.open('https://github.com/yourusername/rhuds', '_blank'),
+    },
+    {
+      icon: '📦',
+      label: 'NPM',
+      action: () => window.open('https://npmjs.com/package/@rhuds/core', '_blank'),
+    },
+    { divider: true },
+    {
+      icon: '📋',
+      label: 'Copy Install Command',
+      action: () => {
+        navigator.clipboard.writeText('npm install @rhuds/core @rhuds/components');
+        alert('Install command copied to clipboard!');
+      },
     },
   ];
 
@@ -1133,6 +1229,199 @@ export default function IntroPage() {
         </div>
       </section>
 
+      {/* GitHub Stats Section */}
+      <section
+        style={{
+          padding: '120px 20px',
+          position: 'relative',
+          zIndex: 20,
+        }}
+      >
+        <h2
+          style={{
+            fontSize: '48px',
+            fontWeight: '900',
+            textAlign: 'center',
+            marginBottom: '80px',
+            background: `linear-gradient(135deg, ${themes[currentTheme].primary} 0%, ${themes[currentTheme].secondary} 100%)`,
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            letterSpacing: '2px',
+          }}
+        >
+          Project Status
+        </h2>
+        <div
+          style={{
+            maxWidth: '1200px',
+            margin: '0 auto',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+            gap: '40px',
+          }}
+        >
+          {[
+            {
+              value: animatedStats.stars,
+              label: 'GitHub Stars',
+              icon: '⭐',
+              color: themes[currentTheme].primary,
+            },
+            {
+              value: animatedStats.downloads,
+              label: 'Downloads',
+              icon: '📦',
+              color: themes[currentTheme].secondary,
+            },
+            {
+              value: animatedStats.contributors,
+              label: 'Contributors',
+              icon: '👥',
+              color: themes[currentTheme].primary,
+            },
+            {
+              value: GITHUB_STATS.version,
+              label: 'Version',
+              icon: '🚀',
+              color: themes[currentTheme].secondary,
+            },
+          ].map((stat, index) => (
+            <div
+              key={index}
+              style={{
+                padding: '40px',
+                background: 'rgba(10, 10, 31, 0.8)',
+                border: `2px solid ${stat.color}`,
+                borderRadius: '16px',
+                textAlign: 'center',
+                animation: `fadeInUp 0.8s ease-out ${0.2 + index * 0.1}s backwards`,
+                transition: 'all 0.3s ease',
+                cursor: 'default',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-8px) scale(1.03)';
+                e.currentTarget.style.boxShadow = `0 20px 60px ${stat.color}60`;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
+            >
+              <div style={{ fontSize: '48px', marginBottom: '20px' }}>{stat.icon}</div>
+              <div
+                style={{
+                  fontSize: '56px',
+                  fontWeight: '900',
+                  color: stat.color,
+                  marginBottom: '15px',
+                  fontFamily: 'monospace',
+                }}
+              >
+                {stat.value}
+              </div>
+              <div
+                style={{
+                  fontSize: '16px',
+                  color: '#8EC8D8',
+                  letterSpacing: '2px',
+                  textTransform: 'uppercase',
+                }}
+              >
+                {stat.label}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Theme Switcher Section */}
+      <section
+        style={{
+          padding: '120px 20px',
+          position: 'relative',
+          zIndex: 20,
+        }}
+      >
+        <h2
+          style={{
+            fontSize: '48px',
+            fontWeight: '900',
+            textAlign: 'center',
+            marginBottom: '40px',
+            background: `linear-gradient(135deg, ${themes[currentTheme].primary} 0%, ${themes[currentTheme].secondary} 100%)`,
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            letterSpacing: '2px',
+          }}
+        >
+          Choose Your Theme
+        </h2>
+        <p
+          style={{
+            textAlign: 'center',
+            fontSize: '18px',
+            color: '#C8D8E8',
+            marginBottom: '60px',
+            maxWidth: '600px',
+            margin: '0 auto 60px',
+          }}
+        >
+          Experience the power of dynamic theming. Switch between color schemes instantly.
+        </p>
+        <div
+          style={{
+            display: 'flex',
+            gap: '30px',
+            justifyContent: 'center',
+            flexWrap: 'wrap',
+            maxWidth: '800px',
+            margin: '0 auto',
+          }}
+        >
+          {Object.entries(themes).map(([key, theme]) => (
+            <button
+              key={key}
+              onClick={() => setCurrentTheme(key as 'cyan' | 'purple' | 'blue')}
+              style={{
+                padding: '20px 40px',
+                background:
+                  currentTheme === key
+                    ? `linear-gradient(135deg, ${theme.primary} 0%, ${theme.secondary} 100%)`
+                    : 'rgba(10, 10, 31, 0.8)',
+                border: `3px solid ${theme.primary}`,
+                borderRadius: '12px',
+                color: currentTheme === key ? '#000' : theme.primary,
+                fontSize: '18px',
+                fontWeight: '800',
+                letterSpacing: '2px',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                textTransform: 'uppercase',
+                boxShadow:
+                  currentTheme === key
+                    ? `0 0 40px ${theme.primary}80, 0 10px 30px rgba(0,0,0,0.5)`
+                    : 'none',
+              }}
+              onMouseEnter={(e) => {
+                if (currentTheme !== key) {
+                  e.currentTarget.style.background = `linear-gradient(135deg, ${theme.primary}20 0%, ${theme.secondary}20 100%)`;
+                  e.currentTarget.style.transform = 'translateY(-4px)';
+                }
+                playHoverSound(440 + Object.keys(themes).indexOf(key) * 100, 0.1);
+              }}
+              onMouseLeave={(e) => {
+                if (currentTheme !== key) {
+                  e.currentTarget.style.background = 'rgba(10, 10, 31, 0.8)';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }
+              }}
+            >
+              {theme.name}
+            </button>
+          ))}
+        </div>
+      </section>
+
       {/* Stats Section */}
       <section
         style={{
@@ -1152,9 +1441,14 @@ export default function IntroPage() {
           }}
         >
           {[
-            { value: '51+', label: 'Components', color: '#29F2DF', icon: '⚡' },
-            { value: '100%', label: 'TypeScript', color: '#EF3EF1', icon: '🔷' },
-            { value: '∞', label: 'Possibilities', color: '#1C7FA6', icon: '✨' },
+            { value: '51+', label: 'Components', color: themes[currentTheme].primary, icon: '⚡' },
+            {
+              value: '100%',
+              label: 'TypeScript',
+              color: themes[currentTheme].secondary,
+              icon: '🔷',
+            },
+            { value: '∞', label: 'Possibilities', color: themes[currentTheme].primary, icon: '✨' },
           ].map((stat, index) => (
             <div
               key={index}
@@ -1231,9 +1525,37 @@ export default function IntroPage() {
         </div>
       </section>
 
+      {/* Context Menu */}
+      {showContextMenu && (
+        <GlassContextMenu
+          x={contextMenuPos.x}
+          y={contextMenuPos.y}
+          onClose={() => setShowContextMenu(false)}
+          onNavigate={(path) => {
+            navigate(path);
+            setShowContextMenu(false);
+          }}
+          onCopyInstall={() => {
+            navigator.clipboard.writeText('npm install @rhuds/core @rhuds/components');
+            setShowContextMenu(false);
+          }}
+        />
+      )}
+
       {/* Animations */}
       <style>
         {`
+        @keyframes contextMenuFadeIn {
+          from {
+            opacity: 0;
+            transform: scale(0.95);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+
         @keyframes fadeInUp {
           from {
             opacity: 0;

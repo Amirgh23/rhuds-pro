@@ -1,6 +1,8 @@
 ﻿import React, { useState, useRef } from 'react';
 import { useTheme } from '@rhuds/core';
 import { AnimatedBackground } from '../components/AnimatedBackground';
+import { useContextMenu } from '../hooks/useContextMenu';
+import { GlassContextMenu } from '../components/GlassContextMenu';
 import {
   Text,
   Button,
@@ -113,6 +115,7 @@ import {
 export const ShowcasePage: React.FC = () => {
   const theme = useTheme();
   const { showToast } = useHudToast();
+  const { position, visible, closeMenu, handleNavigation, handleCopyInstall } = useContextMenu();
   const [activeTab, setActiveTab] = useState(0);
 
   // Form states
@@ -2356,6 +2359,15 @@ export const ShowcasePage: React.FC = () => {
           </Text>
         </div>
       </div>
+      {visible && position && (
+        <GlassContextMenu
+          x={position.x}
+          y={position.y}
+          onClose={closeMenu}
+          onNavigate={handleNavigation}
+          onCopyInstall={handleCopyInstall}
+        />
+      )}
     </div>
   );
 };

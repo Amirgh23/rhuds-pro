@@ -44,10 +44,13 @@ import {
 } from '@rhuds/components';
 import { AnimatedBackground } from '../components/AnimatedBackground';
 import { ComponentPlayground } from '../components/ComponentPlayground';
+import { useContextMenu } from '../hooks/useContextMenu';
+import { GlassContextMenu } from '../components/GlassContextMenu';
 
 const PlaygroundContent: React.FC = () => {
   const notification = useNotification();
   const location = useLocation();
+  const { position, visible, closeMenu, handleNavigation, handleCopyInstall } = useContextMenu();
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -951,6 +954,15 @@ const PlaygroundContent: React.FC = () => {
           </div>
         </ComponentPlayground>
       </Container>
+      {visible && position && (
+        <GlassContextMenu
+          x={position.x}
+          y={position.y}
+          onClose={closeMenu}
+          onNavigate={handleNavigation}
+          onCopyInstall={handleCopyInstall}
+        />
+      )}
     </div>
   );
 };

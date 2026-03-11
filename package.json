@@ -1,76 +1,43 @@
 {
-  "name": "rhuds-pro",
+  "name": "@rhuds/monorepo",
   "version": "0.1.0",
-  "description": "RHUDS Pro - Advanced React UI Design System with theming, animations, and audio capabilities",
   "private": true,
-  "type": "module",
-  "keywords": [
-    "react",
-    "ui",
-    "design-system",
-    "components",
-    "theme",
-    "animation",
-    "audio",
-    "typescript"
-  ],
-  "author": "RHUDS Pro Team",
-  "license": "MIT",
+  "description": "RHUDS Pro - Reactive HUD UI Design System",
+  "author": {
+    "name": "Amirreza Ghaffarian Nakhodi",
+    "email": "contact@rhuds.dev",
+    "url": "https://github.com/yourusername"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/yourusername/rhuds-pro.git"
   },
-  "bugs": {
-    "url": "https://github.com/yourusername/rhuds-pro/issues"
-  },
-  "homepage": "https://github.com/yourusername/rhuds-pro#readme",
+  "keywords": [
+    "react",
+    "typescript",
+    "ui-library",
+    "hud",
+    "sci-fi",
+    "design-system",
+    "components",
+    "three.js",
+    "webgl",
+    "animation"
+  ],
+  "license": "MIT",
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
     "test": "turbo run test",
-    "test:watch": "turbo run test:watch",
-    "test:coverage": "turbo run test -- --coverage",
     "lint": "turbo run lint",
-    "format": "turbo run format",
-    "storybook": "turbo run storybook --filter=@rhuds/storybook",
-    "demo": "turbo run dev --filter=@rhuds/demo-app",
-    "clean": "turbo run clean && rm -rf node_modules",
-    "prepare": "husky install",
-    "changeset": "changeset",
-    "version-packages": "changeset version",
-    "release": "turbo run build && changeset publish"
-  },
-  "workspaces": [
-    "packages/*"
-  ],
-  "pnpm": {
-    "overrides": {
-      "@reduxjs/toolkit": "^1.9.0",
-      "react": "^18.0.0",
-      "react-dom": "^18.0.0"
-    }
+    "clean": "turbo run clean"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.26.0",
-    "@testing-library/jest-dom": "^6.0.0",
-    "@testing-library/react": "^14.0.0",
-    "@testing-library/user-event": "^14.5.0",
-    "@types/jest": "^29.5.0",
-    "@types/node": "^20.0.0",
-    "@vitejs/plugin-react": "^4.0.0",
-    "@vitest/coverage-v8": "^4.0.18",
-    "eslint": "^8.0.0",
-    "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-react": "^7.33.0",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "fast-check": "^3.15.0",
-    "husky": "^8.0.0",
-    "jsdom": "^23.0.0",
-    "prettier": "^3.0.0",
-    "turbo": "^1.10.0",
-    "typescript": "^5.0.0",
-    "vite": "^5.0.0",
-    "vitest": "^4.0.18"
+    "turbo": "latest",
+    "typescript": "^5.0.0"
   },
   "engines": {
     "node": ">=18.0.0",
