@@ -188,68 +188,110 @@ export default function PortfolioPage() {
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              gap: '30px',
+              gap: '40px',
             }}
           >
-            {/* Profile Image */}
+            {/* Professional Profile Photo */}
             <div
               style={{
                 position: 'relative',
-                width: '280px',
-                height: '280px',
-                animation: 'float 3s ease-in-out infinite',
+                width: '240px',
+                height: '300px',
+                borderRadius: '20px',
+                overflow: 'hidden',
+                border: '3px solid rgba(41, 242, 223, 0.7)',
+                boxShadow: `
+                  0 0 50px rgba(41, 242, 223, 0.5),
+                  inset 0 0 30px rgba(41, 242, 223, 0.15),
+                  0 0 100px rgba(239, 62, 241, 0.25)
+                `,
+                background:
+                  'linear-gradient(135deg, rgba(41, 242, 223, 0.1) 0%, rgba(239, 62, 241, 0.1) 100%)',
+                transition: 'all 0.4s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'scale(1.05) translateY(-5px)';
+                e.currentTarget.style.boxShadow = `
+                  0 0 70px rgba(41, 242, 223, 0.7),
+                  inset 0 0 30px rgba(41, 242, 223, 0.2),
+                  0 0 120px rgba(239, 62, 241, 0.4)
+                `;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'scale(1) translateY(0)';
+                e.currentTarget.style.boxShadow = `
+                  0 0 50px rgba(41, 242, 223, 0.5),
+                  inset 0 0 30px rgba(41, 242, 223, 0.15),
+                  0 0 100px rgba(239, 62, 241, 0.25)
+                `;
               }}
             >
-              {/* Outer Glow Ring */}
-              <div
+              <img
+                src="/amirreza-ghafarian.jpg"
+                alt="Amirreza Ghaffarian Nakhodi - Professional Photo"
                 style={{
-                  position: 'absolute',
-                  inset: '-15px',
-                  borderRadius: '50%',
-                  background: 'conic-gradient(from 0deg, #29F2DF, #EF3EF1, #4CC9F0, #29F2DF)',
-                  animation: 'spin 8s linear infinite',
-                  opacity: 0.6,
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  objectPosition: 'center top',
+                  filter: 'brightness(1.08) contrast(1.15) saturate(1.1)',
+                  display: 'block',
                 }}
               />
 
-              {/* Inner Glow Ring */}
+              {/* HUD Corner Accents */}
               <div
                 style={{
                   position: 'absolute',
-                  inset: '-8px',
-                  borderRadius: '50%',
-                  background: 'conic-gradient(from 180deg, #EF3EF1, #29F2DF, #4CC9F0, #EF3EF1)',
-                  animation: 'spin 12s linear infinite reverse',
-                  opacity: 0.4,
+                  top: '0',
+                  left: '0',
+                  width: '25px',
+                  height: '25px',
+                  border: '2px solid #29F2DF',
+                  borderRight: 'none',
+                  borderBottom: 'none',
+                  borderRadius: '3px 0 0 0',
                 }}
               />
-
-              {/* Image Container */}
               <div
                 style={{
                   position: 'absolute',
-                  inset: 0,
-                  borderRadius: '50%',
-                  overflow: 'hidden',
-                  border: '3px solid rgba(41, 242, 223, 0.8)',
-                  boxShadow:
-                    '0 0 40px rgba(41, 242, 223, 0.6), inset 0 0 40px rgba(41, 242, 223, 0.2)',
-                  background:
-                    'linear-gradient(135deg, rgba(41, 242, 223, 0.1) 0%, rgba(239, 62, 241, 0.1) 100%)',
+                  top: '0',
+                  right: '0',
+                  width: '25px',
+                  height: '25px',
+                  border: '2px solid #29F2DF',
+                  borderLeft: 'none',
+                  borderBottom: 'none',
+                  borderRadius: '0 3px 0 0',
                 }}
-              >
-                <img
-                  src="/amirreza-ghafarian.jpg"
-                  alt="Amirreza Ghaffarian Nakhodi"
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'cover',
-                    objectPosition: 'center',
-                    filter: 'brightness(1.1) contrast(1.1)',
-                  }}
-                />
-              </div>
+              />
+              <div
+                style={{
+                  position: 'absolute',
+                  bottom: '0',
+                  left: '0',
+                  width: '25px',
+                  height: '25px',
+                  border: '2px solid #EF3EF1',
+                  borderRight: 'none',
+                  borderTop: 'none',
+                  borderRadius: '0 0 0 3px',
+                }}
+              />
+              <div
+                style={{
+                  position: 'absolute',
+                  bottom: '0',
+                  right: '0',
+                  width: '25px',
+                  height: '25px',
+                  border: '2px solid #EF3EF1',
+                  borderLeft: 'none',
+                  borderTop: 'none',
+                  borderRadius: '0 0 3px 0',
+                }}
+              />
             </div>
 
             {/* Text Content */}
