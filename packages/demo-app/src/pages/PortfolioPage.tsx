@@ -175,7 +175,7 @@ export default function PortfolioPage() {
           padding: '40px 20px',
         }}
       >
-        {/* Header Section */}
+        {/* Header Section with Profile Image */}
         <div
           style={{
             textAlign: 'center',
@@ -183,55 +183,126 @@ export default function PortfolioPage() {
             animation: 'fadeInUp 1s ease-out',
           }}
         >
-          <GeometricWrapper
-            variant="complex"
-            color="#29F2DF"
-            glowIntensity="high"
+          <div
             style={{
-              display: 'inline-block',
-              padding: '40px 60px',
-              background:
-                'linear-gradient(135deg, rgba(41, 242, 223, 0.15) 0%, rgba(239, 62, 241, 0.15) 100%)',
-              backdropFilter: 'blur(40px)',
-              border: '2px solid rgba(41, 242, 223, 0.5)',
-              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5), 0 0 100px rgba(41, 242, 223, 0.3)',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '30px',
             }}
           >
-            <h1
+            {/* Profile Image */}
+            <div
               style={{
-                fontSize: '64px',
-                fontWeight: '900',
-                background: 'linear-gradient(135deg, #29F2DF 0%, #EF3EF1 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                marginBottom: '16px',
-                letterSpacing: '2px',
+                position: 'relative',
+                width: '280px',
+                height: '280px',
+                animation: 'float 3s ease-in-out infinite',
               }}
             >
-              Amirreza Ghaffarian Nakhodi
-            </h1>
-            <p
+              {/* Outer Glow Ring */}
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: '-15px',
+                  borderRadius: '50%',
+                  background: 'conic-gradient(from 0deg, #29F2DF, #EF3EF1, #4CC9F0, #29F2DF)',
+                  animation: 'spin 8s linear infinite',
+                  opacity: 0.6,
+                }}
+              />
+
+              {/* Inner Glow Ring */}
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: '-8px',
+                  borderRadius: '50%',
+                  background: 'conic-gradient(from 180deg, #EF3EF1, #29F2DF, #4CC9F0, #EF3EF1)',
+                  animation: 'spin 12s linear infinite reverse',
+                  opacity: 0.4,
+                }}
+              />
+
+              {/* Image Container */}
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  borderRadius: '50%',
+                  overflow: 'hidden',
+                  border: '3px solid rgba(41, 242, 223, 0.8)',
+                  boxShadow:
+                    '0 0 40px rgba(41, 242, 223, 0.6), inset 0 0 40px rgba(41, 242, 223, 0.2)',
+                  background:
+                    'linear-gradient(135deg, rgba(41, 242, 223, 0.1) 0%, rgba(239, 62, 241, 0.1) 100%)',
+                }}
+              >
+                <img
+                  src="/amirreza-ghafarian.jpg"
+                  alt="Amirreza Ghaffarian Nakhodi"
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    objectPosition: 'center',
+                    filter: 'brightness(1.1) contrast(1.1)',
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Text Content */}
+            <GeometricWrapper
+              variant="complex"
+              color="#29F2DF"
+              glowIntensity="high"
               style={{
-                fontSize: '24px',
-                color: '#29F2DF',
-                fontWeight: '600',
-                marginBottom: '12px',
-                textShadow: '0 0 20px rgba(41, 242, 223, 0.6)',
+                display: 'inline-block',
+                padding: '40px 60px',
+                background:
+                  'linear-gradient(135deg, rgba(41, 242, 223, 0.15) 0%, rgba(239, 62, 241, 0.15) 100%)',
+                backdropFilter: 'blur(40px)',
+                border: '2px solid rgba(41, 242, 223, 0.5)',
+                boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5), 0 0 100px rgba(41, 242, 223, 0.3)',
               }}
             >
-              Frontend Developer & AI Engineer
-            </p>
-            <p
-              style={{
-                fontSize: '18px',
-                color: '#C8D8E8',
-                maxWidth: '600px',
-                margin: '0 auto',
-              }}
-            >
-              7 years programming • 5 years frontend • 3 years AI/ML
-            </p>
-          </GeometricWrapper>
+              <h1
+                style={{
+                  fontSize: '64px',
+                  fontWeight: '900',
+                  background: 'linear-gradient(135deg, #29F2DF 0%, #EF3EF1 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  marginBottom: '16px',
+                  letterSpacing: '2px',
+                }}
+              >
+                Amirreza Ghaffarian Nakhodi
+              </h1>
+              <p
+                style={{
+                  fontSize: '24px',
+                  color: '#29F2DF',
+                  fontWeight: '600',
+                  marginBottom: '12px',
+                  textShadow: '0 0 20px rgba(41, 242, 223, 0.6)',
+                }}
+              >
+                Frontend Developer & AI Engineer
+              </p>
+              <p
+                style={{
+                  fontSize: '18px',
+                  color: '#C8D8E8',
+                  maxWidth: '600px',
+                  margin: '0 auto',
+                }}
+              >
+                7 years programming • 5 years frontend • 3 years AI/ML
+              </p>
+            </GeometricWrapper>
+          </div>
         </div>
 
         {/* Navigation Tabs */}
@@ -315,27 +386,143 @@ export default function PortfolioPage() {
               >
                 About Me
               </h2>
+
+              {/* Profile Section with Photo */}
               <div
                 style={{
-                  fontSize: '18px',
-                  color: '#C8D8E8',
-                  lineHeight: '1.8',
-                  marginBottom: '30px',
+                  display: 'grid',
+                  gridTemplateColumns: 'auto 1fr',
+                  gap: '40px',
+                  alignItems: 'start',
+                  marginBottom: '40px',
+                  flexWrap: 'wrap',
                 }}
               >
-                <p style={{ marginBottom: '20px' }}>
-                  Passionate Frontend Developer and AI Engineer with 7 years of programming
-                  experience, specializing in modern web technologies and artificial intelligence.
-                </p>
-                <p style={{ marginBottom: '20px' }}>
-                  Currently pursuing Master's degree in AI and Robotics at Islamic Azad University,
-                  Mashhad, while working at Science and Technology Park on cutting-edge projects.
-                </p>
-                <p>
-                  Creator of RHUDS Pro - a comprehensive sci-fi HUD component library with 51+
-                  premium components, built with React 18, TypeScript, WebGL, and advanced animation
-                  systems.
-                </p>
+                {/* Professional Photo */}
+                <div
+                  style={{
+                    position: 'relative',
+                    width: '280px',
+                    height: '350px',
+                    borderRadius: '20px',
+                    overflow: 'hidden',
+                    border: '3px solid rgba(41, 242, 223, 0.6)',
+                    boxShadow: `
+                      0 0 40px rgba(41, 242, 223, 0.4),
+                      inset 0 0 40px rgba(41, 242, 223, 0.1),
+                      0 0 80px rgba(239, 62, 241, 0.2)
+                    `,
+                    background:
+                      'linear-gradient(135deg, rgba(41, 242, 223, 0.1) 0%, rgba(239, 62, 241, 0.1) 100%)',
+                    transition: 'all 0.3s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'scale(1.02) rotateY(5deg)';
+                    e.currentTarget.style.boxShadow = `
+                      0 0 60px rgba(41, 242, 223, 0.6),
+                      inset 0 0 40px rgba(41, 242, 223, 0.2),
+                      0 0 100px rgba(239, 62, 241, 0.3)
+                    `;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'scale(1) rotateY(0deg)';
+                    e.currentTarget.style.boxShadow = `
+                      0 0 40px rgba(41, 242, 223, 0.4),
+                      inset 0 0 40px rgba(41, 242, 223, 0.1),
+                      0 0 80px rgba(239, 62, 241, 0.2)
+                    `;
+                  }}
+                >
+                  <img
+                    src="/amirreza-ghafarian.jpg"
+                    alt="Amirreza Ghaffarian Nakhodi"
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      objectPosition: 'center',
+                      filter: 'brightness(1.05) contrast(1.1)',
+                    }}
+                  />
+
+                  {/* HUD Corner Accents */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '0',
+                      left: '0',
+                      width: '30px',
+                      height: '30px',
+                      border: '2px solid #29F2DF',
+                      borderRight: 'none',
+                      borderBottom: 'none',
+                      borderRadius: '4px 0 0 0',
+                    }}
+                  />
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '0',
+                      right: '0',
+                      width: '30px',
+                      height: '30px',
+                      border: '2px solid #29F2DF',
+                      borderLeft: 'none',
+                      borderBottom: 'none',
+                      borderRadius: '0 4px 0 0',
+                    }}
+                  />
+                  <div
+                    style={{
+                      position: 'absolute',
+                      bottom: '0',
+                      left: '0',
+                      width: '30px',
+                      height: '30px',
+                      border: '2px solid #EF3EF1',
+                      borderRight: 'none',
+                      borderTop: 'none',
+                      borderRadius: '0 0 0 4px',
+                    }}
+                  />
+                  <div
+                    style={{
+                      position: 'absolute',
+                      bottom: '0',
+                      right: '0',
+                      width: '30px',
+                      height: '30px',
+                      border: '2px solid #EF3EF1',
+                      borderLeft: 'none',
+                      borderTop: 'none',
+                      borderRadius: '0 0 4px 0',
+                    }}
+                  />
+                </div>
+
+                {/* Bio Text */}
+                <div
+                  style={{
+                    fontSize: '18px',
+                    color: '#C8D8E8',
+                    lineHeight: '1.8',
+                  }}
+                >
+                  <p style={{ marginBottom: '20px' }}>
+                    Passionate Frontend Developer and AI Engineer with 7 years of programming
+                    experience, specializing in modern web technologies and artificial intelligence.
+                  </p>
+                  <p style={{ marginBottom: '20px' }}>
+                    Currently pursuing Master's degree in AI and Robotics at Islamic Azad
+                    University, Mashhad, while working at Science and Technology Park on
+                    cutting-edge projects.
+                  </p>
+                  <p>
+                    Creator of RHUDS Pro - a comprehensive sci-fi HUD component library with 51+
+                    premium components, built with React 18, TypeScript, WebGL, and advanced
+                    animation systems.
+                  </p>
+                </div>
               </div>
 
               <div
@@ -800,6 +987,24 @@ export default function PortfolioPage() {
           }
           to {
             opacity: 1;
+          }
+        }
+
+        @keyframes float {
+          0%, 100% {
+            transform: translateY(0px);
+          }
+          50% {
+            transform: translateY(-20px);
+          }
+        }
+
+        @keyframes spin {
+          from {
+            transform: rotate(0deg);
+          }
+          to {
+            transform: rotate(360deg);
           }
         }
       `}</style>
