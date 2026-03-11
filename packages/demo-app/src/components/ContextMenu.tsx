@@ -28,7 +28,7 @@ export function ContextMenu({ x, y, onClose }: ContextMenuProps) {
         top: `${y}px`,
         background: 'linear-gradient(135deg, rgba(10, 18, 37, 0.7) 0%, rgba(20, 30, 48, 0.7) 100%)',
         border: '2px solid rgba(41, 242, 223, 0.5)',
-        borderRadius: '16px',
+        ,
         padding: '0.5rem 0',
         minWidth: '240px',
         zIndex: 10000,

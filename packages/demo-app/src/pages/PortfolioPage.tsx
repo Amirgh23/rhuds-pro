@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useContextMenu } from '../hooks/useContextMenu';
 import { GlassContextMenu } from '../components/GlassContextMenu';
+import { GeometricWrapper } from '../components/GeometricWrapper';
 
 interface Particle {
   x: number;
@@ -182,7 +183,10 @@ export default function PortfolioPage() {
             animation: 'fadeInUp 1s ease-out',
           }}
         >
-          <div
+          <GeometricWrapper
+            variant="complex"
+            color="#29F2DF"
+            glowIntensity="high"
             style={{
               display: 'inline-block',
               padding: '40px 60px',
@@ -190,7 +194,6 @@ export default function PortfolioPage() {
                 'linear-gradient(135deg, rgba(41, 242, 223, 0.15) 0%, rgba(239, 62, 241, 0.15) 100%)',
               backdropFilter: 'blur(40px)',
               border: '2px solid rgba(41, 242, 223, 0.5)',
-              borderRadius: '30px',
               boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5), 0 0 100px rgba(41, 242, 223, 0.3)',
             }}
           >
@@ -228,7 +231,7 @@ export default function PortfolioPage() {
             >
               7 years programming • 5 years frontend • 3 years AI/ML
             </p>
-          </div>
+          </GeometricWrapper>
         </div>
 
         {/* Navigation Tabs */}
@@ -284,14 +287,16 @@ export default function PortfolioPage() {
         </div>
 
         {/* Content Sections */}
-        <div
+        <GeometricWrapper
+          variant="complex"
+          color="#29F2DF"
+          glowIntensity="medium"
           style={{
             padding: '40px',
             background:
               'linear-gradient(135deg, rgba(41, 242, 223, 0.08) 0%, rgba(239, 62, 241, 0.08) 100%)',
             backdropFilter: 'blur(40px)',
             border: '2px solid rgba(41, 242, 223, 0.3)',
-            borderRadius: '30px',
             boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
             minHeight: '500px',
           }}
@@ -774,7 +779,7 @@ export default function PortfolioPage() {
               </div>
             </div>
           )}
-        </div>
+        </GeometricWrapper>
       </div>
 
       <style>{`

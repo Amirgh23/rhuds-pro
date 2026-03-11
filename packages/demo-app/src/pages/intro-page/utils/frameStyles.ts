@@ -74,7 +74,7 @@ export const getFrameContainerStyles = (
     padding: `${config.padding}px`,
     position: 'relative',
     overflow: 'hidden',
-    borderRadius: '8px',
+    ,
   };
 };
 

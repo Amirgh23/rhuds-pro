@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Navigation } from './intro-page/components/Navigation';
 import { CTAButtons } from './intro-page/components/CTAButtons';
 import { GlassContextMenu } from '../components/GlassContextMenu';
+import { GeometricWrapper } from '../components/GeometricWrapper';
 
 const FULL_TEXT = 'INITIALIZING RHUDS PRO SYSTEM...';
 
@@ -527,7 +528,7 @@ export default function IntroPage() {
             background: 'rgba(41, 242, 223, 0.05)',
             backdropFilter: 'blur(10px)',
             border: '1px solid rgba(41, 242, 223, 0.2)',
-            borderRadius: '8px',
+            ,
             boxShadow: '0 4px 20px rgba(41, 242, 223, 0.15)',
           }}
         >
@@ -546,7 +547,7 @@ export default function IntroPage() {
               'linear-gradient(135deg, rgba(41, 242, 223, 0.12) 0%, rgba(239, 62, 241, 0.12) 100%)',
             backdropFilter: 'blur(60px) saturate(200%)',
             border: '2px solid transparent',
-            borderRadius: '40px',
+            ,
             boxShadow: `
               0 30px 80px rgba(0, 0, 0, 0.6),
               0 0 150px rgba(41, 242, 223, 0.3),
@@ -590,7 +591,7 @@ export default function IntroPage() {
           }}
         >
           {/* Logo container with overflow hidden for holographic layers */}
-          <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '24px' }}>
+          <div style={{ position: 'relative', overflow: 'hidden' }}>
             {/* Holographic layers */}
             <div
               style={{
@@ -690,7 +691,7 @@ export default function IntroPage() {
                 textShadow: '0 0 40px rgba(41, 242, 223, 1), 0 0 80px rgba(41, 242, 223, 0.6)',
                 padding: '12px 32px',
                 border: '3px solid #29F2DF',
-                borderRadius: '8px',
+                ,
                 position: 'relative',
                 background: 'rgba(41, 242, 223, 0.08)',
                 boxShadow:
@@ -728,7 +729,7 @@ export default function IntroPage() {
               'linear-gradient(135deg, rgba(41, 242, 223, 0.1) 0%, rgba(239, 62, 241, 0.1) 100%)',
             backdropFilter: 'blur(40px) saturate(200%)',
             border: '2px solid rgba(41, 242, 223, 0.4)',
-            borderRadius: '32px',
+            ,
             boxShadow: `
               0 25px 70px rgba(0, 0, 0, 0.5),
               0 0 100px rgba(41, 242, 223, 0.25),
@@ -875,7 +876,7 @@ export default function IntroPage() {
                       'linear-gradient(135deg, rgba(41, 242, 223, 0.2) 0%, rgba(239, 62, 241, 0.2) 100%)',
                     backdropFilter: 'blur(25px) saturate(200%)',
                     border: '2px solid rgba(41, 242, 223, 0.6)',
-                    borderRadius: '30px',
+                    ,
                     fontSize: '15px',
                     color: '#29F2DF',
                     fontWeight: '700',
@@ -988,7 +989,7 @@ export default function IntroPage() {
                 width: '12px',
                 height: '12px',
                 background: 'radial-gradient(circle, #29F2DF 0%, #EF3EF1 100%)',
-                borderRadius: '50%',
+                ,
                 filter: 'blur(2px)',
                 animation: 'pulse 1.5s ease-in-out infinite',
               }}
@@ -1048,7 +1049,7 @@ export default function IntroPage() {
                 width: '200px',
                 height: '4px',
                 background: 'linear-gradient(90deg, transparent, #29F2DF, #EF3EF1, transparent)',
-                borderRadius: '2px',
+                ,
                 boxShadow: '0 0 20px rgba(41, 242, 223, 0.6)',
               }}
             />
@@ -1073,7 +1074,7 @@ export default function IntroPage() {
                     'linear-gradient(135deg, rgba(41, 242, 223, 0.08) 0%, rgba(239, 62, 241, 0.08) 100%)',
                   backdropFilter: 'blur(40px) saturate(200%)',
                   border: `2px solid ${feature.color}50`,
-                  borderRadius: '32px',
+                  ,
                   cursor: 'pointer',
                   transition: 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
                   animation: `fadeInUp 0.8s ease-out ${0.2 + index * 0.2}s backwards`,
@@ -1208,7 +1209,7 @@ export default function IntroPage() {
                     height: '40px',
                     borderTop: `3px solid ${feature.color}60`,
                     borderRight: `3px solid ${feature.color}60`,
-                    borderRadius: '0 8px 0 0',
+                    ,
                   }}
                 />
                 <div
@@ -1220,7 +1221,7 @@ export default function IntroPage() {
                     height: '40px',
                     borderBottom: `3px solid ${feature.color}60`,
                     borderLeft: `3px solid ${feature.color}60`,
-                    borderRadius: '0 0 0 8px',
+                    ,
                   }}
                 />
               </div>
@@ -1292,7 +1293,7 @@ export default function IntroPage() {
                 padding: '40px',
                 background: 'rgba(10, 10, 31, 0.8)',
                 border: `2px solid ${stat.color}`,
-                borderRadius: '16px',
+                ,
                 textAlign: 'center',
                 animation: `fadeInUp 0.8s ease-out ${0.2 + index * 0.1}s backwards`,
                 transition: 'all 0.3s ease',
@@ -1389,7 +1390,7 @@ export default function IntroPage() {
                     ? `linear-gradient(135deg, ${theme.primary} 0%, ${theme.secondary} 100%)`
                     : 'rgba(10, 10, 31, 0.8)',
                 border: `3px solid ${theme.primary}`,
-                borderRadius: '12px',
+                ,
                 color: currentTheme === key ? '#000' : theme.primary,
                 fontSize: '18px',
                 fontWeight: '800',
@@ -1459,7 +1460,7 @@ export default function IntroPage() {
                   'linear-gradient(135deg, rgba(41, 242, 223, 0.06) 0%, rgba(239, 62, 241, 0.06) 100%)',
                 backdropFilter: 'blur(30px) saturate(180%)',
                 border: `2px solid ${stat.color}40`,
-                borderRadius: '28px',
+                ,
                 transition: 'all 0.4s ease',
                 cursor: 'default',
                 boxShadow: `
@@ -1835,3 +1836,4 @@ export default function IntroPage() {
     </div>
   );
 }
+

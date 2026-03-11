@@ -1,4 +1,4 @@
-import { fc } from 'fast-check';
+import fc from 'fast-check';
 
 /**
  * Property 4: Animation Time Monotonicity

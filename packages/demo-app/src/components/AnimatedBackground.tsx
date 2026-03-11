@@ -3,23 +3,27 @@ import React from 'react';
 export const AnimatedBackground: React.FC = () => {
   return (
     <>
-      <div style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: '100%',
-        zIndex: 0,
-        pointerEvents: 'none',
-        overflow: 'hidden',
-      }}>
-        {/* Base dark background */}
-        <div style={{
-          position: 'absolute',
+      <div
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
           width: '100%',
           height: '100%',
-          background: '#0A1225',
-        }} />
+          zIndex: 0,
+          pointerEvents: 'none',
+          overflow: 'hidden',
+        }}
+      >
+        {/* Base dark background */}
+        <div
+          style={{
+            position: 'absolute',
+            width: '100%',
+            height: '100%',
+            background: '#0A1225',
+          }}
+        />
 
         {/* Animated gradient mesh */}
         <svg
@@ -70,35 +74,42 @@ export const AnimatedBackground: React.FC = () => {
         </svg>
 
         {/* Grid overlay */}
-        <div style={{
-          position: 'absolute',
-          width: '100%',
-          height: '100%',
-          backgroundImage: `
+        <div
+          style={{
+            position: 'absolute',
+            width: '100%',
+            height: '100%',
+            backgroundImage: `
             linear-gradient(0deg, rgba(41, 242, 223, 0.08) 1px, transparent 1px),
             linear-gradient(90deg, rgba(41, 242, 223, 0.08) 1px, transparent 1px)
           `,
-          backgroundSize: '60px 60px',
-          animation: 'gridScroll 30s linear infinite',
-        }} />
+            backgroundSize: '60px 60px',
+            animation: 'gridScroll 30s linear infinite',
+          }}
+        />
 
         {/* Animated scan lines */}
-        <div style={{
-          position: 'absolute',
-          width: '100%',
-          height: '100%',
-          backgroundImage: 'repeating-linear-gradient(0deg, rgba(41, 242, 223, 0.05) 0px, rgba(41, 242, 223, 0.05) 2px, transparent 2px, transparent 4px)',
-          animation: 'scanMove 8s linear infinite',
-          pointerEvents: 'none',
-        }} />
+        <div
+          style={{
+            position: 'absolute',
+            width: '100%',
+            height: '100%',
+            backgroundImage:
+              'repeating-linear-gradient(0deg, rgba(41, 242, 223, 0.05) 0px, rgba(41, 242, 223, 0.05) 2px, transparent 2px, transparent 4px)',
+            animation: 'scanMove 8s linear infinite',
+            pointerEvents: 'none',
+          }}
+        />
 
         {/* Floating particles */}
-        <div style={{
-          position: 'absolute',
-          width: '100%',
-          height: '100%',
-          overflow: 'hidden',
-        }}>
+        <div
+          style={{
+            position: 'absolute',
+            width: '100%',
+            height: '100%',
+            overflow: 'hidden',
+          }}
+        >
           {[...Array(20)].map((_, i) => (
             <div
               key={i}
@@ -107,29 +118,32 @@ export const AnimatedBackground: React.FC = () => {
                 width: '2px',
                 height: '2px',
                 background: i % 2 === 0 ? 'rgba(41, 242, 223, 0.6)' : 'rgba(239, 62, 241, 0.6)',
-                borderRadius: '50%',
                 left: `${Math.random() * 100}%`,
                 top: `${Math.random() * 100}%`,
                 animation: `float${i % 3} ${8 + Math.random() * 4}s ease-in-out infinite`,
-                boxShadow: i % 2 === 0 ? '0 0 10px rgba(41, 242, 223, 0.8)' : '0 0 10px rgba(239, 62, 241, 0.8)',
+                boxShadow:
+                  i % 2 === 0
+                    ? '0 0 10px rgba(41, 242, 223, 0.8)'
+                    : '0 0 10px rgba(239, 62, 241, 0.8)',
               }}
             />
           ))}
         </div>
 
         {/* Pulsing center glow */}
-        <div style={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: '800px',
-          height: '800px',
-          background: 'radial-gradient(circle, rgba(41, 242, 223, 0.1) 0%, transparent 70%)',
-          borderRadius: '50%',
-          filter: 'blur(60px)',
-          animation: 'centerPulse 6s ease-in-out infinite',
-        }} />
+        <div
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '800px',
+            height: '800px',
+            background: 'radial-gradient(circle, rgba(41, 242, 223, 0.1) 0%, transparent 70%)',
+            filter: 'blur(60px)',
+            animation: 'centerPulse 6s ease-in-out infinite',
+          }}
+        />
       </div>
 
       <style>{`

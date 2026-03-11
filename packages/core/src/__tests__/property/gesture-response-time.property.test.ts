@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { fc } from 'fast-check';
+import fc from 'fast-check';
 
 /**
  * Property 21: Gesture Response Time

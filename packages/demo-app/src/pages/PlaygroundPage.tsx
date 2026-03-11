@@ -46,6 +46,7 @@ import { AnimatedBackground } from '../components/AnimatedBackground';
 import { ComponentPlayground } from '../components/ComponentPlayground';
 import { useContextMenu } from '../hooks/useContextMenu';
 import { GlassContextMenu } from '../components/GlassContextMenu';
+import { GeometricWrapper } from '../components/GeometricWrapper';
 
 const PlaygroundContent: React.FC = () => {
   const notification = useNotification();
@@ -127,11 +128,13 @@ const PlaygroundContent: React.FC = () => {
         >
           <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
             <div style={{ flex: 1, minWidth: '300px' }}>
-              <div
+              <GeometricWrapper
+                variant="cut-corners"
+                color="#29F2DF"
+                glowIntensity="low"
                 style={{
                   padding: '2rem',
                   background: 'rgba(0, 0, 0, 0.3)',
-                  borderRadius: '8px',
                   display: 'flex',
                   justifyContent: 'center',
                 }}
@@ -139,7 +142,7 @@ const PlaygroundContent: React.FC = () => {
                 <Button variant={buttonVariant} onClick={() => notification.success('Clicked!')}>
                   {buttonText}
                 </Button>
-              </div>
+              </GeometricWrapper>
             </div>
             <div style={{ flex: 1, minWidth: '300px' }}>
               <Stack direction="column" gap="1rem">
@@ -227,14 +230,18 @@ const PlaygroundContent: React.FC = () => {
           description="Text input with validation"
           code={`<Input label="Username" placeholder="Enter username" />`}
         >
-          <div style={{ padding: '2rem', background: 'rgba(0, 0, 0, 0.3)', borderRadius: '8px' }}>
+          <GeometricWrapper
+            variant="angled"
+            color="#29F2DF"
+            style={{ padding: '2rem', background: 'rgba(0, 0, 0, 0.3)' }}
+          >
             <Input
               label="Username"
               placeholder="Enter your username"
               value={inputValue}
               onChange={(e: any) => setInputValue(e.target.value)}
             />
-          </div>
+          </GeometricWrapper>
         </ComponentPlayground>
 
         {/* Modal & Dialog */}
@@ -243,7 +250,11 @@ const PlaygroundContent: React.FC = () => {
           description="Overlay components with Portal rendering"
           code={`<Modal isOpen={isOpen} onClose={handleClose} title="Modal">Content</Modal>`}
         >
-          <div style={{ padding: '2rem', background: 'rgba(0, 0, 0, 0.3)', borderRadius: '8px' }}>
+          <GeometricWrapper
+            variant="notched"
+            color="#29F2DF"
+            style={{ padding: '2rem', background: 'rgba(0, 0, 0, 0.3)' }}
+          >
             <Stack direction="row" gap="1rem">
               <Button variant="primary" onClick={() => setModalOpen(true)}>
                 Open Modal
@@ -252,7 +263,7 @@ const PlaygroundContent: React.FC = () => {
                 Open Dialog
               </Button>
             </Stack>
-          </div>
+          </GeometricWrapper>
           <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title="Modal Title">
             <Text variant="body">This is a modal with Portal rendering!</Text>
           </Modal>
@@ -282,7 +293,11 @@ const PlaygroundContent: React.FC = () => {
           description="Range slider"
           code={`<Slider value={${sliderValue}} onChange={setValue} />`}
         >
-          <div style={{ padding: '2rem', background: 'rgba(0, 0, 0, 0.3)', borderRadius: '8px' }}>
+          <GeometricWrapper
+            variant="complex"
+            color="#29F2DF"
+            style={{ padding: '2rem', background: 'rgba(0, 0, 0, 0.3)' }}
+          >
             <Slider value={sliderValue} onChange={setSliderValue} min={0} max={100} step={1} />
             <Text
               variant="body"
@@ -290,7 +305,7 @@ const PlaygroundContent: React.FC = () => {
             >
               Value: {sliderValue}
             </Text>
-          </div>
+          </GeometricWrapper>
         </ComponentPlayground>
 
         {/* Checkbox & Switch */}
@@ -299,7 +314,11 @@ const PlaygroundContent: React.FC = () => {
           description="Toggle components"
           code={`<Checkbox checked={checked} onChange={setChecked} label="Accept" />`}
         >
-          <div style={{ padding: '2rem', background: 'rgba(0, 0, 0, 0.3)', borderRadius: '8px' }}>
+          <GeometricWrapper
+            variant="cut-corners"
+            color="#EF3EF1"
+            style={{ padding: '2rem', background: 'rgba(0, 0, 0, 0.3)' }}
+          >
             <Stack direction="column" gap="1.5rem">
               <Checkbox
                 checked={checkboxChecked}
@@ -312,7 +331,7 @@ const PlaygroundContent: React.FC = () => {
                 label="Enable notifications"
               />
             </Stack>
-          </div>
+          </GeometricWrapper>
         </ComponentPlayground>
 
         {/* HoloCheckbox */}
@@ -321,11 +340,13 @@ const PlaygroundContent: React.FC = () => {
           description="Futuristic holographic checkbox with 3D effects"
           code={`<HoloCheckbox checked={checked} onChange={setChecked} label="SYSTEM" />`}
         >
-          <div
+          <GeometricWrapper
+            variant="angled"
+            color="#29F2DF"
+            glowIntensity="medium"
             style={{
               padding: '2rem',
               background: 'rgba(0, 0, 0, 0.9)',
-              borderRadius: '8px',
               display: 'flex',
               justifyContent: 'center',
             }}
@@ -335,7 +356,7 @@ const PlaygroundContent: React.FC = () => {
               onChange={setHoloCheckboxChecked}
               label="HOLOGRAPHIC SYSTEM"
             />
-          </div>
+          </GeometricWrapper>
         </ComponentPlayground>
 
         {/* Radio */}
@@ -344,7 +365,11 @@ const PlaygroundContent: React.FC = () => {
           description="Radio button group"
           code={`<RadioGroup value={value} onChange={setValue} options={options} />`}
         >
-          <div style={{ padding: '2rem', background: 'rgba(0, 0, 0, 0.3)', borderRadius: '8px' }}>
+          <GeometricWrapper
+            variant="notched"
+            color="#4CC9F0"
+            style={{ padding: '2rem', background: 'rgba(0, 0, 0, 0.3)' }}
+          >
             <RadioGroup
               value={radioValue}
               onChange={(v: string | number) => setRadioValue(String(v))}
@@ -354,7 +379,7 @@ const PlaygroundContent: React.FC = () => {
                 { label: 'Option 3', value: 'option3' },
               ]}
             />
-          </div>
+          </GeometricWrapper>
         </ComponentPlayground>
 
         {/* Tabs */}
@@ -363,7 +388,11 @@ const PlaygroundContent: React.FC = () => {
           description="Tabbed content"
           code={`<Tabs items={items} activeIndex={0} />`}
         >
-          <div style={{ padding: '2rem', background: 'rgba(0, 0, 0, 0.3)', borderRadius: '8px' }}>
+          <GeometricWrapper
+            variant="complex"
+            color="#29F2DF"
+            style={{ padding: '2rem', background: 'rgba(0, 0, 0, 0.3)' }}
+          >
             <Tabs
               items={[
                 { label: 'Overview', content: <Text variant="body">Overview content</Text> },
@@ -374,7 +403,7 @@ const PlaygroundContent: React.FC = () => {
               onChange={setActiveTab}
               variant="line"
             />
-          </div>
+          </GeometricWrapper>
         </ComponentPlayground>
 
         {/* Table */}
@@ -383,7 +412,11 @@ const PlaygroundContent: React.FC = () => {
           description="Data table with sorting"
           code={`<Table data={data} columns={columns} />`}
         >
-          <div style={{ padding: '2rem', background: 'rgba(0, 0, 0, 0.3)', borderRadius: '8px' }}>
+          <GeometricWrapper
+            variant="angled"
+            color="#EF3EF1"
+            style={{ padding: '2rem', background: 'rgba(0, 0, 0, 0.3)' }}
+          >
             <Table
               data={tableData}
               columns={[
@@ -393,7 +426,7 @@ const PlaygroundContent: React.FC = () => {
               ]}
               onRowClick={(row) => notification.info(`Clicked: ${row.name}`)}
             />
-          </div>
+          </GeometricWrapper>
         </ComponentPlayground>
 
         {/* Accordion */}
@@ -402,7 +435,11 @@ const PlaygroundContent: React.FC = () => {
           description="Expandable sections"
           code={`<Accordion items={items} expandedItems={expanded} />`}
         >
-          <div style={{ padding: '2rem', background: 'rgba(0, 0, 0, 0.3)', borderRadius: '8px' }}>
+          <GeometricWrapper
+            variant="cut-corners"
+            color="#4CC9F0"
+            style={{ padding: '2rem', background: 'rgba(0, 0, 0, 0.3)' }}
+          >
             <Accordion
               items={[
                 {
@@ -431,7 +468,7 @@ const PlaygroundContent: React.FC = () => {
               }}
               allowMultiple
             />
-          </div>
+          </GeometricWrapper>
         </ComponentPlayground>
 
         {/* Stepper */}
@@ -440,7 +477,11 @@ const PlaygroundContent: React.FC = () => {
           description="Step-by-step progress"
           code={`<Stepper steps={steps} currentStep={0} />`}
         >
-          <div style={{ padding: '2rem', background: 'rgba(0, 0, 0, 0.3)', borderRadius: '8px' }}>
+          <GeometricWrapper
+            variant="notched"
+            color="#4CC9F0"
+            style={{ padding: '2rem', background: 'rgba(0, 0, 0, 0.3)' }}
+          >
             <Stepper
               steps={[
                 { key: 'step1', label: 'Account', description: 'Create account' },
@@ -469,7 +510,7 @@ const PlaygroundContent: React.FC = () => {
                 Next
               </Button>
             </div>
-          </div>
+          </GeometricWrapper>
         </ComponentPlayground>
 
         {/* Color & Date Pickers */}
@@ -478,7 +519,11 @@ const PlaygroundContent: React.FC = () => {
           description="Specialized inputs"
           code={`<ColorPicker value={color} onChange={setColor} />`}
         >
-          <div style={{ padding: '2rem', background: 'rgba(0, 0, 0, 0.3)', borderRadius: '8px' }}>
+          <GeometricWrapper
+            variant="complex"
+            color="#EF3EF1"
+            style={{ padding: '2rem', background: 'rgba(0, 0, 0, 0.3)' }}
+          >
             <Stack direction="column" gap="2rem">
               <div>
                 <Text variant="h4" style={{ marginBottom: '1rem', color: '#29F2DF' }}>
@@ -499,7 +544,7 @@ const PlaygroundContent: React.FC = () => {
                 </Text>
               </div>
             </Stack>
-          </div>
+          </GeometricWrapper>
         </ComponentPlayground>
 
         {/* Utility Components */}
@@ -508,7 +553,11 @@ const PlaygroundContent: React.FC = () => {
           description="Tooltip, Popover, Dropdown"
           code={`<Tooltip content="Tooltip text"><Button>Hover</Button></Tooltip>`}
         >
-          <div style={{ padding: '2rem', background: 'rgba(0, 0, 0, 0.3)', borderRadius: '8px' }}>
+          <GeometricWrapper
+            variant="angled"
+            color="#29F2DF"
+            style={{ padding: '2rem', background: 'rgba(0, 0, 0, 0.3)' }}
+          >
             <Stack
               direction="row"
               gap="1rem"
@@ -550,7 +599,7 @@ const PlaygroundContent: React.FC = () => {
                 <Button variant="secondary">Open Menu</Button>
               </Dropdown>
             </Stack>
-          </div>
+          </GeometricWrapper>
         </ComponentPlayground>
 
         {/* Breadcrumb */}
@@ -559,7 +608,11 @@ const PlaygroundContent: React.FC = () => {
           description="Navigation breadcrumb"
           code={`<Breadcrumb items={items} />`}
         >
-          <div style={{ padding: '2rem', background: 'rgba(0, 0, 0, 0.3)', borderRadius: '8px' }}>
+          <GeometricWrapper
+            variant="cut-corners"
+            color="#4CC9F0"
+            style={{ padding: '2rem', background: 'rgba(0, 0, 0, 0.3)' }}
+          >
             <Breadcrumb
               items={[
                 { label: 'Home', href: '/' },
@@ -567,7 +620,7 @@ const PlaygroundContent: React.FC = () => {
                 { label: 'Details', href: '/products/1' },
               ]}
             />
-          </div>
+          </GeometricWrapper>
         </ComponentPlayground>
 
         {/* Pagination */}
@@ -576,14 +629,18 @@ const PlaygroundContent: React.FC = () => {
           description="Page navigation"
           code={`<Pagination total={100} perPage={10} currentPage={1} />`}
         >
-          <div style={{ padding: '2rem', background: 'rgba(0, 0, 0, 0.3)', borderRadius: '8px' }}>
+          <GeometricWrapper
+            variant="notched"
+            color="#29F2DF"
+            style={{ padding: '2rem', background: 'rgba(0, 0, 0, 0.3)' }}
+          >
             <Pagination
               total={100}
               perPage={10}
               currentPage={1}
               onPageChange={(page) => notification.info(`Page ${page}`)}
             />
-          </div>
+          </GeometricWrapper>
         </ComponentPlayground>
 
         {/* Grid Layout */}
@@ -592,7 +649,11 @@ const PlaygroundContent: React.FC = () => {
           description="Responsive grid layout"
           code={`<Grid columns={3} gap="1rem">...</Grid>`}
         >
-          <div style={{ padding: '2rem', background: 'rgba(0, 0, 0, 0.3)', borderRadius: '8px' }}>
+          <GeometricWrapper
+            variant="complex"
+            color="#EF3EF1"
+            style={{ padding: '2rem', background: 'rgba(0, 0, 0, 0.3)' }}
+          >
             <Grid columns={3} gap="1rem">
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <div
@@ -608,7 +669,7 @@ const PlaygroundContent: React.FC = () => {
                 </div>
               ))}
             </Grid>
-          </div>
+          </GeometricWrapper>
         </ComponentPlayground>
 
         {/* CyberCard */}
@@ -690,7 +751,12 @@ const PlaygroundContent: React.FC = () => {
   </div>
 </HudFrame>`}
         >
-          <div style={{ padding: '2rem', background: 'rgba(0, 0, 0, 0.5)', borderRadius: '8px' }}>
+          <GeometricWrapper
+            variant="complex"
+            color="#29F2DF"
+            glowIntensity="medium"
+            style={{ padding: '2rem', background: 'rgba(0, 0, 0, 0.5)' }}
+          >
             <Stack direction="column" gap="2rem" style={{ alignItems: 'center' }}>
               <div
                 style={{ width: '100%', maxWidth: '800px', height: '400px', position: 'relative' }}
@@ -737,7 +803,7 @@ const PlaygroundContent: React.FC = () => {
                 </HudFrame>
               </div>
             </Stack>
-          </div>
+          </GeometricWrapper>
         </ComponentPlayground>
 
         {/* Loader Components */}
@@ -747,7 +813,12 @@ const PlaygroundContent: React.FC = () => {
           code={`<AbstergoLoader text="Loading" size={1} />
 <HeartRateLoader color="#29F2DF" width={400} height={150} />`}
         >
-          <div style={{ padding: '2rem', background: 'rgba(0, 0, 0, 0.5)', borderRadius: '8px' }}>
+          <GeometricWrapper
+            variant="angled"
+            color="#EF3EF1"
+            glowIntensity="medium"
+            style={{ padding: '2rem', background: 'rgba(0, 0, 0, 0.5)' }}
+          >
             <Stack direction="column" gap="3rem">
               <div>
                 <Text variant="h4" style={{ marginBottom: '1rem', color: '#29F2DF' }}>
@@ -790,7 +861,7 @@ const PlaygroundContent: React.FC = () => {
                 </div>
               </div>
             </Stack>
-          </div>
+          </GeometricWrapper>
         </ComponentPlayground>
 
         {/* HudBox */}

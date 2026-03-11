@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { Text } from '@rhuds/components';
 
 interface DocViewerProps {
@@ -11,7 +11,7 @@ export const DocViewer: React.FC<DocViewerProps> = ({ title, content }) => {
     <div style={{
       padding: '2rem',
       background: 'rgba(41, 242, 223, 0.05)',
-      borderRadius: '8px',
+      ,
       border: '1px solid rgba(41, 242, 223, 0.3)',
       marginBottom: '2rem',
     }}>

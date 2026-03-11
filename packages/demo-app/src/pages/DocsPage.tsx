@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import { useContextMenu } from '../hooks/useContextMenu';
 import { GlassContextMenu } from '../components/GlassContextMenu';
@@ -150,7 +150,7 @@ const ChartDemo: React.FC = () => {
           Area
         </Button>
       </Stack>
-      <div style={{ background: 'rgba(0, 0, 0, 0.3)', padding: '1rem', borderRadius: '4px' }}>
+      <div style={{ background: 'rgba(0, 0, 0, 0.3)', padding: '1rem' }}>
         <Chart
           type={chartType}
           data={chartData}
@@ -427,7 +427,6 @@ export const DocsPage: React.FC = () => {
                       border: 'none',
                       color: selectedDoc === doc ? '#29F2DF' : 'rgba(255, 255, 255, 0.7)',
                       cursor: 'pointer',
-                      borderRadius: '4px',
                       transition: 'all 0.2s',
                       fontSize: '0.85rem',
                     }}
@@ -519,9 +518,7 @@ export const DocsPage: React.FC = () => {
                 description="Futuristic HUD-style button with glowing effects"
                 code={`<HudButton onClick={handleClick}>I'M READY</HudButton>`}
               >
-                <div
-                  style={{ background: 'rgba(0, 0, 0, 0.5)', padding: '2rem', borderRadius: '8px' }}
-                >
+                <div style={{ background: 'rgba(0, 0, 0, 0.5)', padding: '2rem' }}>
                   <Stack direction="column" gap="2rem">
                     <div>
                       <Text variant="h4" style={{ color: '#29F2DF', marginBottom: '1rem' }}>
@@ -553,7 +550,7 @@ export const DocsPage: React.FC = () => {
                         style={{
                           background: '#000',
                           padding: '1rem',
-                          borderRadius: '4px',
+
                           color: '#29F2DF',
                           fontSize: '0.85rem',
                           overflow: 'auto',
@@ -587,19 +584,19 @@ function MyComponent() {
                       </Text>
                       <Stack direction="column" gap="0.5rem">
                         <Text variant="body" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
-                          • Neon green (#29F2DF) HUD aesthetic
+                          � Neon green (#29F2DF) HUD aesthetic
                         </Text>
                         <Text variant="body" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
-                          • Glowing border and shadow effects
+                          � Glowing border and shadow effects
                         </Text>
                         <Text variant="body" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
-                          • Light wave animation on hover
+                          � Light wave animation on hover
                         </Text>
                         <Text variant="body" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
-                          • Integrated with Bleeps audio system
+                          � Integrated with Bleeps audio system
                         </Text>
                         <Text variant="body" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
-                          • Perfect for cyberpunk/futuristic UIs
+                          � Perfect for cyberpunk/futuristic UIs
                         </Text>
                       </Stack>
                     </div>
@@ -618,7 +615,6 @@ function MyComponent() {
                   style={{
                     background: 'rgba(255, 255, 255, 0.1)',
                     padding: '2rem',
-                    borderRadius: '8px',
                   }}
                 >
                   <Stack direction="column" gap="2rem">
@@ -654,7 +650,7 @@ function MyComponent() {
                         style={{
                           background: '#000',
                           padding: '1rem',
-                          borderRadius: '4px',
+
                           color: '#29F2DF',
                           fontSize: '0.85rem',
                           overflow: 'auto',
@@ -688,25 +684,25 @@ function MyComponent() {
                       </Text>
                       <Stack direction="column" gap="0.5rem">
                         <Text variant="body" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
-                          • VT323 monospace font for retro terminal look
+                          � VT323 monospace font for retro terminal look
                         </Text>
                         <Text variant="body" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
-                          • RGB glitch animation on hover (magenta, green, blue, cyan)
+                          � RGB glitch animation on hover (magenta, green, blue, cyan)
                         </Text>
                         <Text variant="body" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
-                          • HUD-style cyan color (#29F2DF) visible on any background
+                          � HUD-style cyan color (#29F2DF) visible on any background
                         </Text>
                         <Text variant="body" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
-                          • Glowing border and shadow effects
+                          � Glowing border and shadow effects
                         </Text>
                         <Text variant="body" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
-                          • Blinking text decoration and arrow
+                          � Blinking text decoration and arrow
                         </Text>
                         <Text variant="body" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
-                          • Integrated with Bleeps audio system
+                          � Integrated with Bleeps audio system
                         </Text>
                         <Text variant="body" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
-                          • Perfect for retro/terminal/hacker UIs
+                          � Perfect for retro/terminal/hacker UIs
                         </Text>
                       </Stack>
                     </div>
@@ -745,9 +741,7 @@ function MyComponent() {
                 description="Matrix-style hacker input with glowing effects and animations"
                 code={`<HackerInput label="Input Command" placeholder="Type command..." />`}
               >
-                <div
-                  style={{ background: 'rgba(0, 0, 0, 0.8)', padding: '2rem', borderRadius: '8px' }}
-                >
+                <div style={{ background: 'rgba(0, 0, 0, 0.8)', padding: '2rem' }}>
                   <Stack direction="column" gap="2rem">
                     <div>
                       <Text variant="h4" color="#29F2DF" style={{ marginBottom: '1rem' }}>
@@ -770,25 +764,25 @@ function MyComponent() {
                       </Text>
                       <Stack direction="column" gap="0.5rem">
                         <Text variant="body" color="#1C7FA6">
-                          • Matrix green (#29F2DF) color scheme
+                          � Matrix green (#29F2DF) color scheme
                         </Text>
                         <Text variant="body" color="#1C7FA6">
-                          • Glowing border with enhanced glow on focus
+                          � Glowing border with enhanced glow on focus
                         </Text>
                         <Text variant="body" color="#1C7FA6">
-                          • Scanline animation effect
+                          � Scanline animation effect
                         </Text>
                         <Text variant="body" color="#1C7FA6">
-                          • Blinking cursor indicator
+                          � Blinking cursor indicator
                         </Text>
                         <Text variant="body" color="#1C7FA6">
-                          • Glitch effect on hover
+                          � Glitch effect on hover
                         </Text>
                         <Text variant="body" color="#1C7FA6">
-                          • Floating label animation
+                          � Floating label animation
                         </Text>
                         <Text variant="body" color="#1C7FA6">
-                          • Courier New monospace font
+                          � Courier New monospace font
                         </Text>
                       </Stack>
                     </div>
@@ -797,7 +791,7 @@ function MyComponent() {
                       style={{
                         background: 'rgba(41, 242, 223, 0.05)',
                         padding: '1.5rem',
-                        borderRadius: '4px',
+
                         border: '1px solid rgba(41, 242, 223, 0.3)',
                       }}
                     >
@@ -853,7 +847,7 @@ function MyComponent() {
                       style={{
                         padding: '2rem',
                         background: 'rgba(41, 242, 223, 0.1)',
-                        borderRadius: '4px',
+
                         textAlign: 'center',
                       }}
                     >
@@ -875,7 +869,6 @@ function MyComponent() {
                   style={{
                     background: 'rgba(41, 242, 223, 0.1)',
                     padding: '2rem',
-                    borderRadius: '4px',
                   }}
                 >
                   <Text variant="body">Container content with max-width</Text>
@@ -894,7 +887,6 @@ function MyComponent() {
                     style={{
                       padding: '1rem',
                       background: 'rgba(41, 242, 223, 0.1)',
-                      borderRadius: '4px',
                     }}
                   >
                     Item 1
@@ -903,7 +895,6 @@ function MyComponent() {
                     style={{
                       padding: '1rem',
                       background: 'rgba(41, 242, 223, 0.1)',
-                      borderRadius: '4px',
                     }}
                   >
                     Item 2
@@ -912,7 +903,6 @@ function MyComponent() {
                     style={{
                       padding: '1rem',
                       background: 'rgba(41, 242, 223, 0.1)',
-                      borderRadius: '4px',
                     }}
                   >
                     Item 3
@@ -929,9 +919,7 @@ function MyComponent() {
 <HudBox variant="portrait-card" color="#1C7FA6">Vertical</HudBox>
 <HudBox variant="landscape-bar" color="#1C7FA6">Horizontal</HudBox>`}
               >
-                <div
-                  style={{ background: 'rgba(0, 0, 0, 0.8)', padding: '2rem', borderRadius: '8px' }}
-                >
+                <div style={{ background: 'rgba(0, 0, 0, 0.8)', padding: '2rem' }}>
                   <div
                     style={{
                       marginBottom: '2rem',
@@ -941,7 +929,7 @@ function MyComponent() {
                     }}
                   >
                     <HudButton onClick={() => setHudBoxAnimated(!hudBoxAnimated)}>
-                      {hudBoxAnimated ? '⏸ Static Border' : '▶ Animated Border'}
+                      {hudBoxAnimated ? '? Static Border' : '? Animated Border'}
                     </HudButton>
                     <Text color="#29F2DF">Mode: {hudBoxAnimated ? 'Animated' : 'Static'}</Text>
                   </div>
@@ -992,7 +980,7 @@ function MyComponent() {
                           <Text color="#29F2DF">Tech Panel</Text>
                         </HudBox>
                         <HudBox variant="arrow-right" color="#29F2DF" animated={hudBoxAnimated}>
-                          <Text color="#29F2DF">Arrow →</Text>
+                          <Text color="#29F2DF">Arrow ?</Text>
                         </HudBox>
                         <HudBox variant="chevron" color="#29F2DF" animated={hudBoxAnimated}>
                           <Text color="#29F2DF">Chevron</Text>
@@ -1015,7 +1003,7 @@ function MyComponent() {
                             <br />
                             Tall
                             <br />
-                            250×400
+                            250�400
                           </Text>
                         </HudBox>
                         <HudBox variant="portrait-slim" color="#29F2DF" animated={hudBoxAnimated}>
@@ -1024,7 +1012,7 @@ function MyComponent() {
                             <br />
                             Slim
                             <br />
-                            200×350
+                            200�350
                           </Text>
                         </HudBox>
                         <HudBox variant="portrait-card" color="#1C7FA6" animated={hudBoxAnimated}>
@@ -1033,7 +1021,7 @@ function MyComponent() {
                             <br />
                             Card
                             <br />
-                            280×380
+                            280�380
                           </Text>
                         </HudBox>
                         <HudBox variant="portrait-banner" color="#29F2DF" animated={hudBoxAnimated}>
@@ -1042,7 +1030,7 @@ function MyComponent() {
                             <br />
                             Banner
                             <br />
-                            220×320
+                            220�320
                           </Text>
                         </HudBox>
                       </Stack>
@@ -1054,20 +1042,20 @@ function MyComponent() {
                       </Text>
                       <Stack direction="column" gap="2rem" style={{ alignItems: 'center' }}>
                         <HudBox variant="landscape-wide" color="#28125A" animated={hudBoxAnimated}>
-                          <Text color="#28125A">Landscape Wide - 450×180</Text>
+                          <Text color="#28125A">Landscape Wide - 450�180</Text>
                         </HudBox>
                         <HudBox variant="landscape-ultra" color="#EF3EF1" animated={hudBoxAnimated}>
-                          <Text color="#EF3EF1">Landscape Ultra - 500×150</Text>
+                          <Text color="#EF3EF1">Landscape Ultra - 500�150</Text>
                         </HudBox>
                         <HudBox variant="landscape-bar" color="#1C7FA6" animated={hudBoxAnimated}>
-                          <Text color="#1C7FA6">Landscape Bar - 550×120</Text>
+                          <Text color="#1C7FA6">Landscape Bar - 550�120</Text>
                         </HudBox>
                         <HudBox
                           variant="landscape-ribbon"
                           color="#1C7FA6"
                           animated={hudBoxAnimated}
                         >
-                          <Text color="#1C7FA6">Landscape Ribbon - 480×140</Text>
+                          <Text color="#1C7FA6">Landscape Ribbon - 480�140</Text>
                         </HudBox>
                       </Stack>
                     </div>
@@ -1077,14 +1065,14 @@ function MyComponent() {
                       Features:
                     </Text>
                     <Text variant="code" color="#00ccff" style={{ whiteSpace: 'pre-wrap' }}>
-                      {`• Asymmetrical geometric shape (clip-path)
-• Animated rotating gradient borders
-• Glitch scanline effects
-• Blinking shadow animations
-• HUD cyan color scheme
-• Three size variants: compact, default, wide
-• Customizable width and height
-• Perfect for HUD interfaces and dashboards`}
+                      {`� Asymmetrical geometric shape (clip-path)
+� Animated rotating gradient borders
+� Glitch scanline effects
+� Blinking shadow animations
+� HUD cyan color scheme
+� Three size variants: compact, default, wide
+� Customizable width and height
+� Perfect for HUD interfaces and dashboards`}
                     </Text>
                   </div>
                 </div>
@@ -1108,9 +1096,7 @@ function MyComponent() {
   </div>
 </HudFrame>`}
               >
-                <div
-                  style={{ background: 'rgba(0, 0, 0, 0.8)', padding: '2rem', borderRadius: '8px' }}
-                >
+                <div style={{ background: 'rgba(0, 0, 0, 0.8)', padding: '2rem' }}>
                   <Stack direction="column" gap="2rem" style={{ alignItems: 'center' }}>
                     <div
                       style={{
@@ -1172,14 +1158,14 @@ function MyComponent() {
                       Features:
                     </Text>
                     <Text variant="code" color="#00ccff" style={{ whiteSpace: 'pre-wrap' }}>
-                      {`• 18 decorative neon lines positioned around edges
-• Integrated TitleBox with number badge and tooltip
-• Animated gradient sweep on all lines
-• Glowing border and shadow effects
-• Scrollable content area with hidden scrollbar
-• Customizable color scheme for all elements
-• Backdrop blur for glass-morphism effect
-• Perfect for HUD dashboards and monitoring UIs`}
+                      {`� 18 decorative neon lines positioned around edges
+� Integrated TitleBox with number badge and tooltip
+� Animated gradient sweep on all lines
+� Glowing border and shadow effects
+� Scrollable content area with hidden scrollbar
+� Customizable color scheme for all elements
+� Backdrop blur for glass-morphism effect
+� Perfect for HUD dashboards and monitoring UIs`}
                     </Text>
                   </div>
                 </div>
@@ -1205,9 +1191,7 @@ function MyComponent() {
                 description="Holographic 3D checkbox with futuristic space effects, particles, and animations"
                 code={`<HoloCheckbox checked={checked} onChange={setChecked} label="SYSTEM" />`}
               >
-                <div
-                  style={{ background: 'rgba(0, 0, 0, 0.9)', padding: '2rem', borderRadius: '8px' }}
-                >
+                <div style={{ background: 'rgba(0, 0, 0, 0.9)', padding: '2rem' }}>
                   <Stack direction="column" gap="2rem" style={{ alignItems: 'center' }}>
                     <div>
                       <Text
@@ -1224,16 +1208,16 @@ function MyComponent() {
                         Features:
                       </Text>
                       <Text variant="code" color="#00ff88" style={{ whiteSpace: 'pre-wrap' }}>
-                        {`• 3D holographic effects with cube rotation
-• Animated star field background
-• Grid plane with perspective
-• Particle system on activation
-• Frequency spectrum visualization
-• Data chips with system information
-• Activation rings animation
-• Color transition (blue → green)
-• Scan line effects
-• Corner accents`}
+                        {`� 3D holographic effects with cube rotation
+� Animated star field background
+� Grid plane with perspective
+� Particle system on activation
+� Frequency spectrum visualization
+� Data chips with system information
+� Activation rings animation
+� Color transition (blue ? green)
+� Scan line effects
+� Corner accents`}
                       </Text>
                     </div>
                   </Stack>
@@ -1446,9 +1430,9 @@ function MyComponent() {
                 <div style={{ height: '300px', position: 'relative' }}>
                   <Sidebar
                     items={[
-                      { label: 'Dashboard', icon: '📊', href: '/' },
-                      { label: 'Settings', icon: '⚙️', href: '/settings' },
-                      { label: 'Profile', icon: '👤', href: '/profile' },
+                      { label: 'Dashboard', icon: '??', href: '/' },
+                      { label: 'Settings', icon: '??', href: '/settings' },
+                      { label: 'Profile', icon: '??', href: '/profile' },
                     ]}
                     width={200}
                   />
@@ -1464,9 +1448,9 @@ function MyComponent() {
               >
                 <Menu
                   items={[
-                    { label: 'Profile', href: '#profile', icon: '👤' },
-                    { label: 'Settings', href: '#settings', icon: '⚙️' },
-                    { label: 'Logout', href: '#logout', icon: '🚪' },
+                    { label: 'Profile', href: '#profile', icon: '??' },
+                    { label: 'Settings', href: '#settings', icon: '??' },
+                    { label: 'Logout', href: '#logout', icon: '??' },
                   ]}
                   trigger={<Button>Open Menu</Button>}
                   onItemClick={(item) => alert(`Clicked: ${item.label}`)}
@@ -1529,9 +1513,7 @@ function MyComponent() {
                 description="Futuristic HUD-style card with glitch effects and animated borders"
                 code={`<CyberCard title="PROFILE" footer="Social Links" />`}
               >
-                <div
-                  style={{ background: 'rgba(0, 0, 0, 0.8)', padding: '2rem', borderRadius: '8px' }}
-                >
+                <div style={{ background: 'rgba(0, 0, 0, 0.8)', padding: '2rem' }}>
                   <Stack
                     direction="row"
                     gap="2rem"
@@ -1556,9 +1538,7 @@ function MyComponent() {
   githubUrl="https://github.com"
 />`}
               >
-                <div
-                  style={{ background: 'rgba(0, 0, 0, 0.8)', padding: '2rem', borderRadius: '8px' }}
-                >
+                <div style={{ background: 'rgba(0, 0, 0, 0.8)', padding: '2rem' }}>
                   <Stack
                     direction="row"
                     gap="2rem"
@@ -1589,9 +1569,7 @@ function MyComponent() {
                 description="Triangular animated loader with synchronization text"
                 code={`<AbstergoLoader text="Loading" size={1} />`}
               >
-                <div
-                  style={{ background: 'rgba(0, 0, 0, 0.8)', padding: '3rem', borderRadius: '8px' }}
-                >
+                <div style={{ background: 'rgba(0, 0, 0, 0.8)', padding: '3rem' }}>
                   <Stack
                     direction="row"
                     gap="3rem"
@@ -1611,9 +1589,7 @@ function MyComponent() {
                 description="ECG/heart rate style animated loader with customizable colors"
                 code={`<HeartRateLoader color="#29F2DF" width={400} height={150} />`}
               >
-                <div
-                  style={{ background: 'rgba(0, 0, 0, 0.8)', padding: '3rem', borderRadius: '8px' }}
-                >
+                <div style={{ background: 'rgba(0, 0, 0, 0.8)', padding: '3rem' }}>
                   <Stack direction="column" gap="2rem" style={{ alignItems: 'center' }}>
                     <HeartRateLoader color="#EF3EF1" width={550} height={210} />
                     <HeartRateLoader color="#29F2DF" width={400} height={150} />
@@ -1652,7 +1628,7 @@ function MyComponent() {
                     style={{
                       background: 'rgba(0, 0, 0, 0.5)',
                       padding: '1rem',
-                      borderRadius: '4px',
+
                       overflow: 'auto',
                       fontSize: '0.85rem',
                     }}
@@ -1728,9 +1704,9 @@ function YourComponent() {
               >
                 <Dropdown
                   items={[
-                    { key: 'item1', label: 'Item 1', icon: '📁' },
-                    { key: 'item2', label: 'Item 2', icon: '📄' },
-                    { key: 'item3', label: 'Item 3', icon: '📝' },
+                    { key: 'item1', label: 'Item 1', icon: '??' },
+                    { key: 'item2', label: 'Item 2', icon: '??' },
+                    { key: 'item3', label: 'Item 3', icon: '??' },
                   ]}
                 >
                   <Button>Open Dropdown</Button>
@@ -1750,7 +1726,7 @@ function YourComponent() {
                     style={{
                       background: 'rgba(0, 0, 0, 0.5)',
                       padding: '1rem',
-                      borderRadius: '4px',
+
                       fontSize: '0.85rem',
                     }}
                   >
@@ -1833,7 +1809,7 @@ function YourComponent() {
                     style={{
                       background: 'rgba(0, 0, 0, 0.5)',
                       padding: '1rem',
-                      borderRadius: '4px',
+
                       fontFamily: 'monospace',
                       fontSize: '0.85rem',
                     }}
@@ -1856,7 +1832,7 @@ function YourComponent() {
                     style={{
                       background: 'rgba(0, 0, 0, 0.5)',
                       padding: '1rem',
-                      borderRadius: '4px',
+
                       minHeight: '150px',
                     }}
                   >
@@ -1902,7 +1878,7 @@ function YourComponent() {
                     style={{
                       background: 'rgba(0, 0, 0, 0.5)',
                       padding: '1rem',
-                      borderRadius: '4px',
+
                       overflow: 'auto',
                       fontSize: '0.85rem',
                     }}
