@@ -6,7 +6,21 @@ export default function IntroPageFuturistic() {
   const navigate = useNavigate();
   const [isLoaded, setIsLoaded] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [terminalText, setTerminalText] = useState('');
+  const [copied, setCopied] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
+
+  const codeLines = [
+    '$ npm install @rhuds/core @rhuds/components',
+    '',
+    'import { Button, HudBox } from "@rhuds/components";',
+    '',
+    '<HudBox variant="neon">',
+    '  <Button glow>Launch System</Button>',
+    '</HudBox>',
+  ];
+
+  const installCommand = 'npm install @rhuds/core @rhuds/components';
 
   useEffect(() => {
     setTimeout(() => setIsLoaded(true), 100);
@@ -21,6 +35,29 @@ export default function IntroPageFuturistic() {
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
+
+  // Terminal typing animation
+  useEffect(() => {
+    const fullText = codeLines.join('\n');
+    let currentIndex = 0;
+
+    const typingInterval = setInterval(() => {
+      if (currentIndex <= fullText.length) {
+        setTerminalText(fullText.substring(0, currentIndex));
+        currentIndex++;
+      } else {
+        clearInterval(typingInterval);
+      }
+    }, 50);
+
+    return () => clearInterval(typingInterval);
+  }, []);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(installCommand);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
     <div className="intro-futuristic">
@@ -187,6 +224,91 @@ export default function IntroPageFuturistic() {
         </div>
       </section>
 
+      {/* Terminal Section */}
+      <section className="terminal-section">
+        <h2 className="terminal-title">
+          <span className="title-line" />
+          GET STARTED IN SECONDS
+          <span className="title-line" />
+        </h2>
+
+        <div className="terminal-container">
+          <div className="terminal-header">
+            <div className="terminal-buttons">
+              <span className="terminal-button terminal-close"></span>
+              <span className="terminal-button terminal-minimize"></span>
+              <span className="terminal-button terminal-maximize"></span>
+            </div>
+            <div className="terminal-title-text">rhuds-terminal</div>
+          </div>
+          <div className="terminal-body">
+            <pre className="terminal-code">
+              <code>{terminalText}</code>
+              <span className="terminal-cursor">_</span>
+            </pre>
+          </div>
+        </div>
+
+        <div className="install-card">
+          <div className="install-header">
+            <span className="install-icon">📦</span>
+            <span className="install-label">Quick Install</span>
+          </div>
+          <div className="install-command">
+            <code>{installCommand}</code>
+            <button className="copy-button" onClick={handleCopy}>
+              {copied ? '✓ Copied!' : '📋 Copy'}
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Live Preview Section */}
+      <section className="preview-section">
+        <h2 className="preview-title">
+          <span className="title-line" />
+          LIVE COMPONENT PREVIEW
+          <span className="title-line" />
+        </h2>
+
+        <div className="preview-grid">
+          <div className="preview-card">
+            <div className="preview-label">Neon Button</div>
+            <div className="preview-demo">
+              <button className="demo-button demo-neon">
+                <span className="button-text">ACTIVATE</span>
+                <div className="button-glow-effect"></div>
+              </button>
+            </div>
+          </div>
+
+          <div className="preview-card">
+            <div className="preview-label">HUD Box</div>
+            <div className="preview-demo">
+              <div className="demo-hud-box">
+                <div className="hud-corner hud-tl"></div>
+                <div className="hud-corner hud-tr"></div>
+                <div className="hud-corner hud-bl"></div>
+                <div className="hud-corner hud-br"></div>
+                <div className="hud-content">SYSTEM ONLINE</div>
+              </div>
+            </div>
+          </div>
+
+          <div className="preview-card">
+            <div className="preview-label">Progress Bar</div>
+            <div className="preview-demo">
+              <div className="demo-progress">
+                <div className="progress-bar">
+                  <div className="progress-fill"></div>
+                </div>
+                <div className="progress-text">Loading... 75%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Stats Section */}
       <section className="stats-section">
         {[
@@ -210,6 +332,64 @@ export default function IntroPageFuturistic() {
           </div>
         ))}
       </section>
+
+      {/* Footer */}
+      <footer className="intro-footer">
+        <div className="footer-content">
+          <div className="footer-section">
+            <h3 className="footer-title">RHUDS</h3>
+            <p className="footer-description">
+              Next-generation HUD components for React applications
+            </p>
+          </div>
+
+          <div className="footer-section">
+            <h4 className="footer-heading">Quick Links</h4>
+            <div className="footer-links">
+              <button onClick={() => navigate('/playground')} className="footer-link">
+                Playground
+              </button>
+              <button onClick={() => navigate('/showcase')} className="footer-link">
+                Showcase
+              </button>
+              <button onClick={() => navigate('/docs')} className="footer-link">
+                Documentation
+              </button>
+            </div>
+          </div>
+
+          <div className="footer-section">
+            <h4 className="footer-heading">Resources</h4>
+            <div className="footer-links">
+              <a
+                href="https://github.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="footer-link"
+              >
+                GitHub
+              </a>
+              <a
+                href="https://npmjs.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="footer-link"
+              >
+                NPM
+              </a>
+              <button onClick={() => navigate('/docs')} className="footer-link">
+                API Reference
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="footer-bottom">
+          <div className="footer-line" />
+          <p className="footer-copyright">© 2026 RHUDS. Built with React & TypeScript</p>
+          <div className="footer-line" />
+        </div>
+      </footer>
     </div>
   );
 }
