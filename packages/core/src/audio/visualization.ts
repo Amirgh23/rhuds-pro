@@ -3,11 +3,7 @@
  * Frequency analysis, waveform, and beat detection
  */
 
-import {
-  AudioVisualizationData,
-  AudioAnalyzerConfig,
-  BeatDetectionConfig,
-} from './types';
+import { AudioVisualizationData, AudioAnalyzerConfig, BeatDetectionConfig } from './types';
 
 /**
  * Audio analyzer for visualization
@@ -46,8 +42,8 @@ export class AudioAnalyzer {
    */
   getVisualizationData(): AudioVisualizationData {
     // Update data arrays
-    this.analyser.getByteFrequencyData(this.frequencyData);
-    this.analyser.getByteTimeDomainData(this.timeDomainData);
+    this.analyser.getByteFrequencyData(this.frequencyData as any);
+    this.analyser.getByteTimeDomainData(this.timeDomainData as any);
 
     // Calculate volume (RMS)
     let sum = 0;
@@ -155,17 +151,13 @@ class BeatDetector {
     }
 
     // Calculate average energy
-    const avgEnergy =
-      this.energyHistory.reduce((sum, e) => sum + e, 0) / this.energyHistory.length;
+    const avgEnergy = this.energyHistory.reduce((sum, e) => sum + e, 0) / this.energyHistory.length;
 
     // Detect beat
     const now = Date.now();
     const timeSinceLastBeat = now - this.lastBeatTime;
 
-    if (
-      energy > avgEnergy * this.config.threshold &&
-      timeSinceLastBeat > this.config.minInterval
-    ) {
+    if (energy > avgEnergy * this.config.threshold && timeSinceLastBeat > this.config.minInterval) {
       this.lastBeatTime = now;
       this.config.onBeat();
     }

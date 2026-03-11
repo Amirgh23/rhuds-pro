@@ -3,7 +3,7 @@
  * React context provider for bleep manager
  */
 
-import React, { createContext, useContext, useMemo, type ReactNode, useEffect } from 'react';
+import React from 'react';
 import { BleepManager, BleepManagerConfig } from './types';
 import { createBleepManager } from './BleepManager';
 
@@ -14,13 +14,13 @@ interface BleepsContextValue {
   bleepManager: BleepManager;
 }
 
-const BleepsContext = createContext<BleepsContextValue | null>(null);
+const BleepsContext = React.createContext<BleepsContextValue | null>(null);
 
 /**
  * Hook to access bleep manager
  */
 export function useBleeps(): BleepManager {
-  const context = useContext(BleepsContext);
+  const context = React.useContext(BleepsContext);
   if (!context) {
     throw new Error('useBleeps must be used within BleepsProvider');
   }
@@ -32,7 +32,7 @@ export function useBleeps(): BleepManager {
  */
 export interface BleepsProviderProps {
   config?: BleepManagerConfig;
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 /**
@@ -56,17 +56,17 @@ export interface BleepsProviderProps {
  * ```
  */
 export const BleepsProvider: React.FC<BleepsProviderProps> = ({ config, children }) => {
-  const bleepManager = useMemo(() => createBleepManager(config), [config]);
+  const bleepManager = React.useMemo(() => createBleepManager(config), [config]);
 
   // Cleanup on unmount
-  useEffect(() => {
+  React.useEffect(() => {
     return () => {
       bleepManager.stopAll();
       bleepManager.unloadAll();
     };
   }, [bleepManager]);
 
-  const value = useMemo(
+  const value = React.useMemo(
     () => ({
       bleepManager,
     }),
@@ -84,7 +84,7 @@ BleepsProvider.displayName = 'BleepsProvider';
 export function useBleep(id: string) {
   const bleepManager = useBleeps();
 
-  return useMemo(
+  return React.useMemo(
     () => ({
       play: () => bleepManager.play(id),
       pause: () => bleepManager.pause(id),
@@ -94,3 +94,4 @@ export function useBleep(id: string) {
     [bleepManager, id]
   );
 }
+

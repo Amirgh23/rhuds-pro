@@ -3,7 +3,7 @@
  * Global animation configuration provider
  */
 
-import React, { createContext, useContext, useMemo, type ReactNode } from 'react';
+import React from 'react';
 import { AnimatorSystemConfig } from './types';
 import { createAnimatorSystem, getAnimatorSystemConfig } from './createAnimatorSystem';
 
@@ -15,13 +15,13 @@ interface AnimatorGeneralContextValue {
   updateConfig: (config: Partial<AnimatorSystemConfig>) => void;
 }
 
-const AnimatorGeneralContext = createContext<AnimatorGeneralContextValue | null>(null);
+const AnimatorGeneralContext = React.createContext<AnimatorGeneralContextValue | null>(null);
 
 /**
  * Hook to access animator general configuration
  */
 export function useAnimatorGeneral(): AnimatorGeneralContextValue {
-  const context = useContext(AnimatorGeneralContext);
+  const context = React.useContext(AnimatorGeneralContext);
   if (!context) {
     throw new Error('useAnimatorGeneral must be used within AnimatorGeneralProvider');
   }
@@ -33,7 +33,7 @@ export function useAnimatorGeneral(): AnimatorGeneralContextValue {
  */
 export interface AnimatorGeneralProviderProps {
   config?: AnimatorSystemConfig;
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 /**
@@ -66,7 +66,7 @@ export const AnimatorGeneralProvider: React.FC<AnimatorGeneralProviderProps> = (
   children,
 }) => {
   // Initialize animator system with config
-  const systemConfig = useMemo(() => {
+  const systemConfig = React.useMemo(() => {
     if (initialConfig) {
       return createAnimatorSystem(initialConfig);
     }
@@ -76,20 +76,32 @@ export const AnimatorGeneralProvider: React.FC<AnimatorGeneralProviderProps> = (
   const [config, setConfig] = React.useState(systemConfig);
 
   const updateConfig = React.useCallback((newConfig: Partial<AnimatorSystemConfig>) => {
-    setConfig((prev) => ({
-      defaultDuration: {
-        ...prev.defaultDuration,
-        ...newConfig.defaultDuration,
-      },
-      defaultEasing: {
-        ...prev.defaultEasing,
-        ...newConfig.defaultEasing,
-      },
-      disabled: newConfig.disabled ?? prev.disabled,
-    }));
+    setConfig((prev: any) => {
+      const duration = newConfig.defaultDuration;
+      const easing = newConfig.defaultEasing;
+
+      return {
+        autoStart: newConfig.autoStart ?? prev.autoStart,
+        defaultDuration:
+          typeof duration === 'object'
+            ? {
+                ...(prev.defaultDuration || {}),
+                ...duration,
+              }
+            : prev.defaultDuration,
+        defaultEasing:
+          typeof easing === 'object'
+            ? {
+                ...(prev.defaultEasing || {}),
+                ...easing,
+              }
+            : prev.defaultEasing,
+        disabled: newConfig.disabled ?? prev.disabled,
+      };
+    });
   }, []);
 
-  const value = useMemo(
+  const value = React.useMemo(
     () => ({
       config,
       updateConfig,

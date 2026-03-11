@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, BleepsProvider, createAppTheme } from '@rhuds/core';
 import { HudToastProvider } from '@rhuds/components';
-import IntroPage from './pages/IntroPage';
+import IntroPageFuturistic from './pages/IntroPageFuturistic';
 import { ShowcasePage } from './pages/ShowcasePage';
 import { PlaygroundPage } from './pages/PlaygroundPage';
 import { DocsPage } from './pages/DocsPage';
@@ -100,7 +100,7 @@ const AppContent: React.FC = () => {
     >
       <Navbar />
       <Routes>
-        <Route path="/" element={<IntroPage />} />
+        <Route path="/" element={<IntroPageFuturistic />} />
         <Route path="/showcase" element={<ShowcasePage />} />
         <Route path="/playground" element={<PlaygroundPage />} />
         <Route path="/docs" element={<DocsPage />} />

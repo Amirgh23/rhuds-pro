@@ -17,6 +17,15 @@
   --color-glow-cyan: rgba(41, 242, 223, 0.8);
   --color-glow-magenta: rgba(239, 62, 241, 0.8);
 
+  /* HUD Glow Intensities */
+  --glow-subtle: 0 0 10px rgba(41, 242, 223, 0.4);
+  --glow-normal: 0 0 20px rgba(41, 242, 223, 0.6);
+  --glow-intense: 0 0 30px rgba(41, 242, 223, 0.8);
+  --glow-double: 0 0 20px rgba(41, 242, 223, 0.6), 0 0 40px rgba(41, 242, 223, 0.3);
+  --glow-triple:
+    0 0 20px rgba(41, 242, 223, 0.6), 0 0 40px rgba(41, 242, 223, 0.3),
+    0 0 60px rgba(41, 242, 223, 0.1);
+
   /* Font Family */
   --font-family-mono: 'Courier New', 'Consolas', 'Monaco', monospace;
 

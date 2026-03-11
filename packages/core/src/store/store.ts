@@ -1,14 +1,14 @@
-import { configureStore } from '@reduxjs/toolkit'
-import themeReducer from './slices/themeSlice'
-import uiReducer from './slices/uiSlice'
-import sfxReducer from './slices/sfxSlice'
-import animationReducer from './slices/animationSlice'
-import audioReducer from './slices/audioSlice'
-import { createPersistenceMiddleware, loadPersistedState } from './middleware/persistence'
-import { createUndoRedoMiddleware } from './middleware/undoRedo'
+import { configureStore } from '@reduxjs/toolkit';
+import themeReducer from './slices/themeSlice';
+import uiReducer from './slices/uiSlice';
+import sfxReducer from './slices/sfxSlice';
+import animationReducer from './slices/animationSlice';
+import audioReducer from './slices/audioSlice';
+import { createPersistenceMiddleware, loadPersistedState } from './middleware/persistence';
+import { createUndoRedoMiddleware } from './middleware/undoRedo';
 
 // Load persisted state
-const persistedState = loadPersistedState()
+const persistedState = loadPersistedState();
 
 export const store = configureStore({
   reducer: {
@@ -39,7 +39,7 @@ export const store = configureStore({
           ignoreActions: ['ui/addNotification', 'ui/removeNotification'],
         })
       ),
-})
+});
 
-export type RootState = ReturnType<typeof store.getState>
-export type AppDispatch = typeof store.dispatch
+export type RootState = any;
+export type AppDispatch = typeof store.dispatch;

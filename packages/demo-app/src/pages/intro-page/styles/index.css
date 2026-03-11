@@ -985,3 +985,325 @@ svg {
     animation: none;
   }
 }
+
+/* ============================================================================
+   Professional HUD Styling Enhancements
+   ============================================================================ */
+
+/* Enhanced Glow Effects */
+@keyframes hudGlow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 20px rgba(41, 242, 223, 0.6))
+      drop-shadow(0 0 40px rgba(41, 242, 223, 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 0 30px rgba(41, 242, 223, 0.8))
+      drop-shadow(0 0 60px rgba(41, 242, 223, 0.4));
+  }
+}
+
+@keyframes hudPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes hudFlicker {
+  0%,
+  100% {
+    text-shadow: 0 0 20px rgba(41, 242, 223, 0.6);
+  }
+  50% {
+    text-shadow:
+      0 0 30px rgba(41, 242, 223, 0.8),
+      0 0 50px rgba(239, 62, 241, 0.3);
+  }
+}
+
+@keyframes hudScan {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+/* Enhanced Navigation with HUD styling */
+.intro-page__header {
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.8) 100%);
+  box-shadow:
+    0 0 20px rgba(41, 242, 223, 0.2),
+    inset 0 1px 0 rgba(41, 242, 223, 0.1);
+  border-bottom: 2px solid rgba(41, 242, 223, 0.3);
+}
+
+.intro-page__logo {
+  animation: hudFlicker 4s ease-in-out infinite;
+  letter-spacing: 3px;
+  font-size: clamp(18px, 4vw, 28px);
+}
+
+.intro-page__nav-link {
+  position: relative;
+  overflow: hidden;
+}
+
+.intro-page__nav-link::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(41, 242, 223, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.intro-page__nav-link:hover::before {
+  left: 100%;
+}
+
+.intro-page__nav-link:hover {
+  color: var(--color-primary);
+  filter: drop-shadow(0 0 15px rgba(41, 242, 223, 0.8));
+  text-shadow: 0 0 10px rgba(41, 242, 223, 0.6);
+}
+
+/* Enhanced Hero Section */
+.hero-section__frame {
+  animation: hudGlow 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 20px rgba(41, 242, 223, 0.4))
+    drop-shadow(0 0 40px rgba(41, 242, 223, 0.2));
+}
+
+.hero-section__frame:hover {
+  animation: none;
+  filter: drop-shadow(0 0 30px rgba(41, 242, 223, 0.8))
+    drop-shadow(0 0 60px rgba(41, 242, 223, 0.4));
+}
+
+.hero-section__title {
+  animation:
+    hudFlicker 4s ease-in-out infinite,
+    fadeInDown 0.8s ease-out 0.4s both;
+  letter-spacing: 5px;
+  font-weight: 800;
+}
+
+.hero-section__subtitle {
+  color: rgba(41, 242, 223, 0.9);
+  text-shadow: 0 0 15px rgba(41, 242, 223, 0.4);
+  animation: fadeInUp 0.8s ease-out 0.6s both;
+}
+
+.hero-section__description {
+  color: rgba(41, 242, 223, 0.7);
+  text-shadow: 0 0 10px rgba(41, 242, 223, 0.2);
+  animation: fadeInUp 0.8s ease-out 0.8s both;
+}
+
+/* Enhanced CTA Buttons with HUD effects */
+.hero-section__cta-button {
+  position: relative;
+  overflow: hidden;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 700;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.hero-section__cta-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.hero-section__cta-button:hover::before {
+  left: 100%;
+}
+
+.hero-section__cta-button--primary {
+  border: 2px solid var(--color-primary);
+  box-shadow:
+    0 0 10px rgba(41, 242, 223, 0.3),
+    inset 0 0 10px rgba(41, 242, 223, 0.1);
+}
+
+.hero-section__cta-button--primary:hover {
+  background-color: transparent;
+  color: var(--color-primary);
+  filter: drop-shadow(0 0 20px rgba(41, 242, 223, 0.8))
+    drop-shadow(0 0 40px rgba(41, 242, 223, 0.4));
+  box-shadow:
+    0 0 20px rgba(41, 242, 223, 0.6),
+    inset 0 0 20px rgba(41, 242, 223, 0.2);
+  transform: scale(1.08);
+}
+
+.hero-section__cta-button--secondary {
+  border: 2px solid var(--color-secondary);
+  box-shadow:
+    0 0 10px rgba(239, 62, 241, 0.3),
+    inset 0 0 10px rgba(239, 62, 241, 0.1);
+}
+
+.hero-section__cta-button--secondary:hover {
+  background-color: transparent;
+  color: var(--color-secondary);
+  filter: drop-shadow(0 0 20px rgba(239, 62, 241, 0.8))
+    drop-shadow(0 0 40px rgba(239, 62, 241, 0.4));
+  box-shadow:
+    0 0 20px rgba(239, 62, 241, 0.6),
+    inset 0 0 20px rgba(239, 62, 241, 0.2);
+  transform: scale(1.08);
+}
+
+/* Enhanced Feature Cards */
+.intro-page__feature-card {
+  position: relative;
+  background: linear-gradient(135deg, rgba(41, 242, 223, 0.05) 0%, rgba(41, 242, 223, 0.02) 100%);
+  border: 2px solid rgba(41, 242, 223, 0.2);
+  box-shadow:
+    0 0 15px rgba(41, 242, 223, 0.1),
+    inset 0 0 15px rgba(41, 242, 223, 0.05);
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.intro-page__feature-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(41, 242, 223, 0.1) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.intro-page__feature-card:hover {
+  background: linear-gradient(135deg, rgba(41, 242, 223, 0.1) 0%, rgba(41, 242, 223, 0.05) 100%);
+  border-color: rgba(41, 242, 223, 0.5);
+  transform: scale(1.05) translateY(-5px);
+  filter: drop-shadow(0 0 25px rgba(41, 242, 223, 0.4))
+    drop-shadow(0 0 50px rgba(41, 242, 223, 0.2));
+  box-shadow:
+    0 0 25px rgba(41, 242, 223, 0.3),
+    inset 0 0 25px rgba(41, 242, 223, 0.1);
+}
+
+.intro-page__feature-card:hover::before {
+  opacity: 1;
+}
+
+.intro-page__feature-title {
+  animation: hudFlicker 5s ease-in-out infinite;
+  letter-spacing: 1px;
+  font-weight: 700;
+}
+
+.intro-page__feature-description {
+  color: rgba(41, 242, 223, 0.6);
+}
+
+/* Enhanced Footer */
+.intro-page__footer {
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.95) 100%);
+  border-top: 2px solid rgba(41, 242, 223, 0.3);
+  box-shadow: 0 -10px 30px rgba(41, 242, 223, 0.1);
+}
+
+.intro-page__footer-title {
+  color: var(--color-primary);
+  text-shadow: 0 0 10px rgba(41, 242, 223, 0.4);
+  letter-spacing: 2px;
+  font-weight: 700;
+}
+
+.intro-page__footer-link:hover {
+  color: var(--color-primary);
+  filter: drop-shadow(0 0 15px rgba(41, 242, 223, 0.6));
+  text-shadow: 0 0 10px rgba(41, 242, 223, 0.4);
+}
+
+/* Scan line effect for immersive HUD feel */
+@keyframes scanlines {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 10px;
+  }
+}
+
+.intro-page {
+  position: relative;
+}
+
+.intro-page::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(41, 242, 223, 0.03) 0px,
+    rgba(41, 242, 223, 0.03) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 9998;
+  animation: scanlines 8s linear infinite;
+}
+
+/* Enhanced button glow on focus */
+button:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 3px;
+  filter: drop-shadow(0 0 15px rgba(41, 242, 223, 0.6));
+}
+
+/* Responsive HUD enhancements */
+@media (max-width: 767px) {
+  .hero-section__title {
+    letter-spacing: 3px;
+  }
+
+  .hero-section__cta-button {
+    letter-spacing: 1px;
+  }
+
+  .intro-page__feature-card {
+    border-width: 1px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-section__frame {
+    animation: hudGlow 3s ease-in-out infinite;
+  }
+
+  .intro-page__feature-card {
+    border-width: 2px;
+  }
+}

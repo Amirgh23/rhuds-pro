@@ -53,5 +53,22 @@ export {
   createSlideSubsystem,
   createRotateSubsystem,
   createBlurSubsystem,
+  createDynamicRenderingSubsystem,
+  createExternalManagementSubsystem,
+  AnimationSubsystemProvider,
+  useAnimationSubsystems,
 } from './subsystems';
-export type { AnimationSubsystem } from './subsystems';
+export type {
+  AnimationSubsystem,
+  AnimatorStateType,
+  DynamicRenderingConfig,
+  ExternalAnimationConfig,
+  AnimationSubsystemProviderValue,
+  AnimatorGeneralConfig,
+  AnimatorGeneralProviderValue,
+  AnimatorGeneralProviderProps,
+} from './subsystems';
+
+// Scroll-triggered animations
+export { useScrollAnimation, createScrollAnimationManager, ScrollAnimationManager } from './scroll';
+export type { ScrollAnimationConfig } from './scroll';

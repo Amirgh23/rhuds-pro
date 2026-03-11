@@ -1,139 +1,128 @@
-/**
- * FeatureCard Component - Individual Feature Card with Frame
- *
- * Displays a single feature with animated Arwes frame, icon, title, and description.
- *
- * Features:
- * - Animated FrameSVGOctagon or FrameSVGCorners frame
- * - Icon/badge support
- * - Hover effects (scale, glow)
- * - Animation delay support for staggered sequences
- * - Responsive design with mobile/tablet/desktop adjustments
- * - Keyboard accessible and screen reader friendly
- * - GPU-accelerated animations
- */
-
-import React, { useRef, useMemo } from 'react';
-import { FrameSVGOctagon, FrameSVGCorners } from '@rhuds/frames';
+import React, { useEffect, useRef } from 'react';
 import { useFrameSVGAssemblingAnimation } from '@rhuds/frames';
-import type { FeatureCardProps } from '../types';
-import { FRAME_CONFIG, COLOR_PALETTE } from '../constants';
 import '../styles/FeatureCard.css';
 
-/**
- * FeatureCard Component
- *
- * Renders an individual feature card with animated frame and content.
- *
- * Props:
- * - title: Feature title text
- * - description: Feature description text
- * - icon: Optional icon/badge React node
- * - frameType: Frame component type ('octagon' or 'corners', default: 'octagon')
- * - animationDelay: Delay before animation starts (default: 0)
- * - onHover: Optional callback when card is hovered
- */
+export interface FeatureCardProps {
+  icon: string;
+  title: string;
+  description: string;
+  color: 'cyan' | 'magenta' | 'blue';
+  animationDelay?: number;
+  onClick?: () => void;
+}
+
 export const FeatureCard: React.FC<FeatureCardProps> = ({
+  icon,
   title,
   description,
-  icon,
-  frameType = 'octagon',
+  color,
   animationDelay = 0,
-  onHover,
+  onClick,
 }) => {
   const frameRef = useRef<SVGSVGElement>(null);
-
-  // Use the frame animation hook
-  const { onRender } = useFrameSVGAssemblingAnimation(frameRef, {
-    duration: FRAME_CONFIG.cardDuration || 1200,
-    animate: true,
+  const { play } = useFrameSVGAssemblingAnimation(frameRef, {
+    duration: 800,
+    delay: animationDelay,
   });
 
-  // Calculate frame dimensions
-  const frameDimensions = useMemo(() => {
-    return {
-      padding: FRAME_CONFIG.cardPadding,
-      squareSize: FRAME_CONFIG.cardSquareSize,
-    };
-  }, []);
+  useEffect(() => {
+    play();
+  }, [play]);
 
-  // Handle hover event
-  const handleMouseEnter = () => {
-    if (onHover) {
-      onHover();
-    }
+  const colorMap = {
+    cyan: '#29F2DF',
+    magenta: '#EF3EF1',
+    blue: '#1C7FA6',
   };
 
-  // Render the appropriate frame component
-  const renderFrame = () => {
-    if (frameType === 'corners') {
-      return (
-        <FrameSVGCorners
-          elementRef={frameRef}
-          onRender={onRender}
-          padding={frameDimensions.padding}
-          strokeWidth={1}
-          cornerLength={24}
-          className="feature-card__frame"
-          style={{
-            color: COLOR_PALETTE.primary,
-            width: '100%',
-            height: 'auto',
-          }}
-        />
-      );
-    }
-
-    // Default to octagon
-    return (
-      <FrameSVGOctagon
-        elementRef={frameRef}
-        onRender={onRender}
-        padding={frameDimensions.padding}
-        squareSize={frameDimensions.squareSize}
-        className="feature-card__frame"
-        style={{
-          color: COLOR_PALETTE.primary,
-          width: '100%',
-          height: 'auto',
-        }}
-      />
-    );
-  };
+  const color_value = colorMap[color];
 
   return (
-    <article
+    <div
       className="feature-card"
-      onMouseEnter={handleMouseEnter}
-      style={{
-        animationDelay: `${animationDelay}ms`,
+      style={
+        {
+          '--card-color': color_value,
+        } as React.CSSProperties
+      }
+      onClick={onClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if ((e.key === 'Enter' || e.key === ' ') && onClick) {
+          onClick();
+        }
       }}
-      role="region"
-      aria-labelledby={`feature-card-title-${title.replace(/\s+/g, '-').toLowerCase()}`}
     >
-      <div className="feature-card__frame-wrapper">
-        {/* Frame */}
-        {renderFrame()}
+      <div className="feature-card__frame-container">
+        <svg
+          ref={frameRef}
+          className="feature-card__frame"
+          viewBox="0 0 300 400"
+          preserveAspectRatio="xMidYMid meet"
+          aria-hidden="true"
+        >
+          {/* Frame corners - octagon style */}
+          <g className="frame-lines" stroke={color_value} strokeWidth="2" fill="none">
+            {/* Top left corner */}
+            <line x1="20" y1="0" x2="40" y2="0" />
+            <line x1="0" y1="20" x2="0" y2="40" />
+            <line x1="0" y1="0" x2="20" y2="20" />
 
-        {/* Content inside frame */}
-        <div className="feature-card__content">
-          {/* Icon/Badge */}
-          {icon && <div className="feature-card__icon">{icon}</div>}
+            {/* Top right corner */}
+            <line x1="260" y1="0" x2="280" y2="0" />
+            <line x1="300" y1="20" x2="300" y2="40" />
+            <line x1="300" y1="0" x2="280" y2="20" />
 
-          {/* Title */}
-          <h3
-            id={`feature-card-title-${title.replace(/\s+/g, '-').toLowerCase()}`}
-            className="feature-card__title"
-          >
-            {title}
-          </h3>
+            {/* Bottom left corner */}
+            <line x1="0" y1="360" x2="0" y2="380" />
+            <line x1="20" y1="400" x2="40" y2="400" />
+            <line x1="0" y1="400" x2="20" y2="380" />
 
-          {/* Description */}
-          <p className="feature-card__description">{description}</p>
-        </div>
+            {/* Bottom right corner */}
+            <line x1="300" y1="360" x2="300" y2="380" />
+            <line x1="260" y1="400" x2="280" y2="400" />
+            <line x1="300" y1="400" x2="280" y2="380" />
+
+            {/* Side lines */}
+            <line x1="0" y1="60" x2="0" y2="340" opacity="0.5" />
+            <line x1="300" y1="60" x2="300" y2="340" opacity="0.5" />
+            <line x1="40" y1="0" x2="260" y2="0" opacity="0.5" />
+            <line x1="40" y1="400" x2="260" y2="400" opacity="0.5" />
+          </g>
+
+          {/* Glow effect */}
+          <defs>
+            <filter id={`glow-${color}`}>
+              <feGaussianBlur stdDeviation="2" result="coloredBlur" />
+              <feMerge>
+                <feMergeNode in="coloredBlur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+        </svg>
       </div>
-    </article>
+
+      <div className="feature-card__content">
+        <div className="feature-card__icon" style={{ color: color_value }}>
+          {icon}
+        </div>
+        <h3 className="feature-card__title" style={{ color: color_value }}>
+          {title}
+        </h3>
+        <p className="feature-card__description">{description}</p>
+      </div>
+
+      {/* Hover glow effect */}
+      <div
+        className="feature-card__glow"
+        style={{
+          boxShadow: `0 0 30px ${color_value}40, 0 0 60px ${color_value}20`,
+        }}
+      />
+    </div>
   );
 };
 
-export default FeatureCard;
+FeatureCard.displayName = 'FeatureCard';

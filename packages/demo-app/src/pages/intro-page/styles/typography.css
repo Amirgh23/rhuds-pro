@@ -17,8 +17,11 @@ h1 {
   color: var(--color-text-primary);
   line-height: 1.2;
   margin: 0;
-  text-shadow: 0 0 20px rgba(41, 242, 223, 0.6);
+  text-shadow:
+    0 0 20px rgba(41, 242, 223, 0.6),
+    0 0 40px rgba(41, 242, 223, 0.3);
   filter: drop-shadow(0 0 20px var(--color-glow-cyan));
+  letter-spacing: 2px;
 }
 
 h2 {
@@ -28,7 +31,9 @@ h2 {
   color: var(--color-text-primary);
   line-height: 1.3;
   margin: 0;
+  text-shadow: 0 0 15px rgba(41, 242, 223, 0.5);
   filter: drop-shadow(0 0 15px var(--color-glow-cyan));
+  letter-spacing: 1px;
 }
 
 h3 {
@@ -38,7 +43,9 @@ h3 {
   color: var(--color-text-primary);
   line-height: 1.4;
   margin: 0;
+  text-shadow: 0 0 10px rgba(41, 242, 223, 0.4);
   filter: drop-shadow(0 0 10px var(--color-glow-cyan));
+  letter-spacing: 0.5px;
 }
 
 h4 {
@@ -48,6 +55,7 @@ h4 {
   color: var(--color-text-primary);
   line-height: 1.4;
   margin: 0;
+  text-shadow: 0 0 8px rgba(41, 242, 223, 0.3);
 }
 
 h5 {
@@ -99,11 +107,28 @@ a {
   color: var(--color-text-primary);
   text-decoration: none;
   transition: all var(--animation-duration-normal) var(--animation-easing-ease-in-out);
+  position: relative;
+}
+
+a::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: linear-gradient(90deg, var(--color-primary), transparent);
+  transition: width 0.3s ease;
 }
 
 a:hover {
   color: var(--color-secondary);
   filter: drop-shadow(0 0 10px var(--color-glow-magenta));
+  text-shadow: 0 0 10px rgba(239, 62, 241, 0.4);
+}
+
+a:hover::after {
+  width: 100%;
 }
 
 a:focus {
@@ -116,26 +141,33 @@ code {
   font-family: var(--font-family-mono);
   font-size: 0.9em;
   color: var(--color-accent-green);
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 255, 150, 0.1);
   padding: 2px 6px;
   border-radius: 3px;
+  border: 1px solid rgba(0, 255, 150, 0.2);
+  box-shadow: 0 0 8px rgba(0, 255, 150, 0.1);
 }
 
 pre {
   font-family: var(--font-family-mono);
   font-size: clamp(12px, 1.5vw, 14px);
   color: var(--color-text-secondary);
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.7);
   padding: var(--spacing-md);
   border-radius: 4px;
   overflow-x: auto;
   line-height: 1.5;
+  border: 1px solid rgba(41, 242, 223, 0.2);
+  box-shadow:
+    0 0 15px rgba(41, 242, 223, 0.1),
+    inset 0 0 15px rgba(41, 242, 223, 0.05);
 }
 
 /* Strong */
 strong {
   font-weight: 700;
   color: var(--color-text-primary);
+  text-shadow: 0 0 10px rgba(41, 242, 223, 0.3);
 }
 
 /* Emphasis */
@@ -153,6 +185,7 @@ blockquote {
   padding-left: var(--spacing-md);
   margin: 0;
   font-style: italic;
+  box-shadow: inset 10px 0 20px rgba(41, 242, 223, 0.05);
 }
 
 /* List Items */
@@ -167,6 +200,7 @@ li {
 @media (max-width: 767px) {
   h1 {
     text-shadow: 0 0 15px rgba(41, 242, 223, 0.5);
+    letter-spacing: 1px;
   }
 
   h2 {

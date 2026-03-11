@@ -17,6 +17,7 @@ interface AnimatorSystemState {
  * Default animator system configuration
  */
 const defaultConfig: Required<AnimatorSystemConfig> = {
+  autoStart: true,
   defaultDuration: {
     enter: 300,
     exit: 200,
@@ -40,13 +41,13 @@ let systemState: AnimatorSystemState = {
 
 /**
  * Create and initialize the animator system
- * 
+ *
  * This function initializes the global animation engine with
  * default configurations that can be overridden per-component.
- * 
+ *
  * @param config - Optional configuration for the animator system
  * @returns The animator system configuration
- * 
+ *
  * @example
  * ```tsx
  * const animatorSystem = createAnimatorSystem({
@@ -65,15 +66,25 @@ export function createAnimatorSystem(
   config?: AnimatorSystemConfig
 ): Required<AnimatorSystemConfig> {
   // Merge with default config
+  const duration = config?.defaultDuration;
+  const easing = config?.defaultEasing;
+
   systemState.config = {
-    defaultDuration: {
-      ...defaultConfig.defaultDuration,
-      ...config?.defaultDuration,
-    },
-    defaultEasing: {
-      ...defaultConfig.defaultEasing,
-      ...config?.defaultEasing,
-    },
+    autoStart: config?.autoStart ?? defaultConfig.autoStart,
+    defaultDuration:
+      duration && typeof duration === 'object' && !('enter' in duration || 'exit' in duration)
+        ? defaultConfig.defaultDuration
+        : {
+            ...(defaultConfig.defaultDuration as any),
+            ...(duration as any),
+          },
+    defaultEasing:
+      easing && typeof easing === 'object' && !('enter' in easing || 'exit' in easing)
+        ? defaultConfig.defaultEasing
+        : {
+            ...(defaultConfig.defaultEasing as any),
+            ...(easing as any),
+          },
     disabled: config?.disabled ?? defaultConfig.disabled,
   };
 
@@ -84,7 +95,7 @@ export function createAnimatorSystem(
 
 /**
  * Get the current animator system configuration
- * 
+ *
  * @returns The current animator system configuration
  */
 export function getAnimatorSystemConfig(): Required<AnimatorSystemConfig> {
@@ -97,7 +108,7 @@ export function getAnimatorSystemConfig(): Required<AnimatorSystemConfig> {
 
 /**
  * Check if the animator system is initialized
- * 
+ *
  * @returns True if the system is initialized
  */
 export function isAnimatorSystemInitialized(): boolean {
@@ -116,21 +127,29 @@ export function resetAnimatorSystem(): void {
 
 /**
  * Update animator system configuration
- * 
+ *
  * @param config - Partial configuration to merge with current config
  */
-export function updateAnimatorSystemConfig(
-  config: Partial<AnimatorSystemConfig>
-): void {
+export function updateAnimatorSystemConfig(config: Partial<AnimatorSystemConfig>): void {
+  const duration = config.defaultDuration;
+  const easing = config.defaultEasing;
+
   systemState.config = {
-    defaultDuration: {
-      ...systemState.config.defaultDuration,
-      ...config.defaultDuration,
-    },
-    defaultEasing: {
-      ...systemState.config.defaultEasing,
-      ...config.defaultEasing,
-    },
+    autoStart: config.autoStart ?? systemState.config.autoStart,
+    defaultDuration:
+      duration && typeof duration === 'object'
+        ? {
+            ...(systemState.config.defaultDuration as any),
+            ...(duration as any),
+          }
+        : systemState.config.defaultDuration,
+    defaultEasing:
+      easing && typeof easing === 'object'
+        ? {
+            ...(systemState.config.defaultEasing as any),
+            ...(easing as any),
+          }
+        : systemState.config.defaultEasing,
     disabled: config.disabled ?? systemState.config.disabled,
   };
 }

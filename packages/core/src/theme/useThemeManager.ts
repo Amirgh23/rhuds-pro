@@ -4,7 +4,7 @@
  * Provides runtime theme switching, persistence, and system preference support.
  */
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React from 'react';
 import type { RHUDSTheme } from './models';
 import { ThemeManager, getSystemThemePreference, watchSystemThemePreference } from './ThemeManager';
 
@@ -33,12 +33,12 @@ export function useThemeManager(
     autoLoad?: boolean;
   }
 ) {
-  const [currentTheme, setCurrentTheme] = useState<RHUDSTheme>(themeManager.getCurrentTheme());
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+  const [currentTheme, setCurrentTheme] = React.useState<RHUDSTheme>(themeManager.getCurrentTheme());
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [error, setError] = React.useState<Error | null>(null);
 
   // Load theme from storage on mount
-  useEffect(() => {
+  React.useEffect(() => {
     if (options?.autoLoad !== false) {
       setIsLoading(true);
       themeManager
@@ -59,7 +59,7 @@ export function useThemeManager(
   }, [themeManager, options?.autoLoad]);
 
   // Subscribe to theme changes
-  useEffect(() => {
+  React.useEffect(() => {
     const unsubscribe = themeManager.subscribe((theme) => {
       setCurrentTheme(theme);
     });
@@ -68,7 +68,7 @@ export function useThemeManager(
   }, [themeManager]);
 
   // Watch system theme preference
-  useEffect(() => {
+  React.useEffect(() => {
     if (options?.respectSystemPreference) {
       const unwatch = watchSystemThemePreference((preference) => {
         // Try to find a matching theme
@@ -89,7 +89,7 @@ export function useThemeManager(
   /**
    * Switch to a different theme
    */
-  const switchTheme = useCallback(
+  const switchTheme = React.useCallback(
     async (theme: RHUDSTheme | string) => {
       setIsLoading(true);
       setError(null);
@@ -110,7 +110,7 @@ export function useThemeManager(
   /**
    * Register a new theme
    */
-  const registerTheme = useCallback(
+  const registerTheme = React.useCallback(
     (theme: RHUDSTheme) => {
       themeManager.registerTheme(theme);
     },
@@ -120,7 +120,7 @@ export function useThemeManager(
   /**
    * Clear theme from storage
    */
-  const clearStorage = useCallback(async () => {
+  const clearStorage = React.useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
@@ -151,3 +151,4 @@ export function useThemeManager(
     systemPreference,
   };
 }
+

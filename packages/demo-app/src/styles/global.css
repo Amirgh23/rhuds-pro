@@ -19,7 +19,7 @@ body {
     'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #0a1225;
+  background: #000000;
   color: #29f2df;
 }
 
@@ -54,12 +54,46 @@ body {
   }
 }
 
+@keyframes hud-border-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 10px rgba(41, 242, 223, 0.3),
+      inset 0 0 10px rgba(41, 242, 223, 0.1);
+  }
+  50% {
+    box-shadow:
+      0 0 20px rgba(41, 242, 223, 0.5),
+      inset 0 0 20px rgba(41, 242, 223, 0.2);
+  }
+}
+
+@keyframes neon-text-glow {
+  0%,
+  100% {
+    text-shadow: 0 0 10px rgba(41, 242, 223, 0.5);
+  }
+  50% {
+    text-shadow:
+      0 0 20px rgba(41, 242, 223, 0.8),
+      0 0 40px rgba(41, 242, 223, 0.3);
+  }
+}
+
 .animate-scan-line {
   animation: scan-line 8s linear infinite;
 }
 
 .animate-hex-scroll {
   animation: hex-scroll linear infinite;
+}
+
+.animate-hud-border-glow {
+  animation: hud-border-glow 3s ease-in-out infinite;
+}
+
+.animate-neon-text-glow {
+  animation: neon-text-glow 3s ease-in-out infinite;
 }
 
 /* Scrollbar Styling */
@@ -69,27 +103,39 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(10, 18, 37, 0.5);
+  background: rgba(0, 0, 0, 0.8);
+  border-left: 1px solid rgba(41, 242, 223, 0.1);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #29f2df;
+  background: linear-gradient(180deg, #29f2df 0%, #0096ff 100%);
   border-radius: 4px;
+  box-shadow: 0 0 10px rgba(41, 242, 223, 0.3);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #ef3ef1;
+  background: linear-gradient(180deg, #ef3ef1 0%, #29f2df 100%);
+  box-shadow: 0 0 15px rgba(239, 62, 241, 0.5);
 }
 
 /* Selection */
 ::selection {
   background: #29f2df;
-  color: #0a1225;
+  color: #000000;
+  text-shadow: 0 0 10px rgba(41, 242, 223, 0.3);
 }
 
 ::-moz-selection {
   background: #29f2df;
-  color: #0a1225;
+  color: #000000;
+  text-shadow: 0 0 10px rgba(41, 242, 223, 0.3);
+}
+
+/* Focus Visible */
+:focus-visible {
+  outline: 2px solid #29f2df;
+  outline-offset: 2px;
+  box-shadow: 0 0 10px rgba(41, 242, 223, 0.4);
 }
 
 /* Responsive */
@@ -102,5 +148,14 @@ body {
 @media (max-width: 768px) {
   body {
     font-size: 15px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

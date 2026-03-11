@@ -22,12 +22,7 @@ export interface PersistenceConfig {
 export function createPersistenceMiddleware(
   config: PersistenceConfig = {}
 ): Middleware<{}, RootState> {
-  const {
-    key = 'rhuds-state',
-    whitelist = [],
-    blacklist = [],
-    throttle = 1000,
-  } = config;
+  const { key = 'rhuds-state', whitelist = [], blacklist = [], throttle = 1000 } = config;
 
   let saveTimeout: NodeJS.Timeout | null = null;
 
@@ -47,12 +42,10 @@ export function createPersistenceMiddleware(
       // Filter state based on whitelist/blacklist
       Object.keys(state).forEach((sliceKey) => {
         const shouldPersist =
-          (whitelist.length === 0 || whitelist.includes(sliceKey)) &&
-          !blacklist.includes(sliceKey);
+          (whitelist.length === 0 || whitelist.includes(sliceKey)) && !blacklist.includes(sliceKey);
 
         if (shouldPersist) {
-          stateToPersist[sliceKey as keyof RootState] =
-            state[sliceKey as keyof RootState];
+          (stateToPersist as any)[sliceKey] = (state as any)[sliceKey];
         }
       });
 

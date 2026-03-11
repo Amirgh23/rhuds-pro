@@ -19,14 +19,14 @@ interface AnimationState {
 
 /**
  * Create an animation instance
- * 
+ *
  * This function creates a controllable animation with custom
  * duration, easing, and callbacks. The animation can be played,
  * paused, stopped, reversed, and seeked.
- * 
+ *
  * @param config - Animation configuration
  * @returns Animation instance with control methods
- * 
+ *
  * @example
  * ```tsx
  * const animation = createAnimation({
@@ -39,19 +39,12 @@ interface AnimationState {
  *     console.log('Animation complete');
  *   },
  * });
- * 
+ *
  * animation.play();
  * ```
  */
 export function createAnimation(config: AnimationConfig): Animation {
-  const {
-    duration,
-    easing,
-    delay = 0,
-    onStart,
-    onComplete,
-    onUpdate,
-  } = config;
+  const { duration, easing, delay = 0, onStart, onComplete, onUpdate } = config;
 
   // Get easing function
   const easingFn: EasingFunction = getEasingFunction(easing);
@@ -184,7 +177,7 @@ export function createAnimation(config: AnimationConfig): Animation {
 
   /**
    * Seek to a specific progress point
-   * 
+   *
    * @param progress - Progress value (0-1)
    */
   function seek(progress: number): void {
@@ -221,7 +214,7 @@ export function createAnimation(config: AnimationConfig): Animation {
     stop,
     reverse,
     seek,
-    isPlaying,
+    isPlaying: isPlaying(),
     getProgress,
   };
 }

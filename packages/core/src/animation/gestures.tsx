@@ -3,7 +3,7 @@
  * Drag, swipe, pinch, and rotate gesture support
  */
 
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React from 'react';
 
 /**
  * Drag gesture configuration
@@ -42,7 +42,7 @@ interface DragState {
  * Hook for drag gesture support
  */
 export function useDrag(config: DragConfig = {}) {
-  const [state, setState] = useState<DragState>({
+  const [state, setState] = React.useState<DragState>({
     isDragging: false,
     startX: 0,
     startY: 0,
@@ -55,10 +55,10 @@ export function useDrag(config: DragConfig = {}) {
     lastTime: 0,
   });
 
-  const stateRef = useRef(state);
+  const stateRef = React.useRef(state);
   stateRef.current = state;
 
-  const handlePointerDown = useCallback(
+  const handlePointerDown = React.useCallback(
     (event: PointerEvent) => {
       const newState: DragState = {
         isDragging: true,
@@ -78,7 +78,7 @@ export function useDrag(config: DragConfig = {}) {
     [config]
   );
 
-  const handlePointerMove = useCallback(
+  const handlePointerMove = React.useCallback(
     (event: PointerEvent) => {
       if (!stateRef.current.isDragging) return;
 
@@ -140,7 +140,7 @@ export function useDrag(config: DragConfig = {}) {
     [config]
   );
 
-  const handlePointerUp = useCallback(
+  const handlePointerUp = React.useCallback(
     (event: PointerEvent) => {
       if (!stateRef.current.isDragging) return;
 
@@ -154,7 +154,7 @@ export function useDrag(config: DragConfig = {}) {
     [config]
   );
 
-  useEffect(() => {
+  React.useEffect(() => {
     document.addEventListener('pointermove', handlePointerMove as any);
     document.addEventListener('pointerup', handlePointerUp as any);
 
@@ -231,11 +231,11 @@ export interface PinchConfig {
  * Hook for pinch gesture support
  */
 export function usePinch(config: PinchConfig = {}) {
-  const [isPinching, setIsPinching] = useState(false);
-  const [scale, setScale] = useState(1);
-  const initialDistanceRef = useRef(0);
+  const [isPinching, setIsPinching] = React.useState(false);
+  const [scale, setScale] = React.useState(1);
+  const initialDistanceRef = React.useRef(0);
 
-  const handleTouchStart = useCallback(
+  const handleTouchStart = React.useCallback(
     (event: TouchEvent) => {
       if (event.touches.length === 2) {
         const touch1 = event.touches[0];
@@ -252,7 +252,7 @@ export function usePinch(config: PinchConfig = {}) {
     [config]
   );
 
-  const handleTouchMove = useCallback(
+  const handleTouchMove = React.useCallback(
     (event: TouchEvent) => {
       if (event.touches.length === 2 && isPinching) {
         const touch1 = event.touches[0];
@@ -269,7 +269,7 @@ export function usePinch(config: PinchConfig = {}) {
     [isPinching, config]
   );
 
-  const handleTouchEnd = useCallback(() => {
+  const handleTouchEnd = React.useCallback(() => {
     if (isPinching) {
       setIsPinching(false);
       config.onPinchEnd?.();
@@ -300,11 +300,11 @@ export interface RotateConfig {
  * Hook for rotate gesture support
  */
 export function useRotate(config: RotateConfig = {}) {
-  const [isRotating, setIsRotating] = useState(false);
-  const [angle, setAngle] = useState(0);
-  const initialAngleRef = useRef(0);
+  const [isRotating, setIsRotating] = React.useState(false);
+  const [angle, setAngle] = React.useState(0);
+  const initialAngleRef = React.useRef(0);
 
-  const handleTouchStart = useCallback(
+  const handleTouchStart = React.useCallback(
     (event: TouchEvent) => {
       if (event.touches.length === 2) {
         const touch1 = event.touches[0];
@@ -318,7 +318,7 @@ export function useRotate(config: RotateConfig = {}) {
     [config]
   );
 
-  const handleTouchMove = useCallback(
+  const handleTouchMove = React.useCallback(
     (event: TouchEvent) => {
       if (event.touches.length === 2 && isRotating) {
         const touch1 = event.touches[0];
@@ -335,7 +335,7 @@ export function useRotate(config: RotateConfig = {}) {
     [isRotating, config]
   );
 
-  const handleTouchEnd = useCallback(() => {
+  const handleTouchEnd = React.useCallback(() => {
     if (isRotating) {
       setIsRotating(false);
       config.onRotateEnd?.();
@@ -352,3 +352,4 @@ export function useRotate(config: RotateConfig = {}) {
     angle,
   };
 }
+

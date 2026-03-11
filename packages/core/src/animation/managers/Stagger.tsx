@@ -3,7 +3,7 @@
  * Staggers child animations with configurable delays
  */
 
-import React, { Children, cloneElement, isValidElement, type ReactNode } from 'react';
+import React from 'react';
 
 /**
  * Stagger component for staggering child animations
@@ -14,9 +14,9 @@ import React, { Children, cloneElement, isValidElement, type ReactNode } from 'r
 export const Stagger: React.FC<{
   stagger?: number | 'auto';
   direction?: 'forward' | 'reverse';
-  children: ReactNode;
+  children: React.ReactNode;
 }> = ({ stagger = 50, direction = 'forward', children }) => {
-  const childArray = Children.toArray(children);
+  const childArray = React.Children.toArray(children);
   const count = childArray.length;
 
   // Calculate stagger delay
@@ -34,7 +34,7 @@ export const Stagger: React.FC<{
   return (
     <>
       {childArray.map((child: React.ReactNode, index: number) => {
-        if (!isValidElement(child)) {
+        if (!React.isValidElement(child)) {
           return child;
         }
 
@@ -43,7 +43,7 @@ export const Stagger: React.FC<{
         const existingDuration = (child.props as any).duration || {};
         const existingDelay = existingDuration.delay || 0;
 
-        return cloneElement(child, {
+        return React.cloneElement(child, {
           ...child.props,
           duration: {
             ...existingDuration,
@@ -57,3 +57,4 @@ export const Stagger: React.FC<{
 };
 
 Stagger.displayName = 'Stagger';
+

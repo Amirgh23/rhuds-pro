@@ -47,9 +47,5 @@ export function hasSpecialCharacters(str: string): boolean {
   return specialChars.test(str);
 }
 
-/**
- * Check if HEX color is valid
- */
-export function isValidHexColor(color: string): boolean {
-  return /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/.test(color);
-}
+// Re-export from theme
+export { isValidHexColor } from '../theme/colorUtils';

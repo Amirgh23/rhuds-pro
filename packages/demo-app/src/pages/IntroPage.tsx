@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Navigation } from './intro-page/components/Navigation';
+import { CTAButtons } from './intro-page/components/CTAButtons';
 
 const FULL_TEXT = 'INITIALIZING RHUDS PRO SYSTEM...';
 
@@ -32,9 +34,7 @@ export default function IntroPage() {
   const [typedText, setTypedText] = useState('');
   const [isLoaded, setIsLoaded] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(false);
-  const [parallaxLayers, setParallaxLayers] = useState<number[]>([]);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const starsCanvasRef = useRef<HTMLCanvasElement>(null);
   const particlesRef = useRef<Particle[]>([]);
   const starsRef = useRef<Star[]>([]);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -43,11 +43,6 @@ export default function IntroPage() {
   // Initial load animation with progressive reveal
   useEffect(() => {
     const timer = setTimeout(() => setIsLoaded(true), 100);
-
-    // Initialize parallax layers
-    const layers = Array.from({ length: 5 }, (_, i) => Math.random() * 0.3 + 0.1);
-    setParallaxLayers(layers);
-
     return () => clearTimeout(timer);
   }, []);
 
@@ -173,7 +168,6 @@ export default function IntroPage() {
 
     let animationId: number;
     let time = 0;
-    let frameCount = 0;
 
     // Initialize particles with enhanced physics
     const initParticles = () => {
@@ -379,6 +373,9 @@ export default function IntroPage() {
         overflow: 'hidden',
       }}
     >
+      {/* Navigation Bar */}
+      <Navigation />
+
       {/* Animated Background */}
       <canvas
         ref={canvasRef}
@@ -413,7 +410,7 @@ export default function IntroPage() {
           justifyContent: 'center',
           position: 'relative',
           zIndex: 20,
-          padding: '40px 20px',
+          padding: '120px 20px 40px 20px',
           transform: `translateY(${scrollY * 0.3}px)`,
           perspective: '1000px',
         }}
@@ -772,306 +769,98 @@ export default function IntroPage() {
               perspective: '1000px',
             }}
           >
-            {['React 18', 'TypeScript', 'WebGL', 'Canvas API', 'Framer Motion'].map((tech, i) => (
-              <div
-                key={tech}
-                style={{
-                  padding: '12px 28px',
-                  background:
-                    'linear-gradient(135deg, rgba(41, 242, 223, 0.2) 0%, rgba(239, 62, 241, 0.2) 100%)',
-                  backdropFilter: 'blur(25px) saturate(200%)',
-                  border: '2px solid rgba(41, 242, 223, 0.6)',
-                  borderRadius: '30px',
-                  fontSize: '15px',
-                  color: '#29F2DF',
-                  fontWeight: '700',
-                  letterSpacing: '0.5px',
-                  animation: `fadeInUp 0.8s ease-out ${0.6 + i * 0.1}s backwards, float 3s ease-in-out ${i * 0.2}s infinite`,
-                  boxShadow: `
+            {['React 18', 'TypeScript', 'WebGL', 'Canvas API', 'Framer Motion'].map(
+              (tech, index) => (
+                <div
+                  key={tech}
+                  style={{
+                    padding: '12px 28px',
+                    background:
+                      'linear-gradient(135deg, rgba(41, 242, 223, 0.2) 0%, rgba(239, 62, 241, 0.2) 100%)',
+                    backdropFilter: 'blur(25px) saturate(200%)',
+                    border: '2px solid rgba(41, 242, 223, 0.6)',
+                    borderRadius: '30px',
+                    fontSize: '15px',
+                    color: '#29F2DF',
+                    fontWeight: '700',
+                    letterSpacing: '0.5px',
+                    animation: `fadeInUp 0.8s ease-out ${0.6 + index * 0.1}s backwards, float 3s ease-in-out ${index * 0.2}s infinite`,
+                    boxShadow: `
                     0 10px 30px rgba(41, 242, 223, 0.3),
                     0 0 50px rgba(41, 242, 223, 0.2),
                     0 0 70px rgba(239, 62, 241, 0.1),
                     inset 0 2px 0 rgba(255, 255, 255, 0.25),
                     inset 0 -2px 0 rgba(0, 0, 0, 0.3)
                   `,
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  cursor: 'default',
-                  position: 'relative',
-                  overflow: 'hidden',
-                  willChange: 'transform, box-shadow',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = `
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    cursor: 'default',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    willChange: 'transform, box-shadow',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = `
                     translateY(-6px) 
                     scale(1.08) 
                     rotateX(${mousePosition.y * 5}deg) 
                     rotateY(${mousePosition.x * 5}deg)
                   `;
-                  e.currentTarget.style.boxShadow = `
+                    e.currentTarget.style.boxShadow = `
                     0 15px 40px rgba(41, 242, 223, 0.5),
                     0 0 80px rgba(41, 242, 223, 0.4),
                     0 0 100px rgba(239, 62, 241, 0.2),
                     inset 0 2px 0 rgba(255, 255, 255, 0.35)
                   `;
-                  e.currentTarget.style.borderColor = '#FFFFFF';
-                  e.currentTarget.style.color = '#FFFFFF';
-                  playHoverSound(523.25 + i * 50, 0.1); // Ascending notes
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'translateY(0) scale(1) rotateX(0) rotateY(0)';
-                  e.currentTarget.style.boxShadow = `
+                    e.currentTarget.style.borderColor = '#FFFFFF';
+                    e.currentTarget.style.color = '#FFFFFF';
+                    playHoverSound(523.25 + index * 50, 0.1); // Ascending notes
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform =
+                      'translateY(0) scale(1) rotateX(0) rotateY(0)';
+                    e.currentTarget.style.boxShadow = `
                     0 10px 30px rgba(41, 242, 223, 0.3),
                     0 0 50px rgba(41, 242, 223, 0.2),
                     0 0 70px rgba(239, 62, 241, 0.1),
                     inset 0 2px 0 rgba(255, 255, 255, 0.25),
                     inset 0 -2px 0 rgba(0, 0, 0, 0.3)
                   `;
-                  e.currentTarget.style.borderColor = 'rgba(41, 242, 223, 0.6)';
-                  e.currentTarget.style.color = '#29F2DF';
-                }}
-              >
-                {tech}
-                {/* Glow effect */}
-                <div
-                  style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    width: '100%',
-                    height: '100%',
-                    background:
-                      'radial-gradient(circle, rgba(41, 242, 223, 0.1) 0%, transparent 70%)',
-                    filter: 'blur(10px)',
-                    opacity: 0,
-                    transition: 'opacity 0.3s ease',
-                    pointerEvents: 'none',
+                    e.currentTarget.style.borderColor = 'rgba(41, 242, 223, 0.6)';
+                    e.currentTarget.style.color = '#29F2DF';
                   }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.opacity = '1';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.opacity = '0';
-                  }}
-                />
-              </div>
-            ))}
+                >
+                  {tech}
+                  {/* Glow effect */}
+                  <div
+                    style={{
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      width: '100%',
+                      height: '100%',
+                      background:
+                        'radial-gradient(circle, rgba(41, 242, 223, 0.1) 0%, transparent 70%)',
+                      filter: 'blur(10px)',
+                      opacity: 0,
+                      transition: 'opacity 0.3s ease',
+                      pointerEvents: 'none',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.opacity = '1';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.opacity = '0';
+                    }}
+                  />
+                </div>
+              )
+            )}
           </div>
         </div>
 
         {/* CTA Buttons with advanced 3D effects */}
-        <div
-          style={{
-            display: 'flex',
-            gap: '28px',
-            flexWrap: 'wrap',
-            justifyContent: 'center',
-            animation: 'fadeInUp 1s ease-out 0.8s backwards',
-            perspective: '1000px',
-          }}
-        >
-          <button
-            onClick={() => {
-              playHoverSound(659.25, 0.2); // E5 note
-              navigate('/playground');
-            }}
-            style={{
-              position: 'relative',
-              padding: '22px 64px',
-              fontSize: '19px',
-              fontWeight: '800',
-              letterSpacing: '4px',
-              color: '#000',
-              background: 'linear-gradient(135deg, #29F2DF 0%, #1C7FA6 100%)',
-              border: 'none',
-              borderRadius: '16px',
-              cursor: 'pointer',
-              transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-              boxShadow: `
-                0 0 60px rgba(41, 242, 223, 0.8),
-                0 12px 40px rgba(0, 0, 0, 0.5),
-                0 0 100px rgba(41, 242, 223, 0.3),
-                inset 0 3px 0 rgba(255, 255, 255, 0.5),
-                inset 0 -3px 0 rgba(0, 0, 0, 0.4)
-              `,
-              overflow: 'hidden',
-              fontFamily: 'system-ui, -apple-system, sans-serif',
-              transformStyle: 'preserve-3d',
-              willChange: 'transform, box-shadow',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = `
-                translateY(-10px) 
-                scale(1.08)
-                rotateX(${mousePosition.y * 3}deg)
-                rotateY(${mousePosition.x * 3}deg)
-              `;
-              e.currentTarget.style.boxShadow = `
-                0 0 100px rgba(41, 242, 223, 1),
-                0 25px 80px rgba(41, 242, 223, 0.8),
-                0 0 150px rgba(41, 242, 223, 0.5),
-                inset 0 3px 0 rgba(255, 255, 255, 0.6)
-              `;
-              playHoverSound(587.33, 0.15); // D5 note
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0) scale(1) rotateX(0) rotateY(0)';
-              e.currentTarget.style.boxShadow = `
-                0 0 60px rgba(41, 242, 223, 0.8),
-                0 12px 40px rgba(0, 0, 0, 0.5),
-                0 0 100px rgba(41, 242, 223, 0.3),
-                inset 0 3px 0 rgba(255, 255, 255, 0.5),
-                inset 0 -3px 0 rgba(0, 0, 0, 0.4)
-              `;
-            }}
-          >
-            <span style={{ position: 'relative', zIndex: 1 }}>GET STARTED</span>
-            {/* Advanced shine effect */}
-            <div
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: '-100%',
-                width: '100%',
-                height: '100%',
-                background:
-                  'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent)',
-                animation: 'shine 2s infinite',
-                filter: 'blur(5px)',
-              }}
-            />
-            {/* Particle burst on click */}
-            <div
-              style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                transform: 'translate(-50%, -50%)',
-                width: '0',
-                height: '0',
-                background: 'radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, transparent 70%)',
-                borderRadius: '50%',
-                transition: 'width 0.3s ease, height 0.3s ease',
-                pointerEvents: 'none',
-              }}
-              onClick={(e) => {
-                e.currentTarget.style.width = '200px';
-                e.currentTarget.style.height = '200px';
-                setTimeout(() => {
-                  e.currentTarget.style.width = '0';
-                  e.currentTarget.style.height = '0';
-                }, 300);
-              }}
-            />
-          </button>
-
-          <button
-            onClick={() => {
-              playHoverSound(523.25, 0.2); // C5 note
-              navigate('/docs');
-            }}
-            style={{
-              position: 'relative',
-              padding: '22px 64px',
-              fontSize: '19px',
-              fontWeight: '800',
-              letterSpacing: '4px',
-              color: '#29F2DF',
-              background: 'rgba(41, 242, 223, 0.15)',
-              backdropFilter: 'blur(30px) saturate(200%)',
-              border: '3px solid #29F2DF',
-              borderRadius: '16px',
-              cursor: 'pointer',
-              transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-              overflow: 'hidden',
-              boxShadow: `
-                0 0 50px rgba(41, 242, 223, 0.5),
-                0 0 80px rgba(41, 242, 223, 0.2),
-                inset 0 3px 0 rgba(255, 255, 255, 0.2),
-                inset 0 -3px 0 rgba(0, 0, 0, 0.3)
-              `,
-              fontFamily: 'system-ui, -apple-system, sans-serif',
-              transformStyle: 'preserve-3d',
-              willChange: 'transform, box-shadow, background',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(41, 242, 223, 0.25)';
-              e.currentTarget.style.transform = `
-                translateY(-10px)
-                rotateX(${mousePosition.y * 2}deg)
-                rotateY(${mousePosition.x * 2}deg)
-              `;
-              e.currentTarget.style.boxShadow = `
-                0 25px 60px rgba(41, 242, 223, 0.8),
-                0 0 120px rgba(41, 242, 223, 0.6),
-                0 0 180px rgba(41, 242, 223, 0.3),
-                inset 0 3px 0 rgba(255, 255, 255, 0.3)
-              `;
-              e.currentTarget.style.borderColor = '#FFFFFF';
-              e.currentTarget.style.color = '#FFFFFF';
-              playHoverSound(493.88, 0.15); // B4 note
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'rgba(41, 242, 223, 0.15)';
-              e.currentTarget.style.transform = 'translateY(0) rotateX(0) rotateY(0)';
-              e.currentTarget.style.boxShadow = `
-                0 0 50px rgba(41, 242, 223, 0.5),
-                0 0 80px rgba(41, 242, 223, 0.2),
-                inset 0 3px 0 rgba(255, 255, 255, 0.2),
-                inset 0 -3px 0 rgba(0, 0, 0, 0.3)
-              `;
-              e.currentTarget.style.borderColor = '#29F2DF';
-              e.currentTarget.style.color = '#29F2DF';
-            }}
-          >
-            <span style={{ position: 'relative', zIndex: 1 }}>VIEW DOCS</span>
-            {/* Animated corner accents */}
-            <div
-              style={{
-                position: 'absolute',
-                top: '8px',
-                left: '8px',
-                width: '20px',
-                height: '20px',
-                borderTop: '3px solid currentColor',
-                borderLeft: '3px solid currentColor',
-                opacity: 0.7,
-                animation: 'pulse 2s ease-in-out infinite',
-              }}
-            />
-            <div
-              style={{
-                position: 'absolute',
-                bottom: '8px',
-                right: '8px',
-                width: '20px',
-                height: '20px',
-                borderBottom: '3px solid currentColor',
-                borderRight: '3px solid currentColor',
-                opacity: 0.7,
-                animation: 'pulse 2s ease-in-out infinite 1s',
-              }}
-            />
-            {/* Holographic grid overlay */}
-            <div
-              style={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                background: `
-                  linear-gradient(90deg, transparent 49%, rgba(41, 242, 223, 0.1) 50%, transparent 51%),
-                  linear-gradient(0deg, transparent 49%, rgba(41, 242, 223, 0.1) 50%, transparent 51%)
-                `,
-                backgroundSize: '20px 20px',
-                opacity: 0.3,
-                pointerEvents: 'none',
-                animation: 'gridMove 10s linear infinite',
-              }}
-            />
-          </button>
-        </div>
+        <CTAButtons onPlaySound={playHoverSound} mousePosition={mousePosition} />
 
         {/* Advanced Scroll Indicator */}
         <div

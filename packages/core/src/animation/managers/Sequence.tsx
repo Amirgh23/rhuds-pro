@@ -3,7 +3,7 @@
  * Runs animations in sequence
  */
 
-import React, { Children, useState, useEffect, cloneElement, isValidElement } from 'react';
+import React from 'react';
 
 /**
  * Sequence component for running animations sequentially
@@ -15,9 +15,9 @@ export const Sequence: React.FC<{ children: React.ReactNode; onComplete?: () => 
   children,
   onComplete,
 }) => {
-  const childArray = Children.toArray(children);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [completedIndices, setCompletedIndices] = useState<Set<number>>(new Set());
+  const childArray = React.Children.toArray(children);
+  const [activeIndex, setActiveIndex] = React.useState(0);
+  const [completedIndices, setCompletedIndices] = React.useState<Set<number>>(new Set());
 
   // Handle animation completion
   const handleAnimationComplete = (index: number) => {
@@ -37,7 +37,7 @@ export const Sequence: React.FC<{ children: React.ReactNode; onComplete?: () => 
   };
 
   // Reset when children change
-  useEffect(() => {
+  React.useEffect(() => {
     setActiveIndex(0);
     setCompletedIndices(new Set());
   }, [children]);
@@ -45,7 +45,7 @@ export const Sequence: React.FC<{ children: React.ReactNode; onComplete?: () => 
   return (
     <>
       {childArray.map((child, index) => {
-        if (!isValidElement(child)) {
+        if (!React.isValidElement(child)) {
           return child;
         }
 
@@ -54,7 +54,7 @@ export const Sequence: React.FC<{ children: React.ReactNode; onComplete?: () => 
         const isCompleted = completedIndices.has(index);
 
         // Clone child and inject activation state
-        return cloneElement(child, {
+        return React.cloneElement(child, {
           ...child.props,
           activate: isActive,
           onAnimateEntered: () => {
@@ -71,3 +71,4 @@ export const Sequence: React.FC<{ children: React.ReactNode; onComplete?: () => 
 };
 
 Sequence.displayName = 'Sequence';
+

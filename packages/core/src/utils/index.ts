@@ -27,15 +27,12 @@ export * from './validation';
 export * from './format';
 
 // Animation utilities (excluding duplicates from animation package)
-export {
-  interpolateColor,
-  createColorTransitionKeyframes,
-} from './animation';
+export { interpolateColor, createColorTransitionKeyframesSimple } from './animation';
 
 // Theme utilities (excluding duplicates from theme package)
 export {
-  extendTheme,
-  composeThemes,
+  extendThemeSimple,
+  composeThemesSimple,
   getSystemThemePreference,
   watchSystemThemePreference,
 } from './theme';

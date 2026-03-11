@@ -3,7 +3,7 @@
  * Provides parent-child animator relationships and state propagation
  */
 
-import React, { createContext, useContext, useMemo, type ReactNode } from 'react';
+import React from 'react';
 
 /**
  * Animator control interface
@@ -23,7 +23,7 @@ interface AnimatorContextValue {
   depth: number;
 }
 
-const AnimatorContext = createContext<AnimatorContextValue>({
+const AnimatorContext = React.createContext<AnimatorContextValue>({
   depth: 0,
 });
 
@@ -31,7 +31,7 @@ const AnimatorContext = createContext<AnimatorContextValue>({
  * Hook to access parent animator control
  */
 export function useParentAnimator(): AnimatorControl | undefined {
-  const context = useContext(AnimatorContext);
+  const context = React.useContext(AnimatorContext);
   return context.parentControl;
 }
 
@@ -39,7 +39,7 @@ export function useParentAnimator(): AnimatorControl | undefined {
  * Hook to get animator depth in hierarchy
  */
 export function useAnimatorDepth(): number {
-  const context = useContext(AnimatorContext);
+  const context = React.useContext(AnimatorContext);
   return context.depth;
 }
 
@@ -48,13 +48,13 @@ export function useAnimatorDepth(): number {
  */
 interface AnimatorProviderProps {
   control: AnimatorControl;
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 export const AnimatorProvider: React.FC<AnimatorProviderProps> = ({ control, children }) => {
-  const parentContext = useContext(AnimatorContext);
+  const parentContext = React.useContext(AnimatorContext);
 
-  const value = useMemo(
+  const value = React.useMemo(
     () => ({
       parentControl: control,
       depth: parentContext.depth + 1,

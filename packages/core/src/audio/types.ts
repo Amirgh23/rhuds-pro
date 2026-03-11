@@ -81,7 +81,7 @@ export interface DelayEffect extends AudioEffect {
 /**
  * Filter effect parameters
  */
-export interface FilterEffect extends AudioEffect {
+export interface FilterEffect extends Omit<AudioEffect, 'params'> {
   type: 'filter';
   params?: {
     filterType?: FilterType;

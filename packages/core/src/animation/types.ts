@@ -43,24 +43,29 @@ export interface AnimationConfig {
   loop?: boolean | number;
   direction?: 'normal' | 'reverse' | 'alternate' | 'alternate-reverse';
   fill?: 'none' | 'forwards' | 'backwards' | 'both';
+  onStart?: () => void;
+  onComplete?: () => void;
+  onUpdate?: (progress: number) => void;
 }
 
 /**
  * Animation instance
  */
 export interface Animation {
-  id: string;
-  config: AnimationConfig;
-  state: AnimationState;
-  progress: number;
+  id?: string;
+  config?: AnimationConfig;
+  state?: AnimationState;
+  progress?: number;
   play: () => void;
   pause: () => void;
-  resume: () => void;
+  resume?: () => void;
   stop: () => void;
   seek: (time: number) => void;
+  reverse: () => void;
+  isPlaying?: boolean;
   getProgress: () => number;
-  getDuration: () => number;
-  getCurrentTime: () => number;
+  getDuration?: () => number;
+  getCurrentTime?: () => number;
 }
 
 /**
@@ -68,8 +73,22 @@ export interface Animation {
  */
 export interface AnimatorSystemConfig {
   autoStart?: boolean;
-  defaultEasing?: string | EasingFunction;
-  defaultDuration?: number;
+  defaultEasing?:
+    | string
+    | EasingFunction
+    | {
+        enter?: string | EasingFunction;
+        exit?: string | EasingFunction;
+      };
+  defaultDuration?:
+    | number
+    | {
+        enter?: number;
+        exit?: number;
+        stagger?: number;
+        delay?: number;
+      };
+  disabled?: boolean;
 }
 
 /**
