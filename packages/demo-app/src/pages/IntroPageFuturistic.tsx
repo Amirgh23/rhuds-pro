@@ -176,6 +176,13 @@ export default function IntroPageFuturistic() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const scrollToSection = (index: number) => {
+    const element = document.getElementById(sections[index]);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   const runCode = () => {
     setOutput(
       '✓ Code executed successfully!\n\nComponent rendered with:\n- Variant: neon\n- Animation: enabled\n- Theme: cyan (#29F2DF)'
@@ -243,11 +250,6 @@ export default function IntroPageFuturistic() {
       company: 'Tech Stack',
     },
   ];
-
-  const scrollToSection = (index: number) => {
-    const sections = document.querySelectorAll('section');
-    sections[index]?.scrollIntoView({ behavior: 'smooth' });
-  };
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
@@ -330,23 +332,24 @@ export default function IntroPageFuturistic() {
         {/* Animated Grid Background */}
         <div className="grid-background" style={{ transform: `translateY(${scrollY * 0.5}px)` }} />
 
-        {/* Floating Particles */}
-        <div
-          className="particles-container"
-          style={{ transform: `translateY(${scrollY * 0.3}px)` }}
-        >
-          {[...Array(30)].map((_, i) => (
-            <div
-              key={i}
-              className="particle"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 3}s`,
-                animationDuration: `${Math.random() * 3 + 2}s`,
-              }}
-            />
-          ))}
+        {/* Animated Mesh Lines */}
+        <div className="mesh-lines">
+          <div className="mesh-line" />
+          <div className="mesh-line" />
+          <div className="mesh-line" />
+          <div className="mesh-line" />
+          <div className="mesh-line" />
+          <div className="mesh-line" />
+        </div>
+
+        {/* Orbs/Spheres Effect */}
+        <div className="orbs-container" style={{ transform: `translateY(${scrollY * 0.3}px)` }}>
+          <div className="orb orb-1" />
+          <div className="orb orb-2" />
+          <div className="orb orb-3" />
+          <div className="orb orb-4" />
+          <div className="orb orb-5" />
+          <div className="orb orb-6" />
         </div>
 
         {/* Radial Glow Effect */}

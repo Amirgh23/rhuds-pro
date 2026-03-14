@@ -183,6 +183,9 @@ importers:
       '@reduxjs/toolkit':
         specifier: ^1.9.0
         version: 1.9.7(react-redux@8.1.3(@types/react-dom@18.3.7(@types/react@18.3.28))(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(redux@4.2.1))(react@18.3.1)
+      '@rhuds/components':
+        specifier: file:../components
+        version: file:packages/components(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@rhuds/core':
         specifier: file:../core
         version: file:packages/core(@types/react-dom@18.3.7(@types/react@18.3.28))(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react-is@18.3.1)(react@18.3.1)
@@ -1741,6 +1744,12 @@ packages:
   '@remix-run/router@1.23.2':
     resolution: {integrity: sha512-Ic6m2U/rMjTkhERIa/0ZtXJP17QUi2CbWE7cqx4J58M8aA3QTfW+2UlQ4psvTX9IO1RfNVhK3pcpdjej7L+t2w==}
     engines: {node: '>=14.0.0'}
+
+  '@rhuds/components@file:packages/components':
+    resolution: {directory: packages/components, type: directory}
+    peerDependencies:
+      react: ^18.0.0
+      react-dom: ^18.0.0
 
   '@rhuds/core@file:packages/core':
     resolution: {directory: packages/core, type: directory}
@@ -5756,6 +5765,16 @@ snapshots:
       react-redux: 8.1.3(@types/react-dom@18.3.7(@types/react@18.3.28))(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(redux@4.2.1)
 
   '@remix-run/router@1.23.2': {}
+
+  '@rhuds/components@file:packages/components(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@rhuds/backgrounds': link:packages/backgrounds
+      '@rhuds/core': link:packages/core
+      '@rhuds/frames': link:packages/frames
+      '@rhuds/hooks': link:packages/hooks
+      '@rhuds/webgl': link:packages/webgl
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
 
   '@rhuds/core@file:packages/core(@types/react-dom@18.3.7(@types/react@18.3.28))(@types/react@18.3.28)(react-dom@18.3.1(react@18.3.1))(react-is@18.3.1)(react@18.3.1)':
     dependencies:

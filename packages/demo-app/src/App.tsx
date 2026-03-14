@@ -4,7 +4,7 @@ import { ThemeProvider, BleepsProvider, createAppTheme } from '@rhuds/core';
 import { HudToastProvider } from '@rhuds/components';
 import IntroPageFuturistic from './pages/IntroPageFuturistic';
 import { ShowcasePage } from './pages/ShowcasePage';
-import { PlaygroundPage } from './pages/PlaygroundPage';
+import InteractivePlayground from './pages/InteractivePlayground';
 import { DocsPage } from './pages/DocsPage';
 import PortfolioPage from './pages/PortfolioPage';
 import { Navbar } from './components/Navbar';
@@ -103,7 +103,7 @@ const AppContent: React.FC = () => {
       <Routes>
         <Route path="/" element={<IntroPageFuturistic />} />
         <Route path="/showcase" element={<ShowcasePage />} />
-        <Route path="/playground" element={<PlaygroundPage />} />
+        <Route path="/playground" element={<InteractivePlayground />} />
         <Route path="/docs" element={<DocsPage />} />
         <Route path="/docs/:section" element={<DocsPage />} />
         <Route path="/portfolio" element={<PortfolioPage />} />

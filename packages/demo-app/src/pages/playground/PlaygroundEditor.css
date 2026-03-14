@@ -1,0 +1,83 @@
+.playground-editor {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+  border: 1px solid rgba(41, 242, 223, 0.2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.editor-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid rgba(41, 242, 223, 0.2);
+  flex-shrink: 0;
+}
+
+.editor-icon {
+  font-size: 14px;
+  color: #29f2df;
+  text-shadow: 0 0 8px rgba(41, 242, 223, 0.5);
+}
+
+.editor-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #29f2df;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.editor-textarea {
+  flex: 1;
+  padding: 12px;
+  background: transparent;
+  border: none;
+  color: #a8dadc;
+  font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  resize: none;
+  outline: none;
+  overflow: auto;
+  tab-size: 2;
+  -moz-tab-size: 2;
+}
+
+.editor-textarea::selection {
+  background: rgba(41, 242, 223, 0.3);
+  color: #a8dadc;
+}
+
+.editor-textarea::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.editor-textarea::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.editor-textarea::-webkit-scrollbar-thumb {
+  background: rgba(41, 242, 223, 0.3);
+  border-radius: 3px;
+}
+
+.editor-textarea::-webkit-scrollbar-thumb:hover {
+  background: rgba(41, 242, 223, 0.5);
+}
+
+/* Syntax highlighting simulation */
+.editor-textarea {
+  color: #a8dadc;
+}
+
+/* Placeholder */
+.editor-textarea::placeholder {
+  color: rgba(168, 218, 220, 0.3);
+}

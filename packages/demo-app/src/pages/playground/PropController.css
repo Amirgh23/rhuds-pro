@@ -1,0 +1,124 @@
+.prop-controller {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(180deg, rgba(10, 14, 39, 0.9) 0%, rgba(26, 31, 58, 0.9) 100%);
+  border-top: 1px solid rgba(41, 242, 223, 0.2);
+  overflow: hidden;
+}
+
+.props-header {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid rgba(41, 242, 223, 0.2);
+  flex-shrink: 0;
+}
+
+.props-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #29f2df;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.props-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: rgba(168, 218, 220, 0.5);
+  font-size: 12px;
+  font-style: italic;
+}
+
+.props-list {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 8px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px;
+}
+
+.prop-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(41, 242, 223, 0.15);
+  border-radius: 3px;
+}
+
+.prop-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: #29f2df;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.prop-input,
+.prop-checkbox {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(41, 242, 223, 0.2);
+  color: #a8dadc;
+  padding: 6px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-family: inherit;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.prop-input:focus,
+.prop-checkbox:focus {
+  border-color: #29f2df;
+  box-shadow: 0 0 6px rgba(41, 242, 223, 0.3);
+}
+
+.prop-input::placeholder {
+  color: rgba(168, 218, 220, 0.3);
+}
+
+.prop-checkbox {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #29f2df;
+}
+
+.props-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.props-list::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.props-list::-webkit-scrollbar-thumb {
+  background: rgba(41, 242, 223, 0.3);
+  border-radius: 3px;
+}
+
+.props-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(41, 242, 223, 0.5);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .props-list {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .props-list {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+}

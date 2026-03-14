@@ -1,0 +1,57 @@
+.playground-editor {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: rgba(10, 10, 31, 0.6);
+}
+
+.editor-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 15px;
+  background: rgba(41, 242, 223, 0.1);
+  border-bottom: 1px solid rgba(41, 242, 223, 0.2);
+  font-weight: 600;
+  font-size: 14px;
+  color: #29f2df;
+}
+
+.editor-icon {
+  font-size: 16px;
+}
+
+.editor-textarea {
+  flex: 1;
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.3);
+  color: #29f2df;
+  border: none;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  resize: none;
+  outline: none;
+  tab-size: 2;
+}
+
+.editor-textarea::selection {
+  background: rgba(41, 242, 223, 0.3);
+}
+
+.editor-textarea::-webkit-scrollbar {
+  width: 8px;
+}
+
+.editor-textarea::-webkit-scrollbar-track {
+  background: rgba(41, 242, 223, 0.05);
+}
+
+.editor-textarea::-webkit-scrollbar-thumb {
+  background: rgba(41, 242, 223, 0.3);
+  border-radius: 4px;
+}
+
+.editor-textarea::-webkit-scrollbar-thumb:hover {
+  background: rgba(41, 242, 223, 0.5);
+}

@@ -21,6 +21,7 @@
     "@reduxjs/toolkit": "^1.9.0",
     "react-redux": "^8.0.0",
     "@rhuds/core": "file:../core",
+    "@rhuds/components": "file:../components",
     "@rhuds/hooks": "file:../hooks",
     "@rhuds/utils": "file:../utils",
     "@rhuds/sfx": "file:../sfx"
