@@ -4,6 +4,7 @@
 @import './variables.css';
 @import './typography.css';
 @import './utilities.css';
+@import './cyberpunk-borders.css';
 
 /* Global Styles */
 * {
@@ -21,6 +22,26 @@ body {
   color: var(--color-text-secondary);
   font-family: var(--font-family-mono);
   overflow-x: hidden;
+  position: relative;
+}
+
+#scanlines {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 100vh;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(41, 242, 223, 0.03) 0px,
+    rgba(41, 242, 223, 0.03) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 9998;
+  animation: scanlines 8s linear infinite;
 }
 
 /* Container */
@@ -91,6 +112,7 @@ button {
   align-items: center;
   justify-content: center;
   gap: 8px;
+  overflow: hidden;
 }
 
 button:hover {
@@ -175,7 +197,7 @@ svg {
 
 ::-webkit-scrollbar-thumb {
   background-color: var(--color-primary);
-  border-radius: 6px;
+  border-radius: 0;
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -253,7 +275,7 @@ svg {
   padding: 8px 16px;
   text-decoration: none;
   z-index: 9999;
-  border-radius: 0 0 4px 0;
+  border-radius: 0;
 }
 
 .skip-to-content:focus {
@@ -351,7 +373,7 @@ svg {
   text-decoration: none;
   transition: all var(--animation-duration-normal) var(--animation-easing-ease-in-out);
   padding: 8px 12px;
-  border-radius: 2px;
+  border-radius: 0;
   display: inline-block;
   min-height: 44px;
   display: flex;
@@ -434,7 +456,7 @@ svg {
   min-height: 44px;
   min-width: 120px;
   border: 2px solid;
-  border-radius: 2px;
+  border-radius: 0;
   font-family: var(--font-family-mono);
   font-weight: 600;
   cursor: pointer;
@@ -444,6 +466,7 @@ svg {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 }
 
 .intro-page__cta-button:hover {
@@ -529,13 +552,14 @@ svg {
   padding: 24px;
   background-color: rgba(41, 242, 223, 0.05);
   border: 1px solid rgba(41, 242, 223, 0.2);
-  border-radius: 2px;
+  border-radius: 0;
   transition: all var(--animation-duration-normal) var(--animation-easing-ease-in-out);
   cursor: pointer;
   min-height: 200px;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  overflow: hidden;
 }
 
 .intro-page__feature-card:hover {
@@ -883,7 +907,7 @@ svg {
   min-height: 44px;
   min-width: 120px;
   border: 2px solid;
-  border-radius: 2px;
+  border-radius: 0;
   font-family: var(--font-family-mono);
   font-weight: 600;
   cursor: pointer;
@@ -893,6 +917,7 @@ svg {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 }
 
 .hero-section__cta-button:hover {
@@ -1257,25 +1282,6 @@ svg {
 
 .intro-page {
   position: relative;
-}
-
-.intro-page::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: repeating-linear-gradient(
-    0deg,
-    rgba(41, 242, 223, 0.03) 0px,
-    rgba(41, 242, 223, 0.03) 1px,
-    transparent 1px,
-    transparent 2px
-  );
-  pointer-events: none;
-  z-index: 9998;
-  animation: scanlines 8s linear infinite;
 }
 
 /* Enhanced button glow on focus */

@@ -1,0 +1,254 @@
+/* Professional HUD Font System - Fantasy Edition */
+
+:root {
+  /* Primary HUD Font - Audiowide (Ultra Futuristic) */
+  --font-hud-primary: 'Audiowide', 'Orbitron', monospace;
+
+  /* Secondary HUD Font - Michroma (Sci-Fi) */
+  --font-hud-secondary: 'Michroma', 'Space Mono', monospace;
+
+  /* Tertiary HUD Font - Rajdhani (Tech) */
+  --font-hud-tertiary: 'Rajdhani', 'Electrolize', monospace;
+
+  /* Display Font - Oxanium (Bold Futuristic) */
+  --font-display: 'Oxanium', 'Space Grotesk', sans-serif;
+
+  /* Accent Font - Rubik Mono One (Extreme) */
+  --font-accent: 'Rubik Mono One', monospace;
+
+  /* Body Font - Inter (Readability) */
+  --font-body: 'Inter', sans-serif;
+
+  /* Font Sizes for HUD */
+  --font-size-hud-xs: 0.75rem;
+  --font-size-hud-sm: 0.875rem;
+  --font-size-hud-md: 1rem;
+  --font-size-hud-lg: 1.125rem;
+  --font-size-hud-xl: 1.25rem;
+  --font-size-hud-2xl: 1.5rem;
+  --font-size-hud-3xl: 1.875rem;
+
+  /* Font Weights */
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 900;
+
+  /* Letter Spacing for HUD Effect */
+  --letter-spacing-tight: -0.02em;
+  --letter-spacing-normal: 0em;
+  --letter-spacing-wide: 0.05em;
+  --letter-spacing-wider: 0.1em;
+  --letter-spacing-widest: 0.15em;
+  --letter-spacing-extreme: 0.25em;
+
+  /* Line Heights */
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+  --line-height-loose: 2;
+}
+
+/* HUD Text Styles - Fantasy Edition */
+.hud-text-primary {
+  font-family: var(--font-hud-primary);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-extreme);
+  text-transform: uppercase;
+  font-style: italic;
+}
+
+.hud-text-secondary {
+  font-family: var(--font-hud-secondary);
+  font-weight: var(--font-weight-normal);
+  letter-spacing: var(--letter-spacing-wider);
+  text-transform: uppercase;
+}
+
+.hud-text-tertiary {
+  font-family: var(--font-hud-tertiary);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.hud-text-display {
+  font-family: var(--font-display);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-wider);
+  text-transform: uppercase;
+}
+
+.hud-text-accent {
+  font-family: var(--font-accent);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-extreme);
+  text-transform: uppercase;
+}
+
+.hud-text-body {
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-normal);
+  letter-spacing: var(--letter-spacing-normal);
+}
+
+/* HUD Heading Styles - Fantasy Edition */
+.hud-h1 {
+  font-family: var(--font-accent);
+  font-size: var(--font-size-hud-3xl);
+  font-weight: var(--font-weight-extrabold);
+  letter-spacing: var(--letter-spacing-extreme);
+  text-transform: uppercase;
+  line-height: var(--line-height-tight);
+  text-shadow:
+    0 0 10px rgba(0, 255, 255, 0.5),
+    0 0 20px rgba(255, 0, 255, 0.3);
+}
+
+.hud-h2 {
+  font-family: var(--font-hud-primary);
+  font-size: var(--font-size-hud-2xl);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-wider);
+  text-transform: uppercase;
+  line-height: var(--line-height-tight);
+  font-style: italic;
+}
+
+.hud-h3 {
+  font-family: var(--font-hud-secondary);
+  font-size: var(--font-size-hud-xl);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+  line-height: var(--line-height-tight);
+}
+
+.hud-h4 {
+  font-family: var(--font-hud-tertiary);
+  font-size: var(--font-size-hud-lg);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: var(--letter-spacing-wide);
+  line-height: var(--line-height-normal);
+}
+
+/* HUD Code/Data Display */
+.hud-code {
+  font-family: var(--font-hud-tertiary);
+  font-size: var(--font-size-hud-sm);
+  font-weight: var(--font-weight-normal);
+  letter-spacing: var(--letter-spacing-normal);
+  line-height: var(--line-height-relaxed);
+}
+
+.hud-data {
+  font-family: var(--font-hud-secondary);
+  font-size: var(--font-size-hud-md);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-wider);
+  text-transform: uppercase;
+  line-height: var(--line-height-normal);
+}
+
+/* HUD Label/Status Text */
+.hud-label {
+  font-family: var(--font-hud-primary);
+  font-size: var(--font-size-hud-xs);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-extreme);
+  text-transform: uppercase;
+  line-height: var(--line-height-tight);
+  font-style: italic;
+}
+
+/* HUD Button Text */
+.hud-button {
+  font-family: var(--font-display);
+  font-size: var(--font-size-hud-sm);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-wider);
+  text-transform: uppercase;
+  line-height: var(--line-height-tight);
+}
+
+/* HUD Status/Alert Text */
+.hud-status {
+  font-family: var(--font-accent);
+  font-size: var(--font-size-hud-md);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-extreme);
+  text-transform: uppercase;
+  line-height: var(--line-height-tight);
+  animation: hud-pulse 2s ease-in-out infinite;
+}
+
+@keyframes hud-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+  }
+  50% {
+    opacity: 0.8;
+    text-shadow:
+      0 0 15px rgba(0, 255, 255, 0.8),
+      0 0 25px rgba(255, 0, 255, 0.5);
+  }
+}
+
+/* HUD Warning Text */
+.hud-warning {
+  font-family: var(--font-hud-primary);
+  font-size: var(--font-size-hud-md);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-wider);
+  text-transform: uppercase;
+  color: #ff6b00;
+  text-shadow: 0 0 10px rgba(255, 107, 0, 0.6);
+}
+
+/* HUD Success Text */
+.hud-success {
+  font-family: var(--font-hud-secondary);
+  font-size: var(--font-size-hud-md);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+  color: #00ff00;
+  text-shadow: 0 0 10px rgba(0, 255, 0, 0.6);
+}
+
+/* HUD Error Text */
+.hud-error {
+  font-family: var(--font-hud-primary);
+  font-size: var(--font-size-hud-md);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: var(--letter-spacing-wider);
+  text-transform: uppercase;
+  color: #ff0000;
+  text-shadow: 0 0 10px rgba(255, 0, 0, 0.6);
+}
+
+/* Responsive Typography */
+@media (max-width: 768px) {
+  .hud-h1 {
+    font-size: var(--font-size-hud-2xl);
+    letter-spacing: var(--letter-spacing-wider);
+  }
+
+  .hud-h2 {
+    font-size: var(--font-size-hud-xl);
+  }
+
+  .hud-h3 {
+    font-size: var(--font-size-hud-lg);
+  }
+}
+
+/* Font Smoothing for Better Rendering */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}

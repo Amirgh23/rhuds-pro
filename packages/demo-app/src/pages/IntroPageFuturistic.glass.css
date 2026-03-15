@@ -1,0 +1,521 @@
+/* ============================================
+   GLASS BOX STYLING FOR ALL DARK BOXES
+   Inspired by ShowcasePage ComponentSection
+   ============================================ */
+
+/* Feature Cards - Glass Style */
+.feature-card {
+  background: rgba(0, 10, 20, 0.4) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(41, 242, 223, 0.2) !important;
+  box-shadow: 0 4px 20px rgba(41, 242, 223, 0.1) !important;
+}
+
+.feature-card:hover {
+  border-color: rgba(41, 242, 223, 0.4) !important;
+  box-shadow: 0 8px 32px rgba(41, 242, 223, 0.15) !important;
+}
+
+/* Terminal Container - Glass Style */
+.terminal-container {
+  background: rgba(0, 10, 20, 0.4) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(41, 242, 223, 0.2) !important;
+  box-shadow: 0 4px 20px rgba(41, 242, 223, 0.1) !important;
+}
+
+/* Install Card - Glass Style */
+.install-card {
+  background: rgba(0, 10, 20, 0.4) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(41, 242, 223, 0.2) !important;
+  box-shadow: 0 4px 20px rgba(41, 242, 223, 0.1) !important;
+}
+
+/* Preview Cards - Glass Style */
+.preview-card {
+  background: rgba(0, 10, 20, 0.4) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(41, 242, 223, 0.2) !important;
+  box-shadow: 0 4px 20px rgba(41, 242, 223, 0.1) !important;
+}
+
+/* Stat Cards - Glass Style */
+.stat-card {
+  background: rgba(0, 10, 20, 0.4) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(41, 242, 223, 0.2) !important;
+  box-shadow: 0 4px 20px rgba(41, 242, 223, 0.1) !important;
+}
+
+.stat-card:hover {
+  border-color: rgba(41, 242, 223, 0.4) !important;
+  box-shadow: 0 8px 32px rgba(41, 242, 223, 0.15) !important;
+}
+
+/* GitHub Stat Box - Glass Style */
+.github-stat-box {
+  background: rgba(0, 10, 20, 0.4) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(41, 242, 223, 0.2) !important;
+  box-shadow: 0 4px 20px rgba(41, 242, 223, 0.1) !important;
+}
+
+.github-stat-box:hover {
+  border-color: rgba(41, 242, 223, 0.4) !important;
+  box-shadow: 0 8px 32px rgba(41, 242, 223, 0.15) !important;
+}
+
+/* Playground Editor - Glass Style */
+.playground-editor {
+  background: rgba(0, 10, 20, 0.4) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(41, 242, 223, 0.2) !important;
+  box-shadow: 0 4px 20px rgba(41, 242, 223, 0.1) !important;
+}
+
+/* Playground Output - Glass Style */
+.playground-output {
+  background: rgba(0, 10, 20, 0.4) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(41, 242, 223, 0.2) !important;
+  box-shadow: 0 4px 20px rgba(41, 242, 223, 0.1) !important;
+}
+
+/* Playground Preview Demo - Glass Style */
+.playground-preview-demo {
+  background: rgba(0, 10, 20, 0.4) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(41, 242, 223, 0.2) !important;
+  box-shadow: 0 4px 20px rgba(41, 242, 223, 0.1) !important;
+}
+
+/* Theme Button - Glass Style */
+.theme-button {
+  background: rgba(0, 10, 20, 0.4) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(41, 242, 223, 0.2) !important;
+  box-shadow: 0 4px 20px rgba(41, 242, 223, 0.1) !important;
+}
+
+.theme-button:hover {
+  border-color: rgba(41, 242, 223, 0.4) !important;
+  box-shadow: 0 8px 32px rgba(41, 242, 223, 0.15) !important;
+}
+
+/* Theme Preview - Glass Style */
+.theme-preview {
+  background: rgba(0, 10, 20, 0.4) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(41, 242, 223, 0.2) !important;
+  box-shadow: 0 4px 20px rgba(41, 242, 223, 0.1) !important;
+}
+
+/* Testimonial Card - Glass Style */
+.testimonial-card {
+  background: rgba(0, 10, 20, 0.4) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(41, 242, 223, 0.2) !important;
+  box-shadow: 0 4px 20px rgba(41, 242, 223, 0.1) !important;
+}
+
+.testimonial-card:hover {
+  border-color: rgba(41, 242, 223, 0.4) !important;
+  box-shadow: 0 8px 32px rgba(41, 242, 223, 0.15) !important;
+}
+
+/* Comparison Table Container - Glass Style */
+.comparison-table-container {
+  background: rgba(0, 10, 20, 0.4) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(41, 242, 223, 0.2) !important;
+  box-shadow: 0 4px 20px rgba(41, 242, 223, 0.1) !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+/* Newsletter Form - Glass Style */
+.newsletter-form {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.newsletter-form:hover {
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Newsletter Input Wrapper - Glass Style */
+.newsletter-input-wrapper {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Roadmap Content - Glass Style */
+.roadmap-content {
+  background: rgba(0, 10, 20, 0.4) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(41, 242, 223, 0.2) !important;
+  box-shadow: 0 4px 20px rgba(41, 242, 223, 0.1) !important;
+}
+
+/* Roadmap Dot - Glass Style */
+.roadmap-dot {
+  background: rgba(0, 10, 20, 0.4) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(41, 242, 223, 0.2) !important;
+  box-shadow: 0 4px 20px rgba(41, 242, 223, 0.1) !important;
+}
+
+/* Performance Card - Glass Style */
+.performance-card {
+  background: rgba(0, 10, 20, 0.4) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(41, 242, 223, 0.2) !important;
+  box-shadow: 0 4px 20px rgba(41, 242, 223, 0.1) !important;
+}
+
+.performance-card:hover {
+  border-color: rgba(41, 242, 223, 0.4) !important;
+  box-shadow: 0 8px 32px rgba(41, 242, 223, 0.15) !important;
+}
+
+/* Example Button - Glass Style */
+.example-button {
+  background: rgba(0, 10, 20, 0.4) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(41, 242, 223, 0.2) !important;
+  box-shadow: 0 4px 20px rgba(41, 242, 223, 0.1) !important;
+}
+
+.example-button:hover {
+  border-color: rgba(41, 242, 223, 0.4) !important;
+  box-shadow: 0 8px 32px rgba(41, 242, 223, 0.15) !important;
+}
+
+/* Context Menu - Glass Style */
+.context-menu {
+  background: rgba(0, 10, 20, 0.4) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(41, 242, 223, 0.2) !important;
+  box-shadow: 0 4px 20px rgba(41, 242, 223, 0.1) !important;
+}
+
+/* Footer - Glass Style */
+.intro-footer {
+  background: rgba(0, 10, 20, 0.4) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border-top: 1px solid rgba(41, 242, 223, 0.2) !important;
+  border-radius: 4px !important;
+  box-shadow: 0 4px 20px rgba(41, 242, 223, 0.1) !important;
+}
+
+/* Nav Dot Tooltip - Glass Style */
+.nav-dot-tooltip {
+  background: rgba(0, 10, 20, 0.4) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(41, 242, 223, 0.2) !important;
+  box-shadow: 0 4px 20px rgba(41, 242, 223, 0.1) !important;
+}
+
+/* Terminal Container - Glass Style (Override) */
+.terminal-container {
+  background: rgba(0, 10, 20, 0.4) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+}
+
+/* Install Card - Glass Style (Override) */
+.install-card {
+  background: rgba(0, 10, 20, 0.4) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+}
+
+/* Code Playground Section - Glass Style */
+.code-playground-section {
+  background: transparent !important;
+}
+
+/* Newsletter Input - Glass Style */
+.newsletter-input {
+  background: rgba(0, 10, 20, 0.4) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(41, 242, 223, 0.2) !important;
+}
+
+.newsletter-input:focus {
+  background: rgba(0, 10, 20, 0.6) !important;
+  border-color: rgba(41, 242, 223, 0.4) !important;
+  box-shadow: 0 0 20px rgba(41, 242, 223, 0.2) !important;
+}
+
+/* Roadmap Dot - Glass Style (Override) */
+.roadmap-dot {
+  background: rgba(0, 10, 20, 0.4) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+}
+
+/* Performance Card - Glass Style (Override) */
+.performance-card {
+  background: rgba(0, 10, 20, 0.4) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+}
+
+/* Code Editor - Glass Style */
+.code-editor {
+  background: rgba(0, 10, 20, 0.4) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(41, 242, 223, 0.2) !important;
+  color: #29f2df !important;
+}
+
+.code-editor:focus {
+  background: rgba(0, 10, 20, 0.6) !important;
+  border-color: rgba(41, 242, 223, 0.4) !important;
+  box-shadow: 0 0 20px rgba(41, 242, 223, 0.2) !important;
+}
+
+/* Run Button - Glass Style */
+.run-button {
+  background: rgba(0, 10, 20, 0.4) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(41, 242, 223, 0.2) !important;
+}
+
+.run-button:hover {
+  background: rgba(0, 10, 20, 0.6) !important;
+  border-color: rgba(41, 242, 223, 0.4) !important;
+  box-shadow: 0 0 20px rgba(41, 242, 223, 0.2) !important;
+}
+
+/* Output Header - Glass Style */
+.output-header {
+  background: rgba(0, 10, 20, 0.4) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+}
+
+/* Preview Header - Glass Style */
+.preview-header {
+  background: rgba(0, 10, 20, 0.4) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+}
+
+/* Editor Header - Glass Style */
+.editor-header {
+  background: rgba(0, 10, 20, 0.4) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+}
+
+/* Smooth transitions for all glass effects */
+.feature-card,
+.terminal-container,
+.install-card,
+.preview-card,
+.stat-card,
+.github-stat-box,
+.playground-editor,
+.playground-output,
+.playground-preview-demo,
+.theme-button,
+.theme-preview,
+.testimonial-card,
+.comparison-table-container,
+.newsletter-form,
+.newsletter-input-wrapper,
+.roadmap-content,
+.roadmap-dot,
+.performance-card,
+.example-button,
+.context-menu,
+.intro-footer,
+.code-editor,
+.newsletter-input,
+.run-button,
+.output-header,
+.preview-header,
+.editor-header {
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Accessibility - Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  .feature-card,
+  .terminal-container,
+  .install-card,
+  .preview-card,
+  .stat-card,
+  .github-stat-box,
+  .playground-editor,
+  .playground-output,
+  .playground-preview-demo,
+  .theme-button,
+  .theme-preview,
+  .testimonial-card,
+  .comparison-table-container,
+  .newsletter-form,
+  .newsletter-input-wrapper,
+  .roadmap-content,
+  .roadmap-dot,
+  .performance-card,
+  .example-button,
+  .context-menu,
+  .intro-footer,
+  .code-editor,
+  .newsletter-input,
+  .run-button,
+  .output-header,
+  .preview-header,
+  .editor-header {
+    transition: none;
+  }
+}
+
+/* Additional Glass Styles for Inner Elements */
+
+/* Terminal Body - Glass Style */
+.terminal-body {
+  background: rgba(0, 10, 20, 0.3) !important;
+  backdrop-filter: blur(5px) !important;
+  -webkit-backdrop-filter: blur(5px) !important;
+}
+
+/* Install Command - Glass Style */
+.install-command {
+  background: rgba(0, 10, 20, 0.3) !important;
+  backdrop-filter: blur(5px) !important;
+  -webkit-backdrop-filter: blur(5px) !important;
+}
+
+/* Copy Button - Glass Style */
+.copy-button {
+  background: rgba(0, 10, 20, 0.4) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(41, 242, 223, 0.2) !important;
+}
+
+.copy-button:hover {
+  background: rgba(0, 10, 20, 0.6) !important;
+  border-color: rgba(41, 242, 223, 0.4) !important;
+}
+
+/* Demo Radar Wrapper - Glass Style */
+.demo-radar-wrapper {
+  background: rgba(0, 10, 20, 0.3) !important;
+  backdrop-filter: blur(5px) !important;
+  -webkit-backdrop-filter: blur(5px) !important;
+  border-radius: 12px !important;
+  padding: 20px !important;
+}
+
+/* Demo Loader Wrapper - Glass Style */
+.demo-loader-wrapper {
+  background: rgba(0, 10, 20, 0.3) !important;
+  backdrop-filter: blur(5px) !important;
+  -webkit-backdrop-filter: blur(5px) !important;
+  border-radius: 12px !important;
+  padding: 20px !important;
+}
+
+/* Preview Demo - Glass Style */
+.preview-demo {
+  background: rgba(0, 10, 20, 0.3) !important;
+  backdrop-filter: blur(5px) !important;
+  -webkit-backdrop-filter: blur(5px) !important;
+  border-radius: 8px !important;
+  padding: 20px !important;
+}
+
+/* Preview Content - Glass Style */
+.preview-content {
+  background: rgba(0, 10, 20, 0.2) !important;
+  backdrop-filter: blur(5px) !important;
+  -webkit-backdrop-filter: blur(5px) !important;
+  border-radius: 8px !important;
+  padding: 15px !important;
+}
+
+/* Output Content - Glass Style */
+.output-content {
+  background: rgba(0, 10, 20, 0.2) !important;
+  backdrop-filter: blur(5px) !important;
+  -webkit-backdrop-filter: blur(5px) !important;
+}
+
+/* Terminal Body Inner - Glass Style */
+.terminal-body {
+  background: rgba(0, 10, 20, 0.3) !important;
+  backdrop-filter: blur(5px) !important;
+  -webkit-backdrop-filter: blur(5px) !important;
+}
+
+/* Demo Wrapper - Glass Style */
+.demo-wrapper {
+  background: rgba(0, 10, 20, 0.3) !important;
+  backdrop-filter: blur(5px) !important;
+  -webkit-backdrop-filter: blur(5px) !important;
+}
+
+/* Code Editor Focus - Glass Style */
+.code-editor:focus {
+  background: rgba(0, 10, 20, 0.6) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+}
+
+/* Playground Examples Container - Glass Style */
+.playground-examples {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Playground Container - Glass Style */
+.playground-container {
+  background: rgba(0, 10, 20, 0.2) !important;
+  backdrop-filter: blur(5px) !important;
+  -webkit-backdrop-filter: blur(5px) !important;
+}
+
+/* Playground Results - Glass Style */
+.playground-results {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}

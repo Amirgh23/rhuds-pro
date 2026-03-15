@@ -2,10 +2,42 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { HudBox, RadarHud, HackerLoader } from '@rhuds/components';
 import { GlassContextMenu } from '../components/GlassContextMenu';
+import { useScrollAnimationManager } from '../hooks/useScrollAnimationManager';
+import { useRevealOnScroll } from '../hooks/useRevealOnScroll';
+import { useGSAPAnimations } from '../hooks/useGSAPAnimations';
 import './IntroPageFuturistic.css';
+import './IntroPageFuturistic.glass.css';
+import './IntroPageFuturistic.gsap.css';
 
 export default function IntroPageFuturistic() {
   const navigate = useNavigate();
+  const featuresRef = useRef<HTMLDivElement>(null);
+  const terminalRef = useRef<HTMLDivElement>(null);
+  const previewRef = useRef<HTMLDivElement>(null);
+  const statsRef = useRef<HTMLDivElement>(null);
+  const playgroundRef = useRef<HTMLDivElement>(null);
+  const githubRef = useRef<HTMLDivElement>(null);
+  const themeRef = useRef<HTMLDivElement>(null);
+  const testimonialsRef = useRef<HTMLDivElement>(null);
+  const comparisonRef = useRef<HTMLDivElement>(null);
+  const newsletterRef = useRef<HTMLDivElement>(null);
+  const roadmapRef = useRef<HTMLDivElement>(null);
+  const performanceRef = useRef<HTMLDivElement>(null);
+
+  useScrollAnimationManager();
+  useGSAPAnimations();
+  useRevealOnScroll(featuresRef, { direction: 'up', delay: 0 });
+  useRevealOnScroll(terminalRef, { direction: 'up', delay: 0 });
+  useRevealOnScroll(previewRef, { direction: 'up', delay: 0 });
+  useRevealOnScroll(statsRef, { direction: 'up', delay: 0 });
+  useRevealOnScroll(playgroundRef, { direction: 'up', delay: 0 });
+  useRevealOnScroll(githubRef, { direction: 'up', delay: 0 });
+  useRevealOnScroll(themeRef, { direction: 'up', delay: 0 });
+  useRevealOnScroll(testimonialsRef, { direction: 'up', delay: 0 });
+  useRevealOnScroll(comparisonRef, { direction: 'up', delay: 0 });
+  useRevealOnScroll(newsletterRef, { direction: 'up', delay: 0 });
+  useRevealOnScroll(roadmapRef, { direction: 'up', delay: 0 });
+  useRevealOnScroll(performanceRef, { direction: 'up', delay: 0 });
   const [isLoaded, setIsLoaded] = useState(false);
   const [showLoading, setShowLoading] = useState(true);
   const [loadingProgress, setLoadingProgress] = useState(0);
@@ -22,6 +54,7 @@ export default function IntroPageFuturistic() {
   <Button glow>Launch System</Button>
 </HudBox>`);
   const [output, setOutput] = useState('');
+  const [renderedComponent, setRenderedComponent] = useState<React.ReactNode>(null);
   const [githubStats, setGithubStats] = useState({
     stars: 0,
     downloads: 0,
@@ -68,12 +101,12 @@ export default function IntroPageFuturistic() {
           setTimeout(() => {
             setShowLoading(false);
             setIsLoaded(true);
-          }, 500);
+          }, 300);
           return 100;
         }
-        return prev + 2;
+        return prev + 3;
       });
-    }, 30);
+    }, 20);
 
     return () => clearInterval(interval);
   }, []);
@@ -137,6 +170,15 @@ export default function IntroPageFuturistic() {
 
     const handleScroll = () => {
       setScrollY(window.scrollY);
+      // Apply parallax effect to background elements
+      const gridBg = document.querySelector('.grid-background') as HTMLElement;
+      const orbsContainer = document.querySelector('.orbs-container') as HTMLElement;
+      if (gridBg) {
+        gridBg.style.transform = `translateY(${window.scrollY * 0.5}px)`;
+      }
+      if (orbsContainer) {
+        orbsContainer.style.transform = `translateY(${window.scrollY * 0.3}px)`;
+      }
     };
 
     window.addEventListener('mousemove', handleMouseMove);
@@ -184,9 +226,55 @@ export default function IntroPageFuturistic() {
   };
 
   const runCode = () => {
-    setOutput(
-      '✓ Code executed successfully!\n\nComponent rendered with:\n- Variant: neon\n- Animation: enabled\n- Theme: cyan (#29F2DF)'
-    );
+    try {
+      // Try to render the component based on the code
+      if (code.includes('HudBox')) {
+        setRenderedComponent(
+          <HudBox variant="tech-panel" color="#29F2DF" animated={true} width="220px" height="140px">
+            <div
+              style={{
+                fontSize: '16px',
+                fontWeight: 700,
+                letterSpacing: '0.1em',
+                textAlign: 'center',
+              }}
+            >
+              SYSTEM ONLINE
+            </div>
+          </HudBox>
+        );
+      } else if (code.includes('RadarHud')) {
+        setRenderedComponent(
+          <div style={{ transform: 'scale(0.85)' }}>
+            <RadarHud
+              coordinates="51° 30' N; 0° 7' W"
+              depth="DEPT - 450"
+              wind="WIND - 32.8"
+              color="#29F2DF"
+              size={240}
+            />
+          </div>
+        );
+      } else if (code.includes('HackerLoader')) {
+        setRenderedComponent(
+          <div style={{ transform: 'scale(0.9)' }}>
+            <HackerLoader text="LOADING" color="#29F2DF" />
+          </div>
+        );
+      } else {
+        setRenderedComponent(
+          <div style={{ color: '#29f2df', fontSize: '14px', textAlign: 'center' }}>
+            Component preview not available
+          </div>
+        );
+      }
+
+      setOutput(
+        '✓ Code executed successfully!\n\nComponent rendered with:\n- Variant: neon\n- Animation: enabled\n- Theme: cyan (#29F2DF)'
+      );
+    } catch (error) {
+      setOutput(`✗ Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   };
 
   const codeExamples = [
@@ -315,6 +403,9 @@ export default function IntroPageFuturistic() {
       )}
 
       <div className="intro-futuristic">
+        {/* Full-Width Scanline Effect */}
+        <div className="fullwidth-scanline" />
+
         {/* Navigation Dots */}
         <div className="nav-dots">
           {sections.map((section, index) => (
@@ -330,7 +421,7 @@ export default function IntroPageFuturistic() {
         </div>
 
         {/* Animated Grid Background */}
-        <div className="grid-background" style={{ transform: `translateY(${scrollY * 0.5}px)` }} />
+        <div className="grid-background" data-parallax="0.5" />
 
         {/* Animated Mesh Lines */}
         <div className="mesh-lines">
@@ -343,7 +434,7 @@ export default function IntroPageFuturistic() {
         </div>
 
         {/* Orbs/Spheres Effect */}
-        <div className="orbs-container" style={{ transform: `translateY(${scrollY * 0.3}px)` }}>
+        <div className="orbs-container" data-parallax="0.3">
           <div className="orb orb-1" />
           <div className="orb orb-2" />
           <div className="orb orb-3" />
@@ -352,7 +443,7 @@ export default function IntroPageFuturistic() {
           <div className="orb orb-6" />
         </div>
 
-        {/* Radial Glow Effect */}
+        {/* Radial Glow Effect - Original Color */}
         <div
           className="radial-glow"
           style={{
@@ -361,14 +452,18 @@ export default function IntroPageFuturistic() {
         />
 
         {/* Hero Section */}
-        <section id="hero" className={`hero-section ${isLoaded ? 'loaded' : ''}`} ref={heroRef}>
+        <section
+          id="hero"
+          className={`hero-section ${isLoaded ? 'loaded' : ''}`}
+          ref={heroRef}
+          data-gsap="fade-up"
+        >
           <div className="hero-content">
             {/* Holographic Logo */}
             <div className="logo-container">
               <div className="logo-glitch-layer logo-glitch-1">RHUDS</div>
               <div className="logo-glitch-layer logo-glitch-2">RHUDS</div>
               <h1 className="logo-main">RHUDS</h1>
-              <div className="logo-scanline" />
             </div>
 
             {/* Subtitle */}
@@ -433,7 +528,12 @@ export default function IntroPageFuturistic() {
         </section>
 
         {/* Features Section */}
-        <section id="features" className="features-section">
+        <section
+          id="features"
+          className="features-section scroll-animate"
+          ref={featuresRef}
+          data-gsap="fade-up"
+        >
           <h2 className="features-title">
             <span className="title-line" />
             EXPLORE THE SYSTEM
@@ -501,7 +601,12 @@ export default function IntroPageFuturistic() {
         </section>
 
         {/* Terminal Section */}
-        <section id="terminal" className="terminal-section">
+        <section
+          id="terminal"
+          className="terminal-section scroll-animate"
+          ref={terminalRef}
+          data-gsap="fade-up"
+        >
           <h2 className="terminal-title">
             <span className="title-line" />
             GET STARTED IN SECONDS
@@ -540,7 +645,12 @@ export default function IntroPageFuturistic() {
         </section>
 
         {/* Live Preview Section */}
-        <section id="preview" className="preview-section">
+        <section
+          id="preview"
+          className="preview-section scroll-animate"
+          ref={previewRef}
+          data-gsap="fade-up"
+        >
           <h2 className="preview-title">
             <span className="title-line" />
             LIVE COMPONENT PREVIEW
@@ -599,7 +709,12 @@ export default function IntroPageFuturistic() {
         </section>
 
         {/* Stats Section */}
-        <section id="stats" className="stats-section">
+        <section
+          id="stats"
+          className="stats-section scroll-animate"
+          ref={statsRef}
+          data-gsap="scale-up"
+        >
           {[
             { value: '51+', label: 'Components', icon: '⚡' },
             { value: '100%', label: 'TypeScript', icon: '🔷' },
@@ -623,46 +738,61 @@ export default function IntroPageFuturistic() {
         </section>
 
         {/* Code Playground Section */}
-        <section id="code-playground" className="code-playground-section">
+        <section
+          id="code-playground"
+          className="code-playground-section scroll-animate"
+          ref={playgroundRef}
+          data-gsap="fade-up"
+        >
           <h2 className="playground-title">
             <span className="title-line" />
             INTERACTIVE CODE PLAYGROUND
             <span className="title-line" />
           </h2>
 
-          <div className="playground-container">
-            <div className="playground-examples">
-              {codeExamples.map((example, i) => (
-                <button
-                  key={example.title}
-                  className={`example-button ${code === example.code ? 'active' : ''}`}
-                  onClick={() => {
-                    setCode(example.code);
-                    setOutput('');
-                  }}
-                  style={{ animationDelay: `${i * 0.1}s` }}
-                >
-                  {example.title}
-                </button>
-              ))}
-            </div>
-
-            <div className="playground-editor">
-              <div className="editor-header">
-                <span className="editor-icon">⚡</span>
-                <span className="editor-label">Code Editor</span>
-              </div>
-              <textarea
-                className="code-editor"
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                spellCheck={false}
-              />
-              <button className="run-button" onClick={runCode}>
-                <span className="button-icon">▶</span>
-                RUN CODE
+          <div className="playground-examples">
+            {codeExamples.map((example, i) => (
+              <button
+                key={example.title}
+                className={`example-button ${code === example.code ? 'active' : ''}`}
+                onClick={() => {
+                  setCode(example.code);
+                  setOutput('');
+                }}
+                style={{ animationDelay: `${i * 0.1}s` }}
+              >
+                {example.title}
               </button>
+            ))}
+          </div>
+
+          <div className="playground-editor">
+            <div className="editor-header">
+              <span className="editor-icon">⚡</span>
+              <span className="editor-label">Code Editor</span>
             </div>
+            <textarea
+              className="code-editor"
+              value={code}
+              onChange={(e) => setCode(e.target.value)}
+              spellCheck={false}
+            />
+            <button className="run-button" onClick={runCode}>
+              <span className="button-icon">▶</span>
+              RUN CODE
+            </button>
+          </div>
+
+          <div className="playground-results">
+            {renderedComponent && (
+              <div className="playground-preview-demo">
+                <div className="preview-header">
+                  <span className="preview-icon">🎨</span>
+                  <span className="preview-label">Component Preview</span>
+                </div>
+                <div className="preview-content">{renderedComponent}</div>
+              </div>
+            )}
 
             {output && (
               <div className="playground-output">
@@ -677,7 +807,12 @@ export default function IntroPageFuturistic() {
         </section>
 
         {/* GitHub Stats Section */}
-        <section id="github-stats" className="github-stats-section">
+        <section
+          id="github-stats"
+          className="github-stats-section scroll-animate"
+          ref={githubRef}
+          data-gsap="scale-up"
+        >
           <h2 className="github-title">
             <span className="title-line" />
             LIVE GITHUB STATISTICS
@@ -736,7 +871,12 @@ export default function IntroPageFuturistic() {
         </section>
 
         {/* Theme Switcher Section */}
-        <section id="theme-switcher" className="theme-switcher-section">
+        <section
+          id="theme-switcher"
+          className="theme-switcher-section scroll-animate"
+          ref={themeRef}
+          data-gsap="fade-up"
+        >
           <h2 className="theme-title">
             <span className="title-line" />
             CHOOSE YOUR THEME
@@ -788,7 +928,12 @@ export default function IntroPageFuturistic() {
         </section>
 
         {/* Testimonials Section */}
-        <section id="testimonials" className="testimonials-section">
+        <section
+          id="testimonials"
+          className="testimonials-section scroll-animate"
+          ref={testimonialsRef}
+          data-gsap="fade-up"
+        >
           <h2 className="testimonials-title">
             <span className="title-line" />
             WHAT DEVELOPERS SAY
@@ -825,7 +970,12 @@ export default function IntroPageFuturistic() {
         </section>
 
         {/* Comparison Table Section */}
-        <section id="comparison" className="comparison-section">
+        <section
+          id="comparison"
+          className="comparison-section scroll-animate"
+          ref={comparisonRef}
+          data-gsap="fade-right"
+        >
           <h2 className="comparison-title">
             <span className="title-line" />
             LIBRARY COMPARISON
@@ -845,8 +995,10 @@ export default function IntroPageFuturistic() {
               <tbody>
                 {comparisonData.map((row, i) => (
                   <tr key={row.feature} style={{ animationDelay: `${i * 0.1}s` }}>
-                    <td className="feature-name">{row.feature}</td>
-                    <td className="highlight-col">
+                    <td className="feature-name" data-label="Feature">
+                      {row.feature}
+                    </td>
+                    <td className="highlight-col" data-label="RHUDS">
                       {typeof row.rhuds === 'boolean' ? (
                         row.rhuds ? (
                           <span className="check-icon">✓</span>
@@ -857,7 +1009,7 @@ export default function IntroPageFuturistic() {
                         row.rhuds
                       )}
                     </td>
-                    <td>
+                    <td data-label="Library A">
                       {typeof row.libA === 'boolean' ? (
                         row.libA ? (
                           <span className="check-icon">✓</span>
@@ -868,7 +1020,7 @@ export default function IntroPageFuturistic() {
                         row.libA
                       )}
                     </td>
-                    <td>
+                    <td data-label="Library B">
                       {typeof row.libB === 'boolean' ? (
                         row.libB ? (
                           <span className="check-icon">✓</span>
@@ -887,7 +1039,12 @@ export default function IntroPageFuturistic() {
         </section>
 
         {/* Newsletter Section */}
-        <section id="newsletter" className="newsletter-section">
+        <section
+          id="newsletter"
+          className="newsletter-section scroll-animate"
+          ref={newsletterRef}
+          data-gsap="fade-up"
+        >
           <h2 className="newsletter-title">
             <span className="title-line" />
             STAY UPDATED
@@ -924,7 +1081,12 @@ export default function IntroPageFuturistic() {
         </section>
 
         {/* Roadmap Section */}
-        <section id="roadmap" className="roadmap-section">
+        <section
+          id="roadmap"
+          className="roadmap-section scroll-animate"
+          ref={roadmapRef}
+          data-gsap="fade-left"
+        >
           <h2 className="roadmap-title">
             <span className="title-line" />
             PROJECT ROADMAP
@@ -956,7 +1118,12 @@ export default function IntroPageFuturistic() {
         </section>
 
         {/* Performance Metrics Section */}
-        <section id="performance" className="performance-section">
+        <section
+          id="performance"
+          className="performance-section scroll-animate"
+          ref={performanceRef}
+          data-gsap="scale-up"
+        >
           <h2 className="performance-title">
             <span className="title-line" />
             PERFORMANCE METRICS

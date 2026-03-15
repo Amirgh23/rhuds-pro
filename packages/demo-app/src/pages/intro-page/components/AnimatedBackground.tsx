@@ -29,6 +29,16 @@ interface Particle {
 }
 
 /**
+ * Grid configuration
+ */
+interface GridConfig {
+  cellSize: number;
+  color: string;
+  opacity: number;
+  strokeWidth: number;
+}
+
+/**
  * AnimatedBackground Component
  *
  * Renders a Canvas-based particle animation system behind all page content.
@@ -52,7 +62,16 @@ export const AnimatedBackground: React.FC<AnimatedBackgroundProps> = ({
   const particlesRef = useRef<Particle[]>([]);
   const animationFrameRef = useRef<number | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
-  const { fps } = useFrameRateMonitor({ enabled: true });
+  useFrameRateMonitor({ enabled: true });
+  const timeRef = useRef(0);
+
+  // Grid configuration
+  const gridConfig: GridConfig = {
+    cellSize: 50,
+    color: '#FFD700', // GOLD - Grid lines
+    opacity: 0.8,
+    strokeWidth: 2,
+  };
 
   // Clamp opacity to valid range
   const clampedOpacity = Math.max(
@@ -133,18 +152,90 @@ export const AnimatedBackground: React.FC<AnimatedBackgroundProps> = ({
   }, []);
 
   /**
+   * Render grid lines with glow effect
+   */
+  const renderGrid = useCallback(
+    (canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D): void => {
+      const { cellSize, color, opacity: gridOpacity, strokeWidth } = gridConfig;
+
+      // Save context state
+      ctx.save();
+
+      // Set line style
+      ctx.strokeStyle = color;
+      ctx.lineWidth = strokeWidth;
+      ctx.globalAlpha = gridOpacity;
+      ctx.shadowColor = color;
+      ctx.shadowBlur = 8;
+
+      // Draw vertical lines
+      for (let x = 0; x <= canvas.width; x += cellSize) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
+      }
+
+      // Draw horizontal lines
+      for (let y = 0; y <= canvas.height; y += cellSize) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+      }
+
+      // Draw radial glow effect across full width - STRONG
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      const maxRadius = Math.sqrt(centerX * centerX + centerY * centerY) * 2;
+
+      const radialGradient = ctx.createRadialGradient(
+        centerX,
+        centerY,
+        0,
+        centerX,
+        centerY,
+        maxRadius
+      );
+      radialGradient.addColorStop(0, `rgba(255, 215, 0, 0.9)`); // GOLD
+      radialGradient.addColorStop(0.3, `rgba(255, 215, 0, 0.6)`);
+      radialGradient.addColorStop(0.7, `rgba(255, 215, 0, 0.2)`);
+      radialGradient.addColorStop(1, `rgba(255, 215, 0, 0)`);
+
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = radialGradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Draw intersection points with glow
+      ctx.globalAlpha = gridOpacity * 1.2;
+      ctx.fillStyle = color;
+      ctx.shadowBlur = 12;
+      for (let x = 0; x <= canvas.width; x += cellSize) {
+        for (let y = 0; y <= canvas.height; y += cellSize) {
+          const pulse = Math.sin(timeRef.current * 0.02 + x * 0.001 + y * 0.001) * 0.5 + 0.5;
+          const size = 2 + pulse * 2;
+
+          ctx.beginPath();
+          ctx.arc(x, y, size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      // Restore context state
+      ctx.restore();
+    },
+    [gridConfig]
+  );
+
+  /**
    * Render particles to canvas
    */
   const renderParticles = useCallback(
     (canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D): void => {
-      // Clear canvas with semi-transparent black for trail effect
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
       // Draw particles
       const particles = particlesRef.current;
       particles.forEach((particle) => {
-        ctx.fillStyle = `rgba(41, 242, 223, ${particle.opacity * clampedOpacity})`;
+        ctx.fillStyle = `rgba(0, 255, 0, ${particle.opacity * clampedOpacity * 0.3})`; // GREEN - Particles
         ctx.beginPath();
         ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
         ctx.fill();
@@ -163,13 +254,20 @@ export const AnimatedBackground: React.FC<AnimatedBackgroundProps> = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    // Clear canvas completely
+    ctx.fillStyle = 'rgba(0, 0, 0, 1)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
     // Update and render
     updateParticles(canvas);
+    renderGrid(canvas, ctx);
     renderParticles(canvas, ctx);
+
+    timeRef.current += 1;
 
     // Schedule next frame
     animationFrameRef.current = requestAnimationFrame(animate);
-  }, [updateParticles, renderParticles]);
+  }, [updateParticles, renderParticles, renderGrid]);
 
   /**
    * Handle canvas resize

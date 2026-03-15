@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cyberpunk Borders Test</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background: #000;
+        color: #29f2df;
+        font-family: 'Courier New', monospace;
+        padding: 40px;
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 60px;
+        font-size: 32px;
+        text-shadow: 0 0 20px #29f2df;
+      }
+
+      .demo-section {
+        margin-bottom: 80px;
+      }
+
+      .demo-section h2 {
+        font-size: 20px;
+        margin-bottom: 30px;
+        color: #ef3ef1;
+        text-shadow: 0 0 10px #ef3ef1;
+      }
+
+      .demo-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+      }
+
+      /* Glitch border */
+      .cyberpunk-border-glitch {
+        clip-path: polygon(
+          0 0,
+          95% 0,
+          100% 5%,
+          100% 10%,
+          98% 15%,
+          100% 20%,
+          97% 25%,
+          100% 30%,
+          99% 35%,
+          100% 40%,
+          96% 45%,
+          100% 50%,
+          98% 55%,
+          100% 60%,
+          97% 65%,
+          100% 70%,
+          99% 75%,
+          100% 80%,
+          98% 85%,
+          100% 90%,
+          95% 95%,
+          100% 100%,
+          5% 100%,
+          0 95%,
+          2% 90%,
+          0 85%,
+          3% 80%,
+          0 75%,
+          4% 70%,
+          0 65%,
+          2% 60%,
+          0 55%,
+          3% 50%,
+          0 45%,
+          4% 40%,
+          0 35%,
+          2% 30%,
+          0 25%,
+          3% 20%,
+          0 15%,
+          2% 10%,
+          0 5%
+        );
+      }
+
+      /* Torn border */
+      .cyberpunk-border-torn {
+        clip-path: polygon(
+          0 2%,
+          3% 0,
+          8% 1%,
+          12% 0,
+          18% 2%,
+          25% 0,
+          32% 1%,
+          40% 0,
+          48% 3%,
+          55% 0,
+          62% 1%,
+          70% 0,
+          78% 2%,
+          85% 0,
+          92% 1%,
+          97% 0,
+          100% 3%,
+          100% 10%,
+          98% 18%,
+          100% 25%,
+          97% 32%,
+          100% 40%,
+          98% 48%,
+          100% 55%,
+          97% 62%,
+          100% 70%,
+          98% 78%,
+          100% 85%,
+          97% 92%,
+          100% 100%,
+          97% 100%,
+          92% 98%,
+          85% 100%,
+          78% 97%,
+          70% 100%,
+          62% 98%,
+          55% 100%,
+          48% 97%,
+          40% 100%,
+          32% 98%,
+          25% 100%,
+          18% 97%,
+          12% 100%,
+          8% 98%,
+          3% 100%,
+          0 97%,
+          0 90%,
+          2% 82%,
+          0 75%,
+          3% 68%,
+          0 60%,
+          2% 52%,
+          0 45%,
+          3% 38%,
+          0 30%,
+          2% 22%,
+          0 15%,
+          3% 8%
+        );
+      }
+
+      /* Angled cut */
+      .cyberpunk-border-angled {
+        clip-path: polygon(0 0, 100% 0, 100% 92%, 98% 96%, 100% 100%, 0 100%, 2% 96%, 0 92%);
+      }
+
+      /* Zigzag */
+      .cyberpunk-border-zigzag {
+        clip-path: polygon(
+          0 0,
+          100% 0,
+          100% 8%,
+          95% 12%,
+          100% 16%,
+          95% 20%,
+          100% 24%,
+          95% 28%,
+          100% 32%,
+          95% 36%,
+          100% 40%,
+          95% 44%,
+          100% 48%,
+          95% 52%,
+          100% 56%,
+          95% 60%,
+          100% 64%,
+          95% 68%,
+          100% 72%,
+          95% 76%,
+          100% 80%,
+          95% 84%,
+          100% 88%,
+          95% 92%,
+          100% 96%,
+          100% 100%,
+          0 100%,
+          5% 96%,
+          0 92%,
+          5% 88%,
+          0 84%,
+          5% 80%,
+          0 76%,
+          5% 72%,
+          0 68%,
+          5% 64%,
+          0 60%,
+          5% 56%,
+          0 52%,
+          5% 48%,
+          0 44%,
+          5% 40%,
+          0 36%,
+          5% 32%,
+          0 28%,
+          5% 24%,
+          0 20%,
+          5% 16%,
+          0 12%,
+          5% 8%,
+          0 4%
+        );
+      }
+
+      .card {
+        padding: 30px;
+        background: linear-gradient(
+          135deg,
+          rgba(41, 242, 223, 0.1) 0%,
+          rgba(40, 18, 90, 0.15) 100%
+        );
+        border: 2px solid #29f2df;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .card:hover {
+        transform: scale(1.05);
+        box-shadow:
+          0 0 40px rgba(41, 242, 223, 0.8),
+          0 0 80px rgba(41, 242, 223, 0.4);
+      }
+
+      .card h3 {
+        margin-bottom: 15px;
+        font-size: 18px;
+        color: #29f2df;
+        text-shadow: 0 0 10px #29f2df;
+      }
+
+      .card p {
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.7);
+        line-height: 1.6;
+      }
+
+      .button-demo {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-top: 40px;
+      }
+
+      .btn {
+        padding: 15px 40px;
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: 'Courier New', monospace;
+        overflow: hidden;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #29f2df 0%, #1c7fa6 100%);
+        color: #000;
+        border: none;
+      }
+
+      .btn-primary:hover {
+        transform: scale(1.08);
+        box-shadow:
+          0 0 40px rgba(41, 242, 223, 0.8),
+          0 0 80px rgba(41, 242, 223, 0.4);
+      }
+
+      .btn-secondary {
+        background: rgba(41, 242, 223, 0.15);
+        color: #29f2df;
+        border: 2px solid #29f2df;
+      }
+
+      .btn-secondary:hover {
+        background: rgba(41, 242, 223, 0.25);
+        box-shadow:
+          0 0 40px rgba(41, 242, 223, 0.8),
+          0 0 80px rgba(41, 242, 223, 0.4);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>🔮 Cyberpunk Borders Test</h1>
+
+      <!-- Cards Demo -->
+      <div class="demo-section">
+        <h2>Feature Cards with Torn Borders</h2>
+        <div class="demo-grid">
+          <div class="card cyberpunk-border-torn">
+            <h3>⚡ Glitch Effect</h3>
+            <p>Sharp, jagged edges with asymmetric cuts for that authentic cyberpunk feel.</p>
+          </div>
+          <div class="card cyberpunk-border-torn">
+            <h3>🌐 Digital Terrain</h3>
+            <p>Torn and distorted borders that look like broken digital surfaces.</p>
+          </div>
+          <div class="card cyberpunk-border-torn">
+            <h3>💻 Neon Grid</h3>
+            <p>Asymmetric sliced edges creating a futuristic, tech-forward appearance.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Buttons Demo -->
+      <div class="demo-section">
+        <h2>Buttons with Glitch Borders</h2>
+        <div class="button-demo">
+          <button class="btn btn-primary cyberpunk-border-glitch">GET STARTED</button>
+          <button class="btn btn-secondary cyberpunk-border-glitch">VIEW DOCS</button>
+        </div>
+      </div>
+
+      <!-- Alternative Borders -->
+      <div class="demo-section">
+        <h2>Alternative Border Styles</h2>
+        <div class="demo-grid">
+          <div class="card cyberpunk-border-glitch">
+            <h3>Glitch Style</h3>
+            <p>Distorted and broken appearance with random jagged edges.</p>
+          </div>
+          <div class="card cyberpunk-border-angled">
+            <h3>Angled Cut</h3>
+            <p>Clean diagonal slices for a sharp, minimalist cyberpunk look.</p>
+          </div>
+          <div class="card cyberpunk-border-zigzag">
+            <h3>Zigzag Pattern</h3>
+            <p>Repeating zigzag pattern for a rhythmic, wave-like effect.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

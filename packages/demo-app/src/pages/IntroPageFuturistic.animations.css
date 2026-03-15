@@ -1,0 +1,562 @@
+/* ============================================
+   RHUDS INTRO PAGE - ANIMATION SYSTEM
+   Organized animation patterns and keyframes
+   ============================================ */
+
+/* ============================================
+   ENTRANCE ANIMATIONS
+   ============================================ */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(60px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-60px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-80px) rotateY(20deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) rotateY(0deg);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(80px) rotateY(-20deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) rotateY(0deg);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes fadeInRotate {
+  from {
+    opacity: 0;
+    transform: rotate(-10deg) scale(0.9) translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(0deg) scale(1) translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ============================================
+   EXIT ANIMATIONS
+   ============================================ */
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* ============================================
+   GLOW & PULSE ANIMATIONS
+   ============================================ */
+
+@keyframes glow {
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(41, 242, 223, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(41, 242, 223, 0.8);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes textGlow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 80px rgba(41, 242, 223, 0.5));
+  }
+  50% {
+    filter: drop-shadow(0 0 120px rgba(41, 242, 223, 0.8))
+      drop-shadow(0 0 160px rgba(239, 62, 241, 0.4));
+  }
+}
+
+/* ============================================
+   GLITCH ANIMATIONS
+   ============================================ */
+
+@keyframes glitch1 {
+  0%,
+  90%,
+  100% {
+    transform: translate(0, 0);
+  }
+  91% {
+    transform: translate(-2px, -2px);
+  }
+  93% {
+    transform: translate(2px, 2px);
+  }
+  95% {
+    transform: translate(-2px, 2px);
+  }
+}
+
+@keyframes glitch2 {
+  0%,
+  90%,
+  100% {
+    transform: translate(0, 0);
+  }
+  92% {
+    transform: translate(2px, -2px);
+  }
+  94% {
+    transform: translate(-2px, 2px);
+  }
+  96% {
+    transform: translate(2px, -2px);
+  }
+}
+
+/* ============================================
+   SCAN & LINE ANIMATIONS
+   ============================================ */
+
+@keyframes scanline {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes linePulse {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes borderSlide {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* ============================================
+   FLOATING & MOVEMENT ANIMATIONS
+   ============================================ */
+
+@keyframes orbFloat {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.4;
+  }
+  25% {
+    transform: translate(30px, -40px) scale(1.05);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translate(-20px, 30px) scale(1.1);
+    opacity: 0.8;
+  }
+  75% {
+    transform: translate(40px, 20px) scale(1.05);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.4;
+  }
+}
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  50% {
+    transform: translateX(-50%) translateY(10px);
+  }
+}
+
+@keyframes meshShift {
+  0% {
+    background-position:
+      0% 0%,
+      100% 0%,
+      50% 100%,
+      20% 80%,
+      80% 20%,
+      40% 60%;
+  }
+  25% {
+    background-position:
+      50% 50%,
+      50% 50%,
+      0% 0%,
+      80% 20%,
+      20% 80%,
+      60% 40%;
+  }
+  50% {
+    background-position:
+      100% 100%,
+      0% 100%,
+      50% 0%,
+      40% 60%,
+      60% 40%,
+      20% 80%;
+  }
+  75% {
+    background-position:
+      50% 50%,
+      50% 50%,
+      100% 100%,
+      60% 40%,
+      40% 60%,
+      80% 20%;
+  }
+  100% {
+    background-position:
+      0% 0%,
+      100% 0%,
+      50% 100%,
+      20% 80%,
+      80% 20%,
+      40% 60%;
+  }
+}
+
+/* ============================================
+   COLOR & GRADIENT ANIMATIONS
+   ============================================ */
+
+@keyframes gradientShift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* ============================================
+   BLINK & FLICKER ANIMATIONS
+   ============================================ */
+
+@keyframes blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ============================================
+   SHINE & LIGHT ANIMATIONS
+   ============================================ */
+
+@keyframes shine {
+  0% {
+    transform: translateX(-100%);
+  }
+  50%,
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+/* ============================================
+   SCROLL-TRIGGERED ANIMATIONS
+   ============================================ */
+
+.scroll-animate {
+  opacity: 0;
+  animation-fill-mode: both;
+}
+
+.scroll-animate.visible {
+  animation: fadeInUp 0.8s ease-out forwards;
+}
+
+.scroll-animate.visible.delay-1 {
+  animation-delay: 0.1s;
+}
+
+.scroll-animate.visible.delay-2 {
+  animation-delay: 0.2s;
+}
+
+.scroll-animate.visible.delay-3 {
+  animation-delay: 0.3s;
+}
+
+.scroll-animate.visible.delay-4 {
+  animation-delay: 0.4s;
+}
+
+.scroll-animate.visible.delay-5 {
+  animation-delay: 0.5s;
+}
+
+/* Staggered animations for cards */
+.feature-card {
+  animation: fadeInUp 0.8s ease-out backwards !important;
+}
+
+.feature-card:nth-child(1) {
+  animation-delay: 0s !important;
+}
+
+.feature-card:nth-child(2) {
+  animation-delay: 0.15s !important;
+}
+
+.feature-card:nth-child(3) {
+  animation-delay: 0.3s !important;
+}
+
+.stat-card {
+  animation: fadeInScale 0.8s ease-out backwards !important;
+}
+
+.stat-card:nth-child(1) {
+  animation-delay: 0s !important;
+}
+
+.stat-card:nth-child(2) {
+  animation-delay: 0.15s !important;
+}
+
+.stat-card:nth-child(3) {
+  animation-delay: 0.3s !important;
+}
+
+.preview-card {
+  animation: fadeInRotate 0.8s ease-out backwards !important;
+}
+
+.preview-card:nth-child(1) {
+  animation-delay: 0s !important;
+}
+
+.preview-card:nth-child(2) {
+  animation-delay: 0.15s !important;
+}
+
+.preview-card:nth-child(3) {
+  animation-delay: 0.3s !important;
+}
+
+.testimonial-card {
+  animation: fadeInLeft 0.8s ease-out backwards !important;
+}
+
+.testimonial-card:nth-child(odd) {
+  animation: fadeInRight 0.8s ease-out backwards !important;
+}
+
+.testimonial-card:nth-child(1) {
+  animation-delay: 0s !important;
+}
+
+.testimonial-card:nth-child(2) {
+  animation-delay: 0.15s !important;
+}
+
+.testimonial-card:nth-child(3) {
+  animation-delay: 0.3s !important;
+}
+
+/* ============================================
+   ANIMATION TIMING CLASSES
+   ============================================ */
+
+/* Fast animations (0.3s) */
+.animate-fast {
+  animation-duration: 0.3s;
+}
+
+/* Normal animations (0.8s - 1s) */
+.animate-normal {
+  animation-duration: 0.8s;
+}
+
+/* Slow animations (2s - 3s) */
+.animate-slow {
+  animation-duration: 2s;
+}
+
+/* Very slow animations (4s - 5s) */
+.animate-very-slow {
+  animation-duration: 4s;
+}
+
+/* ============================================
+   ANIMATION EASING CLASSES
+   ============================================ */
+
+.ease-linear {
+  animation-timing-function: linear;
+}
+
+.ease-in-out {
+  animation-timing-function: ease-in-out;
+}
+
+.ease-out {
+  animation-timing-function: ease-out;
+}
+
+/* ============================================
+   STAGGER DELAY SYSTEM
+   ============================================ */
+
+.stagger-1 {
+  animation-delay: 0.1s;
+}
+
+.stagger-2 {
+  animation-delay: 0.2s;
+}
+
+.stagger-3 {
+  animation-delay: 0.3s;
+}
+
+.stagger-4 {
+  animation-delay: 0.4s;
+}
+
+.stagger-5 {
+  animation-delay: 0.5s;
+}
+
+.stagger-6 {
+  animation-delay: 0.6s;
+}
+
+.stagger-7 {
+  animation-delay: 0.7s;
+}
+
+.stagger-8 {
+  animation-delay: 0.8s;
+}
+
+.stagger-9 {
+  animation-delay: 0.9s;
+}
+
+.stagger-10 {
+  animation-delay: 1s;
+}
+
+/* ============================================
+   ANIMATION FILL MODES
+   ============================================ */
+
+.fill-forwards {
+  animation-fill-mode: forwards;
+}
+
+.fill-backwards {
+  animation-fill-mode: backwards;
+}
+
+.fill-both {
+  animation-fill-mode: both;
+}
+
+/* ============================================
+   ANIMATION DIRECTION
+   ============================================ */
+
+.direction-reverse {
+  animation-direction: reverse;
+}
+
+.direction-alternate {
+  animation-direction: alternate;
+}
+
+/* ============================================
+   ANIMATION ITERATION
+   ============================================ */
+
+.iterate-once {
+  animation-iteration-count: 1;
+}
+
+.iterate-infinite {
+  animation-iteration-count: infinite;
+}

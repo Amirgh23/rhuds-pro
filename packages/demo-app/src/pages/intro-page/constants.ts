@@ -225,3 +225,152 @@ export const DEFAULT_NAV_LINKS = [
   { label: 'Documentation', route: '/docs' },
   { label: 'GitHub', route: 'https://github.com/rhuds' },
 ];
+
+/**
+ * Quick Install section data
+ */
+export const QUICK_INSTALL_STEPS = [
+  {
+    id: 'npm',
+    title: 'npm',
+    command: 'npm install @rhuds/core @rhuds/components',
+  },
+  {
+    id: 'yarn',
+    title: 'yarn',
+    command: 'yarn add @rhuds/core @rhuds/components',
+  },
+  {
+    id: 'pnpm',
+    title: 'pnpm',
+    command: 'pnpm add @rhuds/core @rhuds/components',
+  },
+];
+
+/**
+ * Performance metrics data
+ */
+export const PERFORMANCE_METRICS = [
+  {
+    id: 'bundle-size',
+    label: 'Bundle Size',
+    value: '45KB',
+    unit: 'gzipped',
+  },
+  {
+    id: 'performance',
+    label: 'Performance',
+    value: '98',
+    unit: 'Lighthouse',
+  },
+  {
+    id: 'accessibility',
+    label: 'Accessibility',
+    value: '100',
+    unit: 'WCAG AA',
+  },
+  {
+    id: 'components',
+    label: 'Components',
+    value: '50+',
+    unit: 'ready to use',
+  },
+];
+
+/**
+ * Library comparison data
+ */
+export const LIBRARY_COMPARISON = [
+  {
+    feature: 'Arwes Frames',
+    rhuds: true,
+    material: false,
+    chakra: false,
+  },
+  {
+    feature: 'Sci-Fi Theme',
+    rhuds: true,
+    material: false,
+    chakra: false,
+  },
+  {
+    feature: 'TypeScript',
+    rhuds: true,
+    material: true,
+    chakra: true,
+  },
+  {
+    feature: 'Accessibility',
+    rhuds: true,
+    material: true,
+    chakra: true,
+  },
+  {
+    feature: 'Customizable',
+    rhuds: true,
+    material: true,
+    chakra: true,
+  },
+];
+
+/**
+ * Theme options
+ */
+export const THEME_OPTIONS = [
+  {
+    id: 'dark',
+    name: 'Dark Cyberpunk',
+    description: 'Default dark theme with cyan and magenta accents',
+    colors: {
+      primary: '#29F2DF',
+      secondary: '#EF3EF1',
+      background: '#000000',
+    },
+  },
+  {
+    id: 'light',
+    name: 'Light Neon',
+    description: 'Light theme with vibrant neon colors',
+    colors: {
+      primary: '#0066FF',
+      secondary: '#FF00FF',
+      background: '#FFFFFF',
+    },
+  },
+  {
+    id: 'matrix',
+    name: 'Matrix Green',
+    description: 'Matrix-inspired green monochrome theme',
+    colors: {
+      primary: '#00FF00',
+      secondary: '#00AA00',
+      background: '#000000',
+    },
+  },
+];
+
+/**
+ * Project roadmap items
+ */
+export const PROJECT_ROADMAP = [
+  {
+    id: 'q1-2024',
+    quarter: 'Q1 2024',
+    items: ['Core component library launch', 'TypeScript support', 'Initial documentation'],
+  },
+  {
+    id: 'q2-2024',
+    quarter: 'Q2 2024',
+    items: ['Advanced animations', 'Theme customization', 'Accessibility improvements'],
+  },
+  {
+    id: 'q3-2024',
+    quarter: 'Q3 2024',
+    items: ['WebGL components', 'Performance optimization', 'Community feedback integration'],
+  },
+  {
+    id: 'q4-2024',
+    quarter: 'Q4 2024',
+    items: ['Mobile optimization', 'Plugin system', 'Enterprise features'],
+  },
+];

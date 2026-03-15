@@ -70,7 +70,7 @@ export const IntroPage: React.FC<IntroPageProps> = ({
         style={{ zIndex: Z_INDEX.background }}
         aria-hidden="true"
       >
-        <AnimatedBackground opacity={0.15} animationSpeed={1.0} />
+        <AnimatedBackground opacity={0.25} animationSpeed={1.0} />
       </div>
 
       {/* Navigation header (z-index: 100) */}

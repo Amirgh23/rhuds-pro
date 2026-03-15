@@ -3,7 +3,7 @@
   padding: 24px;
   background: linear-gradient(135deg, rgba(41, 242, 223, 0.08) 0%, rgba(40, 18, 90, 0.1) 100%);
   backdrop-filter: blur(20px);
-  border-radius: 8px;
+  border-radius: 0;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
@@ -83,7 +83,7 @@
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.3s ease;
-  border-radius: 8px;
+  border-radius: 0;
 }
 
 .feature-card:hover .feature-card__glow {

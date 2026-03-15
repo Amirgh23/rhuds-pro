@@ -1,0 +1,158 @@
+/* ============================================
+   PROFESSIONAL SCROLL ANIMATIONS
+   Inspired by OSE Engineering & Framer Motion
+   ============================================ */
+
+/* Fade Up Animation */
+@keyframes fadeUpAnimation {
+  from {
+    opacity: 0;
+    transform: translateY(60px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fadeUpAnimation 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Fade Left Animation */
+@keyframes fadeLeftAnimation {
+  from {
+    opacity: 0;
+    transform: translateX(-80px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-fade-left {
+  animation: fadeLeftAnimation 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Fade Right Animation */
+@keyframes fadeRightAnimation {
+  from {
+    opacity: 0;
+    transform: translateX(80px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-fade-right {
+  animation: fadeRightAnimation 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Scale Up Animation */
+@keyframes scaleUpAnimation {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-scale-up {
+  animation: scaleUpAnimation 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Stagger delays for child elements */
+[data-gsap] > * {
+  animation-delay: inherit;
+}
+
+[data-gsap] > :nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+[data-gsap] > :nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+[data-gsap] > :nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+[data-gsap] > :nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+[data-gsap] > :nth-child(5) {
+  animation-delay: 0.5s;
+}
+
+/* GPU acceleration */
+[data-gsap] {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Smooth scroll behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Parallax effect for background elements */
+[data-parallax] {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  @keyframes fadeUpAnimation {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes fadeLeftAnimation {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes fadeRightAnimation {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes scaleUpAnimation {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .animate-fade-up,
+  .animate-fade-left,
+  .animate-fade-right,
+  .animate-scale-up {
+    animation-duration: 0.01ms !important;
+  }
+}
