@@ -1,111 +1,147 @@
-/**
- * Radio Component
- * Accessible radio button
- */
+import React from 'react';
+import styled from 'styled-components';
 
-import React, { useMemo } from 'react';
-import { useTheme } from '@rhuds/core';
-import { RadioProps, RadioGroupProps } from './types';
+export interface RadioOption {
+  id: string;
+  label: string;
+}
 
-/**
- * Radio Component
- */
-export const Radio: React.FC<RadioProps> = ({
-  label,
-  value,
-  checked = false,
-  onChange,
-  disabled = false,
-  className,
-  style,
-}) => {
-  const theme = useTheme();
+export interface RadioProps {
+  options: RadioOption[];
+  defaultValue?: string;
+  onChange?: (value: string) => void;
+  color?: string;
+  colorOpacity?: string;
+  name?: string;
+}
 
-  const radioStyle = useMemo<React.CSSProperties>(() => {
-    return {
-      width: '20px',
-      height: '20px',
-      cursor: disabled ? 'not-allowed' : 'pointer',
-      opacity: disabled ? 0.6 : 1,
-      accentColor: theme.currentMode.tokens.colors.primary,
-      ...style,
-    };
-  }, [disabled, theme, style]);
-
-  const containerStyle: React.CSSProperties = {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '0.5rem',
-    cursor: disabled ? 'not-allowed' : 'pointer',
-  };
-
-  const labelStyle: React.CSSProperties = {
-    fontSize: '1rem',
-    color: theme.currentMode.tokens.colors.text,
-    cursor: disabled ? 'not-allowed' : 'pointer',
-    userSelect: 'none',
-  };
-
-  return (
-    <label style={containerStyle} className={className}>
-      <input
-        type="radio"
-        value={value}
-        checked={checked}
-        onChange={(e) => onChange?.(e.target.value)}
-        disabled={disabled}
-        style={radioStyle}
-      />
-      {label && <span style={labelStyle}>{label}</span>}
-    </label>
-  );
-};
-
-Radio.displayName = 'Radio';
-
-/**
- * RadioGroup Component
- */
-export const RadioGroup: React.FC<RadioGroupProps> = ({
+const Radio: React.FC<RadioProps> = ({
   options,
-  value,
+  defaultValue,
   onChange,
-  label,
-  disabled = false,
-  className,
-  style,
+  color = '#f7e479',
+  colorOpacity = '#f7e4791c',
+  name = 'radio',
 }) => {
-  const theme = useTheme();
+  const [selected, setSelected] = React.useState(defaultValue || options[0]?.id);
 
-  const groupStyle: React.CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.75rem',
-    ...style,
-  };
-
-  const labelStyle: React.CSSProperties = {
-    fontSize: '0.875rem',
-    fontWeight: 600,
-    color: theme.currentMode.tokens.colors.text,
-    marginBottom: '0.5rem',
+  const handleChange = (value: string) => {
+    setSelected(value);
+    onChange?.(value);
   };
 
   return (
-    <div className={className} style={groupStyle}>
-      {label && <label style={labelStyle}>{label}</label>}
-      {options.map((option) => (
-        <Radio
-          key={option.value}
-          label={option.label}
-          value={option.value}
-          checked={value === option.value}
-          onChange={onChange}
-          disabled={disabled}
-        />
-      ))}
-    </div>
+    <StyledWrapper $mainColor={color} $mainColorOpacity={colorOpacity} $totalRadio={options.length}>
+      <div className="radio-container">
+        {options.map((option, index) => (
+          <React.Fragment key={option.id}>
+            <input
+              id={option.id}
+              name={name}
+              type="radio"
+              checked={selected === option.id}
+              onChange={() => handleChange(option.id)}
+            />
+            <label htmlFor={option.id}>{option.label}</label>
+          </React.Fragment>
+        ))}
+        <div className="glider-container">
+          <div className="glider" />
+        </div>
+      </div>
+    </StyledWrapper>
   );
 };
 
-RadioGroup.displayName = 'RadioGroup';
+interface StyledWrapperProps {
+  $mainColor: string;
+  $mainColorOpacity: string;
+  $totalRadio: number;
+}
+
+const StyledWrapper = styled.div<StyledWrapperProps>`
+  .radio-container {
+    --main-color: ${(props) => props.$mainColor};
+    --main-color-opacity: ${(props) => props.$mainColorOpacity};
+    --total-radio: ${(props) => props.$totalRadio};
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    padding-left: 0.5rem;
+  }
+
+  .radio-container input {
+    cursor: pointer;
+    appearance: none;
+  }
+
+  .radio-container .glider-container {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    background: linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(27, 27, 27, 1) 50%,
+      rgba(0, 0, 0, 0) 100%
+    );
+    width: 1px;
+  }
+
+  .radio-container .glider-container .glider {
+    position: relative;
+    height: calc(100% / var(--total-radio));
+    width: 100%;
+    background: linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 0) 0%,
+      var(--main-color) 50%,
+      rgba(0, 0, 0, 0) 100%
+    );
+    transition: transform 0.5s cubic-bezier(0.37, 1.95, 0.66, 0.56);
+  }
+
+  .radio-container .glider-container .glider::before {
+    content: '';
+    position: absolute;
+    height: 60%;
+    width: 300%;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--main-color);
+    filter: blur(10px);
+  }
+
+  .radio-container .glider-container .glider::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    height: 100%;
+    width: 150px;
+    background: linear-gradient(90deg, var(--main-color-opacity) 0%, rgba(0, 0, 0, 0) 100%);
+  }
+
+  .radio-container label {
+    cursor: pointer;
+    padding: 1rem;
+    position: relative;
+    color: grey;
+    transition: all 0.3s ease-in-out;
+  }
+
+  .radio-container input:checked + label {
+    color: var(--main-color);
+  }
+
+  ${Array.from(
+    { length: 10 },
+    (_, i) => `
+    .radio-container input:nth-of-type(${i + 1}):checked ~ .glider-container .glider {
+      transform: translateY(${i * 100}%);
+    }
+  `
+  ).join('')}
+`;
+
+export default Radio;

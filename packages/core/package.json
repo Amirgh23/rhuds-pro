@@ -19,7 +19,9 @@
       "types": "./dist/theme/index.d.ts"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
@@ -40,6 +42,7 @@
   "devDependencies": {
     "typescript": "^5.0.0",
     "vite": "^5.0.0",
+    "@vitejs/plugin-react": "^4.0.0",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
     "@types/styled-components": "^5.1.0",

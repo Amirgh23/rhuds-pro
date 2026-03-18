@@ -28,6 +28,36 @@ const COMPONENTS = [
   { name: 'Button', category: 'Button', code: '<Button variant="primary">Click me</Button>' },
   { name: 'HudButton', category: 'Button', code: '<HudButton>ACTIVATE</HudButton>' },
   { name: 'GlitchButton', category: 'Button', code: '<GlitchButton>// Execute</GlitchButton>' },
+  {
+    name: 'GridPatternButton',
+    category: 'Button',
+    code: '<GridPatternButton color="#00ffff" onClick={() => console.log("clicked")}>Start</GridPatternButton>',
+  },
+  {
+    name: 'FingerprintButton',
+    category: 'Button',
+    code: '<FingerprintButton color="#00ff00" onClick={() => console.log("scanned")} />',
+  },
+  {
+    name: 'GlitchHoverButton',
+    category: 'Button',
+    code: '<GlitchHoverButton onClick={() => console.log("clicked")}>HOVER ME</GlitchHoverButton>',
+  },
+  {
+    name: 'SkewedSliderButton',
+    category: 'Button',
+    code: '<SkewedSliderButton onClick={() => console.log("downloaded")}>Download Now</SkewedSliderButton>',
+  },
+  {
+    name: 'CyberSubscribeButton',
+    category: 'Button',
+    code: '<CyberSubscribeButton onClick={() => console.log("subscribed")}>Subscribe</CyberSubscribeButton>',
+  },
+  {
+    name: 'NeonBorderButton',
+    category: 'Button',
+    code: '<NeonBorderButton color="#ff0000" onClick={() => console.log("clicked")}>Click Me</NeonBorderButton>',
+  },
 
   // Input Components
   { name: 'Input', category: 'Input', code: '<Input placeholder="Enter text..." />' },
@@ -42,13 +72,93 @@ const COMPONENTS = [
     category: 'Input',
     code: '<HoloInput placeholder="Holographic input..." />',
   },
+  {
+    name: 'BashInput',
+    category: 'Input',
+    code: '<BashInput placeholder="sudo uiverse or wot" onChange={(value) => console.log(value)} />',
+  },
+  {
+    name: 'GradientSearchInput',
+    category: 'Input',
+    code: '<GradientSearchInput placeholder="Search" color="#00F260" onChange={(value) => console.log(value)} />',
+  },
+  {
+    name: 'FloatingLabelInput',
+    category: 'Input',
+    code: '<FloatingLabelInput label="Email" type="email" color="#ac2eac" onChange={(value) => console.log(value)} />',
+  },
+  {
+    name: 'AddFriendInput',
+    category: 'Input',
+    code: '<AddFriendInput title="Add Friend" primaryColor="rgb(169, 116, 255)" backgroundColor="rgb(36, 34, 39)" />',
+  },
+  {
+    name: 'VerificationCodeInput',
+    category: 'Input',
+    code: '<VerificationCodeInput length={6} primaryColor="rgb(0, 255, 136)" backgroundColor="rgb(15, 15, 25)" />',
+  },
+  {
+    name: 'AnimatedLoadingText',
+    category: 'Loader',
+    code: '<AnimatedLoadingText text="LOADING" primaryColor="rgb(41, 242, 223)" backgroundColor="rgb(15, 20, 30)" />',
+  },
+  {
+    name: 'BinaryWaveLoader',
+    category: 'Loader',
+    code: '<BinaryWaveLoader primaryColor="rgb(0, 255, 136)" backgroundColor="rgb(200, 200, 200)" />',
+  },
 
   // Form Components
   { name: 'Checkbox', category: 'Form', code: '<Checkbox label="Accept terms" />' },
   { name: 'HoloCheckbox', category: 'Form', code: '<HoloCheckbox label="HOLOGRAPHIC SYSTEM" />' },
+  {
+    name: 'CyberpunkCheckbox',
+    category: 'Form',
+    code: '<CyberpunkCheckbox color="#00ffff" label="SYSTEM CHECK" onChange={(checked) => console.log(checked)} />',
+  },
+  {
+    name: 'BubbleCheckbox',
+    category: 'Form',
+    code: '<BubbleCheckbox label="Floating Bubble" onChange={(checked) => console.log(checked)} />',
+  },
+  {
+    name: 'NeonCheckbox',
+    category: 'Form',
+    code: '<NeonCheckbox color="#00ffaa" label="NEON CHECK" onChange={(checked) => console.log(checked)} />',
+  },
+  {
+    name: 'GlowingNeonCheckbox',
+    category: 'Form',
+    code: '<GlowingNeonCheckbox label="Glowing Neon" color="#00ff88" onChange={(checked) => console.log(checked)} />',
+  },
   { name: 'Switch', category: 'Form', code: '<Switch label="Enable notifications" />' },
   { name: 'Radio', category: 'Form', code: '<Radio label="Option" />' },
   { name: 'GlitchRadio', category: 'Form', code: '<GlitchRadio label="Glitch Option" />' },
+  {
+    name: 'CyberpunkRadio',
+    category: 'Form',
+    code: '<CyberpunkRadio options={[{value: "1", label: "Helios Blue"}, {value: "2", label: "Cygnus Magenta"}, {value: "3", label: "Orion Lime"}]} color="#00a6ff" onChange={(value) => console.log(value)} />',
+  },
+  {
+    name: 'ToggleSwitch',
+    category: 'Form',
+    code: '<ToggleSwitch label="Enable feature" color="#00ffff" onChange={(checked) => console.log(checked)} />',
+  },
+  {
+    name: 'CyberpunkToggle',
+    category: 'Form',
+    code: '<CyberpunkToggle color="#00ffff" label="SYSTEM POWER" onChange={(checked) => console.log(checked)} />',
+  },
+  {
+    name: 'LockSwitch',
+    category: 'Form',
+    code: '<LockSwitch checked={false} onColor="#00ff88" offColor="#ff0000" onChange={(checked) => console.log(checked)} />',
+  },
+  {
+    name: 'NeonSlider',
+    category: 'Form',
+    code: '<NeonSlider value={50} min={0} max={100} color="#00ffff" onChange={(value) => console.log(value)} />',
+  },
   { name: 'Slider', category: 'Form', code: '<Slider value={50} min={0} max={100} />' },
   {
     name: 'Select',
@@ -77,6 +187,36 @@ const COMPONENTS = [
     category: 'Data Display',
     code: '<Tree data={{label: "Root", children: [{label: "Child 1"}, {label: "Child 2"}]}} />',
   },
+  {
+    name: 'ThermostatCard',
+    category: 'Data Display',
+    code: '<ThermostatCard temperature={70} color="#00f0ff" label="CURRENT" status="Comfort" onChange={(temp) => console.log(temp)} />',
+  },
+  {
+    name: 'TerminalThemeSelector',
+    category: 'Data Display',
+    code: '<TerminalThemeSelector onThemeChange={(theme) => console.log(theme)} />',
+  },
+  {
+    name: 'NotificationCard',
+    category: 'Data Display',
+    code: '<NotificationCard title="Clans of Clash" message="Xhattmahs is not attacking your base!" timestamp="12 min ago" />',
+  },
+  {
+    name: 'HudNotificationCard',
+    category: 'Data Display',
+    code: '<HudNotificationCard title="SYSTEM ALERT" message="Threat detected in sector 7" color="#29F2DF" />',
+  },
+  {
+    name: 'Win95MediaPlayer',
+    category: 'Data Display',
+    code: '<Win95MediaPlayer trackName="track_01.wav" currentTime="00:42" totalDuration="03:17" progress={21} volume={75} />',
+  },
+  {
+    name: 'TubeAmplifier',
+    category: 'Data Display',
+    code: '<TubeAmplifier brandName="FIDELITY 900" isPowered={true} leftChannelLevel={65} rightChannelLevel={70} volume={75} tone={60} />',
+  },
 
   // Loader Components
   {
@@ -93,6 +233,26 @@ const COMPONENTS = [
     name: 'HeartRateLoader',
     category: 'Loader',
     code: '<HeartRateLoader color="#29F2DF" width={400} height={150} />',
+  },
+  {
+    name: 'HackerLoaderBinary',
+    category: 'Loader',
+    code: '<HackerLoaderBinary color="#00ff00" size={100} />',
+  },
+  {
+    name: 'ProgressLoader',
+    category: 'Loader',
+    code: '<ProgressLoader progress={65} color="#00f260" accentColor="#0575e6" showPercentage={true} showParticles={true} />',
+  },
+  {
+    name: 'AIMatrixLoader',
+    category: 'Loader',
+    code: '<AIMatrixLoader color="#00ff88" size={120} />',
+  },
+  {
+    name: 'ScrollingTextLoader',
+    category: 'Loader',
+    code: '<ScrollingTextLoader text="Loading" color="#00ffff" size={64} />',
   },
 
   // Feedback Components
@@ -132,6 +292,11 @@ const COMPONENTS = [
     name: 'Dropdown',
     category: 'Utility',
     code: '<Dropdown items={[{label: "Option 1", value: "1"}, {label: "Option 2", value: "2"}]} />',
+  },
+  {
+    name: 'CyberSupportTooltip',
+    category: 'Utility',
+    code: '<CyberSupportTooltip title="Support" color="#00c1d5" />',
   },
   {
     name: 'Menu',

@@ -24,7 +24,7 @@ export function createPersistenceMiddleware(
 ): Middleware<{}, RootState> {
   const { key = 'rhuds-state', whitelist = [], blacklist = [], throttle = 1000 } = config;
 
-  let saveTimeout: NodeJS.Timeout | null = null;
+  let saveTimeout: ReturnType<typeof setTimeout> | null = null;
 
   return (store) => (next) => (action) => {
     const result = next(action);

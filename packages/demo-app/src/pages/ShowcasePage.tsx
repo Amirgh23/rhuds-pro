@@ -8,6 +8,13 @@ import {
   Button,
   HudButton,
   GlitchButton,
+  NeonHoverButton,
+  GridPatternButton,
+  FingerprintButton,
+  GlitchHoverButton,
+  SkewedSliderButton,
+  CyberSubscribeButton,
+  NeonBorderButton,
   Icon,
   Input,
   HackerInput,
@@ -15,6 +22,13 @@ import {
   HoloGlitchInput,
   HoloInput,
   FuturisticInput,
+  BashInput,
+  GradientSearchInput,
+  FloatingLabelInput,
+  AddFriendInput,
+  VerificationCodeInput,
+  AnimatedLoadingText,
+  BinaryWaveLoader,
   Select,
   Grid,
   Stack,
@@ -23,7 +37,11 @@ import {
   GlitchFrame,
   Checkbox,
   HoloCheckbox,
-  RadioGroup,
+  CyberpunkCheckbox,
+  BubbleCheckbox,
+  NeonCheckbox,
+  GlowingNeonCheckbox,
+  Radio,
   Switch,
   Tabs,
   Pagination,
@@ -36,6 +54,7 @@ import {
   Tooltip,
   Popover,
   Dropdown,
+  CyberSupportTooltip,
   Accordion,
   Stepper,
   Carousel,
@@ -47,20 +66,40 @@ import {
   DataGrid,
   Tree,
   CyberCard,
+  GlassCard,
+  ThermostatCard,
   GlitchProfileCard,
+  TerminalThemeSelector,
+  NotificationCard,
+  HudNotificationCard,
+  Win95MediaPlayer,
   RadarHud,
   PipBoy,
   AbstergoLoader,
   HeartRateLoader,
   HackerLoader,
+  BinaryLoader,
+  Cube3DLoader,
+  InteractiveProgressLoader,
+  HackerLoaderBinary,
+  ProgressLoader,
+  AIMatrixLoader,
+  ScrollingTextLoader,
+  CyberpunkAccessInput,
   GlitchRadio,
+  CyberpunkRadio,
   Sidebar,
   Breadcrumb,
   Menu,
   CodeEditor,
   RichTextEditor,
   GlitchLoginForm,
+  CyberLoginForm,
   NeonRadio,
+  ToggleSwitch,
+  CyberpunkToggle,
+  LockSwitch,
+  NeonSlider,
   HudTableBasic,
   HudTableBorderless,
   HudTableHoverable,
@@ -120,16 +159,30 @@ export const ShowcasePage: React.FC = () => {
 
   // Form states
   const [inputValue, setInputValue] = useState('');
+  const [bashInputValue, setBashInputValue] = useState('');
+  const [gradientSearchValue, setGradientSearchValue] = useState('');
+  const [floatingLabelValue, setFloatingLabelValue] = useState('');
   const [selectValue, setSelectValue] = useState('');
   const [checkboxValue, setCheckboxValue] = useState(false);
   const [holoCheckboxValue, setHoloCheckboxValue] = useState(false);
+  const [cyberpunkCheckboxValue, setCyberpunkCheckboxValue] = useState(false);
+  const [bubbleCheckboxValue, setBubbleCheckboxValue] = useState(false);
+  const [neonCheckboxValue, setNeonCheckboxValue] = useState(false);
+  const [glowingNeonCheckboxValue, setGlowingNeonCheckboxValue] = useState(false);
   const [radioValue, setRadioValue] = useState('option1');
   const [glitchRadioValue, setGlitchRadioValue] = useState('tcp');
+  const [cyberpunkRadioValue, setCyberpunkRadioValue] = useState('1');
   const [switchValue, setSwitchValue] = useState(false);
+  const [toggleSwitchValue, setToggleSwitchValue] = useState(false);
+  const [cyberpunkToggleValue, setCyberpunkToggleValue] = useState(false);
+  const [lockSwitchValue, setLockSwitchValue] = useState(false);
+  const [neonSliderValue, setNeonSliderValue] = useState(50);
   const [sliderValue, setSliderValue] = useState(50);
   const [colorValue, setColorValue] = useState('#29F2DF');
   const [dateValue, setDateValue] = useState(new Date());
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [thermostatTemp, setThermostatTemp] = useState(70);
+  const [terminalTheme, setTerminalTheme] = useState('green');
   const [hudBoxAnimated, setHudBoxAnimated] = useState(true);
 
   // UI states
@@ -227,14 +280,157 @@ export const ShowcasePage: React.FC = () => {
                 <GlitchButton>// Run code</GlitchButton>
               </Stack>
             </div>
+            <div style={{ marginTop: '1rem' }}>
+              <Text
+                variant="caption"
+                style={{ display: 'block', marginBottom: '0.5rem', color: '#29F2DF' }}
+              >
+                Neon Hover Button Style:
+              </Text>
+              <Stack direction="row" gap="2rem" style={{ flexWrap: 'wrap' }}>
+                <NeonHoverButton text="Hover Me" animationColor="#37FF8B" />
+                <NeonHoverButton text="Click Me" animationColor="#00D9FF" />
+                <NeonHoverButton text="Neon" animationColor="#FF00FF" />
+              </Stack>
+            </div>
+            <div style={{ marginTop: '1rem' }}>
+              <Text
+                variant="caption"
+                style={{ display: 'block', marginBottom: '0.5rem', color: '#29F2DF' }}
+              >
+                Grid Pattern Button Style:
+              </Text>
+              <Stack direction="row" gap="1rem" style={{ flexWrap: 'wrap' }}>
+                <GridPatternButton color="#00ffff">Cyan</GridPatternButton>
+                <GridPatternButton color="#ff00ff">Magenta</GridPatternButton>
+                <GridPatternButton color="#00ff88">Green</GridPatternButton>
+                <GridPatternButton color="#ffff00" hueRotate={45}>
+                  Yellow
+                </GridPatternButton>
+              </Stack>
+            </div>
+            <div style={{ marginTop: '1rem' }}>
+              <Text
+                variant="caption"
+                style={{ display: 'block', marginBottom: '0.5rem', color: '#29F2DF' }}
+              >
+                Fingerprint Button Style:
+              </Text>
+              <Stack direction="row" gap="2rem" style={{ flexWrap: 'wrap' }}>
+                <FingerprintButton color="#00ff00" onClick={() => console.log('Green scanned')} />
+                <FingerprintButton color="#00ffff" onClick={() => console.log('Cyan scanned')} />
+                <FingerprintButton color="#ff00ff" onClick={() => console.log('Magenta scanned')} />
+                <FingerprintButton color="#ffff00" onClick={() => console.log('Yellow scanned')} />
+              </Stack>
+            </div>
           </ComponentSection>
-          <ComponentSection title="3. Icon">
+          <ComponentSection title="3c. GlitchHoverButton (Glitch Effect)">
+            <Stack direction="column" gap="2rem" style={{ alignItems: 'center' }}>
+              <div>
+                <Text
+                  variant="caption"
+                  style={{ display: 'block', marginBottom: '1rem', color: '#ff013c' }}
+                >
+                  Glitch Hover Effect:
+                </Text>
+                <GlitchHoverButton onClick={() => console.log('Glitch button clicked')}>
+                  HOVER ME
+                </GlitchHoverButton>
+              </div>
+            </Stack>
+          </ComponentSection>
+          <ComponentSection title="3d. SkewedSliderButton (Skewed Slider)">
+            <Stack direction="column" gap="2rem" style={{ alignItems: 'center' }}>
+              <div>
+                <Text
+                  variant="caption"
+                  style={{ display: 'block', marginBottom: '1rem', color: '#ff4655' }}
+                >
+                  Red Slider:
+                </Text>
+                <SkewedSliderButton onClick={() => console.log('Download clicked')}>
+                  Download Now
+                </SkewedSliderButton>
+              </div>
+              <div>
+                <Text
+                  variant="caption"
+                  style={{ display: 'block', marginBottom: '1rem', color: '#00ffff' }}
+                >
+                  Cyan Slider:
+                </Text>
+                <SkewedSliderButton
+                  sliderColor="#00ffff"
+                  onClick={() => console.log('Download clicked')}
+                >
+                  Download Now
+                </SkewedSliderButton>
+              </div>
+              <div>
+                <Text
+                  variant="caption"
+                  style={{ display: 'block', marginBottom: '1rem', color: '#00ff88' }}
+                >
+                  Green Slider:
+                </Text>
+                <SkewedSliderButton
+                  sliderColor="#00ff88"
+                  onClick={() => console.log('Download clicked')}
+                >
+                  Download Now
+                </SkewedSliderButton>
+              </div>
+            </Stack>
+          </ComponentSection>
+          <ComponentSection title="3e. CyberSubscribeButton (Cyber Subscribe)">
+            <Stack
+              direction="row"
+              gap="2rem"
+              style={{ flexWrap: 'wrap', justifyContent: 'center' }}
+            >
+              <CyberSubscribeButton onClick={() => console.log('Subscribed')}>
+                Subscribe
+              </CyberSubscribeButton>
+              <CyberSubscribeButton color="#00ffff" onClick={() => console.log('Subscribed')}>
+                Subscribe
+              </CyberSubscribeButton>
+              <CyberSubscribeButton color="#00ff88" onClick={() => console.log('Subscribed')}>
+                Subscribe
+              </CyberSubscribeButton>
+              <CyberSubscribeButton color="#ffff00" onClick={() => console.log('Subscribed')}>
+                Subscribe
+              </CyberSubscribeButton>
+            </Stack>
+          </ComponentSection>
+
+          <ComponentSection title="3f. NeonBorderButton (Animated Neon Borders)">
+            <Stack
+              direction="row"
+              gap="2rem"
+              style={{ flexWrap: 'wrap', justifyContent: 'center' }}
+            >
+              <NeonBorderButton color="#ff0000" onClick={() => console.log('Red clicked')}>
+                Red
+              </NeonBorderButton>
+              <NeonBorderButton color="#00ffff" onClick={() => console.log('Cyan clicked')}>
+                Cyan
+              </NeonBorderButton>
+              <NeonBorderButton color="#00ff88" onClick={() => console.log('Green clicked')}>
+                Green
+              </NeonBorderButton>
+              <NeonBorderButton color="#ffff00" onClick={() => console.log('Yellow clicked')}>
+                Yellow
+              </NeonBorderButton>
+            </Stack>
+          </ComponentSection>
+
+          <ComponentSection title="4. Icon">
             <Stack direction="row" gap="1rem">
               <Icon name="check" size={24} color={theme.currentMode.tokens.colors.success} />
               <Icon name="close" size={24} color={theme.currentMode.tokens.colors.error} />
             </Stack>
           </ComponentSection>
-          <ComponentSection title="4. Input">
+          <ComponentSection title="5. Input">
             <Stack direction="column" gap="2rem" style={{ alignItems: 'flex-start' }}>
               <div style={{ width: '100%', maxWidth: '500px' }}>
                 <Text
@@ -305,9 +501,150 @@ export const ShowcasePage: React.FC = () => {
                   <FuturisticInput enterLabel="ENTER" nameLabel="DATA" placeholder="" />
                 </div>
               </div>
+
+              <div style={{ marginTop: '3rem', width: '100%', maxWidth: '500px' }}>
+                <Text
+                  variant="caption"
+                  style={{ display: 'block', marginBottom: '2rem', color: '#29F2DF' }}
+                >
+                  BashInput (terminal-style bash prompt):
+                </Text>
+                <div style={{ display: 'flex', justifyContent: 'center' }}>
+                  <BashInput
+                    value={bashInputValue}
+                    onChange={setBashInputValue}
+                    placeholder="sudo uiverse or wot"
+                  />
+                </div>
+              </div>
+
+              <div style={{ marginTop: '3rem', width: '100%', maxWidth: '500px' }}>
+                <Text
+                  variant="caption"
+                  style={{ display: 'block', marginBottom: '2rem', color: '#29F2DF' }}
+                >
+                  GradientSearchInput (search with gradient border):
+                </Text>
+                <Stack
+                  direction="row"
+                  gap="1rem"
+                  style={{ flexWrap: 'wrap', justifyContent: 'center' }}
+                >
+                  <GradientSearchInput
+                    value={gradientSearchValue}
+                    onChange={setGradientSearchValue}
+                    placeholder="Search"
+                    color="#00F260"
+                  />
+                  <GradientSearchInput
+                    value={gradientSearchValue}
+                    onChange={setGradientSearchValue}
+                    placeholder="Search"
+                    color="#0575E6"
+                  />
+                  <GradientSearchInput
+                    value={gradientSearchValue}
+                    onChange={setGradientSearchValue}
+                    placeholder="Search"
+                    color="#FF006E"
+                  />
+                </Stack>
+              </div>
+
+              <div style={{ marginTop: '3rem', width: '100%', maxWidth: '500px' }}>
+                <Text
+                  variant="caption"
+                  style={{ display: 'block', marginBottom: '2rem', color: '#29F2DF' }}
+                >
+                  FloatingLabelInput (animated floating label with decorative lines):
+                </Text>
+                <Stack
+                  direction="row"
+                  gap="2rem"
+                  style={{ flexWrap: 'wrap', justifyContent: 'center' }}
+                >
+                  <FloatingLabelInput
+                    label="Email"
+                    type="email"
+                    value={floatingLabelValue}
+                    onChange={setFloatingLabelValue}
+                    color="#ac2eac"
+                  />
+                  <FloatingLabelInput
+                    label="Username"
+                    type="text"
+                    value={floatingLabelValue}
+                    onChange={setFloatingLabelValue}
+                    color="#00ffff"
+                  />
+                  <FloatingLabelInput
+                    label="Password"
+                    type="password"
+                    value={floatingLabelValue}
+                    onChange={setFloatingLabelValue}
+                    color="#00ff88"
+                  />
+                </Stack>
+              </div>
+
+              <div style={{ marginTop: '3rem', width: '100%', maxWidth: '500px' }}>
+                <Text
+                  variant="caption"
+                  style={{ display: 'block', marginBottom: '2rem', color: '#22c55e' }}
+                >
+                  CyberpunkAccessInput (admin access with corner brackets):
+                </Text>
+                <CyberpunkAccessInput
+                  label="ADMIN_ACCESS"
+                  placeholder="➤ ENTER CREDENTIALS"
+                  primaryColor="#22c55e"
+                  warningText="Unauthorized access will be reported"
+                />
+              </div>
+
+              <div style={{ marginTop: '3rem', width: '100%', maxWidth: '500px' }}>
+                <Text
+                  variant="caption"
+                  style={{ display: 'block', marginBottom: '2rem', color: '#a974ff' }}
+                >
+                  AddFriendInput (friend code with animated verification):
+                </Text>
+                <Stack
+                  direction="row"
+                  gap="2rem"
+                  style={{ flexWrap: 'wrap', justifyContent: 'center' }}
+                >
+                  <AddFriendInput
+                    title="Add Friend"
+                    primaryColor="rgb(169, 116, 255)"
+                    backgroundColor="rgb(36, 34, 39)"
+                  />
+                </Stack>
+              </div>
+
+              <div style={{ marginTop: '3rem', width: '100%', maxWidth: '500px' }}>
+                <Text
+                  variant="caption"
+                  style={{ display: 'block', marginBottom: '2rem', color: '#00ff88' }}
+                >
+                  VerificationCodeInput (6-digit code verification):
+                </Text>
+                <Stack
+                  direction="row"
+                  gap="2rem"
+                  style={{ flexWrap: 'wrap', justifyContent: 'center' }}
+                >
+                  <VerificationCodeInput
+                    length={6}
+                    primaryColor="rgb(0, 255, 136)"
+                    backgroundColor="rgb(15, 15, 25)"
+                    title="Enter Code"
+                  />
+                </Stack>
+              </div>
             </Stack>
           </ComponentSection>
-          <ComponentSection title="5. Select">
+          <ComponentSection title="6. Select">
             <Select
               value={selectValue}
               onChange={(v) => setSelectValue(String(v))}
@@ -324,14 +661,14 @@ export const ShowcasePage: React.FC = () => {
       label: 'Layout (3)',
       content: (
         <Stack direction="column" gap="2rem">
-          <ComponentSection title="6. Grid">
+          <ComponentSection title="7. Grid">
             <Grid columns={3} gap={1}>
               <div style={{ padding: '1rem', background: 'rgba(41, 242, 223, 0.2)' }}>1</div>
               <div style={{ padding: '1rem', background: 'rgba(41, 242, 223, 0.2)' }}>2</div>
               <div style={{ padding: '1rem', background: 'rgba(41, 242, 223, 0.2)' }}>3</div>
             </Grid>
           </ComponentSection>
-          <ComponentSection title="7. Container">
+          <ComponentSection title="8. Container">
             <div
               style={{
                 maxWidth: '600px',
@@ -343,14 +680,14 @@ export const ShowcasePage: React.FC = () => {
               <Text>Content in container</Text>
             </div>
           </ComponentSection>
-          <ComponentSection title="8. Stack">
+          <ComponentSection title="9. Stack">
             <Stack direction="row" gap="1rem">
               <Button>A</Button>
               <Button>B</Button>
               <Button>C</Button>
             </Stack>
           </ComponentSection>
-          <ComponentSection title="8b. HudBox (Asymmetrical) - 18 Variants with Colors">
+          <ComponentSection title="9b. HudBox (Asymmetrical) - 18 Variants with Colors">
             <Stack direction="column" gap="2rem">
               <div
                 style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}
@@ -1171,14 +1508,135 @@ export const ShowcasePage: React.FC = () => {
               />
             </div>
           </ComponentSection>
-          <ComponentSection title="10. RadioGroup">
-            <RadioGroup
-              value={radioValue}
-              onChange={(v) => setRadioValue(String(v))}
+          <ComponentSection title="9c. CyberpunkCheckbox (Glitch)">
+            <Stack
+              direction="row"
+              gap="2rem"
+              style={{ flexWrap: 'wrap', justifyContent: 'center' }}
+            >
+              <CyberpunkCheckbox
+                checked={cyberpunkCheckboxValue}
+                onChange={setCyberpunkCheckboxValue}
+                color="#00ffff"
+                label="CYAN"
+              />
+              <CyberpunkCheckbox
+                checked={cyberpunkCheckboxValue}
+                onChange={setCyberpunkCheckboxValue}
+                color="#ff00ff"
+                label="MAGENTA"
+              />
+              <CyberpunkCheckbox
+                checked={cyberpunkCheckboxValue}
+                onChange={setCyberpunkCheckboxValue}
+                color="#00ff88"
+                label="GREEN"
+              />
+              <CyberpunkCheckbox
+                checked={cyberpunkCheckboxValue}
+                onChange={setCyberpunkCheckboxValue}
+                color="#ffff00"
+                label="YELLOW"
+              />
+            </Stack>
+          </ComponentSection>
+          <ComponentSection title="9d. BubbleCheckbox (Floating Bubble)">
+            <Stack
+              direction="row"
+              gap="2rem"
+              style={{ flexWrap: 'wrap', justifyContent: 'center' }}
+            >
+              <BubbleCheckbox
+                checked={bubbleCheckboxValue}
+                onChange={setBubbleCheckboxValue}
+                label="Floating Bubble"
+              />
+              <BubbleCheckbox
+                checked={bubbleCheckboxValue}
+                onChange={setBubbleCheckboxValue}
+                label="Bubble Checked"
+              />
+              <BubbleCheckbox
+                checked={bubbleCheckboxValue}
+                onChange={setBubbleCheckboxValue}
+                label="Disabled"
+                disabled={true}
+              />
+            </Stack>
+          </ComponentSection>
+          <ComponentSection title="9e. NeonCheckbox (Neon Effects)">
+            <Stack
+              direction="row"
+              gap="2rem"
+              style={{ flexWrap: 'wrap', justifyContent: 'center' }}
+            >
+              <NeonCheckbox
+                checked={neonCheckboxValue}
+                onChange={setNeonCheckboxValue}
+                label="CYAN"
+                color="#00ffaa"
+              />
+              <NeonCheckbox
+                checked={neonCheckboxValue}
+                onChange={setNeonCheckboxValue}
+                label="MAGENTA"
+                color="#ff00ff"
+              />
+              <NeonCheckbox
+                checked={neonCheckboxValue}
+                onChange={setNeonCheckboxValue}
+                label="BLUE"
+                color="#00ffff"
+              />
+              <NeonCheckbox
+                checked={neonCheckboxValue}
+                onChange={setNeonCheckboxValue}
+                label="YELLOW"
+                color="#ffff00"
+              />
+            </Stack>
+          </ComponentSection>
+          <ComponentSection title="9f. GlowingNeonCheckbox (Glowing Neon Effects)">
+            <Stack
+              direction="row"
+              gap="2rem"
+              style={{ flexWrap: 'wrap', justifyContent: 'center' }}
+            >
+              <GlowingNeonCheckbox
+                checked={glowingNeonCheckboxValue}
+                onChange={setGlowingNeonCheckboxValue}
+                label="GREEN"
+                color="#00ff88"
+              />
+              <GlowingNeonCheckbox
+                checked={glowingNeonCheckboxValue}
+                onChange={setGlowingNeonCheckboxValue}
+                label="CYAN"
+                color="#00ffff"
+              />
+              <GlowingNeonCheckbox
+                checked={glowingNeonCheckboxValue}
+                onChange={setGlowingNeonCheckboxValue}
+                label="MAGENTA"
+                color="#ff00ff"
+              />
+              <GlowingNeonCheckbox
+                checked={glowingNeonCheckboxValue}
+                onChange={setGlowingNeonCheckboxValue}
+                label="YELLOW"
+                color="#ffff00"
+              />
+            </Stack>
+          </ComponentSection>
+          <ComponentSection title="10. Radio">
+            <Radio
               options={[
-                { label: 'Option 1', value: 'opt1' },
-                { label: 'Option 2', value: 'opt2' },
+                { id: 'opt1', label: 'Option 1' },
+                { id: 'opt2', label: 'Option 2' },
               ]}
+              defaultValue="opt1"
+              onChange={(v) => setRadioValue(v)}
+              color="#29F2DF"
             />
           </ComponentSection>
           <ComponentSection title="10b. GlitchRadio (Glitch Style)">
@@ -1195,23 +1653,317 @@ export const ShowcasePage: React.FC = () => {
               />
             </div>
           </ComponentSection>
+          <ComponentSection title="10c. CyberpunkRadio (Orbital Animation)">
+            <Stack direction="column" gap="2rem" style={{ alignItems: 'center' }}>
+              <div>
+                <Text
+                  variant="caption"
+                  style={{ display: 'block', marginBottom: '1rem', color: '#00a6ff' }}
+                >
+                  Blue Theme:
+                </Text>
+                <CyberpunkRadio
+                  options={[
+                    { value: '1', label: 'Helios Blue' },
+                    { value: '2', label: 'Cygnus Magenta' },
+                    { value: '3', label: 'Orion Lime' },
+                  ]}
+                  value={cyberpunkRadioValue}
+                  onChange={setCyberpunkRadioValue}
+                  color="#00a6ff"
+                />
+              </div>
+              <div>
+                <Text
+                  variant="caption"
+                  style={{ display: 'block', marginBottom: '1rem', color: '#e900ff' }}
+                >
+                  Magenta Theme:
+                </Text>
+                <CyberpunkRadio
+                  options={[
+                    { value: '1', label: 'Helios Blue' },
+                    { value: '2', label: 'Cygnus Magenta' },
+                    { value: '3', label: 'Orion Lime' },
+                  ]}
+                  value={cyberpunkRadioValue}
+                  onChange={setCyberpunkRadioValue}
+                  color="#e900ff"
+                />
+              </div>
+              <div>
+                <Text
+                  variant="caption"
+                  style={{ display: 'block', marginBottom: '1rem', color: '#00ffc2' }}
+                >
+                  Cyan Theme:
+                </Text>
+                <CyberpunkRadio
+                  options={[
+                    { value: '1', label: 'Helios Blue' },
+                    { value: '2', label: 'Cygnus Magenta' },
+                    { value: '3', label: 'Orion Lime' },
+                  ]}
+                  value={cyberpunkRadioValue}
+                  onChange={setCyberpunkRadioValue}
+                  color="#00ffc2"
+                />
+              </div>
+            </Stack>
+          </ComponentSection>
           <ComponentSection title="11. Switch">
             <Switch checked={switchValue} onChange={setSwitchValue} label="Enable" />
           </ComponentSection>
-          <ComponentSection title="12. Slider">
+          <ComponentSection title="11b. ToggleSwitch (Animated)">
+            <Stack direction="column" gap="2rem">
+              <div>
+                <Text
+                  variant="caption"
+                  style={{ display: 'block', marginBottom: '1rem', color: '#00ffff' }}
+                >
+                  Cyan Theme:
+                </Text>
+                <ToggleSwitch
+                  checked={toggleSwitchValue}
+                  onChange={setToggleSwitchValue}
+                  label="Enable Feature"
+                  color="#00ffff"
+                  colorOpacity="#00ffff1c"
+                  size="medium"
+                />
+              </div>
+              <div>
+                <Text
+                  variant="caption"
+                  style={{ display: 'block', marginBottom: '1rem', color: '#ff00ff' }}
+                >
+                  Magenta Theme:
+                </Text>
+                <ToggleSwitch
+                  checked={false}
+                  onChange={() => {}}
+                  label="Magenta Toggle"
+                  color="#ff00ff"
+                  colorOpacity="#ff00ff1c"
+                  size="medium"
+                />
+              </div>
+              <div>
+                <Text
+                  variant="caption"
+                  style={{ display: 'block', marginBottom: '1rem', color: '#00ff88' }}
+                >
+                  Green Theme (Small):
+                </Text>
+                <ToggleSwitch
+                  checked={false}
+                  onChange={() => {}}
+                  label="Small Toggle"
+                  color="#00ff88"
+                  colorOpacity="#00ff881c"
+                  size="small"
+                />
+              </div>
+              <div>
+                <Text
+                  variant="caption"
+                  style={{ display: 'block', marginBottom: '1rem', color: '#ffff00' }}
+                >
+                  Yellow Theme (Large):
+                </Text>
+                <ToggleSwitch
+                  checked={true}
+                  onChange={() => {}}
+                  label="Large Toggle"
+                  color="#ffff00"
+                  colorOpacity="#ffff001c"
+                  size="large"
+                />
+              </div>
+            </Stack>
+          </ComponentSection>
+          <ComponentSection title="11c. CyberpunkToggle (Particle Animation)">
+            <Stack direction="column" gap="2rem" style={{ alignItems: 'center' }}>
+              <div>
+                <Text
+                  variant="caption"
+                  style={{ display: 'block', marginBottom: '1rem', color: '#00ffff' }}
+                >
+                  Cyan Theme:
+                </Text>
+                <CyberpunkToggle
+                  checked={cyberpunkToggleValue}
+                  onChange={setCyberpunkToggleValue}
+                  color="#00ffff"
+                  label="SYSTEM POWER"
+                />
+              </div>
+              <div>
+                <Text
+                  variant="caption"
+                  style={{ display: 'block', marginBottom: '1rem', color: '#ff00ff' }}
+                >
+                  Magenta Theme:
+                </Text>
+                <CyberpunkToggle
+                  checked={false}
+                  onChange={() => {}}
+                  color="#ff00ff"
+                  label="MAGENTA MODE"
+                />
+              </div>
+              <div>
+                <Text
+                  variant="caption"
+                  style={{ display: 'block', marginBottom: '1rem', color: '#00ff88' }}
+                >
+                  Green Theme:
+                </Text>
+                <CyberpunkToggle
+                  checked={false}
+                  onChange={() => {}}
+                  color="#00ff88"
+                  label="GREEN SIGNAL"
+                />
+              </div>
+            </Stack>
+          </ComponentSection>
+
+          <ComponentSection title="11d. LockSwitch (Lock/Unlock Toggle)">
+            <Stack
+              direction="row"
+              gap="2rem"
+              style={{ flexWrap: 'wrap', justifyContent: 'center' }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '1rem',
+                }}
+              >
+                <Text variant="caption" style={{ color: '#ff0000' }}>
+                  Locked (Red)
+                </Text>
+                <LockSwitch
+                  checked={lockSwitchValue}
+                  onChange={setLockSwitchValue}
+                  offColor="#ff0000"
+                  onColor="#00ff88"
+                />
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '1rem',
+                }}
+              >
+                <Text variant="caption" style={{ color: '#00ffff' }}>
+                  Unlocked (Cyan)
+                </Text>
+                <LockSwitch
+                  checked={true}
+                  onChange={() => {}}
+                  offColor="#ff0000"
+                  onColor="#00ffff"
+                />
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: '1rem',
+                }}
+              >
+                <Text variant="caption" style={{ color: '#ffff00' }}>
+                  Unlocked (Yellow)
+                </Text>
+                <LockSwitch
+                  checked={true}
+                  onChange={() => {}}
+                  offColor="#ff0000"
+                  onColor="#ffff00"
+                />
+              </div>
+            </Stack>
+          </ComponentSection>
+
+          <ComponentSection title="13. Slider">
             <Slider value={sliderValue} onChange={setSliderValue} min={0} max={100} />
             <Text>Value: {sliderValue}</Text>
           </ComponentSection>
-          <ComponentSection title="13. DatePicker">
+          <ComponentSection title="13b. NeonSlider (Animated Neon)">
+            <Stack direction="column" gap="2rem">
+              <div>
+                <Text
+                  variant="caption"
+                  style={{ display: 'block', marginBottom: '1rem', color: '#00ffff' }}
+                >
+                  Cyan Neon Slider:
+                </Text>
+                <NeonSlider
+                  value={neonSliderValue}
+                  onChange={setNeonSliderValue}
+                  min={0}
+                  max={100}
+                  color="#00ffff"
+                  colorOpacity="#00ffff1c"
+                  label="Volume"
+                  showValue={true}
+                />
+              </div>
+              <div>
+                <Text
+                  variant="caption"
+                  style={{ display: 'block', marginBottom: '1rem', color: '#ff00ff' }}
+                >
+                  Magenta Neon Slider:
+                </Text>
+                <NeonSlider
+                  value={60}
+                  onChange={() => {}}
+                  min={0}
+                  max={100}
+                  color="#ff00ff"
+                  colorOpacity="#ff00ff1c"
+                  label="Brightness"
+                  showValue={true}
+                />
+              </div>
+              <div>
+                <Text
+                  variant="caption"
+                  style={{ display: 'block', marginBottom: '1rem', color: '#00ff88' }}
+                >
+                  Green Neon Slider:
+                </Text>
+                <NeonSlider
+                  value={75}
+                  onChange={() => {}}
+                  min={0}
+                  max={100}
+                  color="#00ff88"
+                  colorOpacity="#00ff881c"
+                  label="Intensity"
+                  showValue={true}
+                />
+              </div>
+            </Stack>
+          </ComponentSection>
+          <ComponentSection title="14. DatePicker">
             <DatePicker value={dateValue} onChange={setDateValue} />
           </ComponentSection>
-          <ComponentSection title="14. ColorPicker">
+          <ComponentSection title="15. ColorPicker">
             <ColorPicker value={colorValue} onChange={setColorValue} />
           </ComponentSection>
-          <ComponentSection title="15. FileUpload">
+          <ComponentSection title="16. FileUpload">
             <FileUpload onUpload={setUploadedFiles} accept=".jpg,.png" />
           </ComponentSection>
-          <ComponentSection title="16. GlitchLoginForm (HUD Style)">
+          <ComponentSection title="17. GlitchLoginForm (HUD Style)">
             <div
               style={{
                 display: 'flex',
@@ -1240,7 +1992,38 @@ export const ShowcasePage: React.FC = () => {
               />
             </div>
           </ComponentSection>
-          <ComponentSection title="17. NeonRadio (HUD Style with Neon Effects)">
+          <ComponentSection title="16b. CyberLoginForm (Cyberpunk Style)">
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                background: 'rgba(41, 242, 223, 0.08)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(41, 242, 223, 0.2)',
+                padding: '2rem',
+                borderRadius: '8px',
+                minHeight: '400px',
+              }}
+            >
+              <CyberLoginForm
+                onSubmit={(data) => {
+                  console.log('Login:', data);
+                  showToast({
+                    type: 'success',
+                    message: 'Login Attempt',
+                    description: `User: ${data.username}`,
+                    duration: 3000,
+                  });
+                }}
+                usernamePlaceholder="نام کاربری"
+                passwordPlaceholder="رمز عبور"
+                buttonText="ورود"
+                primaryColor="#4090b5"
+                secondaryColor="#9e30a9"
+              />
+            </div>
+          </ComponentSection>
+          <ComponentSection title="18. NeonRadio (HUD Style with Neon Effects)">
             <div
               style={{
                 display: 'flex',
@@ -1271,7 +2054,7 @@ export const ShowcasePage: React.FC = () => {
       label: 'Navigation (5)',
       content: (
         <Stack direction="column" gap="2rem">
-          <ComponentSection title="18. Sidebar">
+          <ComponentSection title="19. Sidebar">
             <div
               style={{
                 height: '300px',
@@ -1284,13 +2067,13 @@ export const ShowcasePage: React.FC = () => {
               <Sidebar items={navItems} position="relative" />
             </div>
           </ComponentSection>
-          <ComponentSection title="19. Breadcrumb">
+          <ComponentSection title="20. Breadcrumb">
             <Breadcrumb items={breadcrumbItems} />
           </ComponentSection>
-          <ComponentSection title="20. Tabs">
+          <ComponentSection title="21. Tabs">
             <Text>Tabs component (you're using it now!)</Text>
           </ComponentSection>
-          <ComponentSection title="21. Menu">
+          <ComponentSection title="22. Menu">
             <div
               style={{
                 position: 'relative',
@@ -1303,7 +2086,7 @@ export const ShowcasePage: React.FC = () => {
               <Menu items={navItems} />
             </div>
           </ComponentSection>
-          <ComponentSection title="22. Pagination">
+          <ComponentSection title="23. Pagination">
             <Pagination
               total={100}
               perPage={10}
@@ -1318,7 +2101,7 @@ export const ShowcasePage: React.FC = () => {
       label: 'Data (3)',
       content: (
         <Stack direction="column" gap="2rem">
-          <ComponentSection title="23. Table">
+          <ComponentSection title="24. Table">
             <Table
               columns={[
                 { key: 'id', label: 'ID' },
@@ -1328,7 +2111,7 @@ export const ShowcasePage: React.FC = () => {
               data={tableData}
             />
           </ComponentSection>
-          <ComponentSection title="23b. HUD Table Variants (10 Types)">
+          <ComponentSection title="24b. HUD Table Variants (10 Types)">
             <Stack direction="column" gap="2rem">
               <div
                 style={{
@@ -1580,7 +2363,7 @@ export const ShowcasePage: React.FC = () => {
               </div>
             </Stack>
           </ComponentSection>
-          <ComponentSection title="24. DataGrid">
+          <ComponentSection title="25. DataGrid">
             <DataGrid
               columns={[
                 { key: 'id', label: 'ID' },
@@ -1591,10 +2374,10 @@ export const ShowcasePage: React.FC = () => {
               onSelectionChange={(rows) => setSelectedRows(rows as number[])}
             />
           </ComponentSection>
-          <ComponentSection title="25. Tree">
+          <ComponentSection title="26. Tree">
             <Tree nodes={treeData} onNodeClick={(node) => console.log(node)} />
           </ComponentSection>
-          <ComponentSection title="25b. CyberCard (HUD Style)">
+          <ComponentSection title="26b. CyberCard (HUD Style)">
             <div
               style={{ display: 'flex', gap: '2rem', justifyContent: 'center', flexWrap: 'wrap' }}
             >
@@ -1602,7 +2385,124 @@ export const ShowcasePage: React.FC = () => {
               <CyberCard title="CONTACT" footer="Connect" />
             </div>
           </ComponentSection>
-          <ComponentSection title="25c. GlitchProfileCard (GitHub Style)">
+          <ComponentSection title="26c. GlassCard (3D Glass Effect)">
+            <div
+              style={{ display: 'flex', gap: '2rem', justifyContent: 'center', flexWrap: 'wrap' }}
+            >
+              <GlassCard
+                title="Confirm"
+                body="Are you sure you want to proceed?"
+                primaryButtonText="Yes"
+                secondaryButtonText="No"
+              />
+              <GlassCard
+                title="Action"
+                body="Please confirm your choice"
+                primaryButtonText="Accept"
+                secondaryButtonText="Decline"
+                primaryColor="#00D9FF"
+                secondaryColor="#FF00FF"
+              />
+              <GlassCard
+                title="Delete?"
+                body="This cannot be undone"
+                primaryButtonText="Delete"
+                secondaryButtonText="Cancel"
+                primaryColor="#FF006E"
+                secondaryColor="#FF00FF"
+              />
+            </div>
+          </ComponentSection>
+          <ComponentSection title="26d. ThermostatCard (Interactive Thermostat)">
+            <Stack
+              direction="row"
+              gap="2rem"
+              style={{ flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}
+            >
+              <ThermostatCard
+                temperature={thermostatTemp}
+                color="#00f0ff"
+                label="CURRENT"
+                status="Comfort"
+                onChange={setThermostatTemp}
+              />
+              <ThermostatCard
+                temperature={thermostatTemp}
+                color="#ff00ff"
+                label="SYSTEM"
+                status="Active"
+                onChange={setThermostatTemp}
+              />
+              <ThermostatCard
+                temperature={thermostatTemp}
+                color="#00ff88"
+                label="TARGET"
+                status="Optimal"
+                onChange={setThermostatTemp}
+              />
+            </Stack>
+          </ComponentSection>
+          <ComponentSection title="26e. TerminalThemeSelector (Theme Switcher)">
+            <Stack direction="column" gap="2rem" style={{ alignItems: 'center' }}>
+              <TerminalThemeSelector onThemeChange={setTerminalTheme} />
+              <Text variant="caption" style={{ color: '#00ffff' }}>
+                Current Theme: {terminalTheme.toUpperCase()}
+              </Text>
+            </Stack>
+          </ComponentSection>
+          <ComponentSection title="26g. NotificationCard (Classic Style)">
+            <Stack direction="column" gap="2rem" style={{ alignItems: 'center' }}>
+              <NotificationCard
+                title="Clans of Clash"
+                message="Xhattmahs is not attacking your base!"
+                timestamp="12 min ago"
+              />
+            </Stack>
+          </ComponentSection>
+          <ComponentSection title="26h. HudNotificationCard (HUD Style)">
+            <Stack direction="column" gap="2rem" style={{ alignItems: 'center' }}>
+              <div>
+                <Text
+                  variant="caption"
+                  style={{ display: 'block', marginBottom: '1rem', color: '#00ffff' }}
+                >
+                  Cyan Theme:
+                </Text>
+                <HudNotificationCard
+                  title="SYSTEM ALERT"
+                  message="Threat detected in sector 7"
+                  color="#00ffff"
+                />
+              </div>
+              <div>
+                <Text
+                  variant="caption"
+                  style={{ display: 'block', marginBottom: '1rem', color: '#ff00ff' }}
+                >
+                  Magenta Theme:
+                </Text>
+                <HudNotificationCard
+                  title="WARNING"
+                  message="Unauthorized access attempt"
+                  color="#ff00ff"
+                />
+              </div>
+              <div>
+                <Text
+                  variant="caption"
+                  style={{ display: 'block', marginBottom: '1rem', color: '#00ff88' }}
+                >
+                  Green Theme:
+                </Text>
+                <HudNotificationCard
+                  title="SYSTEM OK"
+                  message="All systems operational"
+                  color="#00ff88"
+                />
+              </div>
+            </Stack>
+          </ComponentSection>
+          <ComponentSection title="26f. GlitchProfileCard (GitHub Style)">
             <div
               style={{ display: 'flex', gap: '2rem', justifyContent: 'center', flexWrap: 'wrap' }}
             >
@@ -1622,7 +2522,7 @@ export const ShowcasePage: React.FC = () => {
               />
             </div>
           </ComponentSection>
-          <ComponentSection title="25d. RadarHud (Military Radar Display)">
+          <ComponentSection title="26e. RadarHud (Military Radar Display)">
             <Text
               variant="body"
               style={{ marginBottom: '1.5rem', color: '#EF3EF1', textAlign: 'center' }}
@@ -1657,7 +2557,7 @@ export const ShowcasePage: React.FC = () => {
               />
             </div>
           </ComponentSection>
-          <ComponentSection title="25e. PipBoy (Fallout Style Terminal)">
+          <ComponentSection title="26f. PipBoy (Fallout Style Terminal)">
             <Text
               variant="body"
               style={{ marginBottom: '1.5rem', color: '#29F2DF', textAlign: 'center' }}
@@ -1696,7 +2596,7 @@ export const ShowcasePage: React.FC = () => {
               />
             </div>
           </ComponentSection>
-          <ComponentSection title="25f. Loader Components">
+          <ComponentSection title="26g. Loader Components">
             <Text variant="h4" color="#29F2DF" style={{ marginBottom: '1rem' }}>
               AbstergoLoader (Triangular Animation)
             </Text>
@@ -1768,6 +2668,123 @@ export const ShowcasePage: React.FC = () => {
                 <HackerLoader text="UPLOADING" color="#29F2DF" progress={50} />
               </div>
             </div>
+            <Text variant="h4" color="#29F2DF" style={{ marginBottom: '1rem', marginTop: '2rem' }}>
+              BinaryLoader (Binary Digits with Glitch)
+            </Text>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                padding: '3rem',
+                background: 'rgba(41, 242, 223, 0.08)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(41, 242, 223, 0.2)',
+                borderRadius: '8px',
+              }}
+            >
+              <BinaryLoader />
+            </div>
+            <Text variant="h4" color="#29F2DF" style={{ marginBottom: '1rem', marginTop: '2rem' }}>
+              Cube3DLoader (3D Cube with Neon Glow)
+            </Text>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                padding: '3rem',
+                background: 'rgba(41, 242, 223, 0.08)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(41, 242, 223, 0.2)',
+                borderRadius: '8px',
+              }}
+            >
+              <Cube3DLoader />
+            </div>
+            <Text variant="h4" color="#29F2DF" style={{ marginBottom: '1rem', marginTop: '2rem' }}>
+              InteractiveProgressLoader (3D Interactive with Hover Control)
+            </Text>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                padding: '3rem',
+                background: 'rgba(41, 242, 223, 0.08)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(41, 242, 223, 0.2)',
+                borderRadius: '8px',
+                minHeight: '500px',
+              }}
+            >
+              <InteractiveProgressLoader primaryColor="#29F2DF" />
+            </div>
+            <Text variant="h4" color="#29F2DF" style={{ marginBottom: '1rem', marginTop: '2rem' }}>
+              HackerLoaderBinary (Binary Ring with Glitch)
+            </Text>
+            <Stack
+              direction="row"
+              gap="2rem"
+              style={{ flexWrap: 'wrap', justifyContent: 'center' }}
+            >
+              <HackerLoaderBinary color="#00ff00" size={100} />
+              <HackerLoaderBinary color="#00ffff" size={100} />
+              <HackerLoaderBinary color="#ff00ff" size={100} />
+              <HackerLoaderBinary color="#ffff00" size={100} />
+            </Stack>
+            <Text variant="h4" color="#29F2DF" style={{ marginBottom: '1rem', marginTop: '2rem' }}>
+              ProgressLoader (Animated Progress Bar with Particles)
+            </Text>
+            <Stack
+              direction="row"
+              gap="2rem"
+              style={{ flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}
+            >
+              <ProgressLoader
+                progress={25}
+                color="#00f260"
+                accentColor="#0575e6"
+                showPercentage={true}
+                showParticles={true}
+              />
+              <ProgressLoader
+                progress={50}
+                color="#00ffff"
+                accentColor="#ff00ff"
+                showPercentage={true}
+                showParticles={true}
+              />
+              <ProgressLoader
+                progress={75}
+                color="#ffff00"
+                accentColor="#ff6600"
+                showPercentage={true}
+                showParticles={true}
+              />
+            </Stack>
+            <Text variant="h4" color="#29F2DF" style={{ marginBottom: '1rem', marginTop: '2rem' }}>
+              AIMatrixLoader (Matrix Digital Animation)
+            </Text>
+            <Stack
+              direction="row"
+              gap="2rem"
+              style={{ flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}
+            >
+              <AIMatrixLoader color="#00ff88" size={120} />
+              <AIMatrixLoader color="#00ffff" size={120} />
+              <AIMatrixLoader color="#ff00ff" size={120} />
+              <AIMatrixLoader color="#ffff00" size={120} />
+            </Stack>
+          </ComponentSection>
+          <ComponentSection title="24. ScrollingTextLoader (Scrolling Text Animation)">
+            <Stack
+              direction="row"
+              gap="2rem"
+              style={{ flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center' }}
+            >
+              <ScrollingTextLoader text="Loading" color="#00ffff" size={64} />
+              <ScrollingTextLoader text="Loading" color="#ff00ff" size={64} />
+              <ScrollingTextLoader text="Loading" color="#00ff88" size={64} />
+              <ScrollingTextLoader text="Loading" color="#ffff00" size={64} />
+            </Stack>
           </ComponentSection>
         </Stack>
       ),
@@ -1776,22 +2793,22 @@ export const ShowcasePage: React.FC = () => {
       label: 'Feedback (5)',
       content: (
         <Stack direction="column" gap="2rem">
-          <ComponentSection title="26. Modal">
+          <ComponentSection title="27. Modal">
             <Button onClick={() => setModalOpen(true)}>Open Modal</Button>
             <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title="Modal">
               <Text>Modal content</Text>
             </Modal>
           </ComponentSection>
-          <ComponentSection title="27. Dialog">
+          <ComponentSection title="28. Dialog">
             <Button onClick={() => setDialogOpen(true)}>Open Dialog</Button>
             <Dialog isOpen={dialogOpen} onClose={() => setDialogOpen(false)} title="Dialog">
               <Text>Dialog content</Text>
             </Dialog>
           </ComponentSection>
-          <ComponentSection title="28. Notification">
+          <ComponentSection title="29. Notification">
             <Notification type="success" message="Success notification!" />
           </ComponentSection>
-          <ComponentSection title="28b. GradientAlert (All Types)">
+          <ComponentSection title="29b. GradientAlert (All Types)">
             <Stack direction="column" gap="1.5rem" style={{ alignItems: 'center' }}>
               <GradientAlert
                 type="success"
@@ -1820,7 +2837,7 @@ export const ShowcasePage: React.FC = () => {
               />
             </Stack>
           </ComponentSection>
-          <ComponentSection title="28c. HUD Toast Notifications">
+          <ComponentSection title="29c. HUD Toast Notifications">
             <Text
               variant="body"
               style={{ marginBottom: '1rem', color: '#29F2DF', textAlign: 'center' }}
@@ -1913,17 +2930,17 @@ export const ShowcasePage: React.FC = () => {
       label: 'Utility (3)',
       content: (
         <Stack direction="column" gap="2rem">
-          <ComponentSection title="29. Tooltip">
+          <ComponentSection title="30. Tooltip">
             <Tooltip content="Helpful tip!">
               <Button>Hover me</Button>
             </Tooltip>
           </ComponentSection>
-          <ComponentSection title="30. Popover">
+          <ComponentSection title="31. Popover">
             <Popover content={<Text>Popover content</Text>} title="Info">
               <Button>Click me</Button>
             </Popover>
           </ComponentSection>
-          <ComponentSection title="31. Dropdown">
+          <ComponentSection title="32. Dropdown">
             <Dropdown
               items={[
                 { key: '1', label: 'Action 1', onClick: () => {} },
@@ -1933,6 +2950,41 @@ export const ShowcasePage: React.FC = () => {
               <Button>Menu</Button>
             </Dropdown>
           </ComponentSection>
+          <ComponentSection title="32b. CyberSupportTooltip (Support Dropdown)">
+            <Stack
+              direction="row"
+              gap="2rem"
+              style={{ flexWrap: 'wrap', justifyContent: 'center' }}
+            >
+              <CyberSupportTooltip
+                title="Support"
+                color="#00c1d5"
+                links={[
+                  { icon: '📞', label: '000-000-1111', href: 'tel:000-000-1111' },
+                  { icon: '🕐', label: '8:30AM - 5PM PST', href: '#' },
+                  { icon: '✉️', label: 'uiverse.io', href: 'mailto:support@uiverse.io' },
+                ]}
+              />
+              <CyberSupportTooltip
+                title="Help"
+                color="#00ff88"
+                links={[
+                  { icon: '❓', label: 'FAQ', href: '#' },
+                  { icon: '📚', label: 'Documentation', href: '#' },
+                  { icon: '💬', label: 'Chat Support', href: '#' },
+                ]}
+              />
+              <CyberSupportTooltip
+                title="Contact"
+                color="#ff00ff"
+                links={[
+                  { icon: '📧', label: 'Email Us', href: 'mailto:contact@example.com' },
+                  { icon: '🔗', label: 'Website', href: '#' },
+                  { icon: '🐦', label: 'Twitter', href: '#' },
+                ]}
+              />
+            </Stack>
+          </ComponentSection>
         </Stack>
       ),
     },
@@ -1940,7 +2992,7 @@ export const ShowcasePage: React.FC = () => {
       label: 'Advanced (5)',
       content: (
         <Stack direction="column" gap="2rem">
-          <ComponentSection title="32. Accordion">
+          <ComponentSection title="33. Accordion">
             <Accordion
               items={[
                 { key: '1', title: 'Section 1', content: 'Content 1' },
@@ -1948,7 +3000,7 @@ export const ShowcasePage: React.FC = () => {
               ]}
             />
           </ComponentSection>
-          <ComponentSection title="33. Stepper">
+          <ComponentSection title="34. Stepper">
             <Stepper
               steps={[
                 { key: '1', label: 'Step 1' },
@@ -1958,7 +3010,7 @@ export const ShowcasePage: React.FC = () => {
               currentStep={1}
             />
           </ComponentSection>
-          <ComponentSection title="34. Carousel">
+          <ComponentSection title="35. Carousel">
             <Carousel
               items={[
                 {
@@ -1982,7 +3034,7 @@ export const ShowcasePage: React.FC = () => {
               onIndexChange={setCarouselIndex}
             />
           </ComponentSection>
-          <ComponentSection title="35. CodeEditor">
+          <ComponentSection title="36. CodeEditor">
             <CodeEditor value={codeValue} onChange={setCodeValue} language="javascript" />
           </ComponentSection>
           <ComponentSection title="36. RichTextEditor">

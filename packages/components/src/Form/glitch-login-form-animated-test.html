@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GlitchLoginFormAnimated Test</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background: #0a0a0a;
+        color: #fff;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      h1 {
+        margin-bottom: 40px;
+        text-align: center;
+      }
+
+      .demo-section {
+        margin-bottom: 60px;
+        padding: 20px;
+        border: 1px solid #333;
+        border-radius: 8px;
+        background: #111;
+      }
+
+      .demo-section h2 {
+        margin-bottom: 20px;
+        font-size: 18px;
+        color: #7afbff;
+      }
+
+      .form-wrapper {
+        width: 100%;
+        height: 400px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #1a1a1a;
+        border-radius: 4px;
+        overflow: hidden;
+      }
+
+      /* Glitch Form Styles */
+      .glitch-form-container {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        font-style: italic;
+        font-weight: bold;
+        display: flex;
+        margin: auto;
+        aspect-ratio: 16/9;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 1em;
+        width: 100%;
+        height: 100%;
+      }
+
+      .input-container {
+        filter: drop-shadow(46px 36px 24px #4090b5) drop-shadow(-55px -40px 25px #9e30a9);
+        animation: blinkShadowsFilter 8s ease-in infinite;
+      }
+
+      .input-content {
+        display: grid;
+        align-content: center;
+        justify-items: center;
+        align-items: center;
+        text-align: center;
+        padding-inline: 1em;
+        position: relative;
+      }
+
+      .input-content::before {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        filter: blur(40px);
+        -webkit-clip-path: polygon(
+          26% 0,
+          66% 0,
+          92% 0,
+          100% 8%,
+          100% 89%,
+          91% 100%,
+          7% 100%,
+          0 92%,
+          0 0
+        );
+        clip-path: polygon(26% 0, 66% 0, 92% 0, 100% 8%, 100% 89%, 91% 100%, 7% 100%, 0 92%, 0 0);
+        background: rgba(122, 251, 255, 0.5568627451);
+        transition: all 1s ease-in-out;
+        z-index: 1;
+      }
+
+      .input-content::after {
+        content: '';
+        position: absolute;
+        width: 98%;
+        height: 98%;
+        box-shadow: inset 0px 0px 20px 20px #212121;
+        background:
+          repeating-linear-gradient(
+            to bottom,
+            transparent 0%,
+            rgba(64, 144, 181, 0.6) 1px,
+            rgb(0, 0, 0) 3px,
+            hsl(295, 60%, 12%) 5px,
+            #153544 4px,
+            transparent 0.5%
+          ),
+          repeating-linear-gradient(
+            to left,
+            hsl(295, 60%, 12%) 100%,
+            hsla(295, 60%, 12%, 0.99) 100%
+          );
+        -webkit-clip-path: polygon(
+          26% 0,
+          31% 5%,
+          61% 5%,
+          66% 0,
+          92% 0,
+          100% 8%,
+          100% 89%,
+          91% 100%,
+          7% 100%,
+          0 92%,
+          0 0
+        );
+        clip-path: polygon(
+          26% 0,
+          31% 5%,
+          61% 5%,
+          66% 0,
+          92% 0,
+          100% 8%,
+          100% 89%,
+          91% 100%,
+          7% 100%,
+          0 92%,
+          0 0
+        );
+        animation: backglitch 50ms linear infinite;
+        z-index: 2;
+      }
+
+      .input-dist {
+        z-index: 80;
+        display: grid;
+        align-items: center;
+        text-align: center;
+        width: 100%;
+        padding-inline: 1em;
+        padding-block: 1.2em;
+        grid-template-columns: 1fr;
+        position: relative;
+      }
+
+      .input-type {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: column;
+        gap: 1em;
+        font-size: 1.1rem;
+        background-color: transparent;
+        width: 100%;
+        border: none;
+      }
+
+      .input-is {
+        color: #fff;
+        font-size: 0.9rem;
+        background-color: transparent;
+        width: 100%;
+        box-sizing: border-box;
+        padding-inline: 0.5em;
+        padding-block: 0.7em;
+        border: none;
+        transition: all 1s ease-in-out;
+        border-bottom: 1px solid #4090b5;
+        font-family: inherit;
+      }
+
+      .input-is:hover {
+        background: linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(122, 251, 255, 0.2) 27%,
+          rgba(122, 251, 255, 0.2) 63%,
+          transparent 100%
+        );
+      }
+
+      .input-is:focus {
+        outline: none;
+        border-bottom: 1px solid #7afbff;
+        color: #7afbff;
+        background: linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(122, 251, 255, 0.2) 27%,
+          rgba(122, 251, 255, 0.2) 63%,
+          transparent 100%
+        );
+      }
+
+      .input-is::placeholder {
+        color: rgba(255, 255, 255, 0.806);
+      }
+
+      .input-content:focus-within::before {
+        background: hsla(0, 0%, 100%, 0.814);
+      }
+
+      .submit-button {
+        width: 50%;
+        border: none;
+        color: rgba(255, 255, 255, 0.806);
+        background: linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(122, 251, 255, 0.2) 27%,
+          rgba(122, 251, 255, 0.2) 63%,
+          transparent 100%
+        );
+        clip-path: polygon(0 0, 85% 0%, 100% 0, 100% 15%, 100% 90%, 91% 100%, 0 100%);
+        padding: 0.5em;
+        animation: blinkShadowsFilter 0.5s ease-in infinite;
+        transition: all 500ms;
+        cursor: pointer;
+        font-family: inherit;
+        font-weight: bold;
+      }
+
+      .submit-button:hover {
+        color: #fff;
+        font-size: medium;
+      }
+
+      .submit-button:active {
+        transform: scale(0.98);
+      }
+
+      @keyframes backglitch {
+        0% {
+          box-shadow: inset 0px 20px 20px 30px #212121;
+        }
+        50% {
+          box-shadow: inset 0px -20px 20px 30px hsl(297, 42%, 10%);
+        }
+        to {
+          box-shadow: inset 0px 20px 20px 30px #212121;
+        }
+      }
+
+      @keyframes blinkShadowsFilter {
+        0% {
+          filter: drop-shadow(46px 36px 28px rgba(64, 144, 181, 0.3411764706))
+            drop-shadow(-55px -40px 28px #9e30a9);
+        }
+        25% {
+          filter: drop-shadow(46px -36px 24px rgba(64, 144, 181, 0.8980392157))
+            drop-shadow(-55px 40px 24px #9e30a9);
+        }
+        50% {
+          filter: drop-shadow(46px 36px 30px rgba(64, 144, 181, 0.8980392157))
+            drop-shadow(-55px 40px 30px rgba(158, 48, 169, 0.2941176471));
+        }
+        75% {
+          filter: drop-shadow(20px -18px 25px rgba(64, 144, 181, 0.8980392157))
+            drop-shadow(-20px 20px 25px rgba(158, 48, 169, 0.2941176471));
+        }
+        to {
+          filter: drop-shadow(46px 36px 28px rgba(64, 144, 181, 0.3411764706))
+            drop-shadow(-55px -40px 28px #9e30a9);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>GlitchLoginFormAnimated Component Test</h1>
+
+      <div class="demo-section">
+        <h2>Dark Mode (Default)</h2>
+        <div class="form-wrapper">
+          <form class="glitch-form-container">
+            <div class="input-container">
+              <div class="input-content">
+                <div class="input-dist">
+                  <div class="input-type">
+                    <input class="input-is" type="text" required placeholder="User" />
+                    <input class="input-is" type="password" required placeholder="Password" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button class="submit-button" type="submit">Log in</button>
+          </form>
+        </div>
+      </div>
+
+      <div class="demo-section">
+        <h2>Neon Green Theme</h2>
+        <div class="form-wrapper" style="background: #0a1225">
+          <form
+            class="glitch-form-container"
+            style="--primary-color: #29f2df; --secondary-color: #1c7fa6; --accent-color: #29f2df"
+          >
+            <div
+              class="input-container"
+              style="
+                filter: drop-shadow(46px 36px 24px #29f2df) drop-shadow(-55px -40px 25px #1c7fa6);
+              "
+            >
+              <div class="input-content">
+                <div class="input-dist">
+                  <div class="input-type">
+                    <input
+                      class="input-is"
+                      type="text"
+                      required
+                      placeholder="User"
+                      style="border-bottom-color: #29f2df; color: #e0e0e0"
+                    />
+                    <input
+                      class="input-is"
+                      type="password"
+                      required
+                      placeholder="Password"
+                      style="border-bottom-color: #29f2df; color: #e0e0e0"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <button class="submit-button" type="submit" style="color: rgba(224, 224, 224, 0.806)">
+              Log in
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.querySelectorAll('form').forEach((form) => {
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const username = form.querySelector('input[type="text"]').value;
+          const password = form.querySelector('input[type="password"]').value;
+          console.log('Form submitted:', { username, password });
+          alert(`Login attempt:\nUsername: ${username}\nPassword: ${password}`);
+        });
+      });
+    </script>
+  </body>
+</html>

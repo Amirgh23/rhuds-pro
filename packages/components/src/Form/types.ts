@@ -152,3 +152,73 @@ export interface UseFormProps {
   /** Submit handler */
   onSubmit?: (values: Record<string, any>) => void | Promise<void>;
 }
+
+export interface CyberLoginFormProps {
+  /** Submit handler */
+  onSubmit?: (data: { username: string; password: string }) => void;
+
+  /** Username input placeholder */
+  usernamePlaceholder?: string;
+
+  /** Password input placeholder */
+  passwordPlaceholder?: string;
+
+  /** Submit button text */
+  buttonText?: string;
+
+  /** Primary color (default: #4090b5) */
+  primaryColor?: string;
+
+  /** Secondary color (default: #9e30a9) */
+  secondaryColor?: string;
+
+  /** Accent color (default: #7afbff) */
+  accentColor?: string;
+
+  /** Background color (default: #212121) */
+  backgroundColor?: string;
+
+  /** Text color (default: #fff) */
+  textColor?: string;
+
+  /** Border color (default: #4090b5) */
+  borderColor?: string;
+
+  /** Custom className */
+  className?: string;
+}
+
+export interface GlitchLoginFormAnimatedProps {
+  /** Submit handler */
+  onSubmit?: (data: { username: string; password: string }) => void;
+
+  /** Username input placeholder */
+  usernamePlaceholder?: string;
+
+  /** Password input placeholder */
+  passwordPlaceholder?: string;
+
+  /** Submit button text */
+  buttonText?: string;
+
+  /** Primary color (default: #4090b5) */
+  primaryColor?: string;
+
+  /** Secondary color (default: #9e30a9) */
+  secondaryColor?: string;
+
+  /** Accent color (default: #7afbff) */
+  accentColor?: string;
+
+  /** Background color (default: #212121) */
+  backgroundColor?: string;
+
+  /** Text color (default: #fff) */
+  textColor?: string;
+
+  /** Border color (default: #4090b5) */
+  borderColor?: string;
+
+  /** Custom className */
+  className?: string;
+}

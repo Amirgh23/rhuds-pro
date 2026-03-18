@@ -8,7 +8,6 @@ import {
   GlitchButton,
   Container,
   Input,
-  HackerInput,
   Select,
   Checkbox,
   HoloCheckbox,
@@ -22,15 +21,9 @@ import {
   Table,
   Tabs,
   Accordion,
-  Carousel,
   Stepper,
   DatePicker,
   ColorPicker,
-  Radio,
-  RadioGroup,
-  Sidebar,
-  Breadcrumb,
-  Menu,
   Pagination,
   Grid,
   CyberCard,
@@ -41,6 +34,14 @@ import {
   HudFrame,
   useNotification,
   NotificationProvider,
+  AddFriendInput,
+  VerificationCodeInput,
+  AnimatedLoadingText,
+  BinaryWaveLoader,
+  Radio,
+  Breadcrumb,
+  Win95MediaPlayer,
+  TubeAmplifier,
 } from '@rhuds/components';
 import { AnimatedBackground } from '../components/AnimatedBackground';
 import { ComponentPlayground } from '../components/ComponentPlayground';
@@ -50,16 +51,7 @@ import { GeometricWrapper } from '../components/GeometricWrapper';
 
 const PlaygroundContent: React.FC = () => {
   const notification = useNotification();
-  const location = useLocation();
   const { position, visible, closeMenu, handleNavigation, handleCopyInstall } = useContextMenu();
-
-  const isActive = (path: string) => location.pathname === path;
-
-  const appTheme = {
-    colors: {
-      primary: { main: '#29F2DF' },
-    },
-  };
 
   // States
   const [buttonVariant, setButtonVariant] = useState<
@@ -244,6 +236,55 @@ const PlaygroundContent: React.FC = () => {
           </GeometricWrapper>
         </ComponentPlayground>
 
+        {/* AddFriendInput */}
+        <ComponentPlayground
+          title="AddFriendInput Component"
+          description="Friend code input with animated verification"
+          code={`<AddFriendInput title="Add Friend" />`}
+        >
+          <GeometricWrapper
+            variant="angled"
+            color="#a974ff"
+            style={{
+              padding: '2rem',
+              background: 'rgba(0, 0, 0, 0.3)',
+              display: 'flex',
+              justifyContent: 'center',
+            }}
+          >
+            <AddFriendInput
+              title="Add Friend"
+              primaryColor="rgb(169, 116, 255)"
+              backgroundColor="rgb(36, 34, 39)"
+            />
+          </GeometricWrapper>
+        </ComponentPlayground>
+
+        {/* VerificationCodeInput */}
+        <ComponentPlayground
+          title="VerificationCodeInput Component"
+          description="6-digit code verification with paste support"
+          code={`<VerificationCodeInput length={6} />`}
+        >
+          <GeometricWrapper
+            variant="angled"
+            color="#00ff88"
+            style={{
+              padding: '2rem',
+              background: 'rgba(0, 0, 0, 0.3)',
+              display: 'flex',
+              justifyContent: 'center',
+            }}
+          >
+            <VerificationCodeInput
+              length={6}
+              primaryColor="rgb(0, 255, 136)"
+              backgroundColor="rgb(15, 15, 25)"
+              title="Enter Code"
+            />
+          </GeometricWrapper>
+        </ComponentPlayground>
+
         {/* Modal & Dialog */}
         <ComponentPlayground
           title="Modal & Dialog"
@@ -363,20 +404,20 @@ const PlaygroundContent: React.FC = () => {
         <ComponentPlayground
           title="Radio Component"
           description="Radio button group"
-          code={`<RadioGroup value={value} onChange={setValue} options={options} />`}
+          code={`<Radio options={options} onChange={setValue} />`}
         >
           <GeometricWrapper
             variant="notched"
             color="#4CC9F0"
             style={{ padding: '2rem', background: 'rgba(0, 0, 0, 0.3)' }}
           >
-            <RadioGroup
-              value={radioValue}
-              onChange={(v: string | number) => setRadioValue(String(v))}
+            <Radio
+              defaultValue="option1"
+              onChange={(v: string) => setRadioValue(v)}
               options={[
-                { label: 'Option 1', value: 'option1' },
-                { label: 'Option 2', value: 'option2' },
-                { label: 'Option 3', value: 'option3' },
+                { id: 'option1', label: 'Option 1' },
+                { id: 'option2', label: 'Option 2' },
+                { id: 'option3', label: 'Option 3' },
               ]}
             />
           </GeometricWrapper>
@@ -804,6 +845,92 @@ const PlaygroundContent: React.FC = () => {
               </div>
             </Stack>
           </GeometricWrapper>
+        </ComponentPlayground>
+
+        {/* Win95MediaPlayer */}
+        <ComponentPlayground
+          title="Win95MediaPlayer (Retro Media Player)"
+          description="Nostalgic Windows 95-style media player UI"
+          code={`<Win95MediaPlayer
+  trackName="track_01.wav"
+  currentTime="00:42"
+  totalDuration="03:17"
+  progress={21}
+  volume={75}
+  isPlaying={false}
+/>`}
+        >
+          <div
+            style={{
+              padding: '2rem',
+              background: '#c0c0c0',
+              borderRadius: '8px',
+              display: 'flex',
+              justifyContent: 'center',
+              gap: '2rem',
+              flexWrap: 'wrap',
+            }}
+          >
+            <Win95MediaPlayer
+              trackName="track_01.wav"
+              currentTime="00:42"
+              totalDuration="03:17"
+              progress={21}
+              volume={75}
+              isPlaying={false}
+            />
+            <Win95MediaPlayer
+              trackName="synthwave.wav"
+              currentTime="02:15"
+              totalDuration="05:30"
+              progress={42}
+              volume={85}
+              isPlaying={true}
+            />
+          </div>
+        </ComponentPlayground>
+
+        {/* TubeAmplifier */}
+        <ComponentPlayground
+          title="TubeAmplifier (Vintage Audio Equipment)"
+          description="Realistic tube amplifier UI with animated vacuum tubes and VU meters"
+          code={`<TubeAmplifier
+  brandName="FIDELITY 900"
+  isPowered={true}
+  leftChannelLevel={65}
+  rightChannelLevel={70}
+  volume={75}
+  tone={60}
+/>`}
+        >
+          <div
+            style={{
+              padding: '2rem',
+              background: '#050505',
+              borderRadius: '8px',
+              display: 'flex',
+              justifyContent: 'center',
+              gap: '2rem',
+              flexWrap: 'wrap',
+            }}
+          >
+            <TubeAmplifier
+              brandName="FIDELITY 900"
+              isPowered={true}
+              leftChannelLevel={65}
+              rightChannelLevel={70}
+              volume={75}
+              tone={60}
+            />
+            <TubeAmplifier
+              brandName="VINTAGE PRO"
+              isPowered={false}
+              leftChannelLevel={0}
+              rightChannelLevel={0}
+              volume={50}
+              tone={50}
+            />
+          </div>
         </ComponentPlayground>
 
         {/* Loader Components */}

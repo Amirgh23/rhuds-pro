@@ -1,0 +1,230 @@
+import React, { useState } from 'react';
+import styled from 'styled-components';
+
+export interface GlowingNeonCheckboxProps {
+  checked?: boolean;
+  onChange?: (checked: boolean) => void;
+  label?: string;
+  color?: string;
+  className?: string;
+  disabled?: boolean;
+}
+
+const GlowingNeonCheckbox: React.FC<GlowingNeonCheckboxProps> = ({
+  checked = false,
+  onChange,
+  label = 'Neon Checkbox',
+  color = '#00ff88',
+  className,
+  disabled = false,
+}) => {
+  const [isChecked, setIsChecked] = useState(checked);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (disabled) return;
+    const newChecked = e.target.checked;
+    setIsChecked(newChecked);
+    onChange?.(newChecked);
+  };
+
+  // Calculate complementary color for gradient
+  const getComplementaryColor = (hex: string): string => {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `#${(255 - r).toString(16).padStart(2, '0')}${(255 - g).toString(16).padStart(2, '0')}${(255 - b).toString(16).padStart(2, '0')}`;
+  };
+
+  const complementaryColor = getComplementaryColor(color);
+
+  return (
+    <StyledWrapper className={className} $color={color} $complementaryColor={complementaryColor}>
+      <label className="checkbox-wrapper">
+        <input type="checkbox" checked={isChecked} onChange={handleChange} disabled={disabled} />
+        <div className="checkmark">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path
+              d="M20 6L9 17L4 12"
+              strokeWidth={3}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </div>
+        <span className="label">{label}</span>
+      </label>
+    </StyledWrapper>
+  );
+};
+
+const StyledWrapper = styled.div<{ $color: string; $complementaryColor: string }>`
+  .checkbox-wrapper {
+    --checkbox-size: 25px;
+    --checkbox-color: ${(props) => props.$color};
+    --checkbox-shadow: ${(props) => {
+      const color = props.$color;
+      const r = parseInt(color.slice(1, 3), 16);
+      const g = parseInt(color.slice(3, 5), 16);
+      const b = parseInt(color.slice(5, 7), 16);
+      return `rgba(${r}, ${g}, ${b}, 0.3)`;
+    }};
+    --checkbox-border: ${(props) => {
+      const color = props.$color;
+      const r = parseInt(color.slice(1, 3), 16);
+      const g = parseInt(color.slice(3, 5), 16);
+      const b = parseInt(color.slice(5, 7), 16);
+      return `rgba(${r}, ${g}, ${b}, 0.7)`;
+    }};
+    display: flex;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+    padding: 10px;
+  }
+
+  .checkbox-wrapper input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+  }
+
+  .checkbox-wrapper input:disabled ~ .checkmark {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .checkbox-wrapper .checkmark {
+    position: relative;
+    width: var(--checkbox-size);
+    height: var(--checkbox-size);
+    border: 2px solid var(--checkbox-border);
+    border-radius: 8px;
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 15px var(--checkbox-shadow);
+    overflow: hidden;
+  }
+
+  .checkbox-wrapper .checkmark::before {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      45deg,
+      var(--checkbox-color),
+      ${(props) => props.$complementaryColor}
+    );
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    transform: scale(0) rotate(-45deg);
+  }
+
+  .checkbox-wrapper input:checked ~ .checkmark::before {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+
+  .checkbox-wrapper .checkmark svg {
+    width: 0;
+    height: 0;
+    color: #1a1a1a;
+    z-index: 1;
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.5));
+  }
+
+  .checkbox-wrapper input:checked ~ .checkmark svg {
+    width: 18px;
+    height: 18px;
+    transform: rotate(360deg);
+  }
+
+  .checkbox-wrapper:hover .checkmark {
+    border-color: var(--checkbox-color);
+    transform: scale(1.1);
+    box-shadow:
+      0 0 20px var(--checkbox-shadow),
+      0 0 40px var(--checkbox-shadow),
+      inset 0 0 10px var(--checkbox-shadow);
+  }
+
+  .checkbox-wrapper input:checked ~ .checkmark {
+    animation: pulse 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+      box-shadow: 0 0 20px var(--checkbox-shadow);
+    }
+    50% {
+      transform: scale(0.9);
+      box-shadow:
+        0 0 30px var(--checkbox-shadow),
+        0 0 50px var(--checkbox-shadow);
+    }
+    100% {
+      transform: scale(1);
+      box-shadow: 0 0 20px var(--checkbox-shadow);
+    }
+  }
+
+  .checkbox-wrapper .label {
+    margin-left: 15px;
+    font-family: 'Segoe UI', sans-serif;
+    color: var(--checkbox-color);
+    font-size: 18px;
+    text-shadow: 0 0 10px var(--checkbox-shadow);
+    opacity: 0.9;
+    transition: all 0.3s;
+    user-select: none;
+  }
+
+  .checkbox-wrapper:hover .label {
+    opacity: 1;
+    transform: translateX(5px);
+  }
+
+  /* Glowing dots animation */
+  .checkbox-wrapper::after,
+  .checkbox-wrapper::before {
+    content: '';
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--checkbox-color);
+    opacity: 0;
+    transition: all 0.5s;
+  }
+
+  .checkbox-wrapper::before {
+    left: -10px;
+    top: 50%;
+  }
+
+  .checkbox-wrapper::after {
+    right: -10px;
+    top: 50%;
+  }
+
+  .checkbox-wrapper:hover::before {
+    opacity: 1;
+    transform: translateX(-10px);
+    box-shadow: 0 0 10px var(--checkbox-color);
+  }
+
+  .checkbox-wrapper:hover::after {
+    opacity: 1;
+    transform: translateX(10px);
+    box-shadow: 0 0 10px var(--checkbox-color);
+  }
+`;
+
+export default GlowingNeonCheckbox;
