@@ -8,6 +8,9 @@ import { PlaygroundConsole } from './playground/PlaygroundConsole';
 import { PerformanceMonitor } from './playground/PerformanceMonitor';
 import { useConsoleCapture, ConsoleMessage } from './playground/hooks/useConsoleCapture';
 import { usePerformanceMonitor } from './playground/hooks/usePerformanceMonitor';
+import { useContextMenu } from '../hooks/useContextMenu';
+import { GlassContextMenu } from '../components/GlassContextMenu';
+import { useNavigate } from 'react-router-dom';
 
 const DEFAULT_CODE = `export default function Example() {
   return (
@@ -28,6 +31,8 @@ const DEFAULT_CODE = `export default function Example() {
 const STORAGE_KEY = 'rhuds-playground-code';
 
 export default function InteractivePlayground() {
+  const navigate = useNavigate();
+  const { position, visible, closeMenu, handleNavigation, handleCopyInstall } = useContextMenu();
   const [code, setCode] = useState<string>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -126,6 +131,17 @@ export default function InteractivePlayground() {
 
   return (
     <div className={`playground ${theme} ${fullscreen ? 'fullscreen' : ''}`}>
+      {/* Context Menu */}
+      {visible && position && (
+        <GlassContextMenu
+          x={position.x}
+          y={position.y}
+          onClose={closeMenu}
+          onNavigate={handleNavigation}
+          onCopyInstall={handleCopyInstall}
+        />
+      )}
+
       {/* Header */}
       <div className="playground-header">
         <div className="playground-title">

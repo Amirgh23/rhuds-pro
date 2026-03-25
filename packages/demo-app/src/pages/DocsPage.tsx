@@ -21,7 +21,6 @@ import {
   Tabs,
   Accordion,
   Radio,
-  RadioGroup,
   Breadcrumb,
   Pagination,
   Grid,
@@ -1228,16 +1227,10 @@ function MyComponent() {
             {selectedDoc === 'radio' && (
               <ComponentPlayground
                 title="Radio Example"
-                description="Radio group"
-                code={`<RadioGroup options={options} />`}
+                description="Radio button"
+                code={`<Radio label="Option 1" />`}
               >
-                <RadioGroup
-                  value="option1"
-                  options={[
-                    { label: 'Option 1', value: 'option1' },
-                    { label: 'Option 2', value: 'option2' },
-                  ]}
-                />
+                <Radio label="Option 1" value="option1" />
               </ComponentPlayground>
             )}
 

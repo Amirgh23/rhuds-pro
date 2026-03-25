@@ -18,9 +18,9 @@ body {
   overflow-x: hidden;
   max-width: 100vw;
   width: 100%;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell',
+    'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -81,15 +81,15 @@ main {
 /* Responsive scaling for fixed-width elements on mobile */
 @media (max-width: 480px) {
   /* Scale down HUD Frame Generator on mobile */
-  [style*="width: 384px"],
-  [style*="width:384px"] {
+  [style*='width: 384px'],
+  [style*='width:384px'] {
     width: 100% !important;
     max-width: 384px !important;
   }
-  
+
   /* Ensure all grids are mobile-friendly */
-  [style*="display: grid"],
-  [style*="display:grid"] {
+  [style*='display: grid'],
+  [style*='display:grid'] {
     grid-template-columns: 1fr !important;
   }
 }
