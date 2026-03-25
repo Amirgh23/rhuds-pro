@@ -1,15 +1,162 @@
 # Animation Guide
 
-Master the RHUDS animation system for creating smooth, performant animations.
+Master the RHUDS animation system for creating smooth, performant animations, including Cold War tactical effects.
 
 ## Overview
 
 RHUDS provides a comprehensive animation system with:
+
 - Declarative animations
 - Physics-based motion
 - Gesture support
 - Scroll animations
 - Performance optimization
+- Cold War tactical effects (CRT flicker, scanlines, glitch)
+
+## Cold War Animations
+
+### Tactical Easing Curves
+
+Cold War animations use custom easing curves optimized for tactical military aesthetics:
+
+```typescript
+// Tactical Easing - Bouncy, energetic
+cubic - bezier(0.68, -0.55, 0.265, 1.55);
+
+// Snappy Easing - Quick, responsive
+cubic - bezier(0.34, 1.56, 0.64, 1);
+
+// Smooth Easing - Fluid, natural
+cubic - bezier(0.25, 0.46, 0.45, 0.94);
+```
+
+### Tactical Timing Values
+
+```css
+:root {
+  --cw-timing-fast: 100ms; /* Quick interactions */
+  --cw-timing-normal: 150ms; /* Standard transitions */
+  --cw-timing-slow: 250ms; /* Emphasis animations */
+}
+```
+
+### CRT Flicker Effect
+
+Simulate CRT monitor flicker:
+
+```css
+@keyframes crt-flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.99;
+  }
+}
+
+.crt-element {
+  animation: crt-flicker 150ms ease-in-out infinite;
+}
+```
+
+### Scanline Pulse Effect
+
+Animate scanlines for authentic CRT feel:
+
+```css
+@keyframes scanline-pulse {
+  0%,
+  100% {
+    opacity: 0.15;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+.scanlines {
+  animation: scanline-pulse 3s ease-in-out infinite;
+}
+```
+
+### Glitch Animation
+
+Tactical glitch effect for emphasis:
+
+```css
+@keyframes glitch {
+  0% {
+    transform: translate(0);
+  }
+  20% {
+    transform: translate(-2px, 2px);
+  }
+  40% {
+    transform: translate(-2px, -2px);
+  }
+  60% {
+    transform: translate(2px, 2px);
+  }
+  80% {
+    transform: translate(2px, -2px);
+  }
+  100% {
+    transform: translate(0);
+  }
+}
+
+.glitch-element {
+  animation: glitch 100ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+```
+
+### Button Hover Animation
+
+Tactical button hover effect:
+
+```css
+@keyframes button-hover {
+  0% {
+    box-shadow: 0 0 10px rgba(255, 176, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 176, 0, 0.6);
+  }
+  100% {
+    box-shadow: 0 0 10px rgba(255, 176, 0, 0.3);
+  }
+}
+
+.button:hover {
+  animation: button-hover 300ms ease-in-out;
+}
+```
+
+### Using Cold War Animations in Components
+
+```tsx
+import { ColdWarButton } from '@rhuds/components';
+
+function TacticalUI() {
+  return (
+    <>
+      {/* Glow effect */}
+      <ColdWarButton variant="primary" glow>
+        Tactical System
+      </ColdWarButton>
+
+      {/* Scanlines effect */}
+      <ColdWarButton variant="primary" scanlines>
+        Scan Area
+      </ColdWarButton>
+
+      {/* Glitch variant */}
+      <ColdWarButton variant="glitch">Execute Protocol</ColdWarButton>
+    </>
+  );
+}
+```
 
 ## Basic Animations
 
@@ -53,7 +200,7 @@ import { useAnimator } from '@rhuds/core';
 function AnimatedComponent() {
   const animator = useAnimator();
   const [isVisible, setIsVisible] = useState(false);
-  
+
   useEffect(() => {
     if (isVisible) {
       animator.animate({
@@ -64,7 +211,7 @@ function AnimatedComponent() {
       });
     }
   }, [isVisible]);
-  
+
   return <div ref={animator.ref}>Content</div>;
 }
 ```
@@ -84,13 +231,13 @@ const fadeIn = createAnimation({
 });
 
 const slideUp = createAnimation({
-  from: { 
-    opacity: 0, 
-    transform: 'translateY(20px)' 
+  from: {
+    opacity: 0,
+    transform: 'translateY(20px)',
   },
-  to: { 
-    opacity: 1, 
-    transform: 'translateY(0)' 
+  to: {
+    opacity: 1,
+    transform: 'translateY(0)',
   },
   duration: 400,
   easing: 'ease-out',
@@ -115,46 +262,46 @@ RHUDS provides 20+ easing functions:
 
 ```tsx
 // Basic
-'linear'
-'ease'
-'ease-in'
-'ease-out'
-'ease-in-out'
+'linear';
+'ease';
+'ease-in';
+'ease-out';
+'ease-in-out';
 
 // Quadratic
-'ease-in-quad'
-'ease-out-quad'
-'ease-in-out-quad'
+'ease-in-quad';
+'ease-out-quad';
+'ease-in-out-quad';
 
 // Cubic
-'ease-in-cubic'
-'ease-out-cubic'
-'ease-in-out-cubic'
+'ease-in-cubic';
+'ease-out-cubic';
+'ease-in-out-cubic';
 
 // Quartic
-'ease-in-quart'
-'ease-out-quart'
-'ease-in-out-quart'
+'ease-in-quart';
+'ease-out-quart';
+'ease-in-out-quart';
 
 // Quintic
-'ease-in-quint'
-'ease-out-quint'
-'ease-in-out-quint'
+'ease-in-quint';
+'ease-out-quint';
+'ease-in-out-quint';
 
 // Exponential
-'ease-in-expo'
-'ease-out-expo'
-'ease-in-out-expo'
+'ease-in-expo';
+'ease-out-expo';
+'ease-in-out-expo';
 
 // Circular
-'ease-in-circ'
-'ease-out-circ'
-'ease-in-out-circ'
+'ease-in-circ';
+'ease-out-circ';
+'ease-in-out-circ';
 
 // Back
-'ease-in-back'
-'ease-out-back'
-'ease-in-out-back'
+'ease-in-back';
+'ease-out-back';
+'ease-in-out-back';
 ```
 
 ### Using Easing Functions
@@ -179,12 +326,8 @@ function SpringComponent() {
     damping: 10,
     mass: 1,
   });
-  
-  return (
-    <div style={{ transform: `translateX(${animated}px)` }}>
-      Spring animated
-    </div>
-  );
+
+  return <div style={{ transform: `translateX(${animated}px)` }}>Spring animated</div>;
 }
 ```
 
@@ -192,9 +335,9 @@ function SpringComponent() {
 
 ```tsx
 const springConfig = {
-  stiffness: 100,  // Higher = faster
-  damping: 10,     // Higher = less bouncy
-  mass: 1,         // Higher = slower
+  stiffness: 100, // Higher = faster
+  damping: 10, // Higher = less bouncy
+  mass: 1, // Higher = slower
 };
 ```
 
@@ -207,11 +350,11 @@ import { useDrag } from '@rhuds/core';
 
 function DraggableComponent() {
   const { bind, x, y } = useDrag();
-  
+
   return (
-    <div 
-      {...bind()} 
-      style={{ 
+    <div
+      {...bind()}
+      style={{
         transform: `translate(${x}px, ${y}px)`,
         cursor: 'grab',
       }}
@@ -229,12 +372,9 @@ import { usePinch } from '@rhuds/core';
 
 function ZoomableComponent() {
   const { bind, scale } = usePinch();
-  
+
   return (
-    <div 
-      {...bind()} 
-      style={{ transform: `scale(${scale})` }}
-    >
+    <div {...bind()} style={{ transform: `scale(${scale})` }}>
       Pinch to zoom
     </div>
   );
@@ -254,12 +394,8 @@ function ScrollComponent() {
     to: { opacity: 1, y: 0 },
     threshold: 0.5,
   });
-  
-  return (
-    <div ref={ref}>
-      Animates when scrolled into view
-    </div>
-  );
+
+  return <div ref={ref}>Animates when scrolled into view</div>;
 }
 ```
 
@@ -270,12 +406,8 @@ import { useParallax } from '@rhuds/core';
 
 function ParallaxComponent() {
   const ref = useParallax({ speed: 0.5 });
-  
-  return (
-    <div ref={ref}>
-      Parallax background
-    </div>
-  );
+
+  return <div ref={ref}>Parallax background</div>;
 }
 ```
 
@@ -288,15 +420,11 @@ import { Animator } from '@rhuds/core';
 
 function StaggeredList() {
   const items = ['Item 1', 'Item 2', 'Item 3'];
-  
+
   return (
     <div>
       {items.map((item, index) => (
-        <Animator 
-          key={index}
-          animate
-          delay={index * 100}
-        >
+        <Animator key={index} animate delay={index * 100}>
           <div>{item}</div>
         </Animator>
       ))}
@@ -319,12 +447,8 @@ function SequenceComponent() {
     { transform: 'scale(1.2)', duration: 200 },
     { transform: 'scale(1)', duration: 200 },
   ]);
-  
-  return (
-    <div style={sequence.style}>
-      Animated sequence
-    </div>
-  );
+
+  return <div style={sequence.style}>Animated sequence</div>;
 }
 ```
 
@@ -336,13 +460,13 @@ Prefer `transform` and `opacity` for best performance:
 
 ```tsx
 // Good - GPU accelerated
-<Animator 
+<Animator
   from={{ opacity: 0, transform: 'translateY(20px)' }}
   to={{ opacity: 1, transform: 'translateY(0)' }}
 />
 
 // Avoid - triggers layout
-<Animator 
+<Animator
   from={{ top: 20 }}
   to={{ top: 0 }}
 />
@@ -351,9 +475,7 @@ Prefer `transform` and `opacity` for best performance:
 ### Will-Change Hint
 
 ```tsx
-<div style={{ willChange: 'transform, opacity' }}>
-  Optimized for animation
-</div>
+<div style={{ willChange: 'transform, opacity' }}>Optimized for animation</div>
 ```
 
 ### Reduce Motion
@@ -365,7 +487,7 @@ import { usePrefersReducedMotion } from '@rhuds/core';
 
 function AccessibleAnimation() {
   const prefersReducedMotion = usePrefersReducedMotion();
-  
+
   return (
     <Animator animate={!prefersReducedMotion}>
       <div>Respects motion preferences</div>
@@ -446,7 +568,7 @@ const rotateIn = {
 ```tsx
 function AnimatedButton() {
   const [isHovered, setIsHovered] = useState(false);
-  
+
   return (
     <button
       onMouseEnter={() => setIsHovered(true)}
@@ -468,9 +590,7 @@ function AnimatedButton() {
 function AnimatedModal({ isOpen }) {
   return (
     <Animator animate={isOpen}>
-      <div className="modal">
-        Modal content
-      </div>
+      <div className="modal">Modal content</div>
     </Animator>
   );
 }

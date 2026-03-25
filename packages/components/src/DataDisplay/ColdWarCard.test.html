@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ColdWarCard Enhanced Effects Test</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background: #050508;
+        color: #fff;
+        font-family: 'Share Tech Mono', 'Courier New', monospace;
+        padding: 40px;
+        min-height: 100vh;
+      }
+
+      h1 {
+        color: #ffb000;
+        margin-bottom: 10px;
+        font-size: 28px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+      }
+
+      .subtitle {
+        color: #888;
+        margin-bottom: 30px;
+        font-size: 14px;
+      }
+
+      .test-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 30px;
+        margin-top: 20px;
+      }
+
+      .test-card {
+        position: relative;
+        padding: 24px;
+        min-height: 200px;
+        border: 1px solid #ffb000;
+        clip-path: polygon(
+          0 10px,
+          10px 0,
+          calc(100% - 10px) 0,
+          100% 10px,
+          100% calc(100% - 10px),
+          calc(100% - 10px) 100%,
+          10px 100%,
+          0 calc(100% - 10px)
+        );
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .test-card:hover {
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: 0 10px 30px rgba(255, 176, 0, 0.3);
+      }
+
+      /* ═══════════════════════════════════════════════════════════════════
+         TACTICAL VARIANT - Military Grid Pattern
+         ═══════════════════════════════════════════════════════════════════ */
+      .tactical {
+        background: linear-gradient(135deg, rgba(10, 10, 20, 0.95) 0%, rgba(10, 10, 20, 0.85) 100%);
+      }
+
+      .tactical .effect-overlay {
+        background:
+          repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 9px,
+            rgba(255, 176, 0, 0.15) 9px,
+            rgba(255, 176, 0, 0.15) 10px
+          ),
+          repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 9px,
+            rgba(255, 176, 0, 0.15) 9px,
+            rgba(255, 176, 0, 0.15) 10px
+          ),
+          repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(255, 255, 255, 0.03) 2px,
+            rgba(255, 255, 255, 0.03) 3px
+          ),
+          repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 2px,
+            rgba(255, 255, 255, 0.03) 2px,
+            rgba(255, 255, 255, 0.03) 3px
+          );
+        background-size:
+          10px 10px,
+          10px 10px,
+          3px 3px,
+          3px 3px;
+        opacity: 0.8;
+        mix-blend-mode: screen;
+      }
+
+      /* ═══════════════════════════════════════════════════════════════════
+         GLASS VARIANT - Frosted Glass Effect
+         ═══════════════════════════════════════════════════════════════════ */
+      .glass {
+        background: rgba(10, 10, 20, 0.6);
+        backdrop-filter: blur(10px);
+        border-color: rgba(255, 176, 0, 0.3);
+      }
+
+      .glass .effect-overlay {
+        backdrop-filter: blur(8px) saturate(180%) brightness(1.15);
+        background:
+          radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
+          radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+          linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.12) 0%,
+            rgba(255, 255, 255, 0.02) 50%,
+            transparent 100%
+          ),
+          linear-gradient(225deg, rgba(255, 255, 255, 0.08) 0%, transparent 50%);
+        box-shadow:
+          inset 1px 1px 2px rgba(255, 255, 255, 0.3),
+          inset -1px -1px 2px rgba(0, 0, 0, 0.2);
+        opacity: 0.95;
+      }
+
+      /* ═══════════════════════════════════════════════════════════════════
+         NOTIFICATION VARIANT - Pulsing Alert Glow
+         ═══════════════════════════════════════════════════════════════════ */
+      .notification {
+        background: linear-gradient(135deg, rgba(10, 10, 20, 0.95) 0%, rgba(10, 10, 20, 0.85) 100%);
+        border-left: 4px solid #33ff00;
+        border-color: #33ff00;
+      }
+
+      .notification .effect-overlay {
+        background:
+          radial-gradient(
+            circle at 50% 50%,
+            rgba(51, 255, 0, 0.25) 0%,
+            rgba(51, 255, 0, 0.1) 40%,
+            transparent 70%
+          ),
+          radial-gradient(circle at 30% 30%, rgba(51, 255, 0, 0.15) 0%, transparent 50%),
+          radial-gradient(circle at 70% 70%, rgba(51, 255, 0, 0.15) 0%, transparent 50%);
+        box-shadow:
+          inset 0 0 40px rgba(51, 255, 0, 0.3),
+          inset 0 0 20px rgba(51, 255, 0, 0.2),
+          inset 4px 0 10px rgba(51, 255, 0, 0.4);
+        opacity: 0.85;
+        animation: pulse-glow 2s ease-in-out infinite;
+      }
+
+      /* ═══════════════════════════════════════════════════════════════════
+         DATA VARIANT - CRT Scanlines
+         ═══════════════════════════════════════════════════════════════════ */
+      .data {
+        background: linear-gradient(135deg, rgba(10, 10, 20, 0.98) 0%, rgba(10, 10, 20, 0.92) 100%);
+        border-color: #00ccff;
+      }
+
+      .data .effect-overlay {
+        background: repeating-linear-gradient(
+          0deg,
+          rgba(0, 204, 255, 0.25) 0px,
+          rgba(0, 204, 255, 0.25) 1px,
+          rgba(0, 0, 0, 0.4) 1px,
+          rgba(0, 0, 0, 0.4) 2px
+        );
+        box-shadow:
+          inset 0 0 40px rgba(0, 204, 255, 0.3),
+          inset 0 0 20px rgba(0, 204, 255, 0.2);
+        opacity: 1;
+      }
+
+      /* ═══════════════════════════════════════════════════════════════════
+         MINIMAL VARIANT - Subtle Film Grain
+         ═══════════════════════════════════════════════════════════════════ */
+      .minimal {
+        background: transparent;
+        border-style: dashed;
+        border-color: rgba(255, 176, 0, 0.3);
+      }
+
+      .minimal .effect-overlay {
+        background:
+          repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 1px,
+            rgba(255, 255, 255, 0.015) 1px,
+            rgba(255, 255, 255, 0.015) 2px
+          ),
+          repeating-linear-gradient(
+            -45deg,
+            transparent,
+            transparent 1px,
+            rgba(255, 255, 255, 0.01) 1px,
+            rgba(255, 255, 255, 0.01) 2px
+          );
+        background-size:
+          3px 3px,
+          3px 3px;
+        opacity: 0.4;
+        filter: contrast(1.1);
+      }
+
+      /* ═══════════════════════════════════════════════════════════════════
+         ANIMATIONS
+         ═══════════════════════════════════════════════════════════════════ */
+      @keyframes pulse-glow {
+        0%,
+        100% {
+          opacity: 0.85;
+          filter: brightness(1);
+        }
+        50% {
+          opacity: 1;
+          filter: brightness(1.2);
+        }
+      }
+
+      /* ═══════════════════════════════════════════════════════════════════
+         COMMON STYLES
+         ═══════════════════════════════════════════════════════════════════ */
+      .effect-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      .card-content {
+        position: relative;
+        z-index: 2;
+      }
+
+      h3 {
+        margin: 0 0 12px 0;
+        font-size: 16px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      .tactical h3 {
+        color: #ffb000;
+      }
+      .glass h3 {
+        color: #00ccff;
+      }
+      .notification h3 {
+        color: #33ff00;
+      }
+      .data h3 {
+        color: #00ccff;
+      }
+      .minimal h3 {
+        color: #ffb000;
+      }
+
+      p {
+        margin: 0 0 8px 0;
+        font-size: 13px;
+        opacity: 0.8;
+        line-height: 1.6;
+      }
+
+      .feature-list {
+        margin-top: 12px;
+        padding-left: 20px;
+        font-size: 12px;
+        opacity: 0.7;
+      }
+
+      .feature-list li {
+        margin-bottom: 4px;
+      }
+
+      .info-box {
+        margin-top: 40px;
+        padding: 24px;
+        border: 2px dashed #ffb000;
+        border-radius: 4px;
+        background: rgba(255, 176, 0, 0.05);
+      }
+
+      .info-box h2 {
+        color: #ffb000;
+        margin-bottom: 16px;
+        font-size: 20px;
+      }
+
+      .info-box ul {
+        list-style: none;
+        padding: 0;
+      }
+
+      .info-box li {
+        margin-bottom: 12px;
+        padding-left: 24px;
+        position: relative;
+        line-height: 1.6;
+      }
+
+      .info-box li:before {
+        content: '▸';
+        position: absolute;
+        left: 0;
+        color: #ffb000;
+      }
+
+      .info-box strong {
+        color: #ffb000;
+      }
+
+      .warning {
+        margin-top: 20px;
+        padding: 12px;
+        background: rgba(255, 176, 0, 0.1);
+        border-left: 4px solid #ffb000;
+        font-size: 13px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🎬 ColdWarCard Enhanced Effects Test</h1>
+    <p class="subtitle">تست افکت‌های پیشرفته CSS برای تمام variant های کارت Cold War</p>
+
+    <div class="test-grid">
+      <!-- TACTICAL -->
+      <div class="test-card tactical">
+        <div class="effect-overlay"></div>
+        <div class="card-content">
+          <h3>1. TACTICAL</h3>
+          <p>🎯 Military Grid Pattern</p>
+          <p>الگوی شبکه نظامی با crosshair</p>
+          <ul class="feature-list">
+            <li>Grid 10x10px با accent color</li>
+            <li>Fine grid 3x3px برای جزئیات</li>
+            <li>Mix-blend-mode: screen</li>
+            <li>Opacity: 0.8</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- GLASS -->
+      <div class="test-card glass">
+        <div class="effect-overlay"></div>
+        <div class="card-content">
+          <h3>2. GLASS</h3>
+          <p>💎 Frosted Glass Refraction</p>
+          <p>شیشه مات با شکست نور</p>
+          <ul class="feature-list">
+            <li>Backdrop-filter: blur(8px)</li>
+            <li>Multiple radial gradients</li>
+            <li>Inset shadows برای عمق</li>
+            <li>Saturate(180%) برای رنگ</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- NOTIFICATION -->
+      <div class="test-card notification">
+        <div class="effect-overlay"></div>
+        <div class="card-content">
+          <h3>3. NOTIFICATION</h3>
+          <p>⚠️ Pulsing Alert Glow</p>
+          <p>هاله هشدار با انیمیشن</p>
+          <ul class="feature-list">
+            <li>3 radial gradients متحرک</li>
+            <li>Pulse animation (2s)</li>
+            <li>Multiple inset shadows</li>
+            <li>Border-left: 4px برای تاکید</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- DATA -->
+      <div class="test-card data">
+        <div class="effect-overlay"></div>
+        <div class="card-content">
+          <h3>4. DATA</h3>
+          <p>📊 CRT Monitor Scanlines</p>
+          <p>خطوط اسکن واضح و قوی</p>
+          <ul class="feature-list">
+            <li>Strong visible scanlines (2px)</li>
+            <li>High contrast pattern</li>
+            <li>Phosphor glow effect</li>
+            <li>Double inset shadow</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- MINIMAL -->
+      <div class="test-card minimal">
+        <div class="effect-overlay"></div>
+        <div class="card-content">
+          <h3>5. MINIMAL</h3>
+          <p>✨ Subtle Film Grain</p>
+          <p>دانه‌بندی فیلم ظریف</p>
+          <ul class="feature-list">
+            <li>Diagonal hatching (45° & -45°)</li>
+            <li>Ultra-subtle opacity (0.4)</li>
+            <li>Contrast filter (1.1)</li>
+            <li>Dashed border style</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-box">
+      <h2>📝 توضیحات تکنیکال:</h2>
+      <ul>
+        <li>
+          <strong>Tactical</strong>: الگوی شبکه نظامی دوگانه - یک grid درشت 10x10 با رنگ accent و یک
+          grid ریز 3x3 برای بافت. استفاده از mix-blend-mode برای ترکیب بهتر.
+        </li>
+        <li>
+          <strong>Glass</strong>: افکت شیشه مات واقعی با backdrop-filter و چند gradient شعاعی برای
+          شبیه‌سازی شکست نور. Inset shadows برای عمق سه‌بعدی.
+        </li>
+        <li>
+          <strong>Notification</strong>: سه gradient شعاعی با انیمیشن pulse برای جلب توجه. Multiple
+          inset shadows برای ایجاد هاله درخشان. Border چپ ضخیم‌تر برای تاکید.
+        </li>
+        <li>
+          <strong>Data</strong>: خطوط اسکن افقی با الگوی پیچیده 5 پیکسلی که شبیه مانیتورهای CRT است.
+          انیمیشن sweep برای حرکت scanline و inset shadow برای glow فسفری.
+        </li>
+        <li>
+          <strong>Minimal</strong>: دو الگوی diagonal متقاطع (45 و -45 درجه) با opacity بسیار کم
+          برای ایجاد بافت ظریف فیلم. Filter contrast برای وضوح بیشتر.
+        </li>
+      </ul>
+
+      <div class="warning">
+        ⚠️ نکات مهم:
+        <ul style="margin-top: 8px; padding-left: 20px">
+          <li>هر variant افکت کاملاً متمایز و قابل تشخیص دارد</li>
+          <li>همه افکت‌ها با CSS خالص پیاده‌سازی شده‌اند (بدون SVG filter)</li>
+          <li>انیمیشن‌ها smooth و performance-optimized هستند</li>
+          <li>برای دیدن بهتر، روی هر کارت hover کنید</li>
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>

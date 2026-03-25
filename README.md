@@ -6,18 +6,79 @@
 ![Version](https://img.shields.io/badge/version-0.1.0-green)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![TypeScript](https://img.shields.io/badge/TypeScript-100%25-blue)
+![Cold War Redesign](https://img.shields.io/badge/Cold%20War-Redesign-orange)
 
-**A comprehensive, production-ready React UI design system with advanced theming, animations, and audio capabilities.**
+**A comprehensive, production-ready React UI design system with advanced theming, animations, and audio capabilities. Now featuring Call of Duty: Black Ops Cold War tactical military aesthetic.**
 
-[Features](#features) • [Installation](#installation) • [Documentation](#documentation) • [Examples](#examples) • [Contributing](#contributing)
+[Features](#features) • [Installation](#installation) • [Cold War Aesthetic](#cold-war-aesthetic) • [Documentation](#documentation) • [Examples](#examples) • [Contributing](#contributing)
 
 </div>
+
+---
+
+## 🎖️ Cold War Aesthetic
+
+RHUDS Pro now features a complete redesign inspired by Call of Duty: Black Ops Cold War tactical military HUD aesthetic.
+
+### Key Features
+
+- **Tactical Color Palette**: Amber (#FFB000), Phosphor Green (#33FF00), Muted Red (#FF3333)
+- **Monospace Typography**: Share Tech Mono font for authentic military feel
+- **Chamfered Geometry**: Tactical clip-path borders instead of rounded corners
+- **CRT Effects**: Scanlines, phosphor glow, and flicker animations
+- **Three Theme Variants**: Perseus (Amber), Green Terminal (Green), Satellite View (Blue)
+- **GPU-Accelerated Animations**: 60fps tactical animations with custom easing curves
+
+### Quick Start with Cold War
+
+```tsx
+import { ColdWarButton, ColdWarInput, ColdWarCard } from '@rhuds/components';
+import '../styles/cold-war-theme.css';
+
+function App() {
+  return (
+    <div className="cold-war-app">
+      <ColdWarCard variant="tactical" color="amber">
+        <h1>Tactical System Online</h1>
+        <ColdWarInput variant="tactical" placeholder="Enter command..." />
+        <ColdWarButton variant="primary" glow>
+          Execute
+        </ColdWarButton>
+      </ColdWarCard>
+    </div>
+  );
+}
+```
+
+### Theme Variants
+
+```tsx
+// Perseus Theme (Amber/Black) - Primary military aesthetic
+<ColdWarButton theme="perseus" variant="primary">
+  Launch System
+</ColdWarButton>
+
+// Green Terminal Theme (Green/Black) - Retro terminal aesthetic
+<ColdWarButton theme="green-terminal" variant="primary">
+  Access Terminal
+</ColdWarButton>
+
+// Satellite View Theme (Blue/White) - Radar view aesthetic
+<ColdWarButton theme="satellite-view" variant="primary">
+  Scan Area
+</ColdWarButton>
+```
+
+### Migration from Legacy Aesthetic
+
+See [COLD_WAR_MIGRATION_GUIDE_PHASE_4.md](COLD_WAR_MIGRATION_GUIDE_PHASE_4.md) for detailed migration instructions.
 
 ---
 
 ## 🚀 Features
 
 ### Core Systems
+
 - **🎨 Advanced Theme Engine** - Runtime theme switching, persistence, cross-tab sync
 - **🌈 Color System** - 20+ manipulation functions, WCAG accessibility compliance
 - **✨ Animation System** - Physics-based, gesture-driven, scroll-triggered animations
@@ -25,8 +86,10 @@
 - **📦 State Management** - Redux Toolkit with undo/redo support
 - **🖼️ Frame Rendering** - 6 SVG frame variants with clipping paths
 - **🌌 Background Effects** - 8 particle-based animated backgrounds
+- **🎖️ Cold War Aesthetic** - Tactical military HUD design system
 
 ### UI Components (42 Total)
+
 - **Basic**: Text, Button, Icon, Input, Select
 - **Layout**: Grid, Container, Stack
 - **Form**: Checkbox, Radio, Switch, validation
@@ -35,8 +98,10 @@
 - **Feedback**: Modal, Dialog, Notification
 - **Utility**: Tooltip, Popover, Dropdown
 - **Advanced**: Carousel, Accordion, Stepper
+- **Cold War**: ColdWarButton, ColdWarInput, ColdWarCard
 
 ### Developer Experience
+
 - **📚 15 Custom Hooks** - Theme, animation, audio, form, utility hooks
 - **🛠️ 50+ Utilities** - Color, format, validation, animation helpers
 - **📖 Comprehensive Docs** - 5,000+ lines of documentation
@@ -49,6 +114,7 @@
 ## 📦 Installation
 
 ### Prerequisites
+
 - Node.js 18+ or 20+
 - npm, yarn, or pnpm
 
@@ -93,21 +159,46 @@ function App() {
 export default App;
 ```
 
+### Cold War Setup
+
+```tsx
+import React from 'react';
+import { ColdWarButton, ColdWarInput, ColdWarCard } from '@rhuds/components';
+import '../styles/cold-war-theme.css';
+
+function App() {
+  return (
+    <div className="cold-war-app">
+      <ColdWarCard variant="tactical" color="amber">
+        <ColdWarButton variant="primary" glow>
+          Tactical System Online
+        </ColdWarButton>
+      </ColdWarCard>
+    </div>
+  );
+}
+
+export default App;
+```
+
 ---
 
 ## 📖 Documentation
 
 ### Core Documentation
+
 - [Theme System Guide](./packages/core/src/theme/THEME_SWITCHING_GUIDE.md)
 - [Animation Guide](./packages/core/src/animation/ANIMATION_GUIDE.md)
 - [Utilities API](./packages/core/UTILITIES_API.md)
 
 ### Component Documentation
+
 - [Components API](./packages/components/COMPONENTS_API.md) - All 42 components
 - [Hooks API](./packages/hooks/HOOKS_API.md) - All 15 hooks
 - [Installation Guide](./INSTALLATION_GUIDE.md) - Detailed setup instructions
 
 ### Package READMEs
+
 - [@rhuds/core](./packages/core/README.md)
 - [@rhuds/components](./packages/components/README.md)
 - [@rhuds/backgrounds](./packages/backgrounds/README.md)
@@ -123,12 +214,8 @@ import { useTheme } from '@rhuds/core';
 
 function ThemeSwitcher() {
   const { currentMode, setTheme } = useTheme();
-  
-  return (
-    <button onClick={() => setTheme('dark')}>
-      Current: {currentMode}
-    </button>
-  );
+
+  return <button onClick={() => setTheme('dark')}>Current: {currentMode}</button>;
 }
 ```
 
@@ -141,9 +228,7 @@ import { Button } from '@rhuds/components';
 function AnimatedButton() {
   return (
     <Animator>
-      <Button variant="primary">
-        Hover me!
-      </Button>
+      <Button variant="primary">Hover me!</Button>
     </Animator>
   );
 }
@@ -199,14 +284,9 @@ import { useLocalStorage, useDebounce } from '@rhuds/hooks';
 function SearchComponent() {
   const [search, setSearch] = useLocalStorage('search', '');
   const debouncedSearch = useDebounce(search, 500);
-  
+
   // Use debouncedSearch for API calls
-  return (
-    <input
-      value={search}
-      onChange={(e) => setSearch(e.target.value)}
-    />
-  );
+  return <input value={search} onChange={(e) => setSearch(e.target.value)} />;
 }
 ```
 
@@ -229,6 +309,7 @@ packages/
 ```
 
 ### Technology Stack
+
 - **Framework**: React 18+ with TypeScript
 - **Build**: Vite + Turborepo
 - **State**: Redux Toolkit
@@ -284,7 +365,7 @@ const customTheme = createAppTheme({
 
 <ThemeProvider theme={customTheme}>
   <App />
-</ThemeProvider>
+</ThemeProvider>;
 ```
 
 ---

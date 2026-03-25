@@ -90,32 +90,27 @@ export const easeInOutQuint: EasingFunction = (t: number) => {
 /**
  * Ease-in sine
  */
-export const easeInSine: EasingFunction = (t: number) =>
-  1 - Math.cos((t * Math.PI) / 2);
+export const easeInSine: EasingFunction = (t: number) => 1 - Math.cos((t * Math.PI) / 2);
 
 /**
  * Ease-out sine
  */
-export const easeOutSine: EasingFunction = (t: number) =>
-  Math.sin((t * Math.PI) / 2);
+export const easeOutSine: EasingFunction = (t: number) => Math.sin((t * Math.PI) / 2);
 
 /**
  * Ease-in-out sine
  */
-export const easeInOutSine: EasingFunction = (t: number) =>
-  -(Math.cos(Math.PI * t) - 1) / 2;
+export const easeInOutSine: EasingFunction = (t: number) => -(Math.cos(Math.PI * t) - 1) / 2;
 
 /**
  * Ease-in expo
  */
-export const easeInExpo: EasingFunction = (t: number) =>
-  t === 0 ? 0 : Math.pow(2, 10 * t - 10);
+export const easeInExpo: EasingFunction = (t: number) => (t === 0 ? 0 : Math.pow(2, 10 * t - 10));
 
 /**
  * Ease-out expo
  */
-export const easeOutExpo: EasingFunction = (t: number) =>
-  t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+export const easeOutExpo: EasingFunction = (t: number) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t));
 
 /**
  * Ease-in-out expo
@@ -123,22 +118,18 @@ export const easeOutExpo: EasingFunction = (t: number) =>
 export const easeInOutExpo: EasingFunction = (t: number) => {
   if (t === 0) return 0;
   if (t === 1) return 1;
-  return t < 0.5
-    ? Math.pow(2, 20 * t - 10) / 2
-    : (2 - Math.pow(2, -20 * t + 10)) / 2;
+  return t < 0.5 ? Math.pow(2, 20 * t - 10) / 2 : (2 - Math.pow(2, -20 * t + 10)) / 2;
 };
 
 /**
  * Ease-in circ
  */
-export const easeInCirc: EasingFunction = (t: number) =>
-  1 - Math.sqrt(1 - Math.pow(t, 2));
+export const easeInCirc: EasingFunction = (t: number) => 1 - Math.sqrt(1 - Math.pow(t, 2));
 
 /**
  * Ease-out circ
  */
-export const easeOutCirc: EasingFunction = (t: number) =>
-  Math.sqrt(1 - Math.pow(t - 1, 2));
+export const easeOutCirc: EasingFunction = (t: number) => Math.sqrt(1 - Math.pow(t - 1, 2));
 
 /**
  * Ease-in-out circ
@@ -182,11 +173,7 @@ export const easeInOutBack: EasingFunction = (t: number) => {
  */
 export const easeInElastic: EasingFunction = (t: number) => {
   const c4 = (2 * Math.PI) / 3;
-  return t === 0
-    ? 0
-    : t === 1
-    ? 1
-    : -Math.pow(2, 10 * t - 10) * Math.sin((t * 10 - 10.75) * c4);
+  return t === 0 ? 0 : t === 1 ? 1 : -Math.pow(2, 10 * t - 10) * Math.sin((t * 10 - 10.75) * c4);
 };
 
 /**
@@ -194,11 +181,7 @@ export const easeInElastic: EasingFunction = (t: number) => {
  */
 export const easeOutElastic: EasingFunction = (t: number) => {
   const c4 = (2 * Math.PI) / 3;
-  return t === 0
-    ? 0
-    : t === 1
-    ? 1
-    : Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * c4) + 1;
+  return t === 0 ? 0 : t === 1 ? 1 : Math.pow(2, -10 * t) * Math.sin((t * 10 - 0.75) * c4) + 1;
 };
 
 /**
@@ -209,10 +192,10 @@ export const easeInOutElastic: EasingFunction = (t: number) => {
   return t === 0
     ? 0
     : t === 1
-    ? 1
-    : t < 0.5
-    ? -(Math.pow(2, 20 * t - 10) * Math.sin((20 * t - 11.125) * c5)) / 2
-    : (Math.pow(2, -20 * t + 10) * Math.sin((20 * t - 11.125) * c5)) / 2 + 1;
+      ? 1
+      : t < 0.5
+        ? -(Math.pow(2, 20 * t - 10) * Math.sin((20 * t - 11.125) * c5)) / 2
+        : (Math.pow(2, -20 * t + 10) * Math.sin((20 * t - 11.125) * c5)) / 2 + 1;
 };
 
 /**
@@ -242,9 +225,52 @@ export const easeOutBounce: EasingFunction = (t: number) => {
  * Ease-in-out bounce
  */
 export const easeInOutBounce: EasingFunction = (t: number) =>
-  t < 0.5
-    ? (1 - easeOutBounce(1 - 2 * t)) / 2
-    : (1 + easeOutBounce(2 * t - 1)) / 2;
+  t < 0.5 ? (1 - easeOutBounce(1 - 2 * t)) / 2 : (1 + easeOutBounce(2 * t - 1)) / 2;
+
+/**
+ * Tactical (Mechanical) easing for Cold War aesthetic
+ * Snappy, responsive feel with slight overshoot
+ */
+export const easeTactical: EasingFunction = (t: number) => {
+  // cubic-bezier(0.68, -0.55, 0.265, 1.55)
+  const c1 = 0.68;
+  const c2 = -0.55;
+  const c3 = 0.265;
+  const c4 = 1.55;
+  return c1 * t * t * t + c2 * t * t + c3 * t + c4;
+};
+
+/**
+ * Snappy easing for Cold War aesthetic
+ * Quick response with pronounced overshoot
+ */
+export const easeSnappy: EasingFunction = (t: number) => {
+  // cubic-bezier(0.34, 1.56, 0.64, 1)
+  const c1 = 0.34;
+  const c2 = 1.56;
+  const c3 = 0.64;
+  const c4 = 1;
+  return c1 * t * t * t + c2 * t * t + c3 * t + c4;
+};
+
+/**
+ * Smooth easing for Cold War aesthetic
+ * Gentle acceleration and deceleration
+ */
+export const easeSmooth: EasingFunction = (t: number) => {
+  // cubic-bezier(0.25, 0.46, 0.45, 0.94)
+  const c1 = 0.25;
+  const c2 = 0.46;
+  const c3 = 0.45;
+  const c4 = 0.94;
+  return c1 * t * t * t + c2 * t * t + c3 * t + c4;
+};
+
+/**
+ * Glitch easing for Cold War aesthetic
+ * Mechanical, jerky feel for glitch effects
+ */
+export const easeGlitch: EasingFunction = easeTactical;
 
 /**
  * Map of easing function names to functions
@@ -281,14 +307,17 @@ export const easingFunctions: Record<string, EasingFunction> = {
   easeInBounce,
   easeOutBounce,
   easeInOutBounce,
+  // Cold War tactical easing curves
+  easeTactical,
+  easeSnappy,
+  easeSmooth,
+  easeGlitch,
 };
 
 /**
  * Get easing function by name or return the function itself
  */
-export function getEasingFunction(
-  easing: EasingFunction | string | undefined
-): EasingFunction {
+export function getEasingFunction(easing: EasingFunction | string | undefined): EasingFunction {
   if (!easing) return easeInOut;
   if (typeof easing === 'function') return easing;
   return easingFunctions[easing] || easeInOut;

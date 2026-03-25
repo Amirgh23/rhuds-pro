@@ -10,12 +10,13 @@ Thank you for your interest in contributing to RHUDS Pro! This document provides
 2. [Getting Started](#getting-started)
 3. [Development Setup](#development-setup)
 4. [Project Structure](#project-structure)
-5. [Development Workflow](#development-workflow)
-6. [Coding Standards](#coding-standards)
-7. [Testing Guidelines](#testing-guidelines)
-8. [Documentation](#documentation)
-9. [Pull Request Process](#pull-request-process)
-10. [Release Process](#release-process)
+5. [Cold War Design Guidelines](#cold-war-design-guidelines)
+6. [Development Workflow](#development-workflow)
+7. [Coding Standards](#coding-standards)
+8. [Testing Guidelines](#testing-guidelines)
+9. [Documentation](#documentation)
+10. [Pull Request Process](#pull-request-process)
+11. [Release Process](#release-process)
 
 ---
 
@@ -47,27 +48,32 @@ We are committed to providing a welcoming and inspiring community for all. Pleas
 ### First Time Setup
 
 1. **Fork the repository**
+
    ```bash
    # Click "Fork" on GitHub
    ```
 
 2. **Clone your fork**
+
    ```bash
    git clone https://github.com/YOUR_USERNAME/rhuds-pro.git
    cd rhuds-pro
    ```
 
 3. **Add upstream remote**
+
    ```bash
    git remote add upstream https://github.com/original/rhuds-pro.git
    ```
 
 4. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 5. **Build packages**
+
    ```bash
    npm run build
    ```
@@ -76,6 +82,172 @@ We are committed to providing a welcoming and inspiring community for all. Pleas
    ```bash
    npm test
    ```
+
+---
+
+## Cold War Design Guidelines
+
+### Color Palette
+
+All new components must use the Cold War tactical color palette:
+
+```typescript
+// Primary Colors
+--cw-color-primary: #FFB000;        // Tactical Amber
+--cw-color-secondary: #33FF00;      // Phosphor Green
+--cw-color-error: #FF3333;          // Muted Red
+--cw-color-background: #0a0a0c;     // Deep Black
+--cw-color-surface: #1a1a1f;        // Surface Gray
+--cw-color-text: #f0f0f0;           // Off-White
+```
+
+### Typography
+
+All components must use the Cold War monospace font stack:
+
+```css
+font-family: 'Share Tech Mono', 'Roboto Mono', 'Courier New', monospace;
+```
+
+Font sizes and weights:
+
+- **Headers**: 24px, weight 700, letter-spacing 0.05em, uppercase
+- **Body**: 14px, weight 400, letter-spacing 0.01em
+- **Buttons**: 14px, weight 600, letter-spacing 0.03em, uppercase
+- **Code**: 12px, weight 400, letter-spacing 0.02em
+
+### Geometry
+
+All components must use chamfered corners with clip-path:
+
+```css
+/* Button (8px chamfer) */
+clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+
+/* Input (12px chamfer) */
+clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+
+/* Card (12px chamfer) */
+clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+```
+
+### Animations
+
+All animations must use tactical easing and timing:
+
+```css
+/* Timing */
+--cw-timing-fast: 100ms;
+--cw-timing-normal: 150ms;
+--cw-timing-slow: 250ms;
+
+/* Easing */
+--cw-easing-tactical: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+--cw-easing-snappy: cubic-bezier(0.34, 1.56, 0.64, 1);
+--cw-easing-smooth: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+/* Usage */
+transition: all var(--cw-timing-normal) var(--cw-easing-tactical);
+```
+
+### Effects
+
+Components should support Cold War effects:
+
+- **Glow**: `box-shadow: 0 0 10px rgba(255, 176, 0, 0.5);`
+- **Scanlines**: Repeating linear gradient overlay
+- **Flicker**: CRT flicker animation (150ms)
+- **Phosphor**: Soft glow with blur layers
+
+### Component Structure
+
+New components should follow this structure:
+
+```typescript
+import React from 'react';
+import { getComponentChamferClip } from '@rhuds/core';
+import { THEME_VARIANTS } from '@rhuds/core';
+import { ANIMATION_TOKENS } from '@rhuds/core';
+
+export interface ColdWarComponentProps {
+  /** Component variant */
+  variant?: 'primary' | 'secondary' | 'tactical';
+  /** Component size */
+  size?: 'sm' | 'md' | 'lg';
+  /** Theme variant */
+  theme?: keyof typeof THEME_VARIANTS;
+  /** Apply glow effect */
+  glow?: boolean;
+  /** Apply scanlines effect */
+  scanlines?: boolean;
+  /** Additional CSS classes */
+  className?: string;
+  /** Additional inline styles */
+  style?: React.CSSProperties;
+}
+
+export const ColdWarComponent: React.FC<ColdWarComponentProps> = ({
+  variant = 'primary',
+  size = 'md',
+  theme = 'perseus',
+  glow = true,
+  scanlines = false,
+  className = '',
+  style = {},
+}) => {
+  const baseStyles: React.CSSProperties = {
+    fontFamily: "'Share Tech Mono', 'Roboto Mono', 'Courier New', monospace",
+    clipPath: getComponentChamferClip('component'),
+    transition: `all ${ANIMATION_TOKENS.timing.hover} ${ANIMATION_TOKENS.easing.tactical}`,
+    ...style,
+  };
+
+  return (
+    <div className={className} style={baseStyles}>
+      {/* Component content */}
+    </div>
+  );
+};
+```
+
+### Testing Cold War Components
+
+All Cold War components must include:
+
+1. **Visual tests** - Verify colors, geometry, and effects
+2. **Accessibility tests** - Verify WCAG AA compliance
+3. **Animation tests** - Verify 60fps performance
+4. **Responsive tests** - Verify mobile/tablet/desktop
+
+```typescript
+describe('ColdWarComponent', () => {
+  it('should render with correct colors', () => {
+    const { container } = render(<ColdWarComponent />);
+    const element = container.querySelector('[data-testid="component"]');
+    expect(element).toHaveStyle('color: #FFB000');
+  });
+
+  it('should have correct clip-path', () => {
+    const { container } = render(<ColdWarComponent />);
+    const element = container.querySelector('[data-testid="component"]');
+    expect(element).toHaveStyle('clip-path: polygon(...)');
+  });
+
+  it('should meet WCAG AA contrast', () => {
+    // Use axe-core for accessibility testing
+    const results = await axe(container);
+    expect(results.violations).toHaveLength(0);
+  });
+
+  it('should animate at 60fps', () => {
+    // Use performance monitoring
+    const startTime = performance.now();
+    // Trigger animation
+    const endTime = performance.now();
+    expect(endTime - startTime).toBeLessThan(16.67); // 60fps = 16.67ms per frame
+  });
+});
+```
 
 ---
 
@@ -186,6 +358,7 @@ git commit -m "docs(hooks): update useTheme documentation"
 ```
 
 **Commit Types:**
+
 - `feat` - New feature
 - `fix` - Bug fix
 - `docs` - Documentation
@@ -242,7 +415,7 @@ interface ButtonProps {
 ```typescript
 /**
  * Button component with multiple variants
- * 
+ *
  * @param variant - Button style variant
  * @param onClick - Click handler
  */
@@ -274,9 +447,9 @@ const config = {
 
 // Bad
 const config = {
-  name: "example",
-  value: 42
-}
+  name: 'example',
+  value: 42,
+};
 ```
 
 ---
@@ -338,13 +511,13 @@ npm test -- --watch
 - Include examples in documentation
 - Document parameters and return types
 
-```typescript
+````typescript
 /**
  * Create a new theme
- * 
+ *
  * @param config - Theme configuration
  * @returns Complete theme object
- * 
+ *
  * @example
  * ```typescript
  * const theme = createTheme({
@@ -356,7 +529,7 @@ npm test -- --watch
 export function createTheme(config: ThemeConfig): Theme {
   // Implementation
 }
-```
+````
 
 ### README Files
 
@@ -388,18 +561,22 @@ export function createTheme(config: ThemeConfig): Theme {
 
 ```markdown
 ## Description
+
 Brief description of changes
 
 ## Type of Change
+
 - [ ] Bug fix
 - [ ] New feature
 - [ ] Breaking change
 - [ ] Documentation update
 
 ## Testing
+
 How has this been tested?
 
 ## Checklist
+
 - [ ] Tests added/updated
 - [ ] Documentation updated
 - [ ] No breaking changes
@@ -461,6 +638,7 @@ We use Semantic Versioning (SemVer):
 ## Recognition
 
 Contributors will be:
+
 - Listed in CONTRIBUTORS.md
 - Mentioned in release notes
 - Credited in documentation

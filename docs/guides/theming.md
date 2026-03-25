@@ -1,10 +1,129 @@
 # Theming Guide
 
-Learn how to customize and create themes in RHUDS.
+Learn how to customize and create themes in RHUDS, including the new Cold War tactical aesthetic.
 
 ## Overview
 
-RHUDS provides a powerful theming system that allows you to customize colors, typography, spacing, and more.
+RHUDS provides a powerful theming system that allows you to customize colors, typography, spacing, and more. The system now includes built-in Cold War theme variants for tactical military aesthetics.
+
+## Cold War Themes
+
+### Built-in Cold War Variants
+
+RHUDS includes three pre-configured Cold War theme variants:
+
+#### 1. Perseus Theme (Amber/Black)
+
+Primary military aesthetic with tactical amber accents.
+
+```tsx
+import { ThemeProvider, THEME_VARIANTS } from '@rhuds/core';
+import { ColdWarButton } from '@rhuds/components';
+import '../styles/cold-war-theme.css';
+
+function App() {
+  return (
+    <ThemeProvider>
+      <ColdWarButton theme="perseus" variant="primary">
+        Tactical System Online
+      </ColdWarButton>
+    </ThemeProvider>
+  );
+}
+```
+
+**Colors:**
+
+- Primary: #FFB000 (Tactical Amber)
+- Secondary: #33FF00 (Phosphor Green)
+- Error: #FF3333 (Muted Red)
+- Background: #0a0a0c (Deep Black)
+
+#### 2. Green Terminal Theme (Green/Black)
+
+Retro terminal aesthetic with phosphor green accents.
+
+```tsx
+<ColdWarButton theme="green-terminal" variant="primary">
+  Access Terminal
+</ColdWarButton>
+```
+
+**Colors:**
+
+- Primary: #33FF00 (Phosphor Green)
+- Secondary: #FFB000 (Tactical Amber)
+- Error: #FF3333 (Muted Red)
+- Background: #0a0a0c (Deep Black)
+
+#### 3. Satellite View Theme (Blue/White)
+
+Radar view aesthetic with deep blue accents.
+
+```tsx
+<ColdWarButton theme="satellite-view" variant="primary">
+  Scan Area
+</ColdWarButton>
+```
+
+**Colors:**
+
+- Primary: #0066FF (Deep Blue)
+- Secondary: #FFB000 (Tactical Amber)
+- Error: #FF3333 (Muted Red)
+- Background: #0a0a0c (Deep Black)
+
+### Cold War CSS Custom Properties
+
+All Cold War themes use CSS custom properties for easy customization:
+
+```css
+:root {
+  /* Colors */
+  --cw-color-primary: #ffb000;
+  --cw-color-secondary: #33ff00;
+  --cw-color-error: #ff3333;
+  --cw-color-background: #0a0a0c;
+  --cw-color-surface: #1a1a1f;
+  --cw-color-text: #f0f0f0;
+  --cw-color-text-secondary: #b0b0b0;
+
+  /* Typography */
+  --cw-font-family: 'Share Tech Mono', 'Roboto Mono', 'Courier New', monospace;
+  --cw-font-size-xs: 10px;
+  --cw-font-size-sm: 12px;
+  --cw-font-size-base: 14px;
+  --cw-font-size-lg: 16px;
+  --cw-font-size-xl: 18px;
+  --cw-font-size-2xl: 24px;
+
+  /* Animations */
+  --cw-timing-fast: 100ms;
+  --cw-timing-normal: 150ms;
+  --cw-timing-slow: 250ms;
+  --cw-easing-tactical: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --cw-easing-snappy: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --cw-easing-smooth: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  /* Geometry */
+  --cw-chamfer-sm: 8px;
+  --cw-chamfer-md: 12px;
+  --cw-chamfer-lg: 16px;
+}
+```
+
+### Customizing Cold War Themes
+
+Override CSS custom properties to customize Cold War themes:
+
+```css
+/* Custom Perseus variant */
+:root {
+  --cw-color-primary: #ff8800; /* Custom amber */
+  --cw-color-secondary: #00ff00; /* Custom green */
+  --cw-timing-normal: 200ms; /* Slower animations */
+}
+```
 
 ## Basic Theme Setup
 
@@ -130,13 +249,15 @@ import { useTheme } from '@rhuds/core';
 
 function MyComponent() {
   const theme = useTheme();
-  
+
   return (
-    <div style={{
-      color: theme.currentMode.tokens.colors.primary,
-      padding: theme.currentMode.tokens.spacing['4'],
-      fontFamily: theme.currentMode.tokens.typography.fontFamily,
-    }}>
+    <div
+      style={{
+        color: theme.currentMode.tokens.colors.primary,
+        padding: theme.currentMode.tokens.spacing['4'],
+        fontFamily: theme.currentMode.tokens.typography.fontFamily,
+      }}
+    >
       Themed content
     </div>
   );
@@ -148,10 +269,10 @@ function MyComponent() {
 ```tsx
 function ThemeSwitcher() {
   const { setTheme, availableModes } = useTheme();
-  
+
   return (
     <select onChange={(e) => setTheme(e.target.value)}>
-      {availableModes.map(mode => (
+      {availableModes.map((mode) => (
         <option key={mode.name} value={mode.name}>
           {mode.name}
         </option>
@@ -171,10 +292,10 @@ import { createThemeColor } from '@rhuds/core';
 const primary = createThemeColor('#00f6ff');
 
 // Access variants
-console.log(primary.main);        // '#00f6ff'
-console.log(primary.light);       // Lighter variant
-console.log(primary.dark);        // Darker variant
-console.log(primary.alpha(0.5));  // With 50% opacity
+console.log(primary.main); // '#00f6ff'
+console.log(primary.light); // Lighter variant
+console.log(primary.dark); // Darker variant
+console.log(primary.alpha(0.5)); // With 50% opacity
 ```
 
 ### Color Utilities
@@ -182,9 +303,9 @@ console.log(primary.alpha(0.5));  // With 50% opacity
 ```tsx
 import { lighten, darken, adjustAlpha } from '@rhuds/core';
 
-const lighter = lighten('#00f6ff', 0.2);  // 20% lighter
-const darker = darken('#00f6ff', 0.2);    // 20% darker
-const transparent = adjustAlpha('#00f6ff', 0.5);  // 50% opacity
+const lighter = lighten('#00f6ff', 0.2); // 20% lighter
+const darker = darken('#00f6ff', 0.2); // 20% darker
+const transparent = adjustAlpha('#00f6ff', 0.5); // 50% opacity
 ```
 
 ## Typography
@@ -194,9 +315,9 @@ const transparent = adjustAlpha('#00f6ff', 0.5);  // 50% opacity
 ```tsx
 const typography = {
   fontFamily: {
-    primary: 'Orbitron, sans-serif',    // For body text
-    secondary: 'Rajdhani, sans-serif',  // For headings
-    mono: 'Fira Code, monospace',       // For code
+    primary: 'Orbitron, sans-serif', // For body text
+    secondary: 'Rajdhani, sans-serif', // For headings
+    mono: 'Fira Code, monospace', // For code
   },
 };
 ```
@@ -206,13 +327,13 @@ const typography = {
 ```tsx
 const typography = {
   fontSize: {
-    xs: '0.75rem',    // 12px
-    sm: '0.875rem',   // 14px
-    base: '1rem',     // 16px
-    lg: '1.125rem',   // 18px
-    xl: '1.25rem',    // 20px
-    '2xl': '1.5rem',  // 24px
-    '3xl': '1.875rem',// 30px
+    xs: '0.75rem', // 12px
+    sm: '0.875rem', // 14px
+    base: '1rem', // 16px
+    lg: '1.125rem', // 18px
+    xl: '1.25rem', // 20px
+    '2xl': '1.5rem', // 24px
+    '3xl': '1.875rem', // 30px
     '4xl': '2.25rem', // 36px
   },
 };
@@ -226,27 +347,29 @@ RHUDS uses a numeric scale (0-10) for spacing:
 
 ```tsx
 const spacing = {
-  0: '0px',      // 0
-  1: '4px',      // 1 * baseUnit
-  2: '8px',      // 2 * baseUnit
-  3: '12px',     // 3 * baseUnit
-  4: '16px',     // 4 * baseUnit
-  5: '24px',     // 6 * baseUnit
-  6: '32px',     // 8 * baseUnit
-  7: '48px',     // 12 * baseUnit
-  8: '64px',     // 16 * baseUnit
-  9: '96px',     // 24 * baseUnit
-  10: '128px',   // 32 * baseUnit
+  0: '0px', // 0
+  1: '4px', // 1 * baseUnit
+  2: '8px', // 2 * baseUnit
+  3: '12px', // 3 * baseUnit
+  4: '16px', // 4 * baseUnit
+  5: '24px', // 6 * baseUnit
+  6: '32px', // 8 * baseUnit
+  7: '48px', // 12 * baseUnit
+  8: '64px', // 16 * baseUnit
+  9: '96px', // 24 * baseUnit
+  10: '128px', // 32 * baseUnit
 };
 ```
 
 ### Using Spacing
 
 ```tsx
-<div style={{
-  padding: theme.currentMode.tokens.spacing['4'],
-  margin: theme.currentMode.tokens.spacing['2'],
-}}>
+<div
+  style={{
+    padding: theme.currentMode.tokens.spacing['4'],
+    margin: theme.currentMode.tokens.spacing['2'],
+  }}
+>
   Content
 </div>
 ```
@@ -260,7 +383,7 @@ import { useBreakpoint } from '@rhuds/core';
 
 function ResponsiveComponent() {
   const breakpoint = useBreakpoint();
-  
+
   return (
     <div>
       {breakpoint === 'mobile' && <MobileView />}

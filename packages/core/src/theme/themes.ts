@@ -1,4 +1,5 @@
-﻿import { ThemeMode } from './types'
+﻿import { ThemeMode } from './types';
+import { THEME_VARIANTS } from './colors';
 
 export const darkMode: ThemeMode = {
   name: 'dark',
@@ -65,7 +66,7 @@ export const darkMode: ThemeMode = {
       wide: '1440px',
     },
   },
-}
+};
 
 export const lightMode: ThemeMode = {
   name: 'light',
@@ -132,7 +133,7 @@ export const lightMode: ThemeMode = {
       wide: '1440px',
     },
   },
-}
+};
 
 export const neonGreenMode: ThemeMode = {
   name: 'neon-green',
@@ -150,7 +151,7 @@ export const neonGreenMode: ThemeMode = {
       'glow-lg': '0 0 30px rgba(41, 242, 223, 0.8)',
     },
   },
-}
+};
 
 export const neonBlueMode: ThemeMode = {
   name: 'neon-blue',
@@ -168,7 +169,7 @@ export const neonBlueMode: ThemeMode = {
       'glow-lg': '0 0 30px rgba(28, 127, 166, 0.8)',
     },
   },
-}
+};
 
 export const neonRedMode: ThemeMode = {
   name: 'neon-red',
@@ -186,7 +187,211 @@ export const neonRedMode: ThemeMode = {
       'glow-lg': '0 0 30px rgba(239, 62, 241, 0.8)',
     },
   },
-}
+};
+
+/**
+ * Cold War Redesign Theme Variants
+ */
+export const perseusTheme: ThemeMode = {
+  name: 'perseus',
+  tokens: {
+    colors: {
+      primary: THEME_VARIANTS.perseus.primary,
+      secondary: THEME_VARIANTS.perseus.secondary,
+      accent: THEME_VARIANTS.perseus.accent,
+      background: THEME_VARIANTS.perseus.background,
+      surface: THEME_VARIANTS.perseus.surface,
+      text: THEME_VARIANTS.perseus.text,
+      border: THEME_VARIANTS.perseus.primary,
+      success: THEME_VARIANTS.perseus.success,
+      warning: THEME_VARIANTS.perseus.warning,
+      error: THEME_VARIANTS.perseus.error,
+      info: THEME_VARIANTS.perseus.accent,
+    },
+    spacing: {
+      xs: '4px',
+      sm: '8px',
+      md: '16px',
+      lg: '24px',
+      xl: '32px',
+      '2xl': '48px',
+    },
+    typography: {
+      fontFamily: "'Share Tech Mono', 'Roboto Mono', 'Courier New', monospace",
+      fontSize: {
+        xs: '10px',
+        sm: '12px',
+        md: '14px',
+        lg: '16px',
+        xl: '20px',
+        '2xl': '24px',
+      },
+      fontWeight: {
+        light: 400,
+        normal: 400,
+        semibold: 500,
+        bold: 700,
+      },
+      lineHeight: {
+        tight: 1.2,
+        normal: 1.5,
+        relaxed: 1.75,
+      },
+    },
+    shadows: {
+      sm: '0 2px 4px rgba(0, 0, 0, 0.3)',
+      md: '0 4px 8px rgba(0, 0, 0, 0.4)',
+      lg: '0 8px 16px rgba(0, 0, 0, 0.5)',
+      glow: '0 0 10px rgba(255, 176, 0, 0.5)',
+      'glow-lg': '0 0 20px rgba(255, 176, 0, 0.8)',
+    },
+    transitions: {
+      fast: '150ms cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+      normal: '250ms cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+      slow: '300ms cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+    },
+    breakpoints: {
+      mobile: '320px',
+      tablet: '768px',
+      desktop: '1024px',
+      wide: '1440px',
+    },
+  },
+};
+
+export const greenTerminalTheme: ThemeMode = {
+  name: 'green-terminal',
+  tokens: {
+    colors: {
+      primary: THEME_VARIANTS.greenTerminal.primary,
+      secondary: THEME_VARIANTS.greenTerminal.secondary,
+      accent: THEME_VARIANTS.greenTerminal.accent,
+      background: THEME_VARIANTS.greenTerminal.background,
+      surface: THEME_VARIANTS.greenTerminal.surface,
+      text: THEME_VARIANTS.greenTerminal.text,
+      border: THEME_VARIANTS.greenTerminal.primary,
+      success: THEME_VARIANTS.greenTerminal.success,
+      warning: THEME_VARIANTS.greenTerminal.warning,
+      error: THEME_VARIANTS.greenTerminal.error,
+      info: THEME_VARIANTS.greenTerminal.accent,
+    },
+    spacing: {
+      xs: '4px',
+      sm: '8px',
+      md: '16px',
+      lg: '24px',
+      xl: '32px',
+      '2xl': '48px',
+    },
+    typography: {
+      fontFamily: "'Share Tech Mono', 'Roboto Mono', 'Courier New', monospace",
+      fontSize: {
+        xs: '10px',
+        sm: '12px',
+        md: '14px',
+        lg: '16px',
+        xl: '20px',
+        '2xl': '24px',
+      },
+      fontWeight: {
+        light: 400,
+        normal: 400,
+        semibold: 500,
+        bold: 700,
+      },
+      lineHeight: {
+        tight: 1.2,
+        normal: 1.5,
+        relaxed: 1.75,
+      },
+    },
+    shadows: {
+      sm: '0 2px 4px rgba(0, 0, 0, 0.3)',
+      md: '0 4px 8px rgba(0, 0, 0, 0.4)',
+      lg: '0 8px 16px rgba(0, 0, 0, 0.5)',
+      glow: '0 0 10px rgba(51, 255, 0, 0.5)',
+      'glow-lg': '0 0 20px rgba(51, 255, 0, 0.8)',
+    },
+    transitions: {
+      fast: '150ms cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+      normal: '250ms cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+      slow: '300ms cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+    },
+    breakpoints: {
+      mobile: '320px',
+      tablet: '768px',
+      desktop: '1024px',
+      wide: '1440px',
+    },
+  },
+};
+
+export const satelliteViewTheme: ThemeMode = {
+  name: 'satellite-view',
+  tokens: {
+    colors: {
+      primary: THEME_VARIANTS.satelliteView.primary,
+      secondary: THEME_VARIANTS.satelliteView.secondary,
+      accent: THEME_VARIANTS.satelliteView.accent,
+      background: THEME_VARIANTS.satelliteView.background,
+      surface: THEME_VARIANTS.satelliteView.surface,
+      text: THEME_VARIANTS.satelliteView.text,
+      border: THEME_VARIANTS.satelliteView.primary,
+      success: THEME_VARIANTS.satelliteView.success,
+      warning: THEME_VARIANTS.satelliteView.warning,
+      error: THEME_VARIANTS.satelliteView.error,
+      info: THEME_VARIANTS.satelliteView.accent,
+    },
+    spacing: {
+      xs: '4px',
+      sm: '8px',
+      md: '16px',
+      lg: '24px',
+      xl: '32px',
+      '2xl': '48px',
+    },
+    typography: {
+      fontFamily: "'Share Tech Mono', 'Roboto Mono', 'Courier New', monospace",
+      fontSize: {
+        xs: '10px',
+        sm: '12px',
+        md: '14px',
+        lg: '16px',
+        xl: '20px',
+        '2xl': '24px',
+      },
+      fontWeight: {
+        light: 400,
+        normal: 400,
+        semibold: 500,
+        bold: 700,
+      },
+      lineHeight: {
+        tight: 1.2,
+        normal: 1.5,
+        relaxed: 1.75,
+      },
+    },
+    shadows: {
+      sm: '0 2px 4px rgba(0, 0, 0, 0.3)',
+      md: '0 4px 8px rgba(0, 0, 0, 0.4)',
+      lg: '0 8px 16px rgba(0, 0, 0, 0.5)',
+      glow: '0 0 10px rgba(0, 204, 255, 0.5)',
+      'glow-lg': '0 0 20px rgba(0, 204, 255, 0.8)',
+    },
+    transitions: {
+      fast: '150ms cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+      normal: '250ms cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+      slow: '300ms cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+    },
+    breakpoints: {
+      mobile: '320px',
+      tablet: '768px',
+      desktop: '1024px',
+      wide: '1440px',
+    },
+  },
+};
 
 export const DEFAULT_THEMES: ThemeMode[] = [
   darkMode,
@@ -194,4 +399,7 @@ export const DEFAULT_THEMES: ThemeMode[] = [
   neonGreenMode,
   neonBlueMode,
   neonRedMode,
-]
+  perseusTheme,
+  greenTerminalTheme,
+  satelliteViewTheme,
+];

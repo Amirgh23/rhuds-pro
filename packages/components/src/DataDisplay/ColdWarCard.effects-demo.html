@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ColdWarCard Effects Demo - Scanlines & Glow</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background: #050508;
+        color: #fff;
+        font-family: 'Share Tech Mono', 'Courier New', monospace;
+        padding: 40px;
+        min-height: 100vh;
+      }
+
+      h1 {
+        color: #ffb000;
+        margin-bottom: 10px;
+        font-size: 32px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        text-align: center;
+      }
+
+      .subtitle {
+        color: #888;
+        margin-bottom: 40px;
+        font-size: 14px;
+        text-align: center;
+      }
+
+      .section {
+        margin-bottom: 60px;
+      }
+
+      .section-title {
+        color: #ffb000;
+        font-size: 24px;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #ffb000;
+      }
+
+      .test-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+      }
+
+      .test-card {
+        position: relative;
+        padding: 20px;
+        min-height: 160px;
+        border: 1px solid #ffb000;
+        clip-path: polygon(
+          0 8px,
+          8px 0,
+          calc(100% - 8px) 0,
+          100% 8px,
+          100% calc(100% - 8px),
+          calc(100% - 8px) 100%,
+          8px 100%,
+          0 calc(100% - 8px)
+        );
+        background: linear-gradient(135deg, rgba(10, 10, 20, 0.95) 0%, rgba(10, 10, 20, 0.85) 100%);
+        transition: all 0.3s ease;
+      }
+
+      .test-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(255, 176, 0, 0.2);
+      }
+
+      .card-content {
+        position: relative;
+        z-index: 10;
+      }
+
+      h3 {
+        margin: 0 0 8px 0;
+        color: #ffb000;
+        font-size: 14px;
+        text-transform: uppercase;
+      }
+
+      p {
+        margin: 0 0 4px 0;
+        font-size: 12px;
+        opacity: 0.8;
+      }
+
+      /* Scanline Effects */
+      .scanlines-low {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: repeating-linear-gradient(
+          0deg,
+          transparent 0px,
+          transparent 1px,
+          rgba(0, 0, 0, 0.15) 1px,
+          rgba(0, 0, 0, 0.15) 2px
+        );
+        pointer-events: none;
+        z-index: 5;
+      }
+
+      .scanlines-medium {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: repeating-linear-gradient(
+          0deg,
+          transparent 0px,
+          transparent 1px,
+          rgba(0, 0, 0, 0.25) 1px,
+          rgba(0, 0, 0, 0.25) 2px
+        );
+        pointer-events: none;
+        z-index: 5;
+      }
+
+      .scanlines-high {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: repeating-linear-gradient(
+          0deg,
+          transparent 0px,
+          transparent 1px,
+          rgba(0, 0, 0, 0.35) 1px,
+          rgba(0, 0, 0, 0.35) 2px
+        );
+        pointer-events: none;
+        z-index: 5;
+      }
+
+      /* Glow Effect */
+      .glow-effect {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        box-shadow:
+          inset 0 0 60px rgba(255, 176, 0, 0.2),
+          inset 0 0 30px rgba(255, 176, 0, 0.15),
+          inset 0 0 15px rgba(255, 176, 0, 0.1);
+        pointer-events: none;
+        z-index: 5;
+      }
+
+      .info-box {
+        margin-top: 40px;
+        padding: 20px;
+        border: 2px dashed #ffb000;
+        background: rgba(255, 176, 0, 0.05);
+      }
+
+      .info-box h2 {
+        color: #ffb000;
+        margin-bottom: 12px;
+        font-size: 18px;
+      }
+
+      .info-box p {
+        margin-bottom: 8px;
+        opacity: 1;
+      }
+
+      .badge {
+        display: inline-block;
+        padding: 2px 8px;
+        background: rgba(255, 176, 0, 0.2);
+        border: 1px solid #ffb000;
+        border-radius: 3px;
+        font-size: 10px;
+        margin-top: 8px;
+        color: #ffb000;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🎬 ColdWarCard Effects Demo</h1>
+    <p class="subtitle">نمایش کامل افکت‌های Scanlines و Glow با شدت‌های مختلف</p>
+
+    <!-- SCANLINES INTENSITY -->
+    <div class="section">
+      <h2 class="section-title">1. Scanlines Intensity</h2>
+      <p style="color: #888; margin-bottom: 20px">افکت خطوط اسکن CRT با سه سطح شدت مختلف</p>
+
+      <div class="test-grid">
+        <!-- Low Intensity -->
+        <div class="test-card">
+          <div class="scanlines-low"></div>
+          <div class="card-content">
+            <h3>Low Intensity</h3>
+            <p>شدت کم - ظریف</p>
+            <p>Subtle scanlines effect</p>
+            <p>opacity: 0.15</p>
+            <span class="badge">scanlines={true}</span>
+            <span class="badge">scanlinesIntensity="low"</span>
+          </div>
+        </div>
+
+        <!-- Medium Intensity -->
+        <div class="test-card">
+          <div class="scanlines-medium"></div>
+          <div class="card-content">
+            <h3>Medium Intensity</h3>
+            <p>شدت متوسط - متعادل</p>
+            <p>Balanced scanlines effect</p>
+            <p>opacity: 0.25</p>
+            <span class="badge">scanlines={true}</span>
+            <span class="badge">scanlinesIntensity="medium"</span>
+          </div>
+        </div>
+
+        <!-- High Intensity -->
+        <div class="test-card">
+          <div class="scanlines-high"></div>
+          <div class="card-content">
+            <h3>High Intensity</h3>
+            <p>شدت زیاد - دراماتیک</p>
+            <p>Strong scanlines effect</p>
+            <p>opacity: 0.35</p>
+            <span class="badge">scanlines={true}</span>
+            <span class="badge">scanlinesIntensity="high"</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GLOW EFFECTS -->
+    <div class="section">
+      <h2 class="section-title">2. Glow Effects</h2>
+      <p style="color: #888; margin-bottom: 20px">
+        افکت درخشش فسفری (Phosphor Glow) - فعال/غیرفعال
+      </p>
+
+      <div class="test-grid">
+        <!-- No Glow -->
+        <div class="test-card">
+          <div class="card-content">
+            <h3>No Glow</h3>
+            <p>بدون درخشش</p>
+            <p>Card without phosphor glow</p>
+            <p>Clean and minimal</p>
+            <span class="badge">glow={false}</span>
+          </div>
+        </div>
+
+        <!-- With Glow -->
+        <div class="test-card">
+          <div class="glow-effect"></div>
+          <div class="card-content">
+            <h3>With Glow</h3>
+            <p>با درخشش فسفری</p>
+            <p>Phosphor glow enabled</p>
+            <p>3-layer inset shadow</p>
+            <span class="badge">glow={true}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMBINED EFFECTS -->
+    <div class="section">
+      <h2 class="section-title">3. Combined Effects</h2>
+      <p style="color: #888; margin-bottom: 20px">
+        ترکیب افکت‌های Glow و Scanlines با شدت‌های مختلف
+      </p>
+
+      <div class="test-grid">
+        <!-- Glow + Low Scanlines -->
+        <div class="test-card">
+          <div class="glow-effect"></div>
+          <div class="scanlines-low"></div>
+          <div class="card-content">
+            <h3>Glow + Low Scanlines</h3>
+            <p>درخشش + اسکن کم</p>
+            <p>Subtle retro CRT look</p>
+            <span class="badge">glow={true}</span>
+            <span class="badge">scanlines={true}</span>
+            <span class="badge">intensity="low"</span>
+          </div>
+        </div>
+
+        <!-- Glow + Medium Scanlines -->
+        <div class="test-card">
+          <div class="glow-effect"></div>
+          <div class="scanlines-medium"></div>
+          <div class="card-content">
+            <h3>Glow + Medium Scanlines</h3>
+            <p>درخشش + اسکن متوسط</p>
+            <p>Balanced retro aesthetic</p>
+            <span class="badge">glow={true}</span>
+            <span class="badge">scanlines={true}</span>
+            <span class="badge">intensity="medium"</span>
+          </div>
+        </div>
+
+        <!-- Glow + High Scanlines -->
+        <div class="test-card">
+          <div class="glow-effect"></div>
+          <div class="scanlines-high"></div>
+          <div class="card-content">
+            <h3>Glow + High Scanlines</h3>
+            <p>درخشش + اسکن زیاد</p>
+            <p>Dramatic CRT effect</p>
+            <span class="badge">glow={true}</span>
+            <span class="badge">scanlines={true}</span>
+            <span class="badge">intensity="high"</span>
+          </div>
+        </div>
+
+        <!-- Only High Scanlines (No Glow) -->
+        <div class="test-card">
+          <div class="scanlines-high"></div>
+          <div class="card-content">
+            <h3>High Scanlines Only</h3>
+            <p>فقط اسکن زیاد</p>
+            <p>Strong CRT without glow</p>
+            <span class="badge">glow={false}</span>
+            <span class="badge">scanlines={true}</span>
+            <span class="badge">intensity="high"</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- USAGE GUIDE -->
+    <div class="info-box">
+      <h2>📝 راهنمای استفاده:</h2>
+
+      <p><strong>Scanlines Intensity:</strong></p>
+      <ul style="margin: 8px 0 16px 20px; opacity: 0.9">
+        <li><code>low</code>: برای حداقل حواس‌پرتی (opacity: 0.15)</li>
+        <li><code>medium</code>: برای ظاهر retro متعادل (opacity: 0.25) - پیش‌فرض</li>
+        <li><code>high</code>: برای افکت CRT دراماتیک (opacity: 0.35)</li>
+      </ul>
+
+      <p><strong>Glow Effect:</strong></p>
+      <ul style="margin: 8px 0 16px 20px; opacity: 0.9">
+        <li><code>glow={true}</code>: فعال‌سازی درخشش فسفری (پیش‌فرض)</li>
+        <li><code>glow={false}</code>: غیرفعال‌سازی برای ظاهر تمیزتر</li>
+      </ul>
+
+      <p><strong>مثال کد:</strong></p>
+      <pre
+        style="
+          background: rgba(0, 0, 0, 0.3);
+          padding: 12px;
+          border-radius: 4px;
+          margin-top: 8px;
+          overflow-x: auto;
+        "
+      ><code style="color: #33ff00; font-size: 12px">&lt;ColdWarCard
+  variant="data"
+  scanlines={true}
+  scanlinesIntensity="medium"
+  glow={true}
+&gt;
+  محتوای کارت
+&lt;/ColdWarCard&gt;</code></pre>
+    </div>
+  </body>
+</html>

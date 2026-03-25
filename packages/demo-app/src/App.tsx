@@ -7,8 +7,10 @@ import { ShowcasePage } from './pages/ShowcasePage';
 import InteractivePlayground from './pages/InteractivePlayground';
 import { DocsPage } from './pages/DocsPage';
 import PortfolioPage from './pages/PortfolioPage';
+import ColdWarShowcase from './pages/ColdWarShowcase';
 import { Navbar } from './components/Navbar';
 import './styles/global.css';
+import './styles/cold-war-theme.css';
 
 // Create theme
 const appTheme = createAppTheme({
@@ -103,6 +105,7 @@ const AppContent: React.FC = () => {
       <Routes>
         <Route path="/" element={<IntroPageFuturistic />} />
         <Route path="/showcase" element={<ShowcasePage />} />
+        <Route path="/cold-war" element={<ColdWarShowcase />} />
         <Route path="/playground" element={<InteractivePlayground />} />
         <Route path="/docs" element={<DocsPage />} />
         <Route path="/docs/:section" element={<DocsPage />} />

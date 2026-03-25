@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cold War Animated Background Test</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      body {
+        background-color: #0a0a0c;
+        color: #ffffff;
+        font-family: 'Share Tech Mono', 'Roboto Mono', 'Courier New', monospace;
+      }
+
+      #canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        display: block;
+      }
+
+      #content {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 1;
+        overflow-y: auto;
+        padding: 48px;
+      }
+
+      h1 {
+        font-size: 32px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: #ffb000;
+        margin-bottom: 16px;
+      }
+
+      p {
+        font-size: 16px;
+        color: #cccccc;
+        letter-spacing: 0.02em;
+        margin-bottom: 24px;
+      }
+
+      .controls {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 48px;
+        flex-wrap: wrap;
+      }
+
+      button {
+        padding: 12px 24px;
+        background-color: #1a1a1e;
+        color: #ffb000;
+        border: 1px solid #ffb000;
+        font-family: 'Share Tech Mono', monospace;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 150ms cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      }
+
+      button:hover {
+        background-color: #ffb000;
+        color: #0a0a0c;
+      }
+
+      button.active {
+        background-color: #ffb000;
+        color: #0a0a0c;
+      }
+
+      .info {
+        padding: 24px;
+        background-color: #1a1a1e;
+        border: 1px solid #ffb000;
+        margin-top: 48px;
+      }
+
+      .info h2 {
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+        color: #ffb000;
+        margin-bottom: 12px;
+      }
+
+      .info p {
+        font-size: 14px;
+        margin-bottom: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas"></canvas>
+
+    <div id="content">
+      <h1>Cold War Animated Background</h1>
+      <p>Tactical Military Aesthetic with Dynamic Effects</p>
+
+      <div class="controls">
+        <button class="variant-btn active" data-variant="perseus">Perseus</button>
+        <button class="variant-btn" data-variant="green-terminal">Green Terminal</button>
+        <button class="variant-btn" data-variant="satellite-view">Satellite View</button>
+
+        <button class="intensity-btn active" data-intensity="medium">Medium</button>
+        <button class="intensity-btn" data-intensity="low">Low</button>
+        <button class="intensity-btn" data-intensity="high">High</button>
+      </div>
+
+      <div class="info">
+        <h2>Features</h2>
+        <p>✓ Animated grid with continuous movement</p>
+        <p>✓ CRT scanlines effect</p>
+        <p>✓ Dynamic noise overlay</p>
+        <p>✓ Pulsing corner markers</p>
+        <p>✓ Animated radar circles</p>
+        <p>✓ Theme-aware color system</p>
+      </div>
+    </div>
+
+    <script>
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
+
+      let variant = 'perseus';
+      let intensity = 'medium';
+      let time = 0;
+
+      // Set canvas size
+      const resizeCanvas = () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      };
+
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+
+      // Get colors based on variant
+      const getColors = () => {
+        switch (variant) {
+          case 'green-terminal':
+            return {
+              primary: '#33ff00',
+              secondary: '#66ff33',
+              accent: '#00ccff',
+            };
+          case 'satellite-view':
+            return {
+              primary: '#00ccff',
+              secondary: '#0066cc',
+              accent: '#ffb000',
+            };
+          default:
+            return {
+              primary: '#ffb000',
+              secondary: '#ffd633',
+              accent: '#0066cc',
+            };
+        }
+      };
+
+      // Get intensity settings
+      const getIntensitySettings = () => {
+        switch (intensity) {
+          case 'low':
+            return { gridOpacity: 0.15, scanlineOpacity: 0.08, noiseOpacity: 0.05 };
+          case 'high':
+            return { gridOpacity: 0.35, scanlineOpacity: 0.2, noiseOpacity: 0.15 };
+          default:
+            return { gridOpacity: 0.25, scanlineOpacity: 0.12, noiseOpacity: 0.1 };
+        }
+      };
+
+      // Draw functions
+      const drawGrid = (colors, settings) => {
+        const gridSize = 40;
+        const offset = (time * 20) % gridSize;
+
+        ctx.strokeStyle = colors.primary;
+        ctx.globalAlpha = settings.gridOpacity;
+        ctx.lineWidth = 1;
+
+        for (let x = -offset; x < canvas.width; x += gridSize) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, canvas.height);
+          ctx.stroke();
+        }
+
+        for (let y = -offset; y < canvas.height; y += gridSize) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(canvas.width, y);
+          ctx.stroke();
+        }
+
+        ctx.globalAlpha = 1;
+      };
+
+      const drawScanlines = (colors, settings) => {
+        ctx.strokeStyle = colors.primary;
+        ctx.globalAlpha = settings.scanlineOpacity;
+        ctx.lineWidth = 1;
+
+        const scanlineSpacing = 3;
+        const offset = (time * 50) % scanlineSpacing;
+
+        for (let y = -offset; y < canvas.height; y += scanlineSpacing) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(canvas.width, y);
+          ctx.stroke();
+        }
+
+        ctx.globalAlpha = 1;
+      };
+
+      const drawCornerMarkers = (colors) => {
+        const markerSize = 30;
+        const markerWidth = 2;
+        const pulse = Math.sin(time * 3) * 0.5 + 0.5;
+
+        ctx.strokeStyle = colors.secondary;
+        ctx.globalAlpha = 0.6 + pulse * 0.4;
+        ctx.lineWidth = markerWidth;
+
+        // Top-left
+        ctx.beginPath();
+        ctx.moveTo(20, 20);
+        ctx.lineTo(20 + markerSize, 20);
+        ctx.moveTo(20, 20);
+        ctx.lineTo(20, 20 + markerSize);
+        ctx.stroke();
+
+        // Top-right
+        ctx.beginPath();
+        ctx.moveTo(canvas.width - 20, 20);
+        ctx.lineTo(canvas.width - 20 - markerSize, 20);
+        ctx.moveTo(canvas.width - 20, 20);
+        ctx.lineTo(canvas.width - 20, 20 + markerSize);
+        ctx.stroke();
+
+        // Bottom-left
+        ctx.beginPath();
+        ctx.moveTo(20, canvas.height - 20);
+        ctx.lineTo(20 + markerSize, canvas.height - 20);
+        ctx.moveTo(20, canvas.height - 20);
+        ctx.lineTo(20, canvas.height - 20 - markerSize);
+        ctx.stroke();
+
+        // Bottom-right
+        ctx.beginPath();
+        ctx.moveTo(canvas.width - 20, canvas.height - 20);
+        ctx.lineTo(canvas.width - 20 - markerSize, canvas.height - 20);
+        ctx.moveTo(canvas.width - 20, canvas.height - 20);
+        ctx.lineTo(canvas.width - 20, canvas.height - 20 - markerSize);
+        ctx.stroke();
+
+        ctx.globalAlpha = 1;
+      };
+
+      const drawRadarCircles = (colors) => {
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        const maxRadius = Math.min(canvas.width, canvas.height) / 4;
+
+        ctx.strokeStyle = colors.accent;
+        ctx.globalAlpha = 0.3;
+        ctx.lineWidth = 1;
+
+        const radarOffset = (time * 30) % maxRadius;
+
+        for (let r = radarOffset; r < maxRadius; r += 40) {
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, r, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        ctx.globalAlpha = 0.2;
+        for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 4) {
+          ctx.beginPath();
+          ctx.moveTo(centerX, centerY);
+          ctx.lineTo(
+            centerX + Math.cos(angle + time) * maxRadius,
+            centerY + Math.sin(angle + time) * maxRadius
+          );
+          ctx.stroke();
+        }
+
+        ctx.globalAlpha = 1;
+      };
+
+      // Animation loop
+      const animate = () => {
+        ctx.fillStyle = 'rgba(10, 10, 12, 0.95)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        const colors = getColors();
+        const settings = getIntensitySettings();
+
+        drawGrid(colors, settings);
+        drawScanlines(colors, settings);
+        drawCornerMarkers(colors);
+        drawRadarCircles(colors);
+
+        time += 0.016;
+        requestAnimationFrame(animate);
+      };
+
+      animate();
+
+      // Event listeners
+      document.querySelectorAll('.variant-btn').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          document.querySelectorAll('.variant-btn').forEach((b) => b.classList.remove('active'));
+          e.target.classList.add('active');
+          variant = e.target.dataset.variant;
+        });
+      });
+
+      document.querySelectorAll('.intensity-btn').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          document.querySelectorAll('.intensity-btn').forEach((b) => b.classList.remove('active'));
+          e.target.classList.add('active');
+          intensity = e.target.dataset.intensity;
+        });
+      });
+    </script>
+  </body>
+</html>

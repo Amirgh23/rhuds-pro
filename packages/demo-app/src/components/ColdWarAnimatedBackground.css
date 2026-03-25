@@ -1,0 +1,65 @@
+/* Cold War Animated Background Styles */
+
+.cold-war-animated-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  background-color: #0a0a0c;
+  display: block;
+}
+
+/* Variant-specific styling */
+.cold-war-animated-background[data-variant='perseus'] {
+  filter: hue-rotate(0deg) saturate(1);
+}
+
+.cold-war-animated-background[data-variant='green-terminal'] {
+  filter: hue-rotate(120deg) saturate(1.2);
+}
+
+.cold-war-animated-background[data-variant='satellite-view'] {
+  filter: hue-rotate(200deg) saturate(0.8) brightness(1.1);
+}
+
+/* Intensity-specific styling */
+.cold-war-animated-background[data-intensity='low'] {
+  opacity: 0.9;
+}
+
+.cold-war-animated-background[data-intensity='medium'] {
+  opacity: 1;
+}
+
+.cold-war-animated-background[data-intensity='high'] {
+  opacity: 1;
+}
+
+/* Accessibility: Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  .cold-war-animated-background {
+    animation: none;
+  }
+}
+
+/* Accessibility: Reduce motion */
+@media (prefers-reduced-motion: reduce) {
+  .cold-war-animated-background {
+    animation: none;
+  }
+}
+
+/* Ensure proper stacking context */
+html,
+body {
+  position: relative;
+}
+
+/* Make sure content appears above canvas */
+#root {
+  position: relative;
+  z-index: 1;
+}

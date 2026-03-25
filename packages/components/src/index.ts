@@ -39,6 +39,10 @@ export type { CyberSubscribeButtonProps } from './Button/CyberSubscribeButton';
 export { default as NeonBorderButton } from './Button/NeonBorderButton';
 export type { NeonBorderButtonProps } from './Button/NeonBorderButton';
 
+// Cold War Redesign Components
+export { ColdWarButton } from './Button/ColdWarButton';
+export type { ColdWarButtonProps } from './Button/ColdWarButton';
+
 export { Icon } from './Icon/Icon';
 export type { IconProps } from './Icon/types';
 
@@ -77,6 +81,10 @@ export type { AddFriendInputProps } from './Input/AddFriendInput';
 
 export { VerificationCodeInput } from './Input/VerificationCodeInput';
 export type { VerificationCodeInputProps } from './Input/VerificationCodeInput';
+
+// Cold War Redesign Input
+export { ColdWarInput } from './Input/ColdWarInput';
+export type { ColdWarInputProps } from './Input/ColdWarInput';
 
 export { Select } from './Select/Select';
 export type { SelectProps } from './Select/types';
@@ -245,6 +253,10 @@ export type { Win95MediaPlayerProps } from './DataDisplay/Win95MediaPlayer';
 
 export { TubeAmplifier } from './DataDisplay/TubeAmplifier';
 export type { TubeAmplifierProps } from './DataDisplay/TubeAmplifier';
+
+// Cold War Redesign Card
+export { ColdWarCard } from './DataDisplay/ColdWarCard';
+export type { ColdWarCardProps } from './DataDisplay/ColdWarCard';
 
 // HUD Table Components (10 variants)
 export { HudTableBasic } from './DataDisplay/HudTableBasic';

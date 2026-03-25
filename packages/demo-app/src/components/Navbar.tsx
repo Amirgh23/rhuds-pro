@@ -88,6 +88,39 @@ export const Navbar: React.FC = () => {
         </button>
 
         <button
+          onClick={handleClick('/cold-war')}
+          style={{
+            padding: '0.5rem 1.5rem',
+            fontSize: '14px',
+            fontWeight: '600',
+            border: isActive('/cold-war')
+              ? '2px solid #FFB000'
+              : '2px solid rgba(255, 176, 0, 0.3)',
+            borderRadius: '4px',
+            background: isActive('/cold-war') ? 'rgba(255, 176, 0, 0.1)' : 'transparent',
+            color: isActive('/cold-war') ? '#FFB000' : '#8EC8D8',
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            textShadow: isActive('/cold-war') ? '0 0 10px rgba(255, 176, 0, 0.5)' : 'none',
+            boxShadow: isActive('/cold-war') ? '0 0 20px rgba(255, 176, 0, 0.3)' : 'none',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.borderColor = '#FFB000';
+            e.currentTarget.style.color = '#FFB000';
+            e.currentTarget.style.background = 'rgba(255, 176, 0, 0.1)';
+          }}
+          onMouseLeave={(e) => {
+            if (!isActive('/cold-war')) {
+              e.currentTarget.style.borderColor = 'rgba(255, 176, 0, 0.3)';
+              e.currentTarget.style.color = '#8EC8D8';
+              e.currentTarget.style.background = 'transparent';
+            }
+          }}
+        >
+          Cold War
+        </button>
+
+        <button
           onClick={handleClick('/playground')}
           style={{
             padding: '0.5rem 1.5rem',

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { HudBox, RadarHud, HackerLoader } from '@rhuds/components';
+import { ColdWarButton, ColdWarInput, ColdWarCard } from '@rhuds/components';
 import { GlassContextMenu } from '../components/GlassContextMenu';
 import { useScrollAnimationManager } from '../hooks/useScrollAnimationManager';
 import { useRevealOnScroll } from '../hooks/useRevealOnScroll';
@@ -8,6 +9,91 @@ import { useGSAPAnimations } from '../hooks/useGSAPAnimations';
 import './IntroPageFuturistic.css';
 import './IntroPageFuturistic.glass.css';
 import './IntroPageFuturistic.gsap.css';
+import '../styles/cold-war-theme.css';
+
+// Cold War Theme Styling
+const coldWarStyles = `
+  .intro-futuristic {
+    background: linear-gradient(135deg, #0a0a0c 0%, #1a1a1f 50%, #0a0a0c 100%);
+  }
+  
+  .intro-futuristic .section-title {
+    color: var(--cw-color-primary, #FFB000);
+    text-shadow: 0 0 10px rgba(255, 176, 0, 0.5);
+    font-family: 'Share Tech Mono', 'Roboto Mono', monospace;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  
+  .intro-futuristic .section-subtitle {
+    color: var(--cw-color-text-secondary, #b0b0b0);
+    font-family: 'Share Tech Mono', 'Roboto Mono', monospace;
+  }
+  
+  .intro-futuristic .feature-card {
+    border: 1px solid var(--cw-color-primary, #FFB000);
+    background: rgba(10, 10, 12, 0.8);
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  }
+  
+  .intro-futuristic .feature-card:hover {
+    box-shadow: 0 0 20px rgba(255, 176, 0, 0.4);
+    background: rgba(255, 176, 0, 0.05);
+  }
+  
+  .intro-futuristic .cta-button {
+    background: var(--cw-color-primary, #FFB000);
+    color: #0a0a0c;
+    border: 1px solid var(--cw-color-primary, #FFB000);
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+    font-family: 'Share Tech Mono', 'Roboto Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    font-weight: 600;
+  }
+  
+  .intro-futuristic .cta-button:hover {
+    box-shadow: 0 0 15px rgba(255, 176, 0, 0.6);
+    transform: scale(1.02);
+  }
+  
+  .intro-futuristic .terminal-section {
+    background: rgba(10, 10, 12, 0.9);
+    border: 1px solid var(--cw-color-primary, #FFB000);
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  }
+  
+  .intro-futuristic .code-block {
+    background: rgba(0, 0, 0, 0.8);
+    border-left: 3px solid var(--cw-color-primary, #FFB000);
+    font-family: 'Share Tech Mono', 'Roboto Mono', monospace;
+    color: var(--cw-color-primary, #FFB000);
+  }
+  
+  .intro-futuristic .stats-item {
+    border: 1px solid var(--cw-color-secondary, #33FF00);
+    background: rgba(51, 255, 0, 0.02);
+  }
+  
+  .intro-futuristic .stats-item:hover {
+    box-shadow: 0 0 15px rgba(51, 255, 0, 0.3);
+  }
+  
+  .intro-futuristic .nav-dot {
+    background: rgba(255, 176, 0, 0.3);
+    border: 2px solid rgba(255, 176, 0, 0.5);
+  }
+  
+  .intro-futuristic .nav-dot:hover {
+    background: rgba(255, 176, 0, 0.6);
+    box-shadow: 0 0 20px rgba(255, 176, 0, 0.8);
+  }
+  
+  .intro-futuristic .nav-dot.active {
+    background: var(--cw-color-primary, #FFB000);
+    box-shadow: 0 0 20px rgba(255, 176, 0, 0.8);
+  }
+`;
 
 export default function IntroPageFuturistic() {
   const navigate = useNavigate();
