@@ -9,6 +9,7 @@ import { ShowcasePage } from './pages/ShowcasePage';
 import InteractivePlayground from './pages/InteractivePlayground';
 import { DocsPage } from './pages/DocsPage';
 import PortfolioPage from './pages/PortfolioPage';
+import ColdWarPortfolioPage from './pages/ColdWarPortfolioPage';
 import ColdWarShowcase from './pages/ColdWarShowcase';
 import ColdWarPlayground from './pages/ColdWarPlayground';
 import ColdWarDocs from './pages/ColdWarDocs';
@@ -121,6 +122,7 @@ const AppContent: React.FC = () => {
         <Route path="/docs" element={<DocsPage />} />
         <Route path="/docs/:section" element={<DocsPage />} />
         <Route path="/portfolio" element={<PortfolioPage />} />
+        <Route path="/coldwar-portfolio" element={<ColdWarPortfolioPage />} />
         {/* Legacy routes for backward compatibility */}
         <Route path="/cold-war" element={<ColdWarShowcase />} />
         <Route path="/cold-war/playground" element={<ColdWarPlayground />} />

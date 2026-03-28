@@ -2,10 +2,15 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ColdWarButton, ColdWarCard, ColdWarInput } from '@rhuds/components';
 import { TacticalMotionBackground } from '../components/TacticalMotionBackground';
+import { useScrollAnimation } from '../hooks/useScrollAnimation';
 import '../styles/cold-war-theme.css';
 
 // Add keyframes for animations
 const styles = `
+  html {
+    scroll-behavior: smooth;
+  }
+
   @keyframes glow {
     0%, 100% {
       text-shadow: 0 0 40px rgba(255, 176, 0, 0.8), 0 0 80px rgba(255, 176, 0, 0.4);
@@ -37,6 +42,392 @@ const styles = `
       opacity: 0;
     }
   }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-50px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(50px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes scaleIn {
+    from {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .scroll-animate {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+  }
+
+  .scroll-animate.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .scroll-animate-fast {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+  }
+
+  .scroll-animate-fast.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .animate-title {
+    animation: fadeInDown 1s ease-out 0.2s both;
+  }
+
+  .animate-subtitle {
+    animation: fadeInUp 1s ease-out 0.4s both;
+  }
+
+  .animate-description {
+    animation: fadeInUp 1s ease-out 0.6s both;
+  }
+
+  .animate-buttons {
+    animation: fadeInUp 1s ease-out 0.8s both;
+  }
+
+  .animate-badges {
+    animation: fadeInUp 1s ease-out 1s both;
+  }
+
+  .animate-scroll-indicator {
+    animation: fadeIn 1s ease-out 1.2s both;
+  }
+
+  .animate-card {
+    animation: scaleIn 0.6s ease-out both;
+  }
+
+  .animate-card:nth-child(1) { animation-delay: 0.1s; }
+  .animate-card:nth-child(2) { animation-delay: 0.2s; }
+  .animate-card:nth-child(3) { animation-delay: 0.3s; }
+  .animate-card:nth-child(4) { animation-delay: 0.4s; }
+  .animate-card:nth-child(5) { animation-delay: 0.5s; }
+  .animate-card:nth-child(6) { animation-delay: 0.6s; }
+
+  .animate-terminal {
+    animation: slideInLeft 0.8s ease-out 0.2s both;
+  }
+
+  .animate-install-box {
+    animation: slideInRight 0.8s ease-out 0.4s both;
+  }
+
+  .animate-component-demo {
+    animation: scaleIn 0.6s ease-out both;
+  }
+
+  .animate-component-demo:nth-child(1) { animation-delay: 0.2s; }
+  .animate-component-demo:nth-child(2) { animation-delay: 0.4s; }
+  .animate-component-demo:nth-child(3) { animation-delay: 0.6s; }
+
+  .animate-stat {
+    animation: scaleIn 0.5s ease-out both;
+  }
+
+  .animate-stat:nth-child(1) { animation-delay: 0.1s; }
+  .animate-stat:nth-child(2) { animation-delay: 0.2s; }
+  .animate-stat:nth-child(3) { animation-delay: 0.3s; }
+  .animate-stat:nth-child(4) { animation-delay: 0.4s; }
+
+  .animate-roadmap-item {
+    animation: slideInLeft 0.6s ease-out both;
+  }
+
+  .animate-roadmap-item:nth-child(1) { animation-delay: 0.1s; }
+  .animate-roadmap-item:nth-child(2) { animation-delay: 0.2s; }
+  .animate-roadmap-item:nth-child(3) { animation-delay: 0.3s; }
+  .animate-roadmap-item:nth-child(4) { animation-delay: 0.4s; }
+  .animate-roadmap-item:nth-child(5) { animation-delay: 0.5s; }
+
+  /* Navigation Dots Animations */
+  @keyframes liquidFlow {
+    0% {
+      transform: translateY(-100%) scaleY(1.5);
+      opacity: 0;
+      border-radius: 50% 50% 30% 30%;
+    }
+    30% {
+      opacity: 1;
+      border-radius: 50% 50% 40% 40%;
+    }
+    50% {
+      transform: translateY(0) scaleY(1);
+      border-radius: 50%;
+    }
+    70% {
+      transform: translateY(10%) scaleY(0.9);
+      border-radius: 50% 50% 55% 55%;
+    }
+    85% {
+      transform: translateY(5%) scaleY(0.95);
+    }
+    100% {
+      transform: translateY(0) scaleY(1);
+      border-radius: 50%;
+      opacity: 1;
+    }
+  }
+
+  @keyframes morphDot {
+    0%, 100% {
+      border-radius: 50%;
+    }
+    25% {
+      border-radius: 50% 50% 40% 40%;
+    }
+    50% {
+      border-radius: 40% 40% 50% 50%;
+    }
+    75% {
+      border-radius: 50% 50% 40% 40%;
+    }
+  }
+
+  @keyframes ripple {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1.8);
+      opacity: 0;
+    }
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 0.3;
+    }
+    50% {
+      transform: scale(1.2);
+      opacity: 0.5;
+    }
+  }
+
+  .nav-dot {
+    position: relative;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    overflow: visible;
+  }
+
+  .nav-dot::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120%;
+    height: 120%;
+    border-radius: 50%;
+    border: 2px solid var(--cw-color-primary);
+    opacity: 0;
+  }
+
+  .nav-dot::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 140%;
+    height: 140%;
+    border-radius: 50%;
+    background: var(--cw-color-primary);
+    opacity: 0;
+    z-index: -1;
+  }
+
+  .nav-dot.active {
+    animation: liquidFlow 0.8s cubic-bezier(0.34, 1.56, 0.64, 1), morphDot 4s ease-in-out infinite 0.8s;
+  }
+
+  .nav-dot.active::before {
+    animation: ripple 2s ease-out infinite;
+  }
+
+  .nav-dot.active::after {
+    animation: pulse 2.5s ease-in-out infinite;
+  }
+
+  .nav-dot:hover {
+    transform: scale(1.4);
+  }
+
+  .nav-dot:hover::before {
+    opacity: 0.6;
+    animation: ripple 1.2s ease-out infinite;
+  }
+
+  .nav-dot:hover::after {
+    animation: pulse 1.8s ease-in-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    
+    .scroll-animate,
+    .scroll-animate-fast {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
+
+  /* Navbar Styles */
+  .coldwar-navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: linear-gradient(180deg, rgba(10, 10, 12, 0.98) 0%, rgba(10, 10, 12, 0.95) 100%);
+    backdrop-filter: blur(12px);
+    border-bottom: 2px solid rgba(255, 176, 0, 0.25);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 176, 0, 0.1);
+    padding: 0.8rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    animation: fadeInDown 0.6s ease-out;
+  }
+
+  .navbar-logo {
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--cw-color-primary);
+    text-shadow: 0 0 12px rgba(255, 176, 0, 0.6);
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: none;
+    border: none;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .navbar-logo:hover {
+    color: #FFD700;
+    text-shadow: 0 0 20px rgba(255, 176, 0, 0.9);
+  }
+
+  .navbar-center {
+    display: flex;
+    gap: 0.8rem;
+    align-items: center;
+  }
+
+  .navbar-link {
+    padding: 0.6rem 1.2rem;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    border: 1px solid rgba(255, 176, 0, 0.4);
+    background: rgba(10, 10, 12, 0.6);
+    color: #D4A574;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px);
+    font-family: 'Share Tech Mono', monospace;
+  }
+
+  .navbar-link:hover {
+    border-color: var(--cw-color-primary);
+    color: var(--cw-color-primary);
+    background: rgba(255, 176, 0, 0.2);
+    box-shadow: 0 0 20px rgba(255, 176, 0, 0.5), inset 0 0 15px rgba(255, 176, 0, 0.15);
+    text-shadow: 0 0 10px rgba(255, 176, 0, 0.8);
+  }
+
+  .navbar-link.active {
+    border-color: var(--cw-color-primary);
+    background: rgba(255, 176, 0, 0.15);
+    color: var(--cw-color-primary);
+    text-shadow: 0 0 8px rgba(255, 176, 0, 0.6);
+    box-shadow: 0 0 15px rgba(255, 176, 0, 0.4), inset 0 0 10px rgba(255, 176, 0, 0.1);
+  }
+
+  @media (max-width: 768px) {
+    .coldwar-navbar {
+      padding: 0.6rem 1rem;
+      flex-wrap: wrap;
+    }
+
+    .navbar-center {
+      order: 3;
+      width: 100%;
+      margin-top: 0.5rem;
+      justify-content: center;
+    }
+
+    .navbar-link {
+      padding: 0.5rem 0.8rem;
+      font-size: 10px;
+    }
+  }
 `;
 
 export const ColdWarIntro: React.FC = () => {
@@ -45,8 +436,10 @@ export const ColdWarIntro: React.FC = () => {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
   const [activeSection, setActiveSection] = useState(0);
+  const [previousSection, setPreviousSection] = useState(0);
   const [terminalText, setTerminalText] = useState('');
 
+  const heroRef = useRef<HTMLElement>(null);
   const featuresRef = useRef<HTMLDivElement>(null);
   const installRef = useRef<HTMLDivElement>(null);
   const componentsRef = useRef<HTMLDivElement>(null);
@@ -54,6 +447,16 @@ export const ColdWarIntro: React.FC = () => {
   const statsRef = useRef<HTMLDivElement>(null);
   const roadmapRef = useRef<HTMLDivElement>(null);
   const newsletterRef = useRef<HTMLDivElement>(null);
+
+  // Apply scroll animations to sections
+  useScrollAnimation(heroRef, { threshold: 0.2, triggerOnce: true });
+  useScrollAnimation(featuresRef, { threshold: 0.1, triggerOnce: true });
+  useScrollAnimation(installRef, { threshold: 0.1, triggerOnce: true });
+  useScrollAnimation(componentsRef, { threshold: 0.1, triggerOnce: true });
+  useScrollAnimation(themesRef, { threshold: 0.1, triggerOnce: true });
+  useScrollAnimation(statsRef, { threshold: 0.1, triggerOnce: true });
+  useScrollAnimation(roadmapRef, { threshold: 0.1, triggerOnce: true });
+  useScrollAnimation(newsletterRef, { threshold: 0.1, triggerOnce: true });
 
   const sections = [
     'hero',
@@ -111,7 +514,8 @@ export const ColdWarIntro: React.FC = () => {
         if (entry.isIntersecting) {
           const sectionId = entry.target.id;
           const sectionIndex = sections.indexOf(sectionId);
-          if (sectionIndex !== -1) {
+          if (sectionIndex !== -1 && sectionIndex !== activeSection) {
+            setPreviousSection(activeSection);
             setActiveSection(sectionIndex);
           }
         }
@@ -224,6 +628,8 @@ export const ColdWarIntro: React.FC = () => {
           {/* Header - Hero Section */}
           <section
             id="hero"
+            ref={heroRef}
+            className="scroll-animate"
             style={{
               textAlign: 'center',
               padding: '6rem 2rem 4rem',
@@ -235,6 +641,7 @@ export const ColdWarIntro: React.FC = () => {
             }}
           >
             <h1
+              className="animate-title"
               style={{
                 fontSize: 'clamp(3rem, 10vw, 6rem)',
                 fontWeight: 700,
@@ -249,6 +656,7 @@ export const ColdWarIntro: React.FC = () => {
               COLD WAR HUD
             </h1>
             <div
+              className="animate-subtitle"
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -275,6 +683,7 @@ export const ColdWarIntro: React.FC = () => {
             </div>
 
             <p
+              className="animate-description"
               style={{
                 fontSize: 'clamp(1rem, 2vw, 1.2rem)',
                 color: 'var(--cw-color-text-tertiary)',
@@ -296,6 +705,7 @@ export const ColdWarIntro: React.FC = () => {
             </p>
 
             <div
+              className="animate-buttons"
               style={{
                 display: 'flex',
                 gap: '1.5rem',
@@ -329,10 +739,19 @@ export const ColdWarIntro: React.FC = () => {
               >
                 DOCUMENTATION
               </ColdWarButton>
+              <ColdWarButton
+                theme="perseus"
+                variant="primary"
+                size="lg"
+                onClick={() => navigate('/coldwar-portfolio')}
+              >
+                PORTFOLIO
+              </ColdWarButton>
             </div>
 
             {/* Tech Stack Badges */}
             <div
+              className="animate-badges"
               style={{
                 display: 'flex',
                 gap: '1rem',
@@ -362,6 +781,7 @@ export const ColdWarIntro: React.FC = () => {
 
             {/* Scroll Indicator */}
             <div
+              className="animate-scroll-indicator"
               style={{
                 marginTop: 'auto',
                 paddingTop: '4rem',
@@ -390,6 +810,7 @@ export const ColdWarIntro: React.FC = () => {
           <section
             id="features"
             ref={featuresRef}
+            className="scroll-animate"
             style={{
               maxWidth: '1400px',
               margin: '0 auto',
@@ -438,6 +859,7 @@ export const ColdWarIntro: React.FC = () => {
               }}
             >
               <ColdWarCard
+                className="animate-card"
                 theme="perseus"
                 variant="tactical"
                 color="amber"
@@ -452,6 +874,7 @@ export const ColdWarIntro: React.FC = () => {
               </ColdWarCard>
 
               <ColdWarCard
+                className="animate-card"
                 theme="perseus"
                 variant="tactical"
                 color="green"
@@ -466,6 +889,7 @@ export const ColdWarIntro: React.FC = () => {
               </ColdWarCard>
 
               <ColdWarCard
+                className="animate-card"
                 theme="perseus"
                 variant="tactical"
                 color="blue"
@@ -480,6 +904,7 @@ export const ColdWarIntro: React.FC = () => {
               </ColdWarCard>
 
               <ColdWarCard
+                className="animate-card"
                 theme="perseus"
                 variant="glass"
                 color="amber"
@@ -493,6 +918,7 @@ export const ColdWarIntro: React.FC = () => {
               </ColdWarCard>
 
               <ColdWarCard
+                className="animate-card"
                 theme="perseus"
                 variant="glass"
                 color="green"
@@ -506,6 +932,7 @@ export const ColdWarIntro: React.FC = () => {
               </ColdWarCard>
 
               <ColdWarCard
+                className="animate-card"
                 theme="perseus"
                 variant="glass"
                 color="blue"
@@ -524,6 +951,7 @@ export const ColdWarIntro: React.FC = () => {
           <section
             id="install"
             ref={installRef}
+            className="scroll-animate"
             style={{
               maxWidth: '1200px',
               margin: '0 auto',
@@ -567,6 +995,7 @@ export const ColdWarIntro: React.FC = () => {
 
             {/* Terminal */}
             <div
+              className="animate-terminal"
               style={{
                 background: 'rgba(0, 0, 0, 0.8)',
                 border: '1px solid var(--cw-color-primary)',
@@ -648,6 +1077,7 @@ export const ColdWarIntro: React.FC = () => {
 
             {/* Install Command */}
             <div
+              className="animate-install-box"
               style={{
                 padding: '2rem',
                 background: 'var(--cw-color-surface)',
@@ -682,6 +1112,7 @@ export const ColdWarIntro: React.FC = () => {
           <section
             id="components"
             ref={componentsRef}
+            className="scroll-animate"
             style={{
               maxWidth: '1400px',
               margin: '0 auto',
@@ -732,6 +1163,7 @@ export const ColdWarIntro: React.FC = () => {
             >
               {/* Button Demo */}
               <div
+                className="animate-component-demo"
                 style={{
                   padding: '2rem',
                   background: 'rgba(255, 176, 0, 0.05)',
@@ -765,6 +1197,7 @@ export const ColdWarIntro: React.FC = () => {
 
               {/* Input Demo */}
               <div
+                className="animate-component-demo"
                 style={{
                   padding: '2rem',
                   background: 'rgba(51, 255, 0, 0.05)',
@@ -791,6 +1224,7 @@ export const ColdWarIntro: React.FC = () => {
 
               {/* Card Demo */}
               <div
+                className="animate-component-demo"
                 style={{
                   padding: '2rem',
                   background: 'rgba(0, 174, 255, 0.05)',
@@ -829,6 +1263,7 @@ export const ColdWarIntro: React.FC = () => {
           <section
             id="themes"
             ref={themesRef}
+            className="scroll-animate"
             style={{
               maxWidth: '1200px',
               margin: '0 auto',
@@ -925,6 +1360,7 @@ export const ColdWarIntro: React.FC = () => {
           <section
             id="stats"
             ref={statsRef}
+            className="scroll-animate"
             style={{
               maxWidth: '1200px',
               margin: '0 auto',
@@ -951,6 +1387,7 @@ export const ColdWarIntro: React.FC = () => {
               ].map((stat) => (
                 <div
                   key={stat.label}
+                  className="animate-stat"
                   style={{
                     padding: '2rem',
                     background: 'rgba(255, 176, 0, 0.05)',
@@ -998,6 +1435,7 @@ export const ColdWarIntro: React.FC = () => {
           <section
             id="roadmap"
             ref={roadmapRef}
+            className="scroll-animate"
             style={{
               maxWidth: '1000px',
               margin: '0 auto',
@@ -1052,9 +1490,10 @@ export const ColdWarIntro: React.FC = () => {
                 }}
               />
 
-              {roadmapData.map((milestone) => (
+              {roadmapData.map((milestone, index) => (
                 <div
                   key={milestone.title}
+                  className="animate-roadmap-item"
                   style={{
                     position: 'relative',
                     paddingLeft: '60px',
@@ -1142,6 +1581,7 @@ export const ColdWarIntro: React.FC = () => {
           <section
             id="newsletter"
             ref={newsletterRef}
+            className="scroll-animate"
             style={{
               maxWidth: '800px',
               margin: '0 auto',

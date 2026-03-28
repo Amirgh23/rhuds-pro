@@ -169,6 +169,7 @@ export const Navbar: React.FC = () => {
               {createNavButton('/coldwar-showcase', 'Showcase', '#FFB000')}
               {createNavButton('/coldwar-playground', 'Playground', '#FFB000')}
               {createNavButton('/coldwar-docs', 'Docs', '#FFB000')}
+              {createNavButton('/coldwar-portfolio', 'Portfolio', '#FFB000')}
               <div
                 style={{
                   width: '1px',
