@@ -45,6 +45,15 @@ body {
   }
 }
 
+@keyframes scanlines-move {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 4px;
+  }
+}
+
 @keyframes hex-scroll {
   0% {
     transform: translateY(0);

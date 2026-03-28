@@ -281,6 +281,33 @@ export const ColdWarInput: React.FC<ColdWarInputProps> = ({
     position: 'relative',
   };
 
+  // Scanlines overlay for input
+  const scanlinesOverlayStyles: CSSProperties = scanlines
+    ? {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        pointerEvents: 'none',
+        zIndex: 100,
+        background: `repeating-linear-gradient(
+          0deg,
+          rgba(0, 0, 0, ${
+            scanlinesIntensity === 'low' ? 0.15 : scanlinesIntensity === 'medium' ? 0.25 : 0.35
+          }) 0px,
+          rgba(0, 0, 0, ${
+            scanlinesIntensity === 'low' ? 0.15 : scanlinesIntensity === 'medium' ? 0.25 : 0.35
+          }) 1px,
+          transparent 1px,
+          transparent 2px
+        )`,
+        backgroundSize: '100% 2px',
+        backgroundPosition: '0 0',
+        animation: 'scanlines-move 8s linear infinite',
+      }
+    : {};
+
   const iconStyles: CSSProperties = {
     display: 'flex',
     alignItems: 'center',
@@ -378,6 +405,9 @@ export const ColdWarInput: React.FC<ColdWarInputProps> = ({
               inputProps.onBlur?.(e);
             }}
           />
+
+          {/* CINEMATIC: Scanlines overlay */}
+          {scanlines && <div style={scanlinesOverlayStyles} />}
 
           {/* CINEMATIC: Scanning animation border on focus */}
           {isFocused && (

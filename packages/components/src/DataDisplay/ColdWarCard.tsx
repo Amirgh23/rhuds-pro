@@ -802,19 +802,22 @@ export const ColdWarCard: React.FC<ColdWarCardProps> = ({
             left: 0,
             right: 0,
             bottom: 0,
+            pointerEvents: 'none',
+            zIndex: 100,
             background: `repeating-linear-gradient(
               0deg,
-              transparent 0px,
-              transparent 1px,
               rgba(0, 0, 0, ${
-                scanlinesIntensity === 'low' ? 0.15 : scanlinesIntensity === 'medium' ? 0.25 : 0.35
+                scanlinesIntensity === 'low' ? 0.2 : scanlinesIntensity === 'medium' ? 0.3 : 0.4
+              }) 0px,
+              rgba(0, 0, 0, ${
+                scanlinesIntensity === 'low' ? 0.2 : scanlinesIntensity === 'medium' ? 0.3 : 0.4
               }) 1px,
-              rgba(0, 0, 0, ${
-                scanlinesIntensity === 'low' ? 0.15 : scanlinesIntensity === 'medium' ? 0.25 : 0.35
-              }) 2px
+              transparent 1px,
+              transparent 2px
             )`,
-            pointerEvents: 'none',
-            zIndex: 5,
+            backgroundSize: '100% 2px',
+            backgroundPosition: '0 0',
+            animation: 'scanlines-move 8s linear infinite',
           }}
         />
       )}

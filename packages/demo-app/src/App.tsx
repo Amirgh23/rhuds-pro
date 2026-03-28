@@ -1,13 +1,17 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { ThemeProvider, BleepsProvider, createAppTheme } from '@rhuds/core';
 import { HudToastProvider } from '@rhuds/components';
+import { ThemeSelector } from './pages/ThemeSelector';
 import IntroPageFuturistic from './pages/IntroPageFuturistic';
+import { ColdWarIntro } from './pages/ColdWarIntro';
 import { ShowcasePage } from './pages/ShowcasePage';
 import InteractivePlayground from './pages/InteractivePlayground';
 import { DocsPage } from './pages/DocsPage';
 import PortfolioPage from './pages/PortfolioPage';
 import ColdWarShowcase from './pages/ColdWarShowcase';
+import ColdWarPlayground from './pages/ColdWarPlayground';
+import ColdWarDocs from './pages/ColdWarDocs';
 import { Navbar } from './components/Navbar';
 import './styles/global.css';
 import './styles/cold-war-theme.css';
@@ -89,6 +93,9 @@ const themeMode = {
 };
 
 const AppContent: React.FC = () => {
+  const location = useLocation();
+  const showNavbar = location.pathname !== '/';
+
   return (
     <div
       style={{
@@ -101,15 +108,23 @@ const AppContent: React.FC = () => {
         boxSizing: 'border-box',
       }}
     >
-      <Navbar />
+      {showNavbar && <Navbar />}
       <Routes>
-        <Route path="/" element={<IntroPageFuturistic />} />
+        <Route path="/" element={<ThemeSelector />} />
+        <Route path="/intro" element={<IntroPageFuturistic />} />
+        <Route path="/coldwar-intro" element={<ColdWarIntro />} />
         <Route path="/showcase" element={<ShowcasePage />} />
-        <Route path="/cold-war" element={<ColdWarShowcase />} />
+        <Route path="/coldwar-showcase" element={<ColdWarShowcase />} />
+        <Route path="/coldwar-playground" element={<ColdWarPlayground />} />
+        <Route path="/coldwar-docs" element={<ColdWarDocs />} />
         <Route path="/playground" element={<InteractivePlayground />} />
         <Route path="/docs" element={<DocsPage />} />
         <Route path="/docs/:section" element={<DocsPage />} />
         <Route path="/portfolio" element={<PortfolioPage />} />
+        {/* Legacy routes for backward compatibility */}
+        <Route path="/cold-war" element={<ColdWarShowcase />} />
+        <Route path="/cold-war/playground" element={<ColdWarPlayground />} />
+        <Route path="/cold-war/docs" element={<ColdWarDocs />} />
       </Routes>
     </div>
   );

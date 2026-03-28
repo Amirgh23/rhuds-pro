@@ -1,0 +1,328 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   SCANLINES EFFECT - CRT Monitor Simulation
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Scanlines Animation */
+@keyframes scanlines-move {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 4px;
+  }
+}
+
+/* Low Intensity Scanlines */
+.scanlines-low {
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 1px,
+    rgba(0, 0, 0, 0.15) 1px,
+    rgba(0, 0, 0, 0.15) 2px
+  ) !important;
+  background-size: 100% 2px;
+  animation: scanlines-move 8s linear infinite;
+}
+
+/* Medium Intensity Scanlines */
+.scanlines-medium {
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 1px,
+    rgba(0, 0, 0, 0.25) 1px,
+    rgba(0, 0, 0, 0.25) 2px
+  ) !important;
+  background-size: 100% 2px;
+  animation: scanlines-move 8s linear infinite;
+}
+
+/* High Intensity Scanlines */
+.scanlines-high {
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 1px,
+    rgba(0, 0, 0, 0.35) 1px,
+    rgba(0, 0, 0, 0.35) 2px
+  ) !important;
+  background-size: 100% 2px;
+  animation: scanlines-move 8s linear infinite;
+}
+
+/* Scanlines Overlay - For layering on top of existing backgrounds */
+.scanlines-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.scanlines-overlay.low {
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 1px,
+    rgba(0, 0, 0, 0.15) 1px,
+    rgba(0, 0, 0, 0.15) 2px
+  );
+  background-size: 100% 2px;
+  animation: scanlines-move 8s linear infinite;
+}
+
+.scanlines-overlay.medium {
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 1px,
+    rgba(0, 0, 0, 0.25) 1px,
+    rgba(0, 0, 0, 0.25) 2px
+  );
+  background-size: 100% 2px;
+  animation: scanlines-move 8s linear infinite;
+}
+
+.scanlines-overlay.high {
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 1px,
+    rgba(0, 0, 0, 0.35) 1px,
+    rgba(0, 0, 0, 0.35) 2px
+  );
+  background-size: 100% 2px;
+  animation: scanlines-move 8s linear infinite;
+}
+
+/* Scanlines with Glow Combination */
+.scanlines-with-glow {
+  position: relative;
+}
+
+.scanlines-with-glow::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 1px,
+    rgba(0, 0, 0, 0.25) 1px,
+    rgba(0, 0, 0, 0.25) 2px
+  );
+  background-size: 100% 2px;
+  animation: scanlines-move 8s linear infinite;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Scanlines for Cards */
+.card-scanlines {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-scanlines::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 1px,
+    rgba(0, 0, 0, 0.25) 1px,
+    rgba(0, 0, 0, 0.25) 2px
+  );
+  background-size: 100% 2px;
+  animation: scanlines-move 8s linear infinite;
+  pointer-events: none;
+  z-index: 100;
+}
+
+/* Scanlines for Buttons */
+.button-scanlines {
+  position: relative;
+  overflow: hidden;
+}
+
+.button-scanlines::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 1px,
+    rgba(0, 0, 0, 0.2) 1px,
+    rgba(0, 0, 0, 0.2) 2px
+  );
+  background-size: 100% 2px;
+  animation: scanlines-move 8s linear infinite;
+  pointer-events: none;
+  z-index: 100;
+}
+
+/* Scanlines for Inputs */
+.input-scanlines {
+  position: relative;
+  overflow: hidden;
+}
+
+.input-scanlines::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 1px,
+    rgba(0, 0, 0, 0.15) 1px,
+    rgba(0, 0, 0, 0.15) 2px
+  );
+  background-size: 100% 2px;
+  animation: scanlines-move 8s linear infinite;
+  pointer-events: none;
+  z-index: 100;
+}
+
+/* Scanlines Flicker Effect */
+@keyframes scanlines-flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+
+.scanlines-flicker {
+  animation: scanlines-flicker 0.15s infinite;
+}
+
+/* Scanlines with Interlace Effect */
+@keyframes interlace {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 8px;
+  }
+}
+
+.scanlines-interlace {
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 1px,
+      rgba(0, 0, 0, 0.25) 1px,
+      rgba(0, 0, 0, 0.25) 2px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 4px,
+      rgba(0, 0, 0, 0.1) 4px,
+      rgba(0, 0, 0, 0.1) 8px
+    );
+  background-size:
+    100% 2px,
+    100% 8px;
+  animation: interlace 0.3s linear infinite;
+}
+
+/* Scanlines with RGB Shift */
+@keyframes rgb-shift {
+  0% {
+    text-shadow:
+      -2px 0 #ff0000,
+      2px 0 #00ff00,
+      0 0 #0000ff;
+  }
+  50% {
+    text-shadow:
+      -1px 0 #ff0000,
+      1px 0 #00ff00,
+      0 0 #0000ff;
+  }
+  100% {
+    text-shadow:
+      -2px 0 #ff0000,
+      2px 0 #00ff00,
+      0 0 #0000ff;
+  }
+}
+
+.scanlines-rgb-shift {
+  animation: rgb-shift 0.1s infinite;
+}
+
+/* Scanlines with Bloom Effect */
+.scanlines-bloom {
+  filter: blur(0.5px) brightness(1.1);
+}
+
+/* Scanlines with Chromatic Aberration */
+@keyframes chromatic-aberration {
+  0%,
+  100% {
+    filter: drop-shadow(-1px 0 rgba(255, 0, 0, 0.3)) drop-shadow(1px 0 rgba(0, 255, 0, 0.3))
+      drop-shadow(0 0 rgba(0, 0, 255, 0.3));
+  }
+  50% {
+    filter: drop-shadow(-0.5px 0 rgba(255, 0, 0, 0.3)) drop-shadow(0.5px 0 rgba(0, 255, 0, 0.3))
+      drop-shadow(0 0 rgba(0, 0, 255, 0.3));
+  }
+}
+
+.scanlines-chromatic {
+  animation: chromatic-aberration 0.2s infinite;
+}
+
+/* Scanlines with Vignette */
+.scanlines-vignette {
+  box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.5);
+}
+
+/* Scanlines with Phosphor Glow */
+.scanlines-phosphor {
+  text-shadow:
+    0 0 10px currentColor,
+    0 0 20px currentColor,
+    0 0 30px currentColor;
+  filter: brightness(1.2);
+}
+
+/* Scanlines Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .scanlines-low,
+  .scanlines-medium,
+  .scanlines-high,
+  .scanlines-overlay,
+  .card-scanlines::after,
+  .button-scanlines::after,
+  .input-scanlines::after,
+  .scanlines-flicker,
+  .scanlines-interlace,
+  .scanlines-rgb-shift,
+  .scanlines-chromatic {
+    animation: none !important;
+  }
+}

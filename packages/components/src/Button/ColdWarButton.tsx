@@ -612,13 +612,22 @@ export const ColdWarButton: React.FC<ColdWarButtonProps> = ({
             left: 0,
             right: 0,
             bottom: 0,
-            background: `repeating-linear-gradient(0deg, transparent 0px, transparent 1px, rgba(0, 0, 0, ${
-              scanlinesIntensity === 'low' ? 0.05 : scanlinesIntensity === 'medium' ? 0.1 : 0.15
-            }) 1px, rgba(0, 0, 0, ${
-              scanlinesIntensity === 'low' ? 0.05 : scanlinesIntensity === 'medium' ? 0.1 : 0.15
-            }) 2px)`,
             pointerEvents: 'none',
-            zIndex: 2,
+            zIndex: 100,
+            background: `repeating-linear-gradient(
+              0deg,
+              rgba(0, 0, 0, ${
+                scanlinesIntensity === 'low' ? 0.15 : scanlinesIntensity === 'medium' ? 0.25 : 0.35
+              }) 0px,
+              rgba(0, 0, 0, ${
+                scanlinesIntensity === 'low' ? 0.15 : scanlinesIntensity === 'medium' ? 0.25 : 0.35
+              }) 1px,
+              transparent 1px,
+              transparent 2px
+            )`,
+            backgroundSize: '100% 2px',
+            backgroundPosition: '0 0',
+            animation: 'scanlines-move 8s linear infinite',
           }}
         />
       )}
