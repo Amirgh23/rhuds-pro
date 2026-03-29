@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bubble Chart Demo - RHUDS & Cold War</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Share Tech Mono', monospace;
+        background: #0a0a0a;
+        color: #ffffff;
+        padding: 2rem;
+      }
+
+      .container {
+        max-width: 1400px;
+        margin: 0 auto;
+      }
+
+      h1 {
+        color: #29f2df;
+        margin-bottom: 2rem;
+        text-align: center;
+      }
+
+      .theme-selector {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        justify-content: center;
+      }
+
+      button {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        cursor: pointer;
+        font-weight: bold;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+        font-family: 'Share Tech Mono', monospace;
+      }
+
+      button.rhuds {
+        background: #29f2df;
+        color: #000;
+      }
+
+      button.rhuds:hover {
+        box-shadow: 0 0 20px rgba(41, 242, 223, 0.5);
+      }
+
+      button.coldwar {
+        background: #ffb000;
+        color: #000;
+      }
+
+      button.coldwar:hover {
+        box-shadow: 0 0 20px rgba(255, 176, 0, 0.5);
+      }
+
+      button.inactive {
+        background: #333;
+        color: #999;
+      }
+
+      .charts-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+      }
+
+      .chart-container {
+        padding: 1.5rem;
+        border-radius: 4px;
+        border: 1px solid rgba(41, 242, 223, 0.2);
+        background: linear-gradient(135deg, rgba(10, 10, 10, 0.9), rgba(26, 26, 30, 0.9));
+      }
+
+      .chart-container.coldwar {
+        border: 2px solid #ffb000;
+        border-radius: 0;
+        background: #0a0a0c;
+        box-shadow: 0 0 30px rgba(255, 176, 0, 0.3);
+        position: relative;
+      }
+
+      .chart-container.coldwar::before,
+      .chart-container.coldwar::after {
+        content: '';
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        border: 2px solid #ffb000;
+      }
+
+      .chart-container.coldwar::before {
+        top: 0;
+        left: 0;
+        border-right: none;
+        border-bottom: none;
+      }
+
+      .chart-container.coldwar::after {
+        bottom: 0;
+        right: 0;
+        border-left: none;
+        border-top: none;
+      }
+
+      .chart-container h2 {
+        margin-bottom: 1rem;
+        color: #29f2df;
+      }
+
+      .chart-container.coldwar h2 {
+        color: #ffb000;
+      }
+
+      canvas {
+        display: block;
+        margin: 0 auto;
+      }
+
+      .info-section {
+        padding: 1.5rem;
+        background: #1a1a1a;
+        border: 1px solid rgba(41, 242, 223, 0.2);
+        border-radius: 4px;
+        margin-top: 2rem;
+      }
+
+      .info-section.coldwar {
+        border: 1px solid #ffb000;
+        border-radius: 0;
+      }
+
+      .info-section h3 {
+        color: #29f2df;
+        margin-bottom: 1rem;
+      }
+
+      .info-section.coldwar h3 {
+        color: #ffb000;
+      }
+
+      .info-section ul {
+        margin-left: 2rem;
+        margin-bottom: 1rem;
+      }
+
+      .info-section li {
+        margin-bottom: 0.5rem;
+      }
+
+      @media (max-width: 1024px) {
+        .charts-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Bubble Chart Component Demo</h1>
+
+      <div class="theme-selector">
+        <button class="rhuds" onclick="switchTheme('rhuds')">RHUDS Theme</button>
+        <button class="coldwar inactive" onclick="switchTheme('coldwar')">COLD WAR Theme</button>
+      </div>
+
+      <div id="rhuds-charts" class="charts-grid" style="display: grid">
+        <div class="chart-container">
+          <h2>Sales Performance</h2>
+          <canvas id="rhuds-sales" width="500" height="400"></canvas>
+        </div>
+        <div class="chart-container">
+          <h2>System Performance</h2>
+          <canvas id="rhuds-performance" width="500" height="400"></canvas>
+        </div>
+      </div>
+
+      <div id="coldwar-charts" class="charts-grid" style="display: none">
+        <div class="chart-container coldwar">
+          <h2>TACTICAL ANALYSIS</h2>
+          <canvas id="coldwar-tactical" width="500" height="400"></canvas>
+        </div>
+        <div class="chart-container coldwar">
+          <h2>THREAT ASSESSMENT</h2>
+          <canvas id="coldwar-threat" width="500" height="400"></canvas>
+        </div>
+      </div>
+
+      <div id="rhuds-info" class="info-section">
+        <h3>About RHUDS Bubble Charts</h3>
+        <p>
+          The RHUDS theme provides a modern, clean aesthetic with smooth transitions and subtle
+          effects.
+        </p>
+        <ul>
+          <li><strong>Color Palette:</strong> Cyan (#29F2DF), Blue (#1C7FA6), Magenta (#EF3EF1)</li>
+          <li>
+            <strong>Design:</strong> Smooth rounded corners, subtle grid lines, clean typography
+          </li>
+          <li><strong>Use Case:</strong> Modern dashboards, analytics, business intelligence</li>
+        </ul>
+      </div>
+
+      <div id="coldwar-info" class="info-section coldwar" style="display: none">
+        <h3>ABOUT COLD WAR BUBBLE CHARTS</h3>
+        <p>
+          The Cold War theme provides a tactical, military aesthetic with intense colors and glow
+          effects.
+        </p>
+        <ul>
+          <li>
+            <strong>COLOR PALETTE:</strong> Tactical Amber (#FFB000), Phosphor Green (#33FF00),
+            Muted Red (#FF3333)
+          </li>
+          <li>
+            <strong>DESIGN:</strong> Sharp angular corners, dashed grid lines, monospace typography
+          </li>
+          <li>
+            <strong>USE CASE:</strong> Tactical analysis, military operations, strategic planning
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <script>
+      // RHUDS Data
+      const rhudsSalesData = [
+        { x: 20, y: 30, r: 15, label: 'Q1', color: '#29F2DF' },
+        { x: 35, y: 50, r: 20, label: 'Q2', color: '#1C7FA6' },
+        { x: 50, y: 65, r: 25, label: 'Q3', color: '#EF3EF1' },
+        { x: 65, y: 75, r: 30, label: 'Q4', color: '#29F2DF' },
+      ];
+
+      const rhudsPerformanceData = [
+        { x: 30, y: 40, r: 18, label: 'CPU', color: '#29F2DF' },
+        { x: 50, y: 60, r: 22, label: 'RAM', color: '#1C7FA6' },
+        { x: 70, y: 50, r: 28, label: 'GPU', color: '#EF3EF1' },
+        { x: 80, y: 75, r: 32, label: 'NET', color: '#29F2DF' },
+      ];
+
+      // Cold War Data
+      const coldwarTacticalData = [
+        { x: 25, y: 35, r: 18, label: 'A', color: '#FFB000' },
+        { x: 45, y: 55, r: 22, label: 'B', color: '#33FF00' },
+        { x: 65, y: 65, r: 28, label: 'C', color: '#FF3333' },
+        { x: 80, y: 45, r: 32, label: 'D', color: '#00ccff' },
+      ];
+
+      const coldwarThreatData = [
+        { x: 20, y: 30, r: 15, label: 'T1', color: '#FFB000' },
+        { x: 40, y: 50, r: 20, label: 'T2', color: '#33FF00' },
+        { x: 60, y: 70, r: 25, label: 'T3', color: '#FF3333' },
+        { x: 75, y: 55, r: 30, label: 'T4', color: '#00ccff' },
+      ];
+
+      function drawBubbleChart(canvasId, data, theme, xLabel, yLabel) {
+        const canvas = document.getElementById(canvasId);
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+
+        // Theme colors
+        const colors =
+          theme === 'rhuds'
+            ? {
+                background: '#0a0a0a',
+                text: '#ffffff',
+                grid: '#333333',
+                border: '#555555',
+              }
+            : {
+                background: '#0a0a0c',
+                text: '#FFB000',
+                grid: '#1a1a1e',
+                border: '#2a2a2e',
+              };
+
+        // Clear canvas
+        ctx.fillStyle = colors.background;
+        ctx.fillRect(0, 0, width, height);
+
+        const padding = 60;
+        const chartWidth = width - padding * 2;
+        const chartHeight = height - padding * 2;
+
+        // Find min/max
+        const xValues = data.map((d) => d.x);
+        const yValues = data.map((d) => d.y);
+        const minX = Math.min(...xValues);
+        const maxX = Math.max(...xValues);
+        const minY = Math.min(...yValues);
+        const maxY = Math.max(...yValues);
+        const maxR = Math.max(...data.map((d) => d.r));
+
+        // Scale functions
+        const scaleX = (x) => padding + ((x - minX) / (maxX - minX)) * chartWidth;
+        const scaleY = (y) => height - padding - ((y - minY) / (maxY - minY)) * chartHeight;
+        const scaleR = (r) => (r / maxR) * 40;
+
+        // Draw grid
+        ctx.strokeStyle = colors.grid;
+        ctx.lineWidth = 1;
+        if (theme === 'coldwar') {
+          ctx.setLineDash([5, 5]);
+        }
+
+        for (let i = 0; i <= 5; i++) {
+          const x = padding + (chartWidth / 5) * i;
+          ctx.beginPath();
+          ctx.moveTo(x, padding);
+          ctx.lineTo(x, height - padding);
+          ctx.stroke();
+
+          const y = padding + (chartHeight / 5) * i;
+          ctx.beginPath();
+          ctx.moveTo(padding, y);
+          ctx.lineTo(width - padding, y);
+          ctx.stroke();
+        }
+        ctx.setLineDash([]);
+
+        // Draw axes
+        ctx.strokeStyle = colors.text;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(padding, height - padding);
+        ctx.lineTo(width - padding, height - padding);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(padding, padding);
+        ctx.lineTo(padding, height - padding);
+        ctx.stroke();
+
+        // Draw bubbles
+        data.forEach((point) => {
+          const x = scaleX(point.x);
+          const y = scaleY(point.y);
+          const r = scaleR(point.r);
+
+          if (theme === 'coldwar') {
+            ctx.shadowColor = point.color;
+            ctx.shadowBlur = 15;
+          }
+
+          ctx.fillStyle = point.color;
+          ctx.globalAlpha = 0.7;
+          ctx.beginPath();
+          ctx.arc(x, y, r, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.globalAlpha = 1;
+          ctx.strokeStyle = point.color;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.arc(x, y, r, 0, Math.PI * 2);
+          ctx.stroke();
+
+          ctx.shadowColor = 'transparent';
+
+          if (point.label) {
+            ctx.fillStyle = colors.text;
+            ctx.font = '10px "Share Tech Mono", monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText(point.label, x, y);
+          }
+        });
+
+        // Draw labels
+        ctx.fillStyle = colors.text;
+        ctx.font = '12px "Share Tech Mono", monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(xLabel, width / 2, height - 10);
+
+        ctx.save();
+        ctx.translate(15, height / 2);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillText(yLabel, 0, 0);
+        ctx.restore();
+      }
+
+      function switchTheme(theme) {
+        const rhudsCharts = document.getElementById('rhuds-charts');
+        const coldwarCharts = document.getElementById('coldwar-charts');
+        const rhudsInfo = document.getElementById('rhuds-info');
+        const coldwarInfo = document.getElementById('coldwar-info');
+        const buttons = document.querySelectorAll('button');
+
+        if (theme === 'rhuds') {
+          rhudsCharts.style.display = 'grid';
+          coldwarCharts.style.display = 'none';
+          rhudsInfo.style.display = 'block';
+          coldwarInfo.style.display = 'none';
+          buttons[0].classList.remove('inactive');
+          buttons[1].classList.add('inactive');
+        } else {
+          rhudsCharts.style.display = 'none';
+          coldwarCharts.style.display = 'grid';
+          rhudsInfo.style.display = 'none';
+          coldwarInfo.style.display = 'block';
+          buttons[0].classList.add('inactive');
+          buttons[1].classList.remove('inactive');
+        }
+
+        // Draw charts
+        if (theme === 'rhuds') {
+          drawBubbleChart(
+            'rhuds-sales',
+            rhudsSalesData,
+            'rhuds',
+            'Market Share (%)',
+            'Revenue Growth (%)'
+          );
+          drawBubbleChart(
+            'rhuds-performance',
+            rhudsPerformanceData,
+            'rhuds',
+            'Utilization (%)',
+            'Performance Score'
+          );
+        } else {
+          drawBubbleChart(
+            'coldwar-tactical',
+            coldwarTacticalData,
+            'coldwar',
+            'Threat Level',
+            'Strategic Value'
+          );
+          drawBubbleChart(
+            'coldwar-threat',
+            coldwarThreatData,
+            'coldwar',
+            'Threat Severity',
+            'Response Priority'
+          );
+        }
+      }
+
+      // Initial draw
+      switchTheme('rhuds');
+    </script>
+  </body>
+</html>

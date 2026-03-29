@@ -12,18 +12,28 @@ import { useContextMenu } from '../hooks/useContextMenu';
 import { GlassContextMenu } from '../components/GlassContextMenu';
 import { useNavigate } from 'react-router-dom';
 
-const DEFAULT_CODE = `export default function Example() {
+const DEFAULT_CODE = `import { RhudsBubbleChart } from '@rhuds/components/Visualization';
+
+export default function Example() {
+  const data = [
+    { x: 20, y: 30, r: 15, label: 'Q1' },
+    { x: 35, y: 50, r: 20, label: 'Q2' },
+    { x: 50, y: 65, r: 25, label: 'Q3' },
+    { x: 65, y: 75, r: 30, label: 'Q4' },
+  ];
+
   return (
     <div style={{ padding: '20px' }}>
       <h3 style={{ color: '#29F2DF', marginBottom: '15px' }}>
-        Welcome to RHUDS Playground
+        Bubble Chart Example
       </h3>
-      <p style={{ color: '#a8dadc', marginBottom: '20px' }}>
-        Edit the code to see changes in real-time
-      </p>
-      <p style={{ fontSize: '12px', color: '#888' }}>
-        All RHUDS components are available in scope
-      </p>
+      <RhudsBubbleChart
+        data={data}
+        width={600}
+        height={400}
+        xLabel="Market Share (%)"
+        yLabel="Revenue Growth (%)"
+      />
     </div>
   );
 }`;

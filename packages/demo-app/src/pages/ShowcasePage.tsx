@@ -4,6 +4,7 @@ import { AnimatedBackground } from '../components/AnimatedBackground';
 import { useContextMenu } from '../hooks/useContextMenu';
 import { GlassContextMenu } from '../components/GlassContextMenu';
 import { ColdWarButton, ColdWarInput, ColdWarCard } from '@rhuds/components';
+import { RhudsBubbleChartStyled } from '../../../components/src/Visualization';
 import '../styles/cold-war-theme.css';
 import {
   Text,
@@ -3046,11 +3047,30 @@ export const ShowcasePage: React.FC = () => {
       ),
     },
     {
-      label: 'Visualization (1)',
+      label: 'Visualization (2)',
       content: (
         <Stack direction="column" gap="2rem">
           <ComponentSection title="37. Chart">
             <Chart data={chartData} type="bar" width={600} height={300} />
+          </ComponentSection>
+          <ComponentSection title="38. Bubble Chart">
+            <Stack direction="column" gap="1rem">
+              <Text variant="body" style={{ color: '#29F2DF' }}>
+                RHUDS Theme:
+              </Text>
+              <RhudsBubbleChartStyled
+                data={[
+                  { x: 20, y: 30, r: 15, label: 'Q1', color: '#29F2DF' },
+                  { x: 35, y: 50, r: 20, label: 'Q2', color: '#1C7FA6' },
+                  { x: 50, y: 65, r: 25, label: 'Q3', color: '#EF3EF1' },
+                  { x: 65, y: 75, r: 30, label: 'Q4', color: '#29F2DF' },
+                ]}
+                width={600}
+                height={400}
+                xLabel="Market Share (%)"
+                yLabel="Revenue Growth (%)"
+              />
+            </Stack>
           </ComponentSection>
         </Stack>
       ),
@@ -3386,7 +3406,7 @@ export const ShowcasePage: React.FC = () => {
               color={theme.currentMode.tokens.colors.success}
             />
             <StatCard
-              title="1"
+              title="2"
               subtitle="Visualization"
               color={theme.currentMode.tokens.colors.secondary}
             />

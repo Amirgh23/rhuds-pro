@@ -7,14 +7,18 @@ import {
   Text,
   Stack,
 } from '@rhuds/components';
+import { ColdWarBubbleChartStyled } from '../../../components/src/Visualization';
 import { TacticalMotionBackground } from '../components/TacticalMotionBackground';
 import { ColdWarComponentPlayground } from '../components/ColdWarComponentPlayground';
 import { GeometricWrapper } from '../components/GeometricWrapper';
+import { ColdWarContextMenu } from '../components/ColdWarContextMenu';
+import { useColdWarContextMenu } from '../hooks/useColdWarContextMenu';
 
 type ThemeVariant = 'perseus' | 'greenTerminal' | 'satelliteView';
 
 const ColdWarPlayground: React.FC = () => {
   const [theme, setTheme] = useState<ThemeVariant>('perseus');
+  const { contextMenu, handleContextMenu, handleCloseContextMenu } = useColdWarContextMenu();
 
   const [inputValue, setInputValue] = useState('');
   const [buttonVariant, setButtonVariant] = useState<string>('primary');
@@ -42,8 +46,12 @@ const ColdWarPlayground: React.FC = () => {
         zIndex: 1,
       }}
       data-theme={theme}
+      onContextMenu={handleContextMenu}
     >
       <TacticalMotionBackground variant={theme === 'satelliteView' ? 'satellite' : 'perimeter'} />
+      {contextMenu && (
+        <ColdWarContextMenu x={contextMenu.x} y={contextMenu.y} onClose={handleCloseContextMenu} />
+      )}
       <Container
         maxWidth="1400px"
         style={{ padding: '3rem 2rem', position: 'relative', zIndex: 10, marginTop: '70px' }}
@@ -404,6 +412,46 @@ const ColdWarPlayground: React.FC = () => {
           </div>
         </ColdWarComponentPlayground>
 
+        {/* Bubble Chart Component */}
+        <ColdWarComponentPlayground
+          title="Bubble Chart Visualization"
+          description="Tactical data visualization with bubble chart"
+          code={`<ColdWarBubbleChartStyled
+  data={[
+    { x: 25, y: 35, r: 18, label: 'A', color: '#FFB000' },
+    { x: 45, y: 55, r: 22, label: 'B', color: '#33FF00' },
+    { x: 65, y: 65, r: 28, label: 'C', color: '#FF3333' },
+    { x: 80, y: 45, r: 32, label: 'D', color: '#00ccff' },
+  ]}
+  width={600}
+  height={400}
+  xLabel="Threat Level"
+  yLabel="Strategic Value"
+/>`}
+        >
+          <GeometricWrapper
+            variant="complex"
+            color="#FFB000"
+            style={{
+              padding: '2rem',
+              background: 'rgba(0, 0, 0, 0.3)',
+            }}
+          >
+            <ColdWarBubbleChartStyled
+              data={[
+                { x: 25, y: 35, r: 18, label: 'A', color: '#FFB000' },
+                { x: 45, y: 55, r: 22, label: 'B', color: '#33FF00' },
+                { x: 65, y: 65, r: 28, label: 'C', color: '#FF3333' },
+                { x: 80, y: 45, r: 32, label: 'D', color: '#00ccff' },
+              ]}
+              width={600}
+              height={400}
+              xLabel="Threat Level"
+              yLabel="Strategic Value"
+            />
+          </GeometricWrapper>
+        </ColdWarComponentPlayground>
+
         {/* Component Library Overview */}
         <div style={{ marginTop: '4rem' }}>
           <Text variant="h2" style={{ color: 'var(--cw-color-primary)', marginBottom: '2rem' }}>
@@ -429,6 +477,11 @@ const ColdWarPlayground: React.FC = () => {
             <ColdWarCard theme={theme} header="Cards" color="blue">
               <p style={{ margin: 0, fontSize: 'var(--cw-font-size-sm)' }}>
                 Display components with multiple variants and effects
+              </p>
+            </ColdWarCard>
+            <ColdWarCard theme={theme} header="Bubble Chart" color="amber">
+              <p style={{ margin: 0, fontSize: 'var(--cw-font-size-sm)' }}>
+                Tactical data visualization with canvas-based rendering
               </p>
             </ColdWarCard>
           </div>

@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { ColdWarButton, ColdWarCard, ColdWarInput } from '@rhuds/components';
 import { TacticalMotionBackground } from '../components/TacticalMotionBackground';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
+import { ColdWarContextMenu } from '../components/ColdWarContextMenu';
+import { useColdWarContextMenu } from '../hooks/useColdWarContextMenu';
 import '../styles/cold-war-theme.css';
 
 // Add keyframes for animations
@@ -438,6 +440,7 @@ export const ColdWarIntro: React.FC = () => {
   const [activeSection, setActiveSection] = useState(0);
   const [previousSection, setPreviousSection] = useState(0);
   const [terminalText, setTerminalText] = useState('');
+  const { contextMenu, handleContextMenu, handleCloseContextMenu } = useColdWarContextMenu();
 
   const heroRef = useRef<HTMLElement>(null);
   const featuresRef = useRef<HTMLDivElement>(null);
@@ -580,8 +583,19 @@ export const ColdWarIntro: React.FC = () => {
           overflow: 'hidden',
         }}
         data-theme="perseus"
+        onContextMenu={(e: React.MouseEvent<HTMLDivElement>) => {
+          e.preventDefault();
+          handleContextMenu(e);
+        }}
       >
         <TacticalMotionBackground variant="perimeter" />
+        {contextMenu && (
+          <ColdWarContextMenu
+            x={contextMenu.x}
+            y={contextMenu.y}
+            onClose={handleCloseContextMenu}
+          />
+        )}
 
         {/* Navigation Dots */}
         <div

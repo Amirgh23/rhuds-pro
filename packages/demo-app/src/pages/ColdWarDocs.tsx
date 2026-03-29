@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
 import { ColdWarButton } from '@rhuds/components';
 import { ColdWarCard } from '@rhuds/components';
+import { ColdWarBubbleChartStyled } from '../../../components/src/Visualization';
 import { TacticalMotionBackground } from '../components/TacticalMotionBackground';
+import { ColdWarContextMenu } from '../components/ColdWarContextMenu';
+import { useColdWarContextMenu } from '../hooks/useColdWarContextMenu';
 
 type ThemeVariant = 'perseus' | 'greenTerminal' | 'satelliteView';
-type DocSection = 'overview' | 'components' | 'theming' | 'effects' | 'api' | 'migration';
+type DocSection = 'overview' | 'components' | 'theming' | 'effects' | 'api' | 'bubblechart';
 
 const ColdWarDocs: React.FC = () => {
   const [theme, setTheme] = useState<ThemeVariant>('perseus');
   const [activeSection, setActiveSection] = useState<DocSection>('overview');
+  const { contextMenu, handleContextMenu, handleCloseContextMenu } = useColdWarContextMenu();
 
   const pageStyle: React.CSSProperties = {
     minHeight: '100vh',
@@ -437,60 +441,70 @@ cubic-bezier(0.68, -0.55, 0.265, 1.55)`}
   const renderMigration = () => (
     <div style={contentStyle}>
       <div>
-        <h2 style={sectionTitleStyle}>Migration Guide</h2>
+        <h2 style={sectionTitleStyle}>Bubble Chart Visualization</h2>
       </div>
 
-      <ColdWarCard theme={theme} header="From Standard Components" color="amber">
+      <ColdWarCard theme={theme} header="Tactical Data Visualization" color="amber">
         <div style={{ fontSize: 'var(--cw-font-size-sm)' }}>
           <p style={{ margin: '0 0 12px 0' }}>
-            <strong>Before:</strong>
+            The Bubble Chart component provides advanced 3D data visualization with tactical
+            styling.
           </p>
-          <div style={codeBlockStyle}>
-            {`<Button variant="primary">
-  Click Me
-</Button>`}
-          </div>
-          <p style={{ margin: '12px 0' }}>
-            <strong>After:</strong>
+          <p style={{ margin: '0 0 12px 0' }}>
+            <strong>Features:</strong>
           </p>
-          <div style={codeBlockStyle}>
-            {`<ColdWarButton theme="perseus" variant="primary">
-  Click Me
-</ColdWarButton>`}
-          </div>
+          <ul style={{ margin: '0 0 12px 0', paddingLeft: '20px' }}>
+            <li>Canvas-based rendering for performance</li>
+            <li>Support for 100+ data points</li>
+            <li>Customizable colors and styling</li>
+            <li>Grid and axis display options</li>
+            <li>Glow effects for tactical appearance</li>
+          </ul>
         </div>
       </ColdWarCard>
 
-      <ColdWarCard theme={theme} header="Styling Approach" color="green">
-        <div style={{ fontSize: 'var(--cw-font-size-sm)' }}>
+      <ColdWarCard theme={theme} header="Example: Tactical Analysis" color="green">
+        <div style={{ fontSize: 'var(--cw-font-size-sm)', marginBottom: '12px' }}>
           <p style={{ margin: '0 0 12px 0' }}>
-            Cold War components use CSS variables for theming. No need for styled-components or
-            inline styles:
+            <strong>Data Structure:</strong>
           </p>
           <div style={codeBlockStyle}>
-            {`/* Set theme on container */
-<div data-theme="perseus">
-  <ColdWarButton>Themed Button</ColdWarButton>
-</div>
-
-/* Or use CSS variables directly */
-:root {
-  --cw-color-primary: #FFB000;
-  --cw-color-background: #0A0A0A;
-}`}
+            {`const tacticalData = [
+  { x: 25, y: 35, r: 18, label: 'A', color: '#FFB000' },
+  { x: 45, y: 55, r: 22, label: 'B', color: '#33FF00' },
+  { x: 65, y: 65, r: 28, label: 'C', color: '#FF3333' },
+  { x: 80, y: 45, r: 32, label: 'D', color: '#00ccff' },
+];`}
           </div>
         </div>
+        <ColdWarBubbleChartStyled
+          data={[
+            { x: 25, y: 35, r: 18, label: 'A', color: '#FFB000' },
+            { x: 45, y: 55, r: 22, label: 'B', color: '#33FF00' },
+            { x: 65, y: 65, r: 28, label: 'C', color: '#FF3333' },
+            { x: 80, y: 45, r: 32, label: 'D', color: '#00ccff' },
+          ]}
+          width={500}
+          height={350}
+          xLabel="Threat Level"
+          yLabel="Strategic Value"
+        />
       </ColdWarCard>
 
-      <ColdWarCard theme={theme} header="Best Practices" color="blue">
-        <ul style={{ margin: 0, paddingLeft: '20px', fontSize: 'var(--cw-font-size-sm)' }}>
-          <li>Always specify the theme prop for consistency</li>
-          <li>Use glow and scanlines sparingly for performance</li>
-          <li>Maintain uppercase text for authentic aesthetic</li>
-          <li>Use monospace fonts for data display</li>
-          <li>Test with reduced motion preferences</li>
-          <li>Ensure sufficient color contrast (WCAG AA minimum)</li>
-        </ul>
+      <ColdWarCard theme={theme} header="Usage" color="blue">
+        <div style={{ fontSize: 'var(--cw-font-size-sm)' }}>
+          <div style={codeBlockStyle}>
+            {`import { ColdWarBubbleChart } from '@rhuds/components/Visualization';
+
+<ColdWarBubbleChart
+  data={tacticalData}
+  width={600}
+  height={400}
+  xLabel="Threat Level"
+  yLabel="Strategic Value"
+/>`}
+          </div>
+        </div>
       </ColdWarCard>
     </div>
   );
@@ -501,12 +515,15 @@ cubic-bezier(0.68, -0.55, 0.265, 1.55)`}
     theming: renderTheming,
     effects: renderEffects,
     api: renderAPI,
-    migration: renderMigration,
+    bubblechart: renderMigration,
   };
 
   return (
-    <div style={pageStyle} data-theme={theme}>
+    <div style={pageStyle} data-theme={theme} onContextMenu={handleContextMenu}>
       <TacticalMotionBackground variant={theme === 'satelliteView' ? 'satellite' : 'perimeter'} />
+      {contextMenu && (
+        <ColdWarContextMenu x={contextMenu.x} y={contextMenu.y} onClose={handleCloseContextMenu} />
+      )}
       <div style={containerStyle}>
         {/* Header */}
         <div style={headerStyle}>
@@ -537,7 +554,7 @@ cubic-bezier(0.68, -0.55, 0.265, 1.55)`}
         <div style={gridStyle}>
           {/* Sidebar */}
           <div style={sidebarStyle}>
-            {(['overview', 'components', 'theming', 'effects', 'api', 'migration'] as const).map(
+            {(['overview', 'components', 'theming', 'effects', 'api', 'bubblechart'] as const).map(
               (section) => (
                 <ColdWarButton
                   key={section}
@@ -552,7 +569,7 @@ cubic-bezier(0.68, -0.55, 0.265, 1.55)`}
                   {section === 'theming' && 'Theming'}
                   {section === 'effects' && 'Effects'}
                   {section === 'api' && 'API Reference'}
-                  {section === 'migration' && 'Migration'}
+                  {section === 'bubblechart' && 'Bubble Chart'}
                 </ColdWarButton>
               )
             )}

@@ -3,6 +3,7 @@ import { useParams, Link, useLocation } from 'react-router-dom';
 import { useContextMenu } from '../hooks/useContextMenu';
 import { GlassContextMenu } from '../components/GlassContextMenu';
 import { ColdWarButton, ColdWarInput, ColdWarCard } from '@rhuds/components';
+import { RhudsBubbleChart } from '../../../components/src/Visualization';
 import '../styles/cold-war-theme.css';
 import {
   Text,
@@ -191,6 +192,30 @@ const ModalDemo: React.FC = () => {
   );
 };
 
+// Bubble Chart Demo Component
+const BubbleChartDemo: React.FC = () => {
+  const rhudsSalesData = [
+    { x: 20, y: 30, r: 15, label: 'Q1', color: '#29F2DF' },
+    { x: 35, y: 50, r: 20, label: 'Q2', color: '#1C7FA6' },
+    { x: 50, y: 65, r: 25, label: 'Q3', color: '#EF3EF1' },
+    { x: 65, y: 75, r: 30, label: 'Q4', color: '#29F2DF' },
+  ];
+
+  return (
+    <Stack direction="column" gap="1rem">
+      <div style={{ background: 'rgba(0, 0, 0, 0.3)', padding: '1rem', borderRadius: '4px' }}>
+        <RhudsBubbleChart
+          data={rhudsSalesData}
+          width={600}
+          height={400}
+          xLabel="Market Share (%)"
+          yLabel="Revenue Growth (%)"
+        />
+      </div>
+    </Stack>
+  );
+};
+
 const docs: Record<string, { title: string; category: string; content: string }> = {
   'getting-started': {
     title: 'Getting Started',
@@ -298,8 +323,13 @@ const docs: Record<string, { title: string; category: string; content: string }>
   colorpicker: { title: 'Color Picker', category: 'Specialized', content: 'Color selection.' },
   datepicker: { title: 'Date Picker', category: 'Specialized', content: 'Date selection.' },
   fileupload: { title: 'File Upload', category: 'Specialized', content: 'File upload component.' },
-  // Visualization (1)
+  // Visualization (2)
   chart: { title: 'Chart', category: 'Visualization', content: 'Data visualization charts.' },
+  bubblechart: {
+    title: 'Bubble Chart',
+    category: 'Visualization',
+    content: 'Bubble chart visualization with dual theme support (RHUDS and Cold War).',
+  },
 };
 
 export const DocsPage: React.FC = () => {
@@ -348,7 +378,7 @@ export const DocsPage: React.FC = () => {
     'Utility (4)': ['tooltip', 'popover', 'dropdown', 'portal'],
     'Advanced (5)': ['carousel', 'accordion', 'stepper', 'codeeditor', 'richtexteditor'],
     'Specialized (4)': ['slider', 'colorpicker', 'datepicker', 'fileupload'],
-    'Visualization (1)': ['chart'],
+    'Visualization (2)': ['chart', 'bubblechart'],
   };
 
   return (
@@ -397,7 +427,7 @@ export const DocsPage: React.FC = () => {
               display: 'block',
             }}
           >
-            43 Components
+            44 Components
           </Text>
 
           {Object.entries(categories).map(([category, items]) => (
@@ -1858,6 +1888,16 @@ function YourComponent() {
                 code={`<Chart type="line" data={data} />`}
               >
                 <ChartDemo />
+              </ComponentPlayground>
+            )}
+
+            {selectedDoc === 'bubblechart' && (
+              <ComponentPlayground
+                title="Bubble Chart Example"
+                description="Bubble chart visualization with dual theme support"
+                code={`<RhudsBubbleChart data={data} width={600} height={400} />`}
+              >
+                <BubbleChartDemo />
               </ComponentPlayground>
             )}
 
