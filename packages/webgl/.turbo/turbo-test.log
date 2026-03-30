@@ -1,4 +1,5 @@
 
 > @rhuds/webgl@0.1.0 test C:\Users\a.ghafarian\Desktop\Luminos HUD\packages\webgl
-> vitest run "--run"
+> vitest run
 
+[33mThe CJS build of Vite's Node API is deprecated. See https://vite.dev/guide/troubleshooting.html#vite-cjs-node-api-deprecated for more details.[39m

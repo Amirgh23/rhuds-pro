@@ -5,12 +5,20 @@
  * Includes basic, layout, form, navigation, data, and feedback components
  */
 
-// Basic Components
-export { Text } from './Text/Text';
-export type { TextProps } from './Text/types';
+// Basic Components (Task 20)
+export { Text, Decipher, Button } from './Basic';
+export type {
+  TextProps,
+  TextRenderMode,
+  DecipherProps,
+  ButtonProps,
+  ButtonVariant,
+  ButtonSize,
+} from './Basic';
 
-export { Button } from './Button/Button';
-export type { ButtonProps } from './Button/types';
+// Legacy Basic Components
+export { Text as LegacyText } from './Text/Text';
+export type { TextProps as LegacyTextProps } from './Text/types';
 
 export { HudButton } from './Button/HudButton';
 export type { HudButtonProps } from './Button/HudButton';
@@ -651,6 +659,21 @@ export type { AccordionProps } from './Advanced/types';
 export { Stepper } from './Advanced/Stepper';
 export type { StepperProps } from './Advanced/types';
 
+export { FileUpload } from './Advanced/FileUpload';
+export type { FileUploadProps } from './Advanced/FileUpload';
+
+export { RichTextEditor } from './Advanced/RichTextEditorNew';
+export type { RichTextEditorProps } from './Advanced/RichTextEditorNew';
+
+export { CodeEditor } from './Advanced/CodeEditorNew';
+export type { CodeEditorProps } from './Advanced/CodeEditorNew';
+
+export { Search } from './Advanced/Search';
+export type { SearchProps, SearchResult } from './Advanced/Search';
+
+export { Filter } from './Advanced/Filter';
+export type { FilterProps, FilterGroup, FilterOption } from './Advanced/Filter';
+
 export const version = '0.1.0';
 
 // Specialized Components
@@ -663,16 +686,6 @@ export type { DatePickerProps } from './Specialized/types';
 export { ColorPicker } from './Specialized/ColorPicker';
 export type { ColorPickerProps } from './Specialized/types';
 
-export { FileUpload } from './Specialized/FileUpload';
-export type { FileUploadProps } from './Specialized/types';
-
 // Visualization Components
 export { Chart } from './Visualization/Chart';
 export type { ChartProps, ChartDataPoint } from './Visualization/types';
-
-// Advanced Editor Components
-export { CodeEditor } from './Advanced/CodeEditor';
-export type { CodeEditorProps } from './Advanced/types';
-
-export { RichTextEditor } from './Advanced/RichTextEditor';
-export type { RichTextEditorProps } from './Advanced/types';

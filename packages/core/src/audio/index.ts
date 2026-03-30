@@ -1,31 +1,46 @@
 /**
- * Audio System
- * Core audio system for RHUDS Pro
+ * Audio System Exports
  */
 
-// Types
-export * from './types';
-
-// Bleep Manager
-export { createBleepManager } from './BleepManager';
-
-// React Integration
-export { BleepsProvider, useBleeps, useBleep } from './BleepsProvider';
-
-// Audio Effects
-export { AudioEffectsProcessor, createAudioEffects } from './effects';
-
-// Audio Visualization
+export { BleepManager } from './BleepManager';
+export { BleepsProvider, useBleeps } from './BleepsProvider';
 export {
-  AudioAnalyzer,
-  AudioVisualizer,
-  createAudioAnalyzer,
+  ReverbEffect,
+  DelayEffect,
+  DistortionEffect,
+  FilterEffect,
+  CompressorEffect,
+  EQEffect,
+} from './effects';
+export {
+  FrequencyAnalyzer,
+  BeatDetector,
+  SpectrumAnalyzer,
+  WaveformAnalyzer,
 } from './visualization';
+export { SpatialAudioSource, Listener, SpatialAudioManager } from './spatial';
+export { DynamicMixer, AudioDucker } from './mixing';
 
-// Spatial Audio
-export {
-  SpatialAudioManager,
-  AudioOcclusionCalculator,
-  DistanceAttenuationCalculator,
-  createSpatialAudio,
-} from './spatial';
+export type {
+  AudioSource,
+  BleepConfig,
+  SpatialConfig,
+  AudioEffect,
+  BleepPlayOptions,
+  BleepState,
+  BleepManagerConfig,
+  AudioVisualizationData,
+  BleepManagerInterface,
+} from './types';
+export type {
+  EffectConfig,
+  ReverbConfig,
+  DelayConfig,
+  DistortionConfig,
+  FilterConfig,
+  CompressorConfig,
+  EQConfig,
+} from './effects';
+export type { AudioFeatures } from './visualization';
+export type { Vector3, SpatialAudioConfig } from './spatial';
+export type { MixingConfig, AudioTrack } from './mixing';

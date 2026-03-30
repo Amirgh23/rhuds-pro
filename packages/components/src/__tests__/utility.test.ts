@@ -3,6 +3,8 @@
  * Tests for Tooltip, Popover, and Dropdown components
  */
 
+import { describe, it, expect, vi } from 'vitest';
+
 describe('Utility Components', () => {
   describe('Tooltip Component', () => {
     it('should render tooltip content', () => {
@@ -105,7 +107,7 @@ describe('Utility Components', () => {
     });
 
     it('should handle open change callback', () => {
-      const onOpenChange = jest.fn();
+      const onOpenChange = vi.fn();
       onOpenChange(true);
       expect(onOpenChange).toHaveBeenCalledWith(true);
     });
@@ -126,7 +128,7 @@ describe('Utility Components', () => {
     });
 
     it('should handle item click', () => {
-      const onClick = jest.fn();
+      const onClick = vi.fn();
       const item = { key: 'item1', label: 'Item 1', onClick };
       item.onClick();
       expect(onClick).toHaveBeenCalled();
@@ -194,7 +196,7 @@ describe('Utility Components', () => {
     });
 
     it('should handle item click callback', () => {
-      const onItemClick = jest.fn();
+      const onItemClick = vi.fn();
       const item = { key: 'item1', label: 'Item 1' };
       onItemClick(item);
       expect(onItemClick).toHaveBeenCalledWith(item);

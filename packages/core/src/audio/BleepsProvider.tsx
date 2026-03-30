@@ -1,17 +1,21 @@
 /**
- * Bleeps Provider
- * React context provider for bleep manager
+ * Bleeps Provider - React Integration for Audio System
  */
 
 import React from 'react';
-import { BleepManager, BleepManagerConfig } from './types';
-import { createBleepManager } from './BleepManager';
+import { BleepManager } from './BleepManager';
+import type { BleepConfig, BleepPlayOptions, BleepManagerConfig } from './types';
 
-/**
- * Bleeps context value
- */
 interface BleepsContextValue {
-  bleepManager: BleepManager;
+  manager: BleepManager;
+  createBleep: (config: BleepConfig) => void;
+  playBleep: (id: string, options?: BleepPlayOptions) => void;
+  stopBleep: (id: string) => void;
+  pauseBleep: (id: string) => void;
+  resumeBleep: (id: string) => void;
+  setBleepVolume: (id: string, volume: number) => void;
+  setCategoryVolume: (category: string, volume: number) => void;
+  setMasterVolume: (volume: number) => void;
 }
 
 const BleepsContext = React.createContext<BleepsContextValue | null>(null);
@@ -19,79 +23,66 @@ const BleepsContext = React.createContext<BleepsContextValue | null>(null);
 /**
  * Hook to access bleep manager
  */
-export function useBleeps(): BleepManager {
+export function useBleeps(): BleepsContextValue {
   const context = React.useContext(BleepsContext);
   if (!context) {
     throw new Error('useBleeps must be used within BleepsProvider');
   }
-  return context.bleepManager;
+  return context;
 }
 
-/**
- * Bleeps provider props
- */
 export interface BleepsProviderProps {
   config?: BleepManagerConfig;
   children: React.ReactNode;
 }
 
 /**
- * Bleeps Provider
+ * Bleeps Provider Component
  *
- * Provides bleep manager to all child components.
+ * Provides audio system to all child components.
+ * Manages bleep creation, playback, and mixing.
  *
  * @example
  * ```tsx
- * <BleepsProvider
- *   config={{
- *     masterVolume: 0.8,
- *     categories: {
- *       ui: { name: 'ui', volume: 1, muted: false },
- *       music: { name: 'music', volume: 0.6, muted: false },
- *     },
- *   }}
- * >
+ * <BleepsProvider config={{ masterVolume: 0.8 }}>
  *   <App />
  * </BleepsProvider>
  * ```
  */
 export const BleepsProvider: React.FC<BleepsProviderProps> = ({ config, children }) => {
-  const bleepManager = React.useMemo(() => createBleepManager(config), [config]);
+  const managerRef = React.useRef<BleepManager | null>(null);
 
-  // Cleanup on unmount
+  if (!managerRef.current) {
+    managerRef.current = new BleepManager(config);
+  }
+
+  const manager = managerRef.current;
+
+  const value: BleepsContextValue = React.useMemo(
+    () => ({
+      manager,
+      createBleep: (config: BleepConfig) => manager.createBleep(config),
+      playBleep: (id: string, options?: BleepPlayOptions) => manager.playBleep(id, options),
+      stopBleep: (id: string) => manager.stopBleep(id),
+      pauseBleep: (id: string) => manager.pauseBleep(id),
+      resumeBleep: (id: string) => manager.resumeBleep(id),
+      setBleepVolume: (id: string, volume: number) => manager.setBleepVolume(id, volume),
+      setCategoryVolume: (category: string, volume: number) =>
+        manager.setCategoryVolume(category, volume),
+      setMasterVolume: (volume: number) => manager.setMasterVolume(volume),
+    }),
+    [manager]
+  );
+
   React.useEffect(() => {
     return () => {
-      bleepManager.stopAll();
-      bleepManager.unloadAll();
+      manager.cleanup();
     };
-  }, [bleepManager]);
-
-  const value = React.useMemo(
-    () => ({
-      bleepManager,
-    }),
-    [bleepManager]
-  );
+  }, [manager]);
 
   return <BleepsContext.Provider value={value}>{children}</BleepsContext.Provider>;
 };
 
 BleepsProvider.displayName = 'BleepsProvider';
 
-/**
- * Hook to play a bleep
- */
-export function useBleep(id: string) {
-  const bleepManager = useBleeps();
-
-  return React.useMemo(
-    () => ({
-      play: () => bleepManager.play(id),
-      pause: () => bleepManager.pause(id),
-      stop: () => bleepManager.stop(id),
-      bleep: bleepManager.getBleep(id),
-    }),
-    [bleepManager, id]
-  );
-}
-
+export default BleepsProvider;

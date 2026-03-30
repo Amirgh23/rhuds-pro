@@ -193,10 +193,14 @@ export class ParticleSystem {
   /**
    * Update particle system
    */
-  update(bounds?: { width: number; height: number }): void {
-    const now = Date.now();
-    const deltaTime = Math.min((now - this.lastTime) / 1000, 0.016); // Cap at 60fps
-    this.lastTime = now;
+  update(bounds?: { width: number; height: number }, deltaTime?: number): void {
+    if (deltaTime === undefined) {
+      const now = Date.now();
+      deltaTime = Math.min((now - this.lastTime) / 1000, 0.016); // Cap at 60fps
+      this.lastTime = now;
+    } else {
+      this.lastTime = Date.now();
+    }
 
     // Emit new particles
     for (const emitter of this.emitters) {

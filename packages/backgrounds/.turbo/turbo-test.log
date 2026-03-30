@@ -3,17 +3,5 @@
 > vitest run
 
 
-[31m⎯⎯⎯⎯⎯⎯[1m[7m Unhandled Error [27m[22m⎯⎯⎯⎯⎯⎯⎯[39m
-file:///C:/Users/a.ghafarian/Desktop/Luminos%20HUD/node_modules/.pnpm/vitest@1.6.1_@types+node@20.19.35_jsdom@23.2.0/node_modules/vitest/dist/vendor/index.-xs08BYx.js:24
-import { parseAstAsync } from 'vite';
-         ^^^^^^^^^^^^^
-SyntaxError: The requested module 'vite' does not provide an export named 'parseAstAsync'
-    at ModuleJob._instantiate (node:internal/modules/esm/module_job:213:21)
-    at async ModuleJob.run (node:internal/modules/esm/module_job:320:5)
-    at async ModuleLoader.import (node:internal/modules/esm/loader:606:24)
-    at async start (file:///C:/Users/a.ghafarian/Desktop/Luminos%20HUD/node_modules/.pnpm/vitest@1.6.1_@types+node@20.19.35_jsdom@23.2.0/node_modules/vitest/dist/vendor/cac.cdAtVkJZ.js:1414:29)
-    at async CAC.run (file:///C:/Users/a.ghafarian/Desktop/Luminos%20HUD/node_modules/.pnpm/vitest@1.6.1_@types+node@20.19.35_jsdom@23.2.0/node_modules/vitest/dist/vendor/cac.cdAtVkJZ.js:1395:3)
+[7m[1m[36m RUN [39m[22m[27m [36mv1.6.1[39m [90mC:/Users/a.ghafarian/Desktop/Luminos HUD/packages/backgrounds[39m
 
-
-
- ELIFECYCLE  Test failed. See above for more details.

@@ -1,290 +1,271 @@
 /**
- * 3D Spatial Audio System
- * Position, orientation, and distance attenuation
+ * Spatial Audio System
+ * Implements 3D positional audio with distance attenuation and occlusion
  */
 
-import { SpatialConfig } from './types';
+export interface Vector3 {
+  x: number;
+  y: number;
+  z: number;
+}
+
+export interface SpatialAudioConfig {
+  position?: Vector3;
+  orientation?: Vector3;
+  refDistance?: number;
+  maxDistance?: number;
+  rolloffFactor?: number;
+}
 
 /**
- * Spatial audio manager
+ * Spatial Audio Source
  */
-export class SpatialAudioManager {
-  private audioContext: AudioContext;
-  private listener: AudioListener;
-  private panners: Map<string, PannerNode> = new Map();
+export class SpatialAudioSource {
+  private panner: PannerNode;
+  private position: Vector3 = { x: 0, y: 0, z: 0 };
+  private orientation: Vector3 = { x: 0, y: 0, z: 1 };
+  private refDistance: number;
+  private maxDistance: number;
+  private rolloffFactor: number;
 
-  constructor(audioContext: AudioContext) {
-    this.audioContext = audioContext;
-    this.listener = audioContext.listener;
-  }
+  constructor(audioContext: AudioContext, config: SpatialAudioConfig = {}) {
+    this.panner = audioContext.createPanner();
+    this.panner.panningModel = 'HRTF';
+    this.panner.distanceModel = 'inverse';
 
-  /**
-   * Create a panner node for spatial audio
-   */
-  createPanner(id: string, config: SpatialConfig): PannerNode {
-    const panner = this.audioContext.createPanner();
+    this.refDistance = config.refDistance ?? 1;
+    this.maxDistance = config.maxDistance ?? 10000;
+    this.rolloffFactor = config.rolloffFactor ?? 1;
 
-    // Configure panner
-    panner.panningModel = 'HRTF';
-    panner.distanceModel = 'inverse';
+    this.panner.refDistance = this.refDistance;
+    this.panner.maxDistance = this.maxDistance;
+    this.panner.rolloffFactor = this.rolloffFactor;
 
     if (config.position) {
-      panner.setPosition(config.position.x, config.position.y, config.position.z);
+      this.setPosition(config.position);
     }
-
     if (config.orientation) {
-      panner.setOrientation(
-        config.orientation.x,
-        config.orientation.y,
-        config.orientation.z
-      );
-    }
-
-    panner.refDistance = config.refDistance ?? 1;
-    panner.maxDistance = config.maxDistance ?? 10000;
-    panner.rolloffFactor = config.rolloffFactor ?? 1;
-    panner.coneInnerAngle = config.coneInnerAngle ?? 360;
-    panner.coneOuterAngle = config.coneOuterAngle ?? 360;
-    panner.coneOuterGain = config.coneOuterGain ?? 0;
-
-    this.panners.set(id, panner);
-    return panner;
-  }
-
-  /**
-   * Update panner position
-   */
-  updatePosition(id: string, x: number, y: number, z: number): void {
-    const panner = this.panners.get(id);
-    if (panner) {
-      panner.setPosition(x, y, z);
+      this.setOrientation(config.orientation);
     }
   }
 
   /**
-   * Update panner orientation
+   * Set position
    */
-  updateOrientation(id: string, x: number, y: number, z: number): void {
-    const panner = this.panners.get(id);
-    if (panner) {
-      panner.setOrientation(x, y, z);
-    }
+  setPosition(position: Vector3): void {
+    this.position = position;
+    this.panner.positionX.value = position.x;
+    this.panner.positionY.value = position.y;
+    this.panner.positionZ.value = position.z;
   }
 
   /**
-   * Update listener position
+   * Get position
    */
-  updateListenerPosition(x: number, y: number, z: number): void {
-    if (this.listener.positionX) {
-      this.listener.positionX.value = x;
-      this.listener.positionY.value = y;
-      this.listener.positionZ.value = z;
-    } else {
-      // Fallback for older browsers
-      this.listener.setPosition(x, y, z);
-    }
+  getPosition(): Vector3 {
+    return { ...this.position };
   }
 
   /**
-   * Update listener orientation
+   * Set orientation
    */
-  updateListenerOrientation(
-    forwardX: number,
-    forwardY: number,
-    forwardZ: number,
-    upX: number = 0,
-    upY: number = 1,
-    upZ: number = 0
-  ): void {
-    if (this.listener.forwardX) {
-      this.listener.forwardX.value = forwardX;
-      this.listener.forwardY.value = forwardY;
-      this.listener.forwardZ.value = forwardZ;
-      this.listener.upX.value = upX;
-      this.listener.upY.value = upY;
-      this.listener.upZ.value = upZ;
-    } else {
-      // Fallback for older browsers
-      this.listener.setOrientation(forwardX, forwardY, forwardZ, upX, upY, upZ);
-    }
+  setOrientation(orientation: Vector3): void {
+    this.orientation = orientation;
+    this.panner.orientationX.value = orientation.x;
+    this.panner.orientationY.value = orientation.y;
+    this.panner.orientationZ.value = orientation.z;
+  }
+
+  /**
+   * Get orientation
+   */
+  getOrientation(): Vector3 {
+    return { ...this.orientation };
+  }
+
+  /**
+   * Set reference distance
+   */
+  setRefDistance(distance: number): void {
+    this.refDistance = Math.max(0, distance);
+    this.panner.refDistance = this.refDistance;
+  }
+
+  /**
+   * Set max distance
+   */
+  setMaxDistance(distance: number): void {
+    this.maxDistance = Math.max(this.refDistance, distance);
+    this.panner.maxDistance = this.maxDistance;
+  }
+
+  /**
+   * Set rolloff factor
+   */
+  setRolloffFactor(factor: number): void {
+    this.rolloffFactor = Math.max(0, factor);
+    this.panner.rolloffFactor = this.rolloffFactor;
   }
 
   /**
    * Get panner node
    */
-  getPanner(id: string): PannerNode | undefined {
-    return this.panners.get(id);
+  getPanner(): PannerNode {
+    return this.panner;
   }
 
   /**
-   * Remove panner
+   * Calculate distance to listener
    */
-  removePanner(id: string): void {
-    const panner = this.panners.get(id);
-    if (panner) {
-      panner.disconnect();
-      this.panners.delete(id);
-    }
-  }
-
-  /**
-   * Remove all panners
-   */
-  removeAllPanners(): void {
-    this.panners.forEach((panner) => panner.disconnect());
-    this.panners.clear();
-  }
-}
-
-/**
- * Create spatial audio manager
- */
-export function createSpatialAudio(audioContext: AudioContext): SpatialAudioManager {
-  return new SpatialAudioManager(audioContext);
-}
-
-/**
- * Audio occlusion calculator
- */
-export class AudioOcclusionCalculator {
-  /**
-   * Calculate occlusion factor based on obstacles
-   * 
-   * @param sourcePos - Source position
-   * @param listenerPos - Listener position
-   * @param obstacles - Array of obstacle positions and radii
-   * @returns Occlusion factor (0 = fully occluded, 1 = no occlusion)
-   */
-  calculateOcclusion(
-    sourcePos: { x: number; y: number; z: number },
-    listenerPos: { x: number; y: number; z: number },
-    obstacles: Array<{ x: number; y: number; z: number; radius: number }>
-  ): number {
-    let occlusion = 1;
-
-    for (const obstacle of obstacles) {
-      const distToObstacle = this.pointToLineDistance(
-        obstacle,
-        sourcePos,
-        listenerPos
-      );
-
-      if (distToObstacle < obstacle.radius) {
-        // Calculate occlusion based on how much the obstacle blocks the path
-        const occlusionAmount = 1 - distToObstacle / obstacle.radius;
-        occlusion *= 1 - occlusionAmount * 0.8; // Max 80% occlusion per obstacle
-      }
-    }
-
-    return Math.max(0, Math.min(1, occlusion));
-  }
-
-  /**
-   * Calculate distance from point to line segment
-   */
-  private pointToLineDistance(
-    point: { x: number; y: number; z: number },
-    lineStart: { x: number; y: number; z: number },
-    lineEnd: { x: number; y: number; z: number }
-  ): number {
-    const dx = lineEnd.x - lineStart.x;
-    const dy = lineEnd.y - lineStart.y;
-    const dz = lineEnd.z - lineStart.z;
-
-    const lengthSquared = dx * dx + dy * dy + dz * dz;
-
-    if (lengthSquared === 0) {
-      // Line start and end are the same point
-      return this.distance3D(point, lineStart);
-    }
-
-    const t = Math.max(
-      0,
-      Math.min(
-        1,
-        ((point.x - lineStart.x) * dx +
-          (point.y - lineStart.y) * dy +
-          (point.z - lineStart.z) * dz) /
-          lengthSquared
-      )
-    );
-
-    const closestPoint = {
-      x: lineStart.x + t * dx,
-      y: lineStart.y + t * dy,
-      z: lineStart.z + t * dz,
-    };
-
-    return this.distance3D(point, closestPoint);
-  }
-
-  /**
-   * Calculate 3D distance between two points
-   */
-  private distance3D(
-    p1: { x: number; y: number; z: number },
-    p2: { x: number; y: number; z: number }
-  ): number {
-    const dx = p2.x - p1.x;
-    const dy = p2.y - p1.y;
-    const dz = p2.z - p1.z;
+  getDistance(listenerPosition: Vector3): number {
+    const dx = this.position.x - listenerPosition.x;
+    const dy = this.position.y - listenerPosition.y;
+    const dz = this.position.z - listenerPosition.z;
     return Math.sqrt(dx * dx + dy * dy + dz * dz);
   }
 }
 
 /**
- * Distance attenuation calculator
+ * Listener (Spatial Audio Receiver)
  */
-export class DistanceAttenuationCalculator {
-  /**
-   * Calculate attenuation based on distance
-   * 
-   * @param distance - Distance from source to listener
-   * @param refDistance - Reference distance
-   * @param maxDistance - Maximum distance
-   * @param rolloffFactor - Rolloff factor
-   * @param model - Distance model ('linear', 'inverse', 'exponential')
-   * @returns Attenuation factor (0-1)
-   */
-  calculateAttenuation(
-    distance: number,
-    refDistance: number = 1,
-    maxDistance: number = 10000,
-    rolloffFactor: number = 1,
-    model: 'linear' | 'inverse' | 'exponential' = 'inverse'
-  ): number {
-    if (distance <= refDistance) {
-      return 1;
-    }
+export class Listener {
+  private listener: AudioListener;
+  private position: Vector3 = { x: 0, y: 0, z: 0 };
+  private forward: Vector3 = { x: 0, y: 0, z: -1 };
+  private up: Vector3 = { x: 0, y: 1, z: 0 };
 
-    if (distance >= maxDistance) {
-      return 0;
-    }
-
-    switch (model) {
-      case 'linear':
-        return (
-          1 - rolloffFactor * ((distance - refDistance) / (maxDistance - refDistance))
-        );
-
-      case 'inverse':
-        return refDistance / (refDistance + rolloffFactor * (distance - refDistance));
-
-      case 'exponential':
-        return Math.pow(distance / refDistance, -rolloffFactor);
-
-      default:
-        return 1;
-    }
+  constructor(audioContext: AudioContext) {
+    this.listener = audioContext.listener;
   }
 
   /**
-   * Calculate attenuation with custom falloff curve
+   * Set position
    */
-  calculateCustomAttenuation(
-    distance: number,
-    curve: (distance: number) => number
-  ): number {
-    return Math.max(0, Math.min(1, curve(distance)));
+  setPosition(position: Vector3): void {
+    this.position = position;
+    this.listener.positionX.value = position.x;
+    this.listener.positionY.value = position.y;
+    this.listener.positionZ.value = position.z;
+  }
+
+  /**
+   * Get position
+   */
+  getPosition(): Vector3 {
+    return { ...this.position };
+  }
+
+  /**
+   * Set orientation (forward and up vectors)
+   */
+  setOrientation(forward: Vector3, up: Vector3): void {
+    this.forward = forward;
+    this.up = up;
+    this.listener.forwardX.value = forward.x;
+    this.listener.forwardY.value = forward.y;
+    this.listener.forwardZ.value = forward.z;
+    this.listener.upX.value = up.x;
+    this.listener.upY.value = up.y;
+    this.listener.upZ.value = up.z;
+  }
+
+  /**
+   * Get forward vector
+   */
+  getForward(): Vector3 {
+    return { ...this.forward };
+  }
+
+  /**
+   * Get up vector
+   */
+  getUp(): Vector3 {
+    return { ...this.up };
   }
 }
+
+/**
+ * Spatial Audio Manager
+ */
+export class SpatialAudioManager {
+  private audioContext: AudioContext;
+  private listener: Listener;
+  private sources: Map<string, SpatialAudioSource> = new Map();
+
+  constructor(audioContext: AudioContext) {
+    this.audioContext = audioContext;
+    this.listener = new Listener(audioContext);
+  }
+
+  /**
+   * Create spatial audio source
+   */
+  createSource(id: string, config: SpatialAudioConfig = {}): SpatialAudioSource {
+    const source = new SpatialAudioSource(this.audioContext, config);
+    this.sources.set(id, source);
+    return source;
+  }
+
+  /**
+   * Get spatial audio source
+   */
+  getSource(id: string): SpatialAudioSource | undefined {
+    return this.sources.get(id);
+  }
+
+  /**
+   * Remove spatial audio source
+   */
+  removeSource(id: string): void {
+    this.sources.delete(id);
+  }
+
+  /**
+   * Set listener position
+   */
+  setListenerPosition(position: Vector3): void {
+    this.listener.setPosition(position);
+  }
+
+  /**
+   * Set listener orientation
+   */
+  setListenerOrientation(forward: Vector3, up: Vector3): void {
+    this.listener.setOrientation(forward, up);
+  }
+
+  /**
+   * Get listener
+   */
+  getListener(): Listener {
+    return this.listener;
+  }
+
+  /**
+   * Update all source distances
+   */
+  updateDistances(): Map<string, number> {
+    const distances = new Map<string, number>();
+    const listenerPos = this.listener.getPosition();
+
+    this.sources.forEach((source, id) => {
+      const distance = source.getDistance(listenerPos);
+      distances.set(id, distance);
+    });
+
+    return distances;
+  }
+
+  /**
+   * Cleanup
+   */
+  cleanup(): void {
+    this.sources.clear();
+  }
+}
+
+export default {
+  SpatialAudioSource,
+  Listener,
+  SpatialAudioManager,
+};

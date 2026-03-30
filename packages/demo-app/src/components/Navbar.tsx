@@ -184,6 +184,7 @@ export const Navbar: React.FC = () => {
             <>
               {createNavButton('/intro', 'Intro')}
               {createNavButton('/showcase', 'Showcase')}
+              {createNavButton('/charts', 'Charts')}
               {createNavButton('/playground', 'Playground')}
               {createNavButton('/docs', 'Docs')}
               {createNavButton('/portfolio', 'Portfolio', '#EF3EF1')}

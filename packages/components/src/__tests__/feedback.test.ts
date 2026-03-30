@@ -16,7 +16,7 @@ describe('Feedback Components', () => {
     });
 
     it('should handle close action', () => {
-      const onClose = jest.fn();
+      const onClose = vi.fn();
       onClose();
       expect(onClose).toHaveBeenCalled();
     });
@@ -84,27 +84,27 @@ describe('Feedback Components', () => {
 
     it('should render action buttons', () => {
       const actions = [
-        { label: 'Cancel', onClick: jest.fn(), variant: 'secondary' as const },
-        { label: 'Confirm', onClick: jest.fn(), variant: 'primary' as const },
+        { label: 'Cancel', onClick: vi.fn(), variant: 'secondary' as const },
+        { label: 'Confirm', onClick: vi.fn(), variant: 'primary' as const },
       ];
       expect(actions).toHaveLength(2);
       expect(actions[0].label).toBe('Cancel');
     });
 
     it('should handle action click', () => {
-      const onClick = jest.fn();
+      const onClick = vi.fn();
       const action = { label: 'Confirm', onClick };
       action.onClick();
       expect(onClick).toHaveBeenCalled();
     });
 
     it('should support danger variant', () => {
-      const action = { label: 'Delete', onClick: jest.fn(), variant: 'danger' as const };
+      const action = { label: 'Delete', onClick: vi.fn(), variant: 'danger' as const };
       expect(action.variant).toBe('danger');
     });
 
     it('should disable action button', () => {
-      const action = { label: 'Disabled', onClick: jest.fn(), disabled: true };
+      const action = { label: 'Disabled', onClick: vi.fn(), disabled: true };
       expect(action.disabled).toBe(true);
     });
 
@@ -114,7 +114,7 @@ describe('Feedback Components', () => {
     });
 
     it('should handle close action', () => {
-      const onClose = jest.fn();
+      const onClose = vi.fn();
       onClose();
       expect(onClose).toHaveBeenCalled();
     });
@@ -148,7 +148,7 @@ describe('Feedback Components', () => {
 
     it('should auto-dismiss after duration', (done) => {
       const duration = 100;
-      const onClose = jest.fn();
+      const onClose = vi.fn();
       
       setTimeout(() => {
         onClose();
@@ -158,7 +158,7 @@ describe('Feedback Components', () => {
     });
 
     it('should handle manual close', () => {
-      const onClose = jest.fn();
+      const onClose = vi.fn();
       onClose();
       expect(onClose).toHaveBeenCalled();
     });
@@ -186,36 +186,36 @@ describe('Feedback Components', () => {
 
   describe('Notification Provider', () => {
     it('should provide notification context', () => {
-      const context = { show: jest.fn(), success: jest.fn(), error: jest.fn(), warning: jest.fn(), info: jest.fn() };
+      const context = { show: vi.fn(), success: vi.fn(), error: vi.fn(), warning: vi.fn(), info: vi.fn() };
       expect(context).toBeDefined();
     });
 
     it('should show notification', () => {
-      const show = jest.fn();
+      const show = vi.fn();
       show('Message', 'info', 3000);
       expect(show).toHaveBeenCalledWith('Message', 'info', 3000);
     });
 
     it('should show success notification', () => {
-      const success = jest.fn();
+      const success = vi.fn();
       success('Success message');
       expect(success).toHaveBeenCalledWith('Success message');
     });
 
     it('should show error notification', () => {
-      const error = jest.fn();
+      const error = vi.fn();
       error('Error message');
       expect(error).toHaveBeenCalledWith('Error message');
     });
 
     it('should show warning notification', () => {
-      const warning = jest.fn();
+      const warning = vi.fn();
       warning('Warning message');
       expect(warning).toHaveBeenCalledWith('Warning message');
     });
 
     it('should show info notification', () => {
-      const info = jest.fn();
+      const info = vi.fn();
       info('Info message');
       expect(info).toHaveBeenCalledWith('Info message');
     });
@@ -270,7 +270,7 @@ describe('Feedback Components', () => {
     });
 
     it('should support keyboard shortcuts', () => {
-      const handleEscape = jest.fn();
+      const handleEscape = vi.fn();
       const event = { key: 'Escape' };
       if (event.key === 'Escape') {
         handleEscape();
@@ -279,3 +279,4 @@ describe('Feedback Components', () => {
     });
   });
 });
+

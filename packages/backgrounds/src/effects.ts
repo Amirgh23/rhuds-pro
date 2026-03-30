@@ -21,12 +21,7 @@ export class NebulaEffect {
   /**
    * Render nebula effect
    */
-  render(
-    colors: string[],
-    scale: number = 1,
-    speed: number = 1,
-    opacity: number = 0.5
-  ): void {
+  render(colors: string[], scale: number = 1, speed: number = 1, opacity: number = 0.5): void {
     const { width, height } = this.canvas;
     const ctx = this.ctx;
 
@@ -168,22 +163,17 @@ export class AnimatedGradientEffect {
   /**
    * Render animated gradient
    */
-  render(
-    colors: string[],
-    angle: number = 0,
-    speed: number = 1,
-    opacity: number = 1
-  ): void {
+  render(colors: string[], angle: number = 0, speed: number = 1, opacity: number = 1): void {
     const { width, height } = this.canvas;
     const ctx = this.ctx;
 
     // Calculate gradient angle with animation
     const animatedAngle = angle + this.time * speed;
     const rad = (animatedAngle * Math.PI) / 180;
-    const x1 = width / 2 + Math.cos(rad) * Math.max(width, height) / 2;
-    const y1 = height / 2 + Math.sin(rad) * Math.max(width, height) / 2;
-    const x2 = width / 2 - Math.cos(rad) * Math.max(width, height) / 2;
-    const y2 = height / 2 - Math.sin(rad) * Math.max(width, height) / 2;
+    const x1 = width / 2 + (Math.cos(rad) * Math.max(width, height)) / 2;
+    const y1 = height / 2 + (Math.sin(rad) * Math.max(width, height)) / 2;
+    const x2 = width / 2 - (Math.cos(rad) * Math.max(width, height)) / 2;
+    const y2 = height / 2 - (Math.sin(rad) * Math.max(width, height)) / 2;
 
     const gradient = ctx.createLinearGradient(x1, y1, x2, y2);
 
@@ -302,7 +292,9 @@ export class NoiseGenerator {
     const x1 = this.lerp(this.grad(aa, xf, yf, zf), this.grad(ba, xf - 1, yf, zf), u);
     const x2 = this.lerp(this.grad(ab, xf, yf - 1, zf), this.grad(bb, xf - 1, yf - 1, zf), u);
 
-    return this.lerp(x1, x2, v);
+    const result = this.lerp(x1, x2, v);
+    // Clamp to [-1, 1] range
+    return Math.max(-1, Math.min(1, result));
   }
 
   /**
@@ -338,9 +330,15 @@ export class NoiseGenerator {
       p[i] = i;
     }
 
-    // Shuffle with seed
+    // Shuffle with seed using a better random function
+    let random = seed;
+    const seededRandom = () => {
+      random = (random * 9301 + 49297) % 233280;
+      return random / 233280;
+    };
+
     for (let i = 255; i > 0; i--) {
-      const j = Math.floor((seed + i) % (i + 1));
+      const j = Math.floor(seededRandom() * (i + 1));
       [p[i], p[j]] = [p[j], p[i]];
     }
 

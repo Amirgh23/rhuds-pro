@@ -28,7 +28,7 @@ describe('Advanced Components', () => {
     });
 
     it('should handle dot click', () => {
-      const onIndexChange = jest.fn();
+      const onIndexChange = vi.fn();
       onIndexChange(2);
       expect(onIndexChange).toHaveBeenCalledWith(2);
     });
@@ -127,13 +127,13 @@ describe('Advanced Components', () => {
     });
 
     it('should handle expand callback', () => {
-      const onExpand = jest.fn();
+      const onExpand = vi.fn();
       onExpand('item1');
       expect(onExpand).toHaveBeenCalledWith('item1');
     });
 
     it('should handle collapse callback', () => {
-      const onCollapse = jest.fn();
+      const onCollapse = vi.fn();
       onCollapse('item1');
       expect(onCollapse).toHaveBeenCalledWith('item1');
     });
@@ -150,7 +150,7 @@ describe('Advanced Components', () => {
     });
 
     it('should handle step change', () => {
-      const onStepChange = jest.fn();
+      const onStepChange = vi.fn();
       onStepChange(1);
       expect(onStepChange).toHaveBeenCalledWith(1);
     });
@@ -240,3 +240,4 @@ describe('Advanced Components', () => {
     });
   });
 });
+

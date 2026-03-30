@@ -3,7 +3,13 @@
  */
 
 import { Particle, ParticleEmitter, ParticleSystem } from '../particles';
-import { NebulaEffect, StarFieldEffect, AnimatedGradientEffect, PlasmaEffect, NoiseGenerator } from '../effects';
+import {
+  NebulaEffect,
+  StarFieldEffect,
+  AnimatedGradientEffect,
+  PlasmaEffect,
+  NoiseGenerator,
+} from '../effects';
 
 describe('Particle System', () => {
   describe('Particle', () => {
@@ -257,7 +263,7 @@ describe('Particle System', () => {
       });
 
       system.addEmitter(emitter);
-      system.update();
+      system.update(undefined, 0.016); // 60fps
 
       expect(system.particles.length).toBeGreaterThan(0);
     });
@@ -276,7 +282,7 @@ describe('Particle System', () => {
       system.addEmitter(emitter);
 
       for (let i = 0; i < 10; i++) {
-        system.update();
+        system.update(undefined, 0.016); // 60fps
       }
 
       expect(system.particles.length).toBeLessThanOrEqual(10);
@@ -294,7 +300,7 @@ describe('Particle System', () => {
       });
 
       system.addEmitter(emitter);
-      system.update();
+      system.update(undefined, 0.016); // 60fps
 
       expect(system.particles.length).toBeGreaterThan(0);
 

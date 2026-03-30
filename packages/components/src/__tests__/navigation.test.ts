@@ -3,6 +3,8 @@
  * Tests for Navbar, Sidebar, Breadcrumb, Tabs, Menu, and Pagination
  */
 
+import { describe, it, expect, vi } from 'vitest';
+
 describe('Navigation Components', () => {
   describe('Navbar Component', () => {
     it('should render navbar with items', () => {
@@ -15,7 +17,7 @@ describe('Navigation Components', () => {
     });
 
     it('should handle item click', () => {
-      const onClick = jest.fn();
+      const onClick = vi.fn();
       const item = { label: 'Home', href: '#' };
       onClick(item);
       expect(onClick).toHaveBeenCalledWith(item);
@@ -46,7 +48,7 @@ describe('Navigation Components', () => {
     });
 
     it('should handle item click', () => {
-      const onClick = jest.fn();
+      const onClick = vi.fn();
       const item = { label: 'Dashboard', icon: '📊', href: '#' };
       onClick(item);
       expect(onClick).toHaveBeenCalledWith(item);
@@ -65,7 +67,7 @@ describe('Navigation Components', () => {
     });
 
     it('should handle breadcrumb item click', () => {
-      const onClick = jest.fn();
+      const onClick = vi.fn();
       const item = { label: 'Components', href: '#' };
       onClick(item);
       expect(onClick).toHaveBeenCalledWith(item);
@@ -88,7 +90,7 @@ describe('Navigation Components', () => {
     });
 
     it('should handle tab change', () => {
-      const onChange = jest.fn();
+      const onChange = vi.fn();
       onChange('tab2');
       expect(onChange).toHaveBeenCalledWith('tab2');
     });
@@ -106,7 +108,7 @@ describe('Navigation Components', () => {
         { id: 'tab1', label: 'Tab 1', content: 'Content 1' },
         { id: 'tab2', label: 'Tab 2', content: 'Content 2' },
       ];
-      const activeContent = tabs.find(t => t.id === activeTab)?.content;
+      const activeContent = tabs.find((t) => t.id === activeTab)?.content;
       expect(activeContent).toBe('Content 1');
     });
   });
@@ -114,16 +116,16 @@ describe('Navigation Components', () => {
   describe('Menu Component', () => {
     it('should render menu items', () => {
       const items = [
-        { label: 'Profile', onClick: jest.fn() },
-        { label: 'Settings', onClick: jest.fn() },
-        { label: 'Logout', onClick: jest.fn() },
+        { label: 'Profile', onClick: vi.fn() },
+        { label: 'Settings', onClick: vi.fn() },
+        { label: 'Logout', onClick: vi.fn() },
       ];
       expect(items).toHaveLength(3);
       expect(items[0].label).toBe('Profile');
     });
 
     it('should handle menu item click', () => {
-      const onClick = jest.fn();
+      const onClick = vi.fn();
       const item = { label: 'Profile', onClick };
       item.onClick();
       expect(onClick).toHaveBeenCalled();
@@ -131,8 +133,8 @@ describe('Navigation Components', () => {
 
     it('should support nested menu items', () => {
       const items = [
-        { label: 'File', onClick: jest.fn() },
-        { label: 'Edit', onClick: jest.fn() },
+        { label: 'File', onClick: vi.fn() },
+        { label: 'Edit', onClick: vi.fn() },
       ];
       expect(items.length > 0).toBe(true);
     });
@@ -147,7 +149,7 @@ describe('Navigation Components', () => {
     });
 
     it('should handle page change', () => {
-      const onChange = jest.fn();
+      const onChange = vi.fn();
       onChange(2);
       expect(onChange).toHaveBeenCalledWith(2);
     });
@@ -159,7 +161,7 @@ describe('Navigation Components', () => {
     });
 
     it('should handle page size change', () => {
-      const onChange = jest.fn();
+      const onChange = vi.fn();
       onChange(20);
       expect(onChange).toHaveBeenCalledWith(20);
     });
@@ -168,20 +170,20 @@ describe('Navigation Components', () => {
       const totalPages = 25;
       const currentPage = 5;
       const maxVisible = 5;
-      
+
       const pages: (number | string)[] = [];
       pages.push(1);
       if (currentPage > 3) pages.push('...');
-      
+
       const start = Math.max(2, currentPage - 1);
       const end = Math.min(totalPages - 1, currentPage + 1);
       for (let i = start; i <= end; i++) {
         pages.push(i);
       }
-      
+
       if (currentPage < totalPages - 2) pages.push('...');
       pages.push(totalPages);
-      
+
       expect(pages.length).toBeGreaterThan(0);
       expect(pages[0]).toBe(1);
       expect(pages[pages.length - 1]).toBe(totalPages);
@@ -206,7 +208,7 @@ describe('Navigation Components', () => {
       const navbar = { items: [{ label: 'Home', href: '#' }] };
       const sidebar = { items: [{ label: 'Dashboard', icon: '📊', href: '#' }] };
       const breadcrumb = { items: [{ label: 'Home', href: '#' }] };
-      
+
       expect(navbar.items).toBeDefined();
       expect(sidebar.items).toBeDefined();
       expect(breadcrumb.items).toBeDefined();
@@ -218,10 +220,11 @@ describe('Navigation Components', () => {
         tablet: 768,
         desktop: 1024,
       };
-      
+
       expect(breakpoints.mobile).toBe(480);
       expect(breakpoints.tablet).toBe(768);
       expect(breakpoints.desktop).toBe(1024);
     });
   });
 });
+

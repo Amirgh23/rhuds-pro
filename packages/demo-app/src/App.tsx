@@ -14,6 +14,7 @@ import ColdWarPortfolioPage from './pages/ColdWarPortfolioPage';
 import ColdWarShowcase from './pages/ColdWarShowcase';
 import ColdWarPlayground from './pages/ColdWarPlayground';
 import ColdWarDocs from './pages/ColdWarDocs';
+import ChartsShowcase from './pages/ChartsShowcase';
 import { Navbar } from './components/Navbar';
 import './styles/global.css';
 import './styles/cold-war-theme.css';
@@ -119,6 +120,7 @@ const AppContent: React.FC = () => {
         <Route path="/intro" element={<IntroPageFuturistic />} />
         <Route path="/coldwar-intro" element={<ColdWarIntro />} />
         <Route path="/showcase" element={<ShowcasePage />} />
+        <Route path="/charts" element={<ChartsShowcase />} />
         <Route path="/coldwar-showcase" element={<ColdWarShowcase />} />
         <Route path="/coldwar-playground" element={<ColdWarPlayground />} />
         <Route path="/coldwar-docs" element={<ColdWarDocs />} />

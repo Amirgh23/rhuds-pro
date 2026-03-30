@@ -35,14 +35,14 @@ describe('Data Display Components', () => {
     });
 
     it('should handle row click', () => {
-      const onClick = jest.fn();
+      const onClick = vi.fn();
       const row = { id: 1, name: 'Alice' };
       onClick(row);
       expect(onClick).toHaveBeenCalledWith(row);
     });
 
     it('should render custom cell content', () => {
-      const render = jest.fn((value) => `Status: ${value}`);
+      const render = vi.fn((value: string) => `Status: ${value}`);
       const result = render('Active');
       expect(result).toBe('Status: Active');
     });
@@ -102,7 +102,7 @@ describe('Data Display Components', () => {
     });
 
     it('should handle cell editing', () => {
-      const onEdit = jest.fn();
+      const onEdit = vi.fn();
       onEdit(0, 'name', 'New Name');
       expect(onEdit).toHaveBeenCalledWith(0, 'name', 'New Name');
     });
@@ -149,7 +149,7 @@ describe('Data Display Components', () => {
     });
 
     it('should handle node selection', () => {
-      const onSelect = jest.fn();
+      const onSelect = vi.fn();
       onSelect('node1');
       expect(onSelect).toHaveBeenCalledWith('node1');
     });
@@ -163,9 +163,7 @@ describe('Data Display Components', () => {
             {
               key: 'parent',
               label: 'Parent',
-              children: [
-                { key: 'child', label: 'Child' },
-              ],
+              children: [{ key: 'child', label: 'Child' }],
             },
           ],
         },
@@ -175,7 +173,7 @@ describe('Data Display Components', () => {
     });
 
     it('should handle lazy loading', async () => {
-      const lazyLoad = jest.fn().mockResolvedValue([
+      const lazyLoad = vi.fn().mockResolvedValue([
         { key: 'lazy1', label: 'Lazy Child 1' },
         { key: 'lazy2', label: 'Lazy Child 2' },
       ]);

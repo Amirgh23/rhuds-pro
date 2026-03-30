@@ -1,289 +1,285 @@
 /**
  * Audio Visualization System
- * Frequency analysis, waveform, and beat detection
+ * Provides frequency analysis, waveform analysis, and beat detection
  */
 
-import { AudioVisualizationData, AudioAnalyzerConfig, BeatDetectionConfig } from './types';
+export interface AudioFeatures {
+  volume: number;
+  bass: number;
+  mid: number;
+  treble: number;
+  peak: number;
+  rms: number;
+}
 
 /**
- * Audio analyzer for visualization
+ * Frequency Analyzer
  */
-export class AudioAnalyzer {
-  private audioContext: AudioContext;
+export class FrequencyAnalyzer {
   private analyser: AnalyserNode;
-  private frequencyData: Uint8Array;
-  private timeDomainData: Uint8Array;
-  private beatDetector: BeatDetector | null = null;
+  private frequencies: Uint8Array;
+  private waveform: Uint8Array;
 
-  constructor(audioContext: AudioContext, config?: AudioAnalyzerConfig) {
-    this.audioContext = audioContext;
-    this.analyser = audioContext.createAnalyser();
-
-    // Configure analyser
-    this.analyser.fftSize = config?.fftSize ?? 2048;
-    this.analyser.smoothingTimeConstant = config?.smoothingTimeConstant ?? 0.8;
-    this.analyser.minDecibels = config?.minDecibels ?? -90;
-    this.analyser.maxDecibels = config?.maxDecibels ?? -10;
-
-    // Create data arrays
-    this.frequencyData = new Uint8Array(this.analyser.frequencyBinCount);
-    this.timeDomainData = new Uint8Array(this.analyser.fftSize);
+  constructor(analyser: AnalyserNode) {
+    this.analyser = analyser;
+    this.analyser.fftSize = 2048;
+    this.frequencies = new Uint8Array(this.analyser.frequencyBinCount);
+    this.waveform = new Uint8Array(this.analyser.frequencyBinCount);
   }
 
   /**
-   * Get analyser node for connecting audio source
+   * Get frequency data
    */
-  getAnalyserNode(): AnalyserNode {
-    return this.analyser;
+  getFrequencies(): Uint8Array {
+    this.analyser.getByteFrequencyData(this.frequencies);
+    return this.frequencies;
   }
 
   /**
-   * Get current visualization data
+   * Get waveform data
    */
-  getVisualizationData(): AudioVisualizationData {
-    // Update data arrays
-    this.analyser.getByteFrequencyData(this.frequencyData as any);
-    this.analyser.getByteTimeDomainData(this.timeDomainData as any);
+  getWaveform(): Uint8Array {
+    this.analyser.getByteTimeDomainData(this.waveform);
+    return this.waveform;
+  }
 
-    // Calculate volume (RMS)
+  /**
+   * Extract audio features
+   */
+  extractFeatures(): AudioFeatures {
+    const frequencies = this.getFrequencies();
+    const waveform = this.getWaveform();
+
+    // Calculate volume (RMS of waveform)
     let sum = 0;
-    for (let i = 0; i < this.timeDomainData.length; i++) {
-      const normalized = (this.timeDomainData[i] - 128) / 128;
+    for (let i = 0; i < waveform.length; i++) {
+      const normalized = (waveform[i] - 128) / 128;
       sum += normalized * normalized;
     }
-    const volume = Math.sqrt(sum / this.timeDomainData.length);
+    const rms = Math.sqrt(sum / waveform.length);
+    const volume = Math.min(1, rms);
 
     // Calculate frequency bands
-    const bass = this.getFrequencyBandAverage(0, 100);
-    const mid = this.getFrequencyBandAverage(100, 1000);
-    const treble = this.getFrequencyBandAverage(1000, 20000);
+    const bandSize = Math.floor(frequencies.length / 3);
+    let bass = 0,
+      mid = 0,
+      treble = 0;
+
+    for (let i = 0; i < bandSize; i++) {
+      bass += frequencies[i];
+    }
+    for (let i = bandSize; i < bandSize * 2; i++) {
+      mid += frequencies[i];
+    }
+    for (let i = bandSize * 2; i < frequencies.length; i++) {
+      treble += frequencies[i];
+    }
+
+    bass /= bandSize * 255;
+    mid /= bandSize * 255;
+    treble /= (frequencies.length - bandSize * 2) * 255;
+
+    // Find peak frequency
+    let peak = 0;
+    let maxValue = 0;
+    for (let i = 0; i < frequencies.length; i++) {
+      if (frequencies[i] > maxValue) {
+        maxValue = frequencies[i];
+        peak = i / frequencies.length;
+      }
+    }
 
     return {
-      frequencyData: this.frequencyData,
-      timeDomainData: this.timeDomainData,
       volume,
       bass,
       mid,
       treble,
+      peak,
+      rms,
     };
-  }
-
-  /**
-   * Get average value for a frequency band
-   */
-  private getFrequencyBandAverage(minFreq: number, maxFreq: number): number {
-    const nyquist = this.audioContext.sampleRate / 2;
-    const minIndex = Math.floor((minFreq / nyquist) * this.frequencyData.length);
-    const maxIndex = Math.ceil((maxFreq / nyquist) * this.frequencyData.length);
-
-    let sum = 0;
-    let count = 0;
-
-    for (let i = minIndex; i < maxIndex && i < this.frequencyData.length; i++) {
-      sum += this.frequencyData[i];
-      count++;
-    }
-
-    return count > 0 ? sum / count / 255 : 0;
-  }
-
-  /**
-   * Get frequency at a specific index
-   */
-  getFrequency(index: number): number {
-    const nyquist = this.audioContext.sampleRate / 2;
-    return (index / this.frequencyData.length) * nyquist;
-  }
-
-  /**
-   * Enable beat detection
-   */
-  enableBeatDetection(config?: BeatDetectionConfig): void {
-    this.beatDetector = new BeatDetector(this, config);
-  }
-
-  /**
-   * Disable beat detection
-   */
-  disableBeatDetection(): void {
-    this.beatDetector?.stop();
-    this.beatDetector = null;
-  }
-
-  /**
-   * Update beat detection (call in animation loop)
-   */
-  updateBeatDetection(): void {
-    this.beatDetector?.update();
   }
 }
 
 /**
- * Beat detector
+ * Beat Detector
  */
-class BeatDetector {
-  private analyzer: AudioAnalyzer;
-  private config: Required<BeatDetectionConfig>;
-  private lastBeatTime: number = 0;
-  private energyHistory: number[] = [];
-  private historySize: number = 43; // ~1 second at 60fps
-
-  constructor(analyzer: AudioAnalyzer, config?: BeatDetectionConfig) {
-    this.analyzer = analyzer;
-    this.config = {
-      threshold: config?.threshold ?? 1.3,
-      minInterval: config?.minInterval ?? 200,
-      onBeat: config?.onBeat ?? (() => {}),
-    };
-  }
+export class BeatDetector {
+  private history: number[] = [];
+  private threshold: number = 0.3;
+  private maxHistory: number = 43;
 
   /**
-   * Update beat detection
+   * Detect beat
    */
-  update(): void {
-    const data = this.analyzer.getVisualizationData();
-    const energy = data.bass; // Use bass frequency for beat detection
+  detectBeat(frequencies: Uint8Array): boolean {
+    // Calculate energy in bass frequencies
+    const bassEnergy = this.calculateBassEnergy(frequencies);
 
     // Add to history
-    this.energyHistory.push(energy);
-    if (this.energyHistory.length > this.historySize) {
-      this.energyHistory.shift();
+    this.history.push(bassEnergy);
+    if (this.history.length > this.maxHistory) {
+      this.history.shift();
     }
 
-    // Calculate average energy
-    const avgEnergy = this.energyHistory.reduce((sum, e) => sum + e, 0) / this.energyHistory.length;
+    // Calculate average
+    const average = this.history.reduce((a, b) => a + b, 0) / this.history.length;
 
-    // Detect beat
-    const now = Date.now();
-    const timeSinceLastBeat = now - this.lastBeatTime;
-
-    if (energy > avgEnergy * this.config.threshold && timeSinceLastBeat > this.config.minInterval) {
-      this.lastBeatTime = now;
-      this.config.onBeat();
-    }
+    // Detect beat if current energy is significantly higher than average
+    return bassEnergy > average * (1 + this.threshold);
   }
 
   /**
-   * Stop beat detection
+   * Calculate bass energy
    */
-  stop(): void {
-    this.energyHistory = [];
+  private calculateBassEnergy(frequencies: Uint8Array): number {
+    const bassRange = Math.floor(frequencies.length * 0.1); // First 10% of spectrum
+    let energy = 0;
+
+    for (let i = 0; i < bassRange; i++) {
+      energy += frequencies[i];
+    }
+
+    return energy / (bassRange * 255);
+  }
+
+  /**
+   * Set detection threshold
+   */
+  setThreshold(threshold: number): void {
+    this.threshold = Math.max(0, Math.min(1, threshold));
+  }
+
+  /**
+   * Reset history
+   */
+  reset(): void {
+    this.history = [];
   }
 }
 
 /**
- * Create audio analyzer
+ * Spectrum Analyzer
  */
-export function createAudioAnalyzer(
-  audioContext: AudioContext,
-  config?: AudioAnalyzerConfig
-): AudioAnalyzer {
-  return new AudioAnalyzer(audioContext, config);
+export class SpectrumAnalyzer {
+  private analyser: AnalyserNode;
+  private frequencies: Uint8Array;
+  private smoothing: number = 0.8;
+
+  constructor(analyser: AnalyserNode) {
+    this.analyser = analyser;
+    this.analyser.fftSize = 256;
+    this.frequencies = new Uint8Array(this.analyser.frequencyBinCount);
+  }
+
+  /**
+   * Get smoothed spectrum
+   */
+  getSpectrum(): Uint8Array {
+    const current = new Uint8Array(this.analyser.frequencyBinCount);
+    this.analyser.getByteFrequencyData(current);
+
+    // Apply smoothing
+    for (let i = 0; i < current.length; i++) {
+      this.frequencies[i] =
+        this.frequencies[i] * this.smoothing + current[i] * (1 - this.smoothing);
+    }
+
+    return this.frequencies;
+  }
+
+  /**
+   * Get normalized spectrum (0-1)
+   */
+  getNormalizedSpectrum(): number[] {
+    const spectrum = this.getSpectrum();
+    const normalized: number[] = [];
+
+    for (let i = 0; i < spectrum.length; i++) {
+      normalized.push(spectrum[i] / 255);
+    }
+
+    return normalized;
+  }
+
+  /**
+   * Set smoothing factor
+   */
+  setSmoothing(smoothing: number): void {
+    this.smoothing = Math.max(0, Math.min(1, smoothing));
+  }
 }
 
 /**
- * Audio visualizer helper for canvas rendering
+ * Waveform Analyzer
  */
-export class AudioVisualizer {
-  private canvas: HTMLCanvasElement;
-  private ctx: CanvasRenderingContext2D;
-  private analyzer: AudioAnalyzer;
-  private animationId: number | null = null;
+export class WaveformAnalyzer {
+  private analyser: AnalyserNode;
+  private waveform: Uint8Array;
 
-  constructor(canvas: HTMLCanvasElement, analyzer: AudioAnalyzer) {
-    this.canvas = canvas;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) {
-      throw new Error('Failed to get canvas context');
+  constructor(analyser: AnalyserNode) {
+    this.analyser = analyser;
+    this.analyser.fftSize = 2048;
+    this.waveform = new Uint8Array(this.analyser.frequencyBinCount);
+  }
+
+  /**
+   * Get waveform data
+   */
+  getWaveform(): Uint8Array {
+    this.analyser.getByteTimeDomainData(this.waveform);
+    return this.waveform;
+  }
+
+  /**
+   * Get normalized waveform (-1 to 1)
+   */
+  getNormalizedWaveform(): number[] {
+    const waveform = this.getWaveform();
+    const normalized: number[] = [];
+
+    for (let i = 0; i < waveform.length; i++) {
+      normalized.push((waveform[i] - 128) / 128);
     }
-    this.ctx = ctx;
-    this.analyzer = analyzer;
+
+    return normalized;
   }
 
   /**
-   * Start visualization
+   * Calculate peak amplitude
    */
-  start(): void {
-    if (this.animationId !== null) return;
+  getPeakAmplitude(): number {
+    const waveform = this.getWaveform();
+    let peak = 0;
 
-    const render = () => {
-      this.render();
-      this.animationId = requestAnimationFrame(render);
-    };
-
-    render();
-  }
-
-  /**
-   * Stop visualization
-   */
-  stop(): void {
-    if (this.animationId !== null) {
-      cancelAnimationFrame(this.animationId);
-      this.animationId = null;
-    }
-  }
-
-  /**
-   * Render visualization
-   */
-  private render(): void {
-    const data = this.analyzer.getVisualizationData();
-    const { width, height } = this.canvas;
-
-    // Clear canvas
-    this.ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
-    this.ctx.fillRect(0, 0, width, height);
-
-    // Draw frequency bars
-    const barWidth = width / data.frequencyData.length;
-    const barGap = 1;
-
-    for (let i = 0; i < data.frequencyData.length; i++) {
-      const barHeight = (data.frequencyData[i] / 255) * height;
-      const x = i * barWidth;
-      const y = height - barHeight;
-
-      // Color based on frequency
-      const hue = (i / data.frequencyData.length) * 360;
-      this.ctx.fillStyle = `hsl(${hue}, 100%, 50%)`;
-      this.ctx.fillRect(x, y, barWidth - barGap, barHeight);
-    }
-  }
-
-  /**
-   * Render waveform
-   */
-  renderWaveform(): void {
-    const data = this.analyzer.getVisualizationData();
-    const { width, height } = this.canvas;
-
-    // Clear canvas
-    this.ctx.fillStyle = 'rgb(0, 0, 0)';
-    this.ctx.fillRect(0, 0, width, height);
-
-    // Draw waveform
-    this.ctx.lineWidth = 2;
-    this.ctx.strokeStyle = 'rgb(0, 255, 255)';
-    this.ctx.beginPath();
-
-    const sliceWidth = width / data.timeDomainData.length;
-    let x = 0;
-
-    for (let i = 0; i < data.timeDomainData.length; i++) {
-      const v = data.timeDomainData[i] / 128.0;
-      const y = (v * height) / 2;
-
-      if (i === 0) {
-        this.ctx.moveTo(x, y);
-      } else {
-        this.ctx.lineTo(x, y);
+    for (let i = 0; i < waveform.length; i++) {
+      const amplitude = Math.abs((waveform[i] - 128) / 128);
+      if (amplitude > peak) {
+        peak = amplitude;
       }
-
-      x += sliceWidth;
     }
 
-    this.ctx.lineTo(width, height / 2);
-    this.ctx.stroke();
+    return peak;
+  }
+
+  /**
+   * Calculate RMS (Root Mean Square)
+   */
+  getRMS(): number {
+    const waveform = this.getWaveform();
+    let sum = 0;
+
+    for (let i = 0; i < waveform.length; i++) {
+      const normalized = (waveform[i] - 128) / 128;
+      sum += normalized * normalized;
+    }
+
+    return Math.sqrt(sum / waveform.length);
   }
 }
+
+export default {
+  FrequencyAnalyzer,
+  BeatDetector,
+  SpectrumAnalyzer,
+  WaveformAnalyzer,
+};
