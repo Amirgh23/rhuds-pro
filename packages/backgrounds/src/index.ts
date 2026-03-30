@@ -22,4 +22,28 @@ export { CircuitPattern } from './CircuitPattern';
 export { Particle, ParticleEmitter, ParticleSystem } from './particles';
 
 // Effects
-export { NebulaEffect, StarFieldEffect, AnimatedGradientEffect, PlasmaEffect, NoiseGenerator } from './effects';
+export {
+  NebulaEffect,
+  StarFieldEffect,
+  AnimatedGradientEffect,
+  PlasmaEffect,
+  NoiseGenerator,
+} from './effects';
+
+// Cold War Components
+export {
+  ColdWarGridLines,
+  ColdWarRadar,
+  ColdWarScanlines,
+  ColdWarParticles,
+  ColdWarNoise,
+  ColdWarMatrix,
+  ColdWarHexGrid,
+  ColdWarWaveform,
+  ColdWarCircuit,
+  ColdWarSonar,
+  ColdWarSatellite,
+  ColdWarTerminal,
+  ColdWarTacticalMap,
+} from './coldwar';
+export type { ColdWarTheme, ColdWarIntensity } from './coldwar';

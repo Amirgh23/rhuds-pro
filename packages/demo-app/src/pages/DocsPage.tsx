@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
+import { useScrollToTop } from '../hooks/useScrollToTop';
 import { useContextMenu } from '../hooks/useContextMenu';
 import { GlassContextMenu } from '../components/GlassContextMenu';
 import { ColdWarButton, ColdWarInput, ColdWarCard } from '@rhuds/components';
@@ -339,12 +340,23 @@ export const DocsPage: React.FC = () => {
   const validSection = section && section in docs ? section : 'getting-started';
   const [selectedDoc, setSelectedDoc] = useState(validSection);
   const [hudBoxAnimated, setHudBoxAnimated] = useState(true);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   const isActive = (path: string) => location.pathname === path;
+
+  // Use scroll to top hook
+  useScrollToTop();
 
   React.useEffect(() => {
     if (section && section in docs) {
       setSelectedDoc(section);
+    }
+  }, [section]);
+
+  // Scroll content container to top when section changes
+  useEffect(() => {
+    if (contentRef.current) {
+      contentRef.current.scrollTop = 0;
     }
   }, [section]);
 
@@ -472,6 +484,7 @@ export const DocsPage: React.FC = () => {
 
         {/* Main Content */}
         <div
+          ref={contentRef}
           style={{
             flex: 1,
             marginLeft: '280px',

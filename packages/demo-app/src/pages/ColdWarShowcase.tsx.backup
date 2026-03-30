@@ -1,0 +1,332 @@
+/**
+ * Cold War Redesign - Showcase Page
+ * Demonstrates the tactical military aesthetic across all components
+ * Reorganized with tab-based conditional rendering to fix performance issues
+ */
+
+import React from 'react';
+import {
+  ColdWarButton,
+  ColdWarHudButton,
+  ColdWarGlitchButton,
+  ColdWarNeonButton,
+  ColdWarGridButton,
+  ColdWarFingerprintButton,
+  ColdWarGlitchHoverButton,
+  ColdWarSliderButton,
+  ColdWarSubscribeButton,
+  ColdWarBorderButton,
+  ColdWarInput,
+  ColdWarSearchInput,
+  ColdWarHackerInput,
+  ColdWarAiInput,
+  ColdWarHoloInput,
+  ColdWarHoloInputAdvanced,
+  ColdWarFuturisticInput,
+  ColdWarBashInput,
+  ColdWarFloatingInput,
+  ColdWarAccessInput,
+  ColdWarFriendInput,
+  ColdWarCodeInput,
+  ColdWarCard,
+  ColdWarCyberCard,
+  ColdWarGlassCard,
+  ColdWarThermostatCard,
+  ColdWarProfileCard,
+  ColdWarTerminalSelector,
+  ColdWarNotificationCard,
+  ColdWarHudNotificationCard,
+  ColdWarMediaPlayer,
+  ColdWarAmplifier,
+  ColdWarRadar,
+  ColdWarPipBoy,
+  ColdWarTable,
+  ColdWarDataGrid,
+  ColdWarHudBox,
+  ColdWarGrid,
+  ColdWarStack,
+  ColdWarGlitchFrame,
+  ColdWarHudFrame,
+  ColdWarCheckbox,
+  ColdWarHoloCheckbox,
+  ColdWarCyberpunkCheckbox,
+  ColdWarBubbleCheckbox,
+  ColdWarNeonCheckbox,
+  ColdWarGlowingCheckbox,
+  ColdWarRadio,
+  ColdWarGlitchRadio,
+  ColdWarCyberpunkRadio,
+  ColdWarNeonRadio,
+  ColdWarSwitch,
+  ColdWarToggleSwitch,
+  ColdWarCyberpunkToggle,
+  ColdWarLockSwitch,
+  ColdWarSlider,
+  ColdWarNeonSlider,
+  ColdWarTabs,
+  ColdWarProgressBar,
+  ColdWarAlert,
+  ColdWarPagination,
+  ColdWarBreadcrumb,
+  ColdWarSidebar,
+  ColdWarMenu,
+  ColdWarDialog,
+  ColdWarNotificationProvider,
+  useNotifications,
+  ColdWarToast,
+  ColdWarAbstergoLoader,
+  ColdWarHeartRateLoader,
+  ColdWarHackerLoader,
+  ColdWarBinaryLoader,
+  ColdWarCubeLoader,
+  ColdWarProgressLoader,
+  ColdWarBinaryHackerLoader,
+  ColdWarMatrixLoader,
+  ColdWarScrollingLoader,
+  ColdWarLoadingText,
+  ColdWarWaveLoader,
+  ColdWarBubbleChartStyled,
+  ColdWarCodeEditor,
+  ColdWarRichTextEditor,
+  ColdWarAccordion,
+  ColdWarCarousel,
+  ColdWarStepper,
+  ColdWarTooltip,
+  ColdWarPopover,
+  ColdWarDropdown,
+  ColdWarSupportTooltip,
+  ColdWarDatePicker,
+  ColdWarColorPicker,
+  ColdWarFileUpload,
+  ColdWarChart,
+  ColdWarCyberLoginForm,
+  ColdWarAnimatedLoginForm,
+  ColdWarLoginForm,
+  ColdWarModal,
+  ColdWarNotification,
+} from '@rhuds/components';
+import { useScrollToTop } from '../hooks/useScrollToTop';
+import { TacticalMotionBackground } from '../components/TacticalMotionBackground';
+import { ColdWarContextMenu } from '../components/ColdWarContextMenu';
+import { useColdWarContextMenu } from '../hooks/useColdWarContextMenu';
+import '../styles/cold-war-theme.css';
+
+type ThemeVariant = 'perseus' | 'greenTerminal' | 'satelliteView';
+
+interface ThemeConfig {
+  name: string;
+  description: string;
+  buttonVariant: 'primary' | 'secondary' | 'danger' | 'success' | 'tactical' | 'glitch';
+  cardColor: 'amber' | 'green' | 'blue' | 'red' | 'neutral';
+  inputVariant: 'tactical' | 'terminal' | 'holo' | 'glitch' | 'minimal';
+}
+
+const THEME_CONFIGS: Record<ThemeVariant, ThemeConfig> = {
+  perseus: {
+    name: 'Perseus',
+    description: 'Tactical Amber & Black - Primary military aesthetic',
+    buttonVariant: 'primary',
+    cardColor: 'amber',
+    inputVariant: 'tactical',
+  },
+  greenTerminal: {
+    name: 'Green Terminal',
+    description: 'Phosphor Green & Black - Retro terminal style',
+    buttonVariant: 'primary',
+    cardColor: 'green',
+    inputVariant: 'terminal',
+  },
+  satelliteView: {
+    name: 'Satellite View',
+    description: 'Satellite Blue & White - Radar view aesthetic',
+    buttonVariant: 'primary',
+    cardColor: 'blue',
+    inputVariant: 'holo',
+  },
+};
+
+// Helper component for consistent section styling
+const ComponentSection: React.FC<{ title: string; children: React.ReactNode }> = ({
+  title,
+  children,
+}) => {
+  return (
+    <div
+      style={{
+        padding: '24px',
+        background: 'rgba(0, 0, 0, 0.4)',
+        border: '1px solid var(--cw-color-primary)',
+        clipPath: 'var(--cw-chamfer-small)',
+        backdropFilter: 'blur(10px)',
+        marginBottom: '24px',
+      }}
+    >
+      <h3
+        style={{
+          marginBottom: '16px',
+          color: 'var(--cw-color-primary)',
+          textTransform: 'uppercase',
+          letterSpacing: '2px',
+          fontSize: '1.1rem',
+          fontWeight: 700,
+        }}
+      >
+        {title}
+      </h3>
+      {children}
+    </div>
+  );
+};
+
+export const ColdWarShowcase: React.FC = () => {
+  const [theme, setTheme] = React.useState<ThemeVariant>('perseus');
+  const [activeTab, setActiveTab] = React.useState(0);
+  const [inputValue, setInputValue] = React.useState('');
+  const [selectedButton, setSelectedButton] = React.useState<string | null>(null);
+  const { contextMenu, handleContextMenu, handleCloseContextMenu } = useColdWarContextMenu();
+  const themeConfig = THEME_CONFIGS[theme];
+
+  const themeColors = {
+    primary: theme === 'perseus' ? '#FFB000' : theme === 'greenTerminal' ? '#33FF00' : '#00CCFF',
+  };
+
+  // Use scroll to top hook
+  useScrollToTop();
+
+  // Scroll to top when tab changes
+  React.useEffect(() => {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, [activeTab]);
+
+  // Tab items configuration
+  const tabItems = [
+    { label: 'Buttons & Inputs', id: 0 },
+    { label: 'Form Controls', id: 1 },
+    { label: 'Layout & Cards', id: 2 },
+    { label: 'Data Display', id: 3 },
+    { label: 'Navigation', id: 4 },
+    { label: 'Feedback & Loaders', id: 5 },
+    { label: 'Advanced', id: 6 },
+    { label: 'Utility & Specialized', id: 7 },
+    { label: 'Visualization & Forms', id: 8 },
+  ];
+
+  const pageStyle: React.CSSProperties = {
+    minHeight: '100vh',
+    backgroundColor: 'var(--cw-color-background)',
+    color: 'var(--cw-color-text)',
+    fontFamily: 'var(--cw-font-family)',
+    padding: '48px',
+    position: 'relative',
+    zIndex: 1,
+  };
+
+  const headerStyle: React.CSSProperties = {
+    marginBottom: '48px',
+    textAlign: 'center',
+  };
+
+  const titleStyle: React.CSSProperties = {
+    fontSize: 'var(--cw-font-size-2xl)',
+    fontWeight: 700,
+    letterSpacing: 'var(--cw-letter-spacing-headers)',
+    textTransform: 'uppercase',
+    color: 'var(--cw-color-primary)',
+    marginBottom: '16px',
+  };
+
+  const subtitleStyle: React.CSSProperties = {
+    fontSize: 'var(--cw-font-size-lg)',
+    color: 'var(--cw-color-text-secondary)',
+    letterSpacing: 'var(--cw-letter-spacing-body)',
+  };
+
+  const themeControlStyle: React.CSSProperties = {
+    display: 'flex',
+    gap: '12px',
+    justifyContent: 'center',
+    marginBottom: '32px',
+    flexWrap: 'wrap',
+  };
+
+  const tabNavigationStyle: React.CSSProperties = {
+    display: 'flex',
+    gap: '8px',
+    justifyContent: 'center',
+    marginBottom: '32px',
+    flexWrap: 'wrap',
+  };
+
+  const tabContentStyle: React.CSSProperties = {
+    padding: '24px',
+    background: 'rgba(0, 0, 0, 0.3)',
+    border: '1px solid var(--cw-color-primary)',
+    clipPath: 'var(--cw-chamfer-medium)',
+    backdropFilter: 'blur(10px)',
+  };
+
+  const sectionTitleStyle: React.CSSProperties = {
+    fontSize: 'var(--cw-font-size-xl)',
+    fontWeight: 700,
+    letterSpacing: 'var(--cw-letter-spacing-headers)',
+    textTransform: 'uppercase',
+    color: 'var(--cw-color-primary)',
+    marginBottom: '24px',
+    paddingBottom: '12px',
+    borderBottom: '2px solid var(--cw-color-primary)',
+  };
+
+  const gridStyle: React.CSSProperties = {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+    gap: '24px',
+    marginBottom: '24px',
+  };
+
+  return (
+    <div style={pageStyle} data-theme={theme}>
+      <TacticalMotionBackground variant={theme === 'satelliteView' ? 'satellite' : 'perimeter'} />
+      {contextMenu && (
+        <ColdWarContextMenu x={contextMenu.x} y={contextMenu.y} onClose={handleCloseContextMenu} />
+      )}
+      <div onContextMenu={handleContextMenu}>
+        <div style={headerStyle}>
+          <h1 style={titleStyle}>Cold War Tactical HUD</h1>
+          <p style={subtitleStyle}>Call of Duty: Black Ops Aesthetic for RHUDS Pro</p>
+        </div>
+
+        {/* Theme Selector */}
+        <div style={themeControlStyle}>
+          {(['perseus', 'greenTerminal', 'satelliteView'] as const).map((t) => (
+            <ColdWarButton
+              key={t}
+              theme={t}
+              variant={theme === t ? 'primary' : 'secondary'}
+              size="md"
+              onClick={() => setTheme(t)}
+            >
+              {THEME_CONFIGS[t].name}
+            </ColdWarButton>
+          ))}
+        </div>
+
+        {/* Tab Navigation */}
+        <div style={tabNavigationStyle}>
+          {tabItems.map((tab) => (
+            <ColdWarButton
+              key={tab.id}
+              theme={theme}
+              variant={activeTab === tab.id ? 'primary' : 'secondary'}
+              size="sm"
+              onClick={() => setActiveTab(tab.id)}
+              glow={activeTab === tab.id}
+            >
+              {tab.label}
+            </ColdWarButton>
+          ))}
+        </div>
+
+        {/* Tab Content */}
+        <div style={tabContentStyle}>

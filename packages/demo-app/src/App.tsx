@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { ThemeProvider, BleepsProvider, createAppTheme } from '@rhuds/core';
 import { HudToastProvider } from '@rhuds/components';
+import { useScrollToTop } from './hooks/useScrollToTop';
 import { ThemeSelector } from './pages/ThemeSelector';
 import IntroPageFuturistic from './pages/IntroPageFuturistic';
 import { ColdWarIntro } from './pages/ColdWarIntro';
@@ -96,6 +97,9 @@ const themeMode = {
 const AppContent: React.FC = () => {
   const location = useLocation();
   const showNavbar = location.pathname !== '/';
+
+  // Use custom hook to scroll to top on route change
+  useScrollToTop();
 
   return (
     <div

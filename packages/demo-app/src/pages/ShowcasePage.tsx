@@ -1,5 +1,6 @@
-﻿import React, { useState, useRef } from 'react';
+﻿import React, { useState, useRef, useEffect } from 'react';
 import { useTheme } from '@rhuds/core';
+import { useScrollToTop } from '../hooks/useScrollToTop';
 import { AnimatedBackground } from '../components/AnimatedBackground';
 import { useContextMenu } from '../hooks/useContextMenu';
 import { GlassContextMenu } from '../components/GlassContextMenu';
@@ -159,6 +160,100 @@ export const ShowcasePage: React.FC = () => {
   const { showToast } = useHudToast();
   const { position, visible, closeMenu, handleNavigation, handleCopyInstall } = useContextMenu();
   const [activeTab, setActiveTab] = useState(0);
+  const pageRef = useRef<HTMLDivElement>(null);
+
+  // Use scroll to top hook
+  useScrollToTop();
+
+  // Ensure scroll to top on mount and when tab changes
+  useEffect(() => {
+    const scrollToTop = () => {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    };
+
+    // Scroll immediately
+    scrollToTop();
+
+    // Scroll after a delay to handle component rendering
+    const timeoutId = setTimeout(scrollToTop, 50);
+    const longTimeoutId = setTimeout(scrollToTop, 150);
+    const extraTimeoutId = setTimeout(scrollToTop, 300);
+
+    return () => {
+      clearTimeout(timeoutId);
+      clearTimeout(longTimeoutId);
+      clearTimeout(extraTimeoutId);
+    };
+  }, [activeTab]);
+
+  // Additional effect to ensure scroll to top on component mount
+  useEffect(() => {
+    const scrollToTop = () => {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    };
+
+    // Scroll after component fully mounts
+    scrollToTop();
+    const timeoutId = setTimeout(scrollToTop, 50);
+    const longTimeoutId = setTimeout(scrollToTop, 150);
+    const extraTimeoutId = setTimeout(scrollToTop, 300);
+
+    return () => {
+      clearTimeout(timeoutId);
+      clearTimeout(longTimeoutId);
+      clearTimeout(extraTimeoutId);
+    };
+  }, []);
+
+  // Prevent auto-focus from causing scroll
+  useEffect(() => {
+    // Blur any focused element to prevent scroll
+    const blurFocused = () => {
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
+    };
+
+    // Blur immediately and after delays
+    blurFocused();
+    const timeoutId = setTimeout(blurFocused, 50);
+    const longTimeoutId = setTimeout(blurFocused, 150);
+
+    return () => {
+      clearTimeout(timeoutId);
+      clearTimeout(longTimeoutId);
+    };
+  }, [activeTab]);
+
+  // Force scroll to top and prevent any scrolling for first 1 second
+  useEffect(() => {
+    const startTime = Date.now();
+
+    const forceScrollToTop = () => {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    };
+
+    // Prevent scroll events
+    const preventScroll = () => {
+      const elapsed = Date.now() - startTime;
+      if (elapsed < 1000) {
+        forceScrollToTop();
+      }
+    };
+
+    forceScrollToTop();
+    window.addEventListener('scroll', preventScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener('scroll', preventScroll);
+    };
+  }, [activeTab]);
 
   // Form states
   const [inputValue, setInputValue] = useState('');
@@ -241,7 +336,7 @@ export const ShowcasePage: React.FC = () => {
 
   const tabItems = [
     {
-      label: 'Basic (5)',
+      label: 'Buttons & Text',
       content: (
         <Stack direction="column" gap="2rem">
           <ComponentSection title="1. Text">
@@ -642,6 +737,7 @@ export const ShowcasePage: React.FC = () => {
                     primaryColor="rgb(0, 255, 136)"
                     backgroundColor="rgb(15, 15, 25)"
                     title="Enter Code"
+                    autoFocus={false}
                   />
                 </Stack>
               </div>
@@ -661,7 +757,7 @@ export const ShowcasePage: React.FC = () => {
       ),
     },
     {
-      label: 'Layout (3)',
+      label: 'Layout & Frames',
       content: (
         <Stack direction="column" gap="2rem">
           <ComponentSection title="7. Grid">
@@ -1066,7 +1162,7 @@ export const ShowcasePage: React.FC = () => {
       ),
     },
     {
-      label: 'Form (10)',
+      label: 'Form Controls',
       content: (
         <Stack direction="column" gap="2rem">
           <ComponentSection title="HUD Form Elements - 14 Sections from Reference Site">
@@ -2054,7 +2150,7 @@ export const ShowcasePage: React.FC = () => {
       ),
     },
     {
-      label: 'Navigation (5)',
+      label: 'Navigation',
       content: (
         <Stack direction="column" gap="2rem">
           <ComponentSection title="19. Sidebar">
@@ -2101,7 +2197,7 @@ export const ShowcasePage: React.FC = () => {
       ),
     },
     {
-      label: 'Data (3)',
+      label: 'Data Display',
       content: (
         <Stack direction="column" gap="2rem">
           <ComponentSection title="24. Table">
@@ -2793,7 +2889,7 @@ export const ShowcasePage: React.FC = () => {
       ),
     },
     {
-      label: 'Feedback (5)',
+      label: 'Feedback & Alerts',
       content: (
         <Stack direction="column" gap="2rem">
           <ComponentSection title="27. Modal">
@@ -2930,7 +3026,7 @@ export const ShowcasePage: React.FC = () => {
       ),
     },
     {
-      label: 'Utility (3)',
+      label: 'Utility & Tooltips',
       content: (
         <Stack direction="column" gap="2rem">
           <ComponentSection title="30. Tooltip">
@@ -2992,7 +3088,7 @@ export const ShowcasePage: React.FC = () => {
       ),
     },
     {
-      label: 'Advanced (5)',
+      label: 'Advanced Components',
       content: (
         <Stack direction="column" gap="2rem">
           <ComponentSection title="33. Accordion">
@@ -3047,7 +3143,7 @@ export const ShowcasePage: React.FC = () => {
       ),
     },
     {
-      label: 'Visualization (2)',
+      label: 'Charts & Visualization',
       content: (
         <Stack direction="column" gap="2rem">
           <ComponentSection title="37. Chart">
@@ -3076,7 +3172,7 @@ export const ShowcasePage: React.FC = () => {
       ),
     },
     {
-      label: 'Backgrounds (10)',
+      label: 'Animated Backgrounds',
       content: (
         <Stack direction="column" gap="2rem">
           <ComponentSection title="38. GridLines">
@@ -3214,13 +3310,14 @@ export const ShowcasePage: React.FC = () => {
       ),
     },
     {
-      label: 'Frames (7)',
+      label: 'HUD Frames',
       content: <FramesTabContent />,
     },
   ];
 
   return (
     <div
+      ref={pageRef}
       style={{
         padding: 0,
         background: '#0A1225',
@@ -3801,21 +3898,7 @@ const FramesTabContent: React.FC = () => {
                       lineHeight: '1.4',
                       color: '#29F2DF',
                     }}
-                  >
-                    <p
-                      style={{
-                        margin: '0 0 0.5rem 0',
-                        fontWeight: 600,
-                        textTransform: 'uppercase',
-                        letterSpacing: '1px',
-                      }}
-                    >
-                      🎯 PROCEDURAL HUD FRAME
-                    </p>
-                    <p style={{ margin: '0', opacity: 0.8 }}>
-                      Randomized borders with trapezoid features
-                    </p>
-                  </div>
+                  ></div>
                 </HudFrameWithControls>
               </div>
             </div>
