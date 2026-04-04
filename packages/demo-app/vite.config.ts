@@ -18,7 +18,8 @@ export default defineConfig({
   server: {
     port: 3001,
     strictPort: false,
-    host: true,
+    host: '0.0.0.0',
+    middlewareMode: false,
   },
   build: {
     outDir: 'dist',

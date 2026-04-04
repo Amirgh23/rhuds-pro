@@ -77,7 +77,43 @@ export class LinearScale extends BaseScale {
   }
 
   draw(chartArea: ChartArea): void {
-    // Draw scale lines and labels
+    if (this.id !== 'y') return; // Only draw Y axis for now
+
+    const ctx = this.ctx;
+    const x = chartArea.left;
+    const top = chartArea.top;
+    const bottom = chartArea.bottom;
+
+    ctx.save();
+    ctx.strokeStyle = '#1C7FA6';
+    ctx.lineWidth = 1;
+    ctx.fillStyle = '#29F2DF';
+    ctx.font = '12px monospace';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+
+    // Draw Y axis line
+    ctx.beginPath();
+    ctx.moveTo(x, top);
+    ctx.lineTo(x, bottom);
+    ctx.stroke();
+
+    // Draw ticks and labels
+    this.ticks.forEach((tick) => {
+      const pixelPos = this.getPixelForValue(tick.value);
+      const y = bottom - pixelPos * (bottom - top);
+
+      // Draw tick mark
+      ctx.beginPath();
+      ctx.moveTo(x - 5, y);
+      ctx.lineTo(x, y);
+      ctx.stroke();
+
+      // Draw label
+      ctx.fillText(tick.label, x - 10, y);
+    });
+
+    ctx.restore();
   }
 
   /**

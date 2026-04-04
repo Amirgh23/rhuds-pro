@@ -62,8 +62,9 @@ class LineController extends DatasetController {
     // Update element positions and styles
     const xScale = this.chart.scales.get('x');
     const yScale = this.chart.scales.get('y');
+    const chartArea = this.chart.chartArea;
 
-    if (!xScale || !yScale) return;
+    if (!xScale || !yScale || !chartArea) return;
 
     for (let i = 0; i < this.meta.data.length; i++) {
       const element = this.meta.data[i];
@@ -71,8 +72,13 @@ class LineController extends DatasetController {
 
       if (!element || !parsed) continue;
 
-      element.x = xScale.getPixelForValue(parsed.x);
-      element.y = yScale.getPixelForValue(parsed.y);
+      // Get normalized positions (0-1)
+      const normalizedX = xScale.getPixelForValue(parsed.x);
+      const normalizedY = yScale.getPixelForValue(parsed.y);
+
+      // Convert to actual pixel coordinates within chartArea
+      element.x = chartArea.left + normalizedX * chartArea.width;
+      element.y = chartArea.bottom - normalizedY * chartArea.height;
 
       const style = this.getStyle(i, mode === 'active');
       element.options = style;
@@ -195,8 +201,9 @@ class BarController extends DatasetController {
     // Update element positions and styles
     const xScale = this.chart.scales.get('x');
     const yScale = this.chart.scales.get('y');
+    const chartArea = this.chart.chartArea;
 
-    if (!xScale || !yScale) return;
+    if (!xScale || !yScale || !chartArea) return;
 
     const barWidth = 20; // Default bar width
     const yMin = yScale.min || 0;
@@ -207,9 +214,15 @@ class BarController extends DatasetController {
 
       if (!element || !parsed) continue;
 
-      const xPos = xScale.getPixelForValue(parsed.x);
-      const yPos = yScale.getPixelForValue(parsed.y);
-      const yMinPos = yScale.getPixelForValue(yMin);
+      // Get normalized positions
+      const normalizedX = xScale.getPixelForValue(parsed.x);
+      const normalizedY = yScale.getPixelForValue(parsed.y);
+      const normalizedYMin = yScale.getPixelForValue(yMin);
+
+      // Convert to actual pixel coordinates
+      const xPos = chartArea.left + normalizedX * chartArea.width;
+      const yPos = chartArea.bottom - normalizedY * chartArea.height;
+      const yMinPos = chartArea.bottom - normalizedYMin * chartArea.height;
 
       (element as BarElement).x = xPos - barWidth / 2;
       (element as BarElement).y = Math.min(yPos, yMinPos);
@@ -756,8 +769,9 @@ class BubbleController extends DatasetController {
     // Update element positions and styles
     const xScale = this.chart.scales.get('x');
     const yScale = this.chart.scales.get('y');
+    const chartArea = this.chart.chartArea;
 
-    if (!xScale || !yScale) return;
+    if (!xScale || !yScale || !chartArea) return;
 
     for (let i = 0; i < this.meta.data.length; i++) {
       const element = this.meta.data[i];
@@ -765,8 +779,13 @@ class BubbleController extends DatasetController {
 
       if (!element || !parsed) continue;
 
-      element.x = xScale.getPixelForValue(parsed.x);
-      element.y = yScale.getPixelForValue(parsed.y);
+      // Get normalized positions
+      const normalizedX = xScale.getPixelForValue(parsed.x);
+      const normalizedY = yScale.getPixelForValue(parsed.y);
+
+      // Convert to actual pixel coordinates
+      element.x = chartArea.left + normalizedX * chartArea.width;
+      element.y = chartArea.bottom - normalizedY * chartArea.height;
 
       const style = this.getStyle(i, mode === 'active');
       element.options = style;
@@ -862,8 +881,9 @@ class ScatterController extends DatasetController {
     // Update element positions and styles
     const xScale = this.chart.scales.get('x');
     const yScale = this.chart.scales.get('y');
+    const chartArea = this.chart.chartArea;
 
-    if (!xScale || !yScale) return;
+    if (!xScale || !yScale || !chartArea) return;
 
     for (let i = 0; i < this.meta.data.length; i++) {
       const element = this.meta.data[i];
@@ -871,8 +891,13 @@ class ScatterController extends DatasetController {
 
       if (!element || !parsed) continue;
 
-      element.x = xScale.getPixelForValue(parsed.x);
-      element.y = yScale.getPixelForValue(parsed.y);
+      // Get normalized positions
+      const normalizedX = xScale.getPixelForValue(parsed.x);
+      const normalizedY = yScale.getPixelForValue(parsed.y);
+
+      // Convert to actual pixel coordinates
+      element.x = chartArea.left + normalizedX * chartArea.width;
+      element.y = chartArea.bottom - normalizedY * chartArea.height;
 
       const style = this.getStyle(i, mode === 'active');
       element.options = style;

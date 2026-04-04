@@ -6,8 +6,19 @@
 // Export all types
 export * from './types/index';
 
-// Export components
-export { BaseChart } from './components/BaseChart';
+// Export components (but not BaseChartProps to avoid conflict)
+export { default as BaseChart } from './components/BaseChart';
+export {
+  LineChart,
+  BarChart,
+  PieChart,
+  DoughnutChart,
+  RadarChart,
+  PolarAreaChart,
+  BubbleChart,
+  ScatterChart,
+  MixedChart,
+} from './components/ChartComponents';
 
 // Export hooks
 export { useChart } from './hooks/useChart';

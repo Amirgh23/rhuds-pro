@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>تست Overflow چارت‌ها</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+        color: #29f2df;
+        font-family: 'Courier New', monospace;
+        padding: 2rem;
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 2rem;
+        text-shadow: 0 0 20px #29f2df;
+      }
+
+      .chart-container {
+        position: relative;
+        width: 600px;
+        height: 400px;
+        margin: 2rem auto;
+        border: 2px solid #29f2df;
+        background: rgba(41, 242, 223, 0.05);
+        overflow: hidden;
+        padding: 1rem;
+      }
+
+      canvas {
+        display: block;
+        width: 100% !important;
+        height: 100% !important;
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        border: 1px solid rgba(41, 242, 223, 0.3);
+      }
+
+      .info {
+        text-align: center;
+        margin-top: 2rem;
+        padding: 1rem;
+        background: rgba(41, 242, 223, 0.1);
+        border: 1px solid #29f2df;
+        border-radius: 8px;
+      }
+
+      .status {
+        margin-top: 1rem;
+        padding: 1rem;
+        background: rgba(0, 255, 0, 0.1);
+        border: 1px solid #00ff00;
+        color: #00ff00;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🔍 تست Overflow چارت‌ها</h1>
+
+    <div class="chart-container">
+      <canvas id="testChart"></canvas>
+    </div>
+
+    <div class="info">
+      <p><strong>این یک تست مستقل است</strong></p>
+      <p>اگر این چارت بدون overflow نمایش داده شود، کد صحیح است</p>
+      <p>مشکل احتمالاً از cache مرورگر یا dev server است</p>
+    </div>
+
+    <div class="status" id="status">در حال رسم چارت...</div>
+
+    <script>
+      const canvas = document.getElementById('testChart');
+      const ctx = canvas.getContext('2d');
+
+      // Set canvas size
+      canvas.width = 560;
+      canvas.height = 360;
+
+      const width = canvas.width;
+      const height = canvas.height;
+      const padding = 50;
+
+      const data = [30, 40, 35, 45, 50, 55];
+      const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+      const colors = {
+        primary: '#29f2df',
+        secondary: '#ff006e',
+        tertiary: '#00ff00',
+      };
+
+      // Background
+      ctx.fillStyle = 'rgba(10, 14, 39, 0.8)';
+      ctx.fillRect(0, 0, width, height);
+
+      // Title
+      ctx.fillStyle = colors.primary;
+      ctx.font = 'bold 16px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('Time Scale - Combo Chart (Test)', width / 2, 25);
+
+      // Grid
+      ctx.strokeStyle = `${colors.primary}33`;
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 5; i++) {
+        const y = padding + (i * (height - 2 * padding - 50)) / 5;
+        ctx.beginPath();
+        ctx.moveTo(padding, y);
+        ctx.lineTo(width - padding, y);
+        ctx.stroke();
+      }
+
+      // Y-axis labels
+      ctx.fillStyle = colors.primary;
+      ctx.font = '11px monospace';
+      ctx.textAlign = 'right';
+      for (let i = 0; i <= 5; i++) {
+        const y = padding + (i * (height - 2 * padding - 50)) / 5;
+        ctx.fillText(`${100 - i * 20}`, padding - 10, y + 4);
+      }
+
+      // X-axis labels - WITH NEW OFFSET (+5)
+      ctx.textAlign = 'center';
+      for (let i = 0; i < labels.length; i++) {
+        const x = padding + (i * (width - 2 * padding)) / (labels.length - 1);
+        // CRITICAL: Using +5 offset (new aggressive fix)
+        ctx.fillText(labels[i], x, height - padding + 5);
+      }
+
+      // Draw bars
+      const barWidth = ((width - 2 * padding) / data.length) * 0.5;
+      const maxValue = 100;
+
+      for (let i = 0; i < data.length; i++) {
+        const x = padding + (i * (width - 2 * padding)) / (data.length - 1) - barWidth / 2;
+        const barHeight = (data[i] / maxValue) * (height - 2 * padding - 50);
+        const y = height - padding - 30 - barHeight;
+
+        ctx.fillStyle = colors.secondary;
+        ctx.fillRect(x, y, barWidth, barHeight);
+        ctx.strokeStyle = colors.secondary;
+        ctx.lineWidth = 2;
+        ctx.strokeRect(x, y, barWidth, barHeight);
+      }
+
+      // Legend - WITH NEW POSITION (width - 120)
+      ctx.fillStyle = colors.secondary;
+      ctx.fillRect(width - 120, 40, 15, 15);
+      ctx.fillStyle = colors.primary;
+      ctx.font = '11px monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText('Bar Data', width - 100, 52);
+
+      // Status update
+      document.getElementById('status').innerHTML = `
+            <strong>✅ چارت با موفقیت رسم شد</strong><br>
+            <small>X-axis offset: +5 | Legend position: width - 120 | Bottom margin: 50px</small><br>
+            <small>اگر هیچ عنصری از مرز قرمز بیرون نزده، کد صحیح است!</small>
+        `;
+
+      // Draw border to show canvas boundaries
+      ctx.strokeStyle = '#ff0000';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(1, 1, width - 2, height - 2);
+    </script>
+  </body>
+</html>

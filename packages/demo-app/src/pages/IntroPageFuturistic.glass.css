@@ -8,12 +8,10 @@
   background: rgba(0, 10, 20, 0.4) !important;
   backdrop-filter: blur(10px) !important;
   -webkit-backdrop-filter: blur(10px) !important;
-  border: 1px solid rgba(41, 242, 223, 0.2) !important;
   box-shadow: 0 4px 20px rgba(41, 242, 223, 0.1) !important;
 }
 
 .feature-card:hover {
-  border-color: rgba(41, 242, 223, 0.4) !important;
   box-shadow: 0 8px 32px rgba(41, 242, 223, 0.15) !important;
 }
 

@@ -20,6 +20,7 @@ import type {
 } from './types/index';
 import { Registry } from './registry/Registry';
 import { DefaultsManager } from './defaults/DefaultsManager';
+import { LayoutManager } from './layout/LayoutManager';
 
 /**
  * Main Chart class
@@ -42,6 +43,7 @@ export class Chart implements IChart {
   chartArea: ChartArea = { left: 0, top: 0, right: 0, bottom: 0, width: 0, height: 0 };
   initialized: boolean = false;
   rendered: boolean = false;
+  layoutManager: LayoutManager;
 
   private eventHandlers: Map<string, Set<EventHandler>> = new Map();
   private animationFrameId: number | null = null;
@@ -83,14 +85,33 @@ export class Chart implements IChart {
     this.ctx = ctx;
 
     // Set canvas dimensions
-    this.width = canvas.width || canvas.offsetWidth || 400;
-    this.height = canvas.height || canvas.offsetHeight || 300;
+    // Get dimensions from canvas attributes first, then from computed styles
+    let width = canvas.width;
+    let height = canvas.height;
+
+    if (!width || width === 0) {
+      const rect = canvas.getBoundingClientRect();
+      width = rect.width || canvas.offsetWidth || 400;
+    }
+    if (!height || height === 0) {
+      const rect = canvas.getBoundingClientRect();
+      height = rect.height || canvas.offsetHeight || 300;
+    }
+
+    this.width = Math.max(width, 100);
+    this.height = Math.max(height, 100);
     canvas.width = this.width;
     canvas.height = this.height;
 
     // Initialize registry with defaults
     this.registry = new Registry();
     DefaultsManager.registerDefaults(this.registry);
+
+    // Initialize layout manager
+    this.layoutManager = new LayoutManager(this.width, this.height, {
+      padding: 20,
+      margin: 10,
+    });
 
     // Register any plugins from config
     if (config.plugins) {
@@ -154,6 +175,18 @@ export class Chart implements IChart {
       // Call plugin beforeUpdate hooks
       this.callPluginHooks('beforeUpdate', { mode });
 
+      // Calculate layout and chart area
+      this.layoutManager.calculateLayout();
+      const layoutArea = this.layoutManager.getChartArea();
+      this.chartArea = {
+        left: layoutArea.left,
+        top: layoutArea.top,
+        right: layoutArea.right,
+        bottom: layoutArea.bottom,
+        width: Math.max(layoutArea.width, 100),
+        height: Math.max(layoutArea.height, 100),
+      };
+
       // Update scales
       this.updateScales();
 
@@ -195,14 +228,20 @@ export class Chart implements IChart {
       }
 
       // Draw scales
-      this.scales.forEach((scale) => {
-        scale.draw(this.chartArea);
-      });
+      if (this.chartArea) {
+        this.scales.forEach((scale) => {
+          scale.draw(this.chartArea);
+        });
+      }
 
       // Draw controllers (datasets)
-      this.controllers.forEach((controller) => {
-        controller.draw();
-      });
+      if (this.controllers && this.controllers.length > 0) {
+        this.controllers.forEach((controller) => {
+          if (controller && typeof controller.draw === 'function') {
+            controller.draw();
+          }
+        });
+      }
 
       // Call plugin afterDraw hooks
       this.callPluginHooks('afterDraw');
@@ -272,6 +311,9 @@ export class Chart implements IChart {
     this.height = height;
     this.canvas.width = width;
     this.canvas.height = height;
+
+    // Update layout manager with new dimensions
+    this.layoutManager.updateContainerSize(width, height);
 
     this.update('resize');
   }
@@ -384,8 +426,12 @@ export class Chart implements IChart {
       }
 
       // Create scale instance
-      const scale = new ScaleClass(scaleId, scaleConfig as any, this);
+      const scale = new ScaleClass(scaleId, scaleConfig as any, this.ctx, this);
       this.scales.set(scaleId, scale);
+
+      // Register with layout manager
+      const position = scaleId === 'x' || scaleId === 'bottom' ? 'bottom' : 'left';
+      this.layoutManager.registerScale(scaleId, scale as any, position);
     });
 
     // Create default scales if none configured
@@ -410,13 +456,25 @@ export class Chart implements IChart {
         const xScaleType = this.type === 'bar' || this.type === 'line' ? 'category' : 'linear';
         const XScaleClass = this.registry.getScale(xScaleType);
         if (XScaleClass) {
-          const xScale = new XScaleClass('x', { type: xScaleType }, this);
+          const xScale = new XScaleClass('x', { type: xScaleType }, this.ctx, this);
           this.scales.set('x', xScale);
+          this.layoutManager.registerScale('x', xScale as any, 'bottom');
         }
 
         // Y scale (always linear for these types)
-        const yScale = new LinearScale('y', { type: 'linear' }, this);
+        const yScale = new LinearScale('y', { type: 'linear' }, this.ctx, this);
         this.scales.set('y', yScale);
+        this.layoutManager.registerScale('y', yScale as any, 'left');
+      }
+    } else if (this.type === 'pie' || this.type === 'doughnut' || this.type === 'polarArea') {
+      // Pie/Doughnut/PolarArea don't need scales
+      return;
+    } else if (this.type === 'radar') {
+      // Radar needs radial scale
+      const RadialScale = this.registry.getScale('linear');
+      if (RadialScale) {
+        const radialScale = new RadialScale('r', { type: 'linear' }, this.ctx, this);
+        this.scales.set('r', radialScale);
       }
     }
   }

@@ -70,7 +70,43 @@ export class CategoryScale extends BaseScale {
   }
 
   draw(chartArea: ChartArea): void {
-    // Draw category labels
+    if (this.id !== 'x') return; // Only draw X axis for now
+
+    const ctx = this.ctx;
+    const left = chartArea.left;
+    const right = chartArea.right;
+    const y = chartArea.bottom;
+
+    ctx.save();
+    ctx.strokeStyle = '#1C7FA6';
+    ctx.lineWidth = 1;
+    ctx.fillStyle = '#29F2DF';
+    ctx.font = '12px monospace';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+
+    // Draw X axis line
+    ctx.beginPath();
+    ctx.moveTo(left, y);
+    ctx.lineTo(right, y);
+    ctx.stroke();
+
+    // Draw ticks and labels
+    this.ticks.forEach((tick) => {
+      const pixelPos = this.getPixelForValue(tick.value);
+      const x = left + pixelPos * (right - left);
+
+      // Draw tick mark
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x, y + 5);
+      ctx.stroke();
+
+      // Draw label
+      ctx.fillText(tick.label, x, y + 10);
+    });
+
+    ctx.restore();
   }
 
   /**

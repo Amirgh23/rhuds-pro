@@ -31,7 +31,7 @@ export class FrequencyAnalyzer {
    * Get frequency data
    */
   getFrequencies(): Uint8Array {
-    this.analyser.getByteFrequencyData(this.frequencies);
+    this.analyser.getByteFrequencyData(this.frequencies as any);
     return this.frequencies;
   }
 
@@ -39,7 +39,7 @@ export class FrequencyAnalyzer {
    * Get waveform data
    */
   getWaveform(): Uint8Array {
-    this.analyser.getByteTimeDomainData(this.waveform);
+    this.analyser.getByteTimeDomainData(this.waveform as any);
     return this.waveform;
   }
 
@@ -226,7 +226,7 @@ export class WaveformAnalyzer {
    * Get waveform data
    */
   getWaveform(): Uint8Array {
-    this.analyser.getByteTimeDomainData(this.waveform);
+    this.analyser.getByteTimeDomainData(this.waveform as any);
     return this.waveform;
   }
 

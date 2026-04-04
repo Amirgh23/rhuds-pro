@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { BaseChart, type BaseChartProps } from '../../react/components/BaseChart';
+import { BaseChart, type BaseChartProps } from '../../react/components/index';
 import { getColdWarChartOptions } from '../themes/ColdWarTheme';
 import type { Chart } from '../../engine/Chart';
 
