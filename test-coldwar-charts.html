@@ -1,0 +1,444 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cold War Charts Test</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        margin: 0;
+        padding: 20px;
+        background: #0a0a0c;
+        color: #f0a000;
+        font-family: 'Share Tech Mono', monospace;
+      }
+
+      .test-container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      h1 {
+        text-align: center;
+        color: #f0a000;
+        text-shadow: 0 0 20px rgba(240, 160, 0, 0.6);
+        margin-bottom: 40px;
+      }
+
+      .chart-wrapper {
+        background: rgba(20, 20, 24, 0.8);
+        border: 1px solid rgba(240, 160, 0, 0.3);
+        padding: 20px;
+        margin-bottom: 30px;
+        border-radius: 4px;
+      }
+
+      .chart-title {
+        font-size: 14px;
+        margin-bottom: 15px;
+        color: #f0a000;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+      }
+
+      canvas {
+        width: 100%;
+        height: auto;
+        display: block;
+        background: rgba(10, 10, 12, 0.5);
+      }
+
+      .status {
+        text-align: center;
+        padding: 10px;
+        background: rgba(240, 160, 0, 0.1);
+        border: 1px solid rgba(240, 160, 0, 0.3);
+        margin-bottom: 20px;
+        font-size: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="test-container">
+      <h1>COLD WAR CHARTS TEST</h1>
+
+      <div class="status" id="status">Initializing...</div>
+
+      <div class="chart-wrapper">
+        <div class="chart-title">Line Chart</div>
+        <canvas id="lineChart" width="600" height="400"></canvas>
+      </div>
+
+      <div class="chart-wrapper">
+        <div class="chart-title">Bar Chart</div>
+        <canvas id="barChart" width="600" height="400"></canvas>
+      </div>
+
+      <div class="chart-wrapper">
+        <div class="chart-title">Pie Chart</div>
+        <canvas id="pieChart" width="600" height="400"></canvas>
+      </div>
+
+      <div class="chart-wrapper">
+        <div class="chart-title">Radar Chart</div>
+        <canvas id="radarChart" width="600" height="400"></canvas>
+      </div>
+    </div>
+
+    <script>
+      // Cold War Colors
+      const COLDWAR_COLORS = {
+        primary: '#f0a000',
+        secondary: '#009797',
+        accent: '#0066cc',
+        danger: '#ff0000',
+        background: 'rgba(10, 10, 12, 0.95)',
+        grid: 'rgba(240, 160, 0, 0.15)',
+        text: '#f0a000',
+      };
+
+      // Easing function
+      function easeOutQuart(t) {
+        return 1 - Math.pow(1 - t, 4);
+      }
+
+      // Draw Line Chart
+      function drawLineChart(canvas, progress = 1) {
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        const width = canvas.width;
+        const height = canvas.height;
+        const padding = 50;
+        const data = [65, 59, 80, 81, 56, 55, 70];
+        const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'];
+
+        // Background
+        ctx.fillStyle = COLDWAR_COLORS.background;
+        ctx.fillRect(0, 0, width, height);
+
+        // Grid
+        ctx.strokeStyle = COLDWAR_COLORS.grid;
+        ctx.lineWidth = 1;
+        ctx.setLineDash([2, 2]);
+        const chartHeight = height - 2 * padding - 40;
+        const chartWidth = width - 2 * padding;
+
+        for (let i = 0; i <= 5; i++) {
+          const y = padding + (i * chartHeight) / 5;
+          ctx.beginPath();
+          ctx.moveTo(padding, y);
+          ctx.lineTo(width - padding, y);
+          ctx.stroke();
+        }
+
+        // Axes
+        ctx.setLineDash([]);
+        ctx.strokeStyle = COLDWAR_COLORS.primary;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(padding, padding);
+        ctx.lineTo(padding, height - padding - 40);
+        ctx.lineTo(width - padding, height - padding - 40);
+        ctx.stroke();
+
+        // Y-axis labels
+        ctx.fillStyle = COLDWAR_COLORS.text;
+        ctx.font = "10px 'Share Tech Mono', monospace";
+        ctx.textAlign = 'right';
+        for (let i = 0; i <= 5; i++) {
+          const y = padding + (i * chartHeight) / 5;
+          ctx.fillText(`${100 - i * 20}`, padding - 10, y + 4);
+        }
+
+        // X-axis labels
+        ctx.textAlign = 'center';
+        for (let i = 0; i < labels.length; i++) {
+          const x = padding + (i / (labels.length - 1)) * chartWidth;
+          ctx.fillText(labels[i], x, height - padding - 20);
+        }
+
+        // Line
+        const easedProgress = easeOutQuart(progress);
+        ctx.strokeStyle = COLDWAR_COLORS.primary;
+        ctx.lineWidth = 3;
+        ctx.shadowColor = COLDWAR_COLORS.primary;
+        ctx.shadowBlur = 10;
+        ctx.beginPath();
+
+        for (let i = 0; i < data.length; i++) {
+          if (i / (data.length - 1) <= easedProgress) {
+            const x = padding + (i / (data.length - 1)) * chartWidth;
+            const y = height - padding - 40 - (data[i] / 100) * chartHeight;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+        }
+        ctx.stroke();
+
+        // Points
+        ctx.shadowBlur = 0;
+        for (let i = 0; i < data.length; i++) {
+          if (i / (data.length - 1) <= easedProgress) {
+            const x = padding + (i / (data.length - 1)) * chartWidth;
+            const y = height - padding - 40 - (data[i] / 100) * chartHeight;
+
+            ctx.fillStyle = COLDWAR_COLORS.primary;
+            ctx.shadowColor = COLDWAR_COLORS.primary;
+            ctx.shadowBlur = 15;
+            ctx.beginPath();
+            ctx.arc(x, y, 6, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = COLDWAR_COLORS.background;
+            ctx.beginPath();
+            ctx.arc(x, y, 3, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+      }
+
+      // Draw Bar Chart
+      function drawBarChart(canvas, progress = 1) {
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        const width = canvas.width;
+        const height = canvas.height;
+        const padding = 40;
+        const data = [45, 55, 60, 70, 50, 65, 75];
+        const labels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'];
+
+        ctx.fillStyle = COLDWAR_COLORS.background;
+        ctx.fillRect(0, 0, width, height);
+
+        // Grid
+        ctx.strokeStyle = COLDWAR_COLORS.grid;
+        ctx.lineWidth = 1;
+        for (let i = 0; i <= 5; i++) {
+          const y = padding + (i * (height - 2 * padding - 40)) / 5;
+          ctx.beginPath();
+          ctx.moveTo(padding, y);
+          ctx.lineTo(width - padding, y);
+          ctx.stroke();
+        }
+
+        // Axes
+        ctx.strokeStyle = COLDWAR_COLORS.primary;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(padding, padding);
+        ctx.lineTo(padding, height - padding - 40);
+        ctx.lineTo(width - padding, height - padding - 40);
+        ctx.stroke();
+
+        // Bars
+        const barWidth = ((width - 2 * padding) / data.length) * 0.7;
+        for (let i = 0; i < data.length; i++) {
+          const delay = i * 0.08;
+          const barProgress = Math.max(0, Math.min(1, (progress - delay) / (1 - delay)));
+          const easedBarProgress = easeOutQuart(barProgress);
+
+          const x =
+            padding +
+            (i * (width - 2 * padding)) / data.length +
+            (width - 2 * padding) / data.length / 2 -
+            barWidth / 2;
+          const barHeight = (data[i] / 100) * (height - 2 * padding - 40) * easedBarProgress;
+          const y = height - padding - 40 - barHeight;
+
+          const gradient = ctx.createLinearGradient(x, y, x, y + barHeight);
+          gradient.addColorStop(0, COLDWAR_COLORS.primary);
+          gradient.addColorStop(1, COLDWAR_COLORS.primary + '66');
+
+          ctx.fillStyle = gradient;
+          ctx.fillRect(x, y, barWidth, barHeight);
+          ctx.strokeStyle = COLDWAR_COLORS.primary;
+          ctx.lineWidth = 1;
+          ctx.strokeRect(x, y, barWidth, barHeight);
+        }
+
+        // Labels
+        ctx.fillStyle = COLDWAR_COLORS.primary;
+        ctx.font = '11px monospace';
+        ctx.textAlign = 'center';
+        for (let i = 0; i < labels.length; i++) {
+          const x =
+            padding +
+            (i * (width - 2 * padding)) / data.length +
+            (width - 2 * padding) / data.length / 2;
+          ctx.fillText(labels[i], x, height - padding - 20);
+        }
+      }
+
+      // Draw Pie Chart
+      function drawPieChart(canvas, progress = 1) {
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        const width = canvas.width;
+        const height = canvas.height;
+        const centerX = width / 2;
+        const centerY = height / 2;
+        const radius = Math.min(width, height) / 3;
+
+        const data = [30, 25, 20, 25];
+        const colors = [
+          COLDWAR_COLORS.primary,
+          COLDWAR_COLORS.secondary,
+          COLDWAR_COLORS.accent,
+          COLDWAR_COLORS.danger,
+        ];
+
+        ctx.fillStyle = COLDWAR_COLORS.background;
+        ctx.fillRect(0, 0, width, height);
+
+        const easedProgress = easeOutQuart(progress);
+        let startAngle = -Math.PI / 2;
+        const total = data.reduce((a, b) => a + b, 0);
+
+        data.forEach((value, i) => {
+          const sliceAngle = (value / total) * Math.PI * 2 * easedProgress;
+          const endAngle = startAngle + sliceAngle;
+
+          ctx.beginPath();
+          ctx.moveTo(centerX, centerY);
+          ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+          ctx.closePath();
+
+          const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+          gradient.addColorStop(0, colors[i] + '88');
+          gradient.addColorStop(1, colors[i]);
+
+          ctx.fillStyle = gradient;
+          ctx.fill();
+          ctx.strokeStyle = COLDWAR_COLORS.background;
+          ctx.lineWidth = 2;
+          ctx.stroke();
+
+          startAngle = endAngle;
+        });
+      }
+
+      // Draw Radar Chart
+      function drawRadarChart(canvas, progress = 1) {
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        const width = canvas.width;
+        const height = canvas.height;
+        const centerX = width / 2;
+        const centerY = height / 2;
+        const radius = Math.min(width, height) / 3;
+
+        const data = [65, 59, 90, 81, 56, 75];
+        const labels = ['Speed', 'Strength', 'Defense', 'Attack', 'Magic', 'HP'];
+
+        ctx.fillStyle = COLDWAR_COLORS.background;
+        ctx.fillRect(0, 0, width, height);
+
+        // Grid circles
+        ctx.strokeStyle = COLDWAR_COLORS.grid;
+        ctx.lineWidth = 1;
+        for (let i = 1; i <= 5; i++) {
+          ctx.beginPath();
+          ctx.arc(centerX, centerY, (radius / 5) * i, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        // Axes
+        ctx.strokeStyle = COLDWAR_COLORS.grid;
+        for (let i = 0; i < labels.length; i++) {
+          const angle = (i * Math.PI * 2) / labels.length - Math.PI / 2;
+          ctx.beginPath();
+          ctx.moveTo(centerX, centerY);
+          ctx.lineTo(centerX + Math.cos(angle) * radius, centerY + Math.sin(angle) * radius);
+          ctx.stroke();
+        }
+
+        // Data polygon
+        const easedProgress = easeOutQuart(progress);
+        ctx.fillStyle = COLDWAR_COLORS.primary + '33';
+        ctx.strokeStyle = COLDWAR_COLORS.primary;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+
+        for (let i = 0; i < data.length; i++) {
+          const angle = (i * Math.PI * 2) / data.length - Math.PI / 2;
+          const r = (data[i] / 100) * radius * easedProgress;
+          const x = centerX + Math.cos(angle) * r;
+          const y = centerY + Math.sin(angle) * r;
+
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+
+        // Points
+        for (let i = 0; i < data.length; i++) {
+          const angle = (i * Math.PI * 2) / data.length - Math.PI / 2;
+          const r = (data[i] / 100) * radius * easedProgress;
+          const x = centerX + Math.cos(angle) * r;
+          const y = centerY + Math.sin(angle) * r;
+
+          ctx.fillStyle = COLDWAR_COLORS.primary;
+          ctx.beginPath();
+          ctx.arc(x, y, 4, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Labels
+        ctx.fillStyle = COLDWAR_COLORS.primary;
+        ctx.font = '11px monospace';
+        ctx.textAlign = 'center';
+        for (let i = 0; i < labels.length; i++) {
+          const angle = (i * Math.PI * 2) / labels.length - Math.PI / 2;
+          const x = centerX + Math.cos(angle) * (radius + 25);
+          const y = centerY + Math.sin(angle) * (radius + 25);
+          ctx.fillText(labels[i], x, y);
+        }
+      }
+
+      // Initialize
+      let progress = 0;
+      const statusEl = document.getElementById('status');
+
+      function animate() {
+        progress += 0.01;
+        if (progress > 1) progress = 1;
+
+        const lineCanvas = document.getElementById('lineChart');
+        const barCanvas = document.getElementById('barChart');
+        const pieCanvas = document.getElementById('pieChart');
+        const radarCanvas = document.getElementById('radarChart');
+
+        if (lineCanvas) drawLineChart(lineCanvas, progress);
+        if (barCanvas) drawBarChart(barCanvas, progress);
+        if (pieCanvas) drawPieChart(pieCanvas, progress);
+        if (radarCanvas) drawRadarChart(radarCanvas, progress);
+
+        statusEl.textContent = `Animation Progress: ${Math.round(progress * 100)}%`;
+        statusEl.style.background =
+          progress === 1 ? 'rgba(0, 151, 151, 0.2)' : 'rgba(240, 160, 0, 0.1)';
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          statusEl.textContent = 'All Charts Rendered Successfully ✓';
+        }
+      }
+
+      // Start animation
+      setTimeout(() => {
+        animate();
+      }, 500);
+    </script>
+  </body>
+</html>

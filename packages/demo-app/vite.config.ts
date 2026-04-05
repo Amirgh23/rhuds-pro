@@ -1,9 +1,26 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { resolve } from 'path';
+import fs from 'fs';
+import path from 'path';
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    {
+      name: 'spa-fallback',
+      configureServer(server) {
+        return () => {
+          server.middlewares.use((req, res, next) => {
+            if (req.url && !req.url.includes('.') && req.method === 'GET') {
+              req.url = '/index.html';
+            }
+            next();
+          });
+        };
+      },
+    },
+  ],
   resolve: {
     alias: {
       '@rhuds/core': resolve(__dirname, '../core/src'),

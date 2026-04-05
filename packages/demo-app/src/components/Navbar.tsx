@@ -167,6 +167,7 @@ export const Navbar: React.FC = () => {
             <>
               {createNavButton('/coldwar-intro', 'Intro', '#FFB000')}
               {createNavButton('/coldwar-showcase', 'Showcase', '#FFB000')}
+              {createNavButton('/coldwar-charts', 'Charts', '#FFB000')}
               {createNavButton('/coldwar-playground', 'Playground', '#FFB000')}
               {createNavButton('/coldwar-docs', 'Docs', '#FFB000')}
               {createNavButton('/coldwar-portfolio', 'Portfolio', '#FFB000')}
@@ -196,7 +197,7 @@ export const Navbar: React.FC = () => {
                   margin: '0 0.3rem',
                 }}
               />
-              {createNavButton('/coldwar-intro', 'Switch to Cold War', '#FFB000')}
+              {createNavButton('/coldwar-charts', 'Cold War Charts', '#FFB000')}
             </>
           )}
         </div>

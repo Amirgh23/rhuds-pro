@@ -17,3 +17,4 @@ export * from './geometry';
 export * from './colors';
 export * from './textures';
 export * from './tokens';
+export * from './coldWarHudColors';

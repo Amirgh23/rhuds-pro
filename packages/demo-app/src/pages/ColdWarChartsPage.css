@@ -1,0 +1,714 @@
+/**
+ * ═══════════════════════════════════════════════════════════════════════════
+ * COLD WAR CHARTS PAGE - COMPLETE STYLING
+ * ═══════════════════════════════════════════════════════════════════════════
+ * استایل کامل صفحه چارت‌های Cold War با ظاهر HUD واقعی
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Roboto+Mono:wght@400;700&display=swap');
+
+/* ═══════════════════════════════════════════════════════════════
+   BASE STYLES
+   ═══════════════════════════════════════════════════════════════ */
+
+.coldwar-charts-page {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  background: #0a0a0c;
+  color: #f0a000;
+  font-family: 'Share Tech Mono', 'Roboto Mono', monospace;
+  overflow-x: hidden;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   HEADER
+   ═══════════════════════════════════════════════════════════════ */
+
+.charts-header {
+  position: relative;
+  z-index: 10;
+  padding: 40px 40px 30px;
+  background: linear-gradient(
+    180deg,
+    rgba(10, 10, 12, 0.98) 0%,
+    rgba(20, 20, 24, 0.95) 50%,
+    transparent 100%
+  );
+  border-bottom: 2px solid rgba(240, 160, 0, 0.3);
+}
+
+.header-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 40px;
+}
+
+.header-title-section {
+  flex: 1;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  font-size: 10px;
+  color: rgba(240, 160, 0, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.led-pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #f0a000;
+  box-shadow: 0 0 12px #f0a000;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+.page-title {
+  margin: 0 0 8px 0;
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #f0a000;
+  text-shadow:
+    0 0 20px rgba(240, 160, 0, 0.6),
+    0 0 40px rgba(240, 160, 0, 0.3);
+  animation: title-glow 3s ease-in-out infinite;
+}
+
+@keyframes title-glow {
+  0%,
+  100% {
+    text-shadow:
+      0 0 20px rgba(240, 160, 0, 0.6),
+      0 0 40px rgba(240, 160, 0, 0.3);
+  }
+  50% {
+    text-shadow:
+      0 0 30px rgba(240, 160, 0, 0.8),
+      0 0 60px rgba(240, 160, 0, 0.5);
+  }
+}
+
+.page-subtitle {
+  margin: 0;
+  font-size: 12px;
+  color: rgba(240, 160, 0, 0.6);
+  letter-spacing: 0.05em;
+}
+
+.header-search {
+  flex-shrink: 0;
+  width: 300px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 12px 16px;
+  background: rgba(20, 20, 24, 0.8);
+  border: 1px solid rgba(240, 160, 0, 0.3);
+  color: #f0a000;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.search-input::placeholder {
+  color: rgba(240, 160, 0, 0.4);
+}
+
+.search-input:focus {
+  border-color: #f0a000;
+  box-shadow:
+    0 0 20px rgba(240, 160, 0, 0.3),
+    inset 0 0 10px rgba(240, 160, 0, 0.1);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CATEGORY TABS
+   ═══════════════════════════════════════════════════════════════ */
+
+.category-tabs {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  gap: 8px;
+  padding: 20px 40px;
+  background: rgba(10, 10, 12, 0.8);
+  border-bottom: 1px solid rgba(240, 160, 0, 0.2);
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(240, 160, 0, 0.3) rgba(20, 20, 24, 0.5);
+}
+
+.category-tabs::-webkit-scrollbar {
+  height: 6px;
+}
+
+.category-tabs::-webkit-scrollbar-track {
+  background: rgba(20, 20, 24, 0.5);
+}
+
+.category-tabs::-webkit-scrollbar-thumb {
+  background: rgba(240, 160, 0, 0.3);
+  border-radius: 3px;
+}
+
+.category-tabs::-webkit-scrollbar-thumb:hover {
+  background: rgba(240, 160, 0, 0.5);
+}
+
+.tab-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: transparent;
+  border: 1px solid rgba(240, 160, 0, 0.3);
+  color: rgba(240, 160, 0, 0.6);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.tab-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: rgba(240, 160, 0, 0.1);
+  transition: left 0.3s ease;
+  z-index: -1;
+}
+
+.tab-button:hover {
+  color: #f0a000;
+  border-color: rgba(240, 160, 0, 0.6);
+  box-shadow: 0 0 15px rgba(240, 160, 0, 0.2);
+}
+
+.tab-button:hover::before {
+  left: 0;
+}
+
+.tab-button.active {
+  color: #f0a000;
+  border-color: #f0a000;
+  background: rgba(240, 160, 0, 0.15);
+  box-shadow:
+    0 0 20px rgba(240, 160, 0, 0.4),
+    inset 0 0 15px rgba(240, 160, 0, 0.1);
+}
+
+.tab-label {
+  display: inline-block;
+}
+
+.tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 20px;
+  padding: 0 6px;
+  background: rgba(240, 160, 0, 0.2);
+  border-radius: 10px;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.tab-button.active .tab-count {
+  background: rgba(240, 160, 0, 0.3);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CHARTS GRID
+   ═══════════════════════════════════════════════════════════════ */
+
+.charts-grid {
+  position: relative;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(600px, 1fr));
+  gap: 30px;
+  padding: 40px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.chart-card {
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, rgba(10, 10, 12, 0.98) 0%, rgba(20, 20, 24, 0.95) 100%);
+  border: 1px solid rgba(240, 160, 0, 0.4);
+  border-radius: 2px;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(240, 160, 0, 0.1);
+}
+
+.chart-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(240, 160, 0, 0.3);
+  border-color: rgba(240, 160, 0, 0.7);
+}
+
+.chart-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: rgba(240, 160, 0, 0.1);
+  border-bottom: 1px solid rgba(240, 160, 0, 0.3);
+}
+
+.chart-title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: #f0a000;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  text-shadow: 0 0 8px rgba(240, 160, 0, 0.5);
+}
+
+.chart-tech-code {
+  font-size: 9px;
+  color: rgba(240, 160, 0, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.chart-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+}
+
+.chart-canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+  background: rgba(10, 10, 12, 0.5);
+  border-radius: 2px;
+}
+
+.chart-description {
+  margin: 0;
+  padding: 8px 0 0 0;
+  font-size: 11px;
+  color: rgba(240, 160, 0, 0.6);
+  text-align: center;
+  letter-spacing: 0.05em;
+  border-top: 1px solid rgba(240, 160, 0, 0.1);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FOOTER
+   ═══════════════════════════════════════════════════════════════ */
+
+.charts-footer {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+  padding: 30px 40px;
+  background: rgba(10, 10, 12, 0.9);
+  border-top: 2px solid rgba(240, 160, 0, 0.3);
+}
+
+.footer-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat-label {
+  font-size: 9px;
+  color: rgba(240, 160, 0, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #f0a000;
+  text-shadow: 0 0 15px rgba(240, 160, 0, 0.6);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════════════════════ */
+
+@media (max-width: 1200px) {
+  .charts-grid {
+    grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+    padding: 20px;
+    gap: 20px;
+  }
+
+  .charts-header {
+    padding: 30px 20px 20px;
+  }
+
+  .header-content {
+    flex-direction: column;
+  }
+
+  .header-search {
+    width: 100%;
+  }
+
+  .page-title {
+    font-size: 24px;
+  }
+
+  .category-tabs {
+    padding: 16px 20px;
+    gap: 6px;
+  }
+
+  .tab-button {
+    padding: 8px 16px;
+    font-size: 10px;
+  }
+
+  .charts-footer {
+    gap: 30px;
+    flex-wrap: wrap;
+  }
+
+  .stat-value {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-title {
+    font-size: 20px;
+  }
+
+  .page-subtitle {
+    font-size: 10px;
+  }
+
+  .charts-grid {
+    padding: 15px;
+  }
+
+  .category-tabs {
+    padding: 12px 15px;
+  }
+
+  .charts-footer {
+    padding: 20px 15px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ANIMATIONS
+   ═══════════════════════════════════════════════════════════════ */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.chart-card {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.chart-card:nth-child(1) {
+  animation-delay: 0.05s;
+}
+.chart-card:nth-child(2) {
+  animation-delay: 0.1s;
+}
+.chart-card:nth-child(3) {
+  animation-delay: 0.15s;
+}
+.chart-card:nth-child(4) {
+  animation-delay: 0.2s;
+}
+.chart-card:nth-child(5) {
+  animation-delay: 0.25s;
+}
+.chart-card:nth-child(6) {
+  animation-delay: 0.3s;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LOADING STATE
+   ═══════════════════════════════════════════════════════════════ */
+
+.charts-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 20px;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(240, 160, 0, 0.2);
+  border-top-color: #f0a000;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-text {
+  font-size: 12px;
+  color: rgba(240, 160, 0, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   EMPTY STATE
+   ═══════════════════════════════════════════════════════════════ */
+
+.charts-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 16px;
+  padding: 40px;
+}
+
+.empty-icon {
+  font-size: 48px;
+  color: rgba(240, 160, 0, 0.3);
+}
+
+.empty-text {
+  font-size: 14px;
+  color: rgba(240, 160, 0, 0.6);
+  text-align: center;
+}
+
+.empty-subtext {
+  font-size: 11px;
+  color: rgba(240, 160, 0, 0.4);
+  text-align: center;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TOOLTIP
+   ═══════════════════════════════════════════════════════════════ */
+
+.chart-tooltip {
+  background: rgba(10, 10, 12, 0.95);
+  border: 2px solid #f0a000;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 12px;
+  color: #f0a000;
+  box-shadow:
+    0 0 20px rgba(240, 160, 0, 0.4),
+    inset 0 0 10px rgba(240, 160, 0, 0.1);
+  backdrop-filter: blur(10px);
+  white-space: nowrap;
+  animation: tooltipFadeIn 0.2s ease-out;
+  pointer-events: none;
+  user-select: none;
+}
+
+.tooltip-label {
+  font-size: 10px;
+  color: rgba(240, 160, 0, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+.tooltip-value {
+  font-size: 14px;
+  font-weight: 700;
+  color: #f0a000;
+  text-shadow: 0 0 10px rgba(240, 160, 0, 0.5);
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.chart-tooltip::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, #f0a000, #009797, #f0a000);
+  border-radius: 4px;
+  z-index: -1;
+  opacity: 0.3;
+  animation: tooltipGlow 2s ease-in-out infinite;
+}
+
+@keyframes tooltipGlow {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* Canvas hover effect */
+.chart-canvas {
+  transition: filter 0.2s ease;
+}
+
+.chart-canvas:hover {
+  filter: brightness(1.1);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   REPLAY BUTTON
+   ═══════════════════════════════════════════════════════════════ */
+
+.chart-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.chart-replay-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(240, 160, 0, 0.1);
+  border: 1px solid #f0a000;
+  border-radius: 4px;
+  color: #f0a000;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.chart-replay-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(240, 160, 0, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.chart-replay-btn:hover {
+  background: rgba(240, 160, 0, 0.2);
+  border-color: #f0a000;
+  box-shadow:
+    0 0 15px rgba(240, 160, 0, 0.4),
+    inset 0 0 10px rgba(240, 160, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.chart-replay-btn:hover::before {
+  left: 100%;
+}
+
+.chart-replay-btn:active {
+  transform: translateY(0);
+  box-shadow:
+    0 0 10px rgba(240, 160, 0, 0.3),
+    inset 0 0 5px rgba(240, 160, 0, 0.2);
+}
+
+.chart-replay-btn svg {
+  width: 14px;
+  height: 14px;
+  animation: rotateIcon 0.6s ease-in-out;
+}
+
+.chart-replay-btn:hover svg {
+  animation: rotateIcon 0.6s ease-in-out infinite;
+}
+
+@keyframes rotateIcon {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.chart-replay-btn span {
+  position: relative;
+  z-index: 1;
+}
