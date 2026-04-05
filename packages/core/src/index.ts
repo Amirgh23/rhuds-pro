@@ -1,17 +1,19 @@
 // Theme exports
-export * from './theme'
+export * from './theme';
 
 // Animation exports
-export * from './animation'
+export * from './animation';
 
 // Audio exports
-export * from './audio'
+export * from './audio';
 
 // Component exports
-export * from './components'
+export * from './components';
+export { ErrorBoundary } from './components/ErrorBoundary';
 
 // Store exports
-export * from './store'
+export * from './store';
 
 // Utility exports
-export * from './utils'
+export * from './utils';
+export * from './utils/useCleanup';

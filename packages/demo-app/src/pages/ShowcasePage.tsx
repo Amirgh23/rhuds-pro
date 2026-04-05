@@ -1,5 +1,5 @@
 ﻿import React, { useState, useRef, useEffect } from 'react';
-import { useTheme } from '@rhuds/core';
+import { useTheme, useTimeout } from '@rhuds/core';
 import { useScrollToTop } from '../hooks/useScrollToTop';
 import { AnimatedBackground } from '../components/AnimatedBackground';
 import { useContextMenu } from '../hooks/useContextMenu';
@@ -166,67 +166,92 @@ export const ShowcasePage: React.FC = () => {
   useScrollToTop();
 
   // Ensure scroll to top on mount and when tab changes
+  const [shouldScroll, setShouldScroll] = useState(true);
+
+  const scrollToTop = () => {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  };
+
+  useTimeout(
+    () => {
+      scrollToTop();
+    },
+    shouldScroll ? 50 : null
+  );
+
+  useTimeout(
+    () => {
+      scrollToTop();
+    },
+    shouldScroll ? 150 : null
+  );
+
+  useTimeout(
+    () => {
+      scrollToTop();
+      setShouldScroll(false);
+    },
+    shouldScroll ? 300 : null
+  );
+
   useEffect(() => {
-    const scrollToTop = () => {
-      window.scrollTo(0, 0);
-      document.documentElement.scrollTop = 0;
-      document.body.scrollTop = 0;
-    };
-
-    // Scroll immediately
-    scrollToTop();
-
-    // Scroll after a delay to handle component rendering
-    const timeoutId = setTimeout(scrollToTop, 50);
-    const longTimeoutId = setTimeout(scrollToTop, 150);
-    const extraTimeoutId = setTimeout(scrollToTop, 300);
-
-    return () => {
-      clearTimeout(timeoutId);
-      clearTimeout(longTimeoutId);
-      clearTimeout(extraTimeoutId);
-    };
+    setShouldScroll(true);
   }, [activeTab]);
 
   // Additional effect to ensure scroll to top on component mount
-  useEffect(() => {
-    const scrollToTop = () => {
-      window.scrollTo(0, 0);
-      document.documentElement.scrollTop = 0;
-      document.body.scrollTop = 0;
-    };
+  const [shouldScrollOnMount, setShouldScrollOnMount] = useState(true);
 
-    // Scroll after component fully mounts
-    scrollToTop();
-    const timeoutId = setTimeout(scrollToTop, 50);
-    const longTimeoutId = setTimeout(scrollToTop, 150);
-    const extraTimeoutId = setTimeout(scrollToTop, 300);
+  useTimeout(
+    () => {
+      scrollToTop();
+    },
+    shouldScrollOnMount ? 50 : null
+  );
 
-    return () => {
-      clearTimeout(timeoutId);
-      clearTimeout(longTimeoutId);
-      clearTimeout(extraTimeoutId);
-    };
-  }, []);
+  useTimeout(
+    () => {
+      scrollToTop();
+    },
+    shouldScrollOnMount ? 150 : null
+  );
+
+  useTimeout(
+    () => {
+      scrollToTop();
+      setShouldScrollOnMount(false);
+    },
+    shouldScrollOnMount ? 300 : null
+  );
 
   // Prevent auto-focus from causing scroll
+  const [shouldBlur, setShouldBlur] = useState(true);
+
+  const blurFocused = () => {
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+  };
+
+  useTimeout(
+    () => {
+      blurFocused();
+    },
+    shouldBlur ? 50 : null
+  );
+
+  useTimeout(
+    () => {
+      blurFocused();
+      setShouldBlur(false);
+    },
+    shouldBlur ? 150 : null
+  );
+
   useEffect(() => {
-    // Blur any focused element to prevent scroll
-    const blurFocused = () => {
-      if (document.activeElement instanceof HTMLElement) {
-        document.activeElement.blur();
-      }
-    };
-
-    // Blur immediately and after delays
     blurFocused();
-    const timeoutId = setTimeout(blurFocused, 50);
-    const longTimeoutId = setTimeout(blurFocused, 150);
-
-    return () => {
-      clearTimeout(timeoutId);
-      clearTimeout(longTimeoutId);
-    };
+    setShouldBlur(true);
   }, [activeTab]);
 
   // Force scroll to top and prevent any scrolling for first 1 second

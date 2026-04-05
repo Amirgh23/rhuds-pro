@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useInterval } from '@rhuds/core';
 import { ColdWarButton, ColdWarCard, ColdWarInput } from '@rhuds/components';
 import { TacticalMotionBackground } from '../components/TacticalMotionBackground';
 import { useScrollAnimation } from '../hooks/useScrollAnimation';
@@ -487,22 +488,20 @@ export const ColdWarIntro: React.FC = () => {
   ];
 
   // Terminal typing animation
+  const fullText = codeLines.join('\n');
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const isTyping = currentIndex <= fullText.length;
+
   useEffect(() => {
-    const fullText = codeLines.join('\n');
-    let currentIndex = 0;
+    setTerminalText(fullText.substring(0, currentIndex));
+  }, [currentIndex, fullText]);
 
-    const typingInterval = setInterval(() => {
-      if (currentIndex <= fullText.length) {
-        setTerminalText(fullText.substring(0, currentIndex));
-        currentIndex++;
-      } else {
-        clearInterval(typingInterval);
-      }
-    }, 50);
-
-    return () => clearInterval(typingInterval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  useInterval(
+    () => {
+      setCurrentIndex((prev) => prev + 1);
+    },
+    isTyping ? 50 : null
+  );
 
   // Section observer
   useEffect(() => {

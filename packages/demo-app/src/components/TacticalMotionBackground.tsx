@@ -36,6 +36,7 @@
  */
 
 import React, { useEffect, useRef, useState, useMemo } from 'react';
+import { useInterval } from '@rhuds/core';
 import './TacticalMotionBackground.css';
 
 interface TacticalMotionBackgroundProps {
@@ -133,63 +134,58 @@ export const TacticalMotionBackground: React.FC<TacticalMotionBackgroundProps> =
   // GENERATE DATA POINTS - Continuous surveillance markers
   // ═══════════════════════════════════════════════════════════════════════════
 
+  const generateDataPoint = () => {
+    const id = Math.random().toString(36).substring(2, 11);
+    const x = Math.random() * 100;
+    const y = Math.random() * 100;
+    const duration = 2 + Math.random() * 2; // 2-4 seconds
+    return { id, x, y, duration };
+  };
+
   useEffect(() => {
-    const generateDataPoint = () => {
-      const id = Math.random().toString(36).substring(2, 11);
-      const x = Math.random() * 100;
-      const y = Math.random() * 100;
-      const duration = 2 + Math.random() * 2; // 2-4 seconds
-
-      return { id, x, y, duration };
-    };
-
     // Initial batch
     const initialCount = intensity === 'low' ? 2 : intensity === 'medium' ? 3 : 5;
     setDataPoints(Array.from({ length: initialCount }, generateDataPoint));
-
-    // Continuous generation
-    const intervalTime = intensity === 'low' ? 2000 : intensity === 'medium' ? 1500 : 1000;
-    const interval = setInterval(() => {
-      setDataPoints((prev) => {
-        const newPoints = [...prev, generateDataPoint()];
-        const maxPoints = intensity === 'low' ? 6 : intensity === 'medium' ? 8 : 12;
-        return newPoints.slice(-maxPoints);
-      });
-    }, intervalTime);
-
-    return () => clearInterval(interval);
   }, [intensity]);
+
+  const intervalTime = intensity === 'low' ? 2000 : intensity === 'medium' ? 1500 : 1000;
+
+  useInterval(() => {
+    setDataPoints((prev) => {
+      const newPoints = [...prev, generateDataPoint()];
+      const maxPoints = intensity === 'low' ? 6 : intensity === 'medium' ? 8 : 12;
+      return newPoints.slice(-maxPoints);
+    });
+  }, intervalTime);
 
   // ═══════════════════════════════════════════════════════════════════════════
   // GENERATE FLOATING COORDINATES - Random location markers
   // ═══════════════════════════════════════════════════════════════════════════
 
+  const generateCoordinateMarker = () => {
+    const id = Math.random().toString(36).substring(2, 11);
+    const x = 10 + Math.random() * 80; // Keep away from edges
+    const y = 10 + Math.random() * 80;
+    const coord = generateCoordinate();
+    const duration = 3 + Math.random() * 3; // 3-6 seconds
+    return { id, x, y, coord, duration };
+  };
+
   useEffect(() => {
     if (!showCoordinates) return;
-
-    const generateCoordinateMarker = () => {
-      const id = Math.random().toString(36).substring(2, 11);
-      const x = 10 + Math.random() * 80; // Keep away from edges
-      const y = 10 + Math.random() * 80;
-      const coord = generateCoordinate();
-      const duration = 3 + Math.random() * 3; // 3-6 seconds
-
-      return { id, x, y, coord, duration };
-    };
-
     // Initial batch
     setCoordinates(Array.from({ length: 4 }, generateCoordinateMarker));
+  }, [showCoordinates]);
 
-    // Continuous generation
-    const interval = setInterval(() => {
+  useInterval(
+    () => {
       setCoordinates((prev) => {
         const newCoords = [...prev, generateCoordinateMarker()];
         return newCoords.slice(-6); // Keep only last 6
       });
-    }, 4000);
-
-    return () => clearInterval(interval);
-  }, [showCoordinates]);
+    },
+    showCoordinates ? 4000 : null
+  );
 
   // ═══════════════════════════════════════════════════════════════════════════
   // RENDER - 10 LAYERS OF CINEMATIC COMPLEXITY

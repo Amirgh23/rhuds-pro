@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useInterval, useTimeout } from '@rhuds/core';
 import { Navigation } from './intro-page/components/Navigation';
 import { CTAButtons } from './intro-page/components/CTAButtons';
 import { GlassContextMenu } from '../components/GlassContextMenu';
@@ -59,54 +60,57 @@ export default function IntroPage() {
   const hoverSoundRef = useRef<OscillatorNode | null>(null);
 
   // Initial load animation with progressive reveal
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoaded(true), 100);
-    return () => clearTimeout(timer);
-  }, []);
+  useTimeout(() => setIsLoaded(true), 100);
 
   // Typing effect with variable speed
+  const [typingIndex, setTypingIndex] = useState(0);
+  const [typingDelay, setTypingDelay] = useState(60 + Math.random() * 40);
+  const [shouldType, setShouldType] = useState(true);
+
   useEffect(() => {
-    let index = 0;
-    const timer = setInterval(
-      () => {
-        if (index <= FULL_TEXT.length) {
-          setTypedText(FULL_TEXT.slice(0, index));
-          index++;
-          // Variable typing speed for more natural feel
-          if (index % 5 === 0) {
-            clearInterval(timer);
-            setTimeout(() => {
-              const newTimer = setInterval(() => {
-                if (index <= FULL_TEXT.length) {
-                  setTypedText(FULL_TEXT.slice(0, index));
-                  index++;
-                } else {
-                  clearInterval(newTimer);
-                }
-              }, 80);
-            }, Math.random() * 200);
-          }
-        } else {
-          clearInterval(timer);
+    setTypedText(FULL_TEXT.slice(0, typingIndex));
+  }, [typingIndex]);
+
+  useInterval(
+    () => {
+      setTypingIndex((prev) => {
+        const next = prev + 1;
+        if (next % 5 === 0 && next <= FULL_TEXT.length) {
+          setShouldType(false);
         }
-      },
-      60 + Math.random() * 40
-    );
-    return () => clearInterval(timer);
-  }, []);
+        return next;
+      });
+    },
+    shouldType && typingIndex <= FULL_TEXT.length ? typingDelay : null
+  );
+
+  useTimeout(
+    () => {
+      setShouldType(true);
+      setTypingDelay(80);
+    },
+    !shouldType && typingIndex <= FULL_TEXT.length ? Math.random() * 200 : null
+  );
 
   // Glitch effect with variable intensity
-  useEffect(() => {
-    const glitchInterval = setInterval(
-      () => {
-        const intensity = Math.random() * 0.5 + 0.5;
-        setGlitchActive(true);
-        setTimeout(() => setGlitchActive(false), 100 + intensity * 100);
-      },
-      2000 + Math.random() * 2000
-    );
-    return () => clearInterval(glitchInterval);
-  }, []);
+  const [glitchDelay, setGlitchDelay] = useState(2000 + Math.random() * 2000);
+  const [shouldGlitch, setShouldGlitch] = useState(true);
+
+  useInterval(
+    () => {
+      const intensity = Math.random() * 0.5 + 0.5;
+      setGlitchActive(true);
+      setGlitchDelay(2000 + Math.random() * 2000);
+    },
+    shouldGlitch ? glitchDelay : null
+  );
+
+  useTimeout(
+    () => {
+      setGlitchActive(false);
+    },
+    glitchActive ? 100 + Math.random() * 100 : null
+  );
 
   // Audio initialization
   useEffect(() => {
@@ -121,29 +125,28 @@ export default function IntroPage() {
   }, []);
 
   // Animate GitHub stats
-  useEffect(() => {
-    const duration = 2000;
-    const steps = 60;
-    const stepDuration = duration / steps;
-    let currentStep = 0;
+  const [statsStep, setStatsStep] = useState(0);
+  const statsDuration = 2000;
+  const statsSteps = 60;
+  const statsStepDuration = statsDuration / statsSteps;
 
-    const interval = setInterval(() => {
-      currentStep++;
-      const progress = currentStep / steps;
+  useInterval(
+    () => {
+      setStatsStep((prev) => {
+        const next = prev + 1;
+        const progress = next / statsSteps;
 
-      setAnimatedStats({
-        stars: Math.floor(GITHUB_STATS.stars * progress),
-        downloads: Math.floor(GITHUB_STATS.downloads * progress),
-        contributors: Math.floor(GITHUB_STATS.contributors * progress),
+        setAnimatedStats({
+          stars: Math.floor(GITHUB_STATS.stars * progress),
+          downloads: Math.floor(GITHUB_STATS.downloads * progress),
+          contributors: Math.floor(GITHUB_STATS.contributors * progress),
+        });
+
+        return next;
       });
-
-      if (currentStep >= steps) {
-        clearInterval(interval);
-      }
-    }, stepDuration);
-
-    return () => clearInterval(interval);
-  }, []);
+    },
+    statsStep < statsSteps ? statsStepDuration : null
+  );
 
   // Context menu handler
   useEffect(() => {

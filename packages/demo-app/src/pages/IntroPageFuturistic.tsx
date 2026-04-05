@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { HudBox, RadarHud, HackerLoader } from '@rhuds/components';
 import { ColdWarButton, ColdWarInput, ColdWarCard } from '@rhuds/components';
+import { useInterval, useTimeout } from '@rhuds/core';
 import { GlassContextMenu } from '../components/GlassContextMenu';
 import { useScrollAnimationManager } from '../hooks/useScrollAnimationManager';
 import { useRevealOnScroll } from '../hooks/useRevealOnScroll';
@@ -179,23 +180,28 @@ export default function IntroPageFuturistic() {
   const installCommand = 'npm install @rhuds/core @rhuds/components';
 
   // Loading animation
-  useEffect(() => {
-    const interval = setInterval(() => {
+  const [shouldRunLoading, setShouldRunLoading] = useState(true);
+
+  useInterval(
+    () => {
       setLoadingProgress((prev) => {
         if (prev >= 100) {
-          clearInterval(interval);
-          setTimeout(() => {
-            setShowLoading(false);
-            setIsLoaded(true);
-          }, 300);
+          setShouldRunLoading(false);
           return 100;
         }
         return prev + 3;
       });
-    }, 20);
+    },
+    shouldRunLoading ? 20 : null
+  );
 
-    return () => clearInterval(interval);
-  }, []);
+  useTimeout(
+    () => {
+      setShowLoading(false);
+      setIsLoaded(true);
+    },
+    !shouldRunLoading && loadingProgress >= 100 ? 300 : null
+  );
 
   // GitHub Stats Counter Animation - Using realistic numbers for a new project
   useEffect(() => {
@@ -282,26 +288,35 @@ export default function IntroPageFuturistic() {
   }, [sections]);
 
   // Terminal typing animation
+  const [typingIndex, setTypingIndex] = useState(0);
+  const fullText = codeLines.join('\n');
+  const isTyping = typingIndex <= fullText.length;
+
   useEffect(() => {
-    const fullText = codeLines.join('\n');
-    let currentIndex = 0;
+    setTerminalText(fullText.substring(0, typingIndex));
+  }, [typingIndex, fullText]);
 
-    const typingInterval = setInterval(() => {
-      if (currentIndex <= fullText.length) {
-        setTerminalText(fullText.substring(0, currentIndex));
-        currentIndex++;
-      } else {
-        clearInterval(typingInterval);
-      }
-    }, 50);
+  useInterval(
+    () => {
+      setTypingIndex((prev) => prev + 1);
+    },
+    isTyping ? 50 : null
+  );
 
-    return () => clearInterval(typingInterval);
-  }, []);
+  const [shouldResetCopied, setShouldResetCopied] = useState(false);
+
+  useTimeout(
+    () => {
+      setCopied(false);
+      setShouldResetCopied(false);
+    },
+    shouldResetCopied ? 2000 : null
+  );
 
   const handleCopy = () => {
     navigator.clipboard.writeText(installCommand);
     setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setShouldResetCopied(true);
   };
 
   const scrollToSection = (index: number) => {

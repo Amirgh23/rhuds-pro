@@ -33,8 +33,15 @@
     "dev": "turbo run dev",
     "build": "turbo run build",
     "test": "turbo run test",
+    "test:run": "turbo run test:run",
+    "test:coverage": "turbo run test:coverage",
     "lint": "turbo run lint",
-    "clean": "turbo run clean"
+    "format": "turbo run format",
+    "format:check": "turbo run format:check",
+    "type-check": "turbo run type-check",
+    "clean": "turbo run clean",
+    "check:duplicates": "ts-node scripts/find-duplicate-exports.ts",
+    "archive:docs": "pwsh scripts/archive-docs.ps1"
   },
   "devDependencies": {
     "turbo": "latest",

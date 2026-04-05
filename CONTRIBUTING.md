@@ -1,654 +1,251 @@
 # Contributing to RHUDS Pro
 
-Thank you for your interest in contributing to RHUDS Pro! This document provides guidelines and instructions for contributing.
+شکریہ که به RHUDS Pro کمک می‌کنید! این راهنما شامل تمام اطلاعات لازم برای مشارکت است.
 
----
-
-## Table of Contents
-
-1. [Code of Conduct](#code-of-conduct)
-2. [Getting Started](#getting-started)
-3. [Development Setup](#development-setup)
-4. [Project Structure](#project-structure)
-5. [Cold War Design Guidelines](#cold-war-design-guidelines)
-6. [Development Workflow](#development-workflow)
-7. [Coding Standards](#coding-standards)
-8. [Testing Guidelines](#testing-guidelines)
-9. [Documentation](#documentation)
-10. [Pull Request Process](#pull-request-process)
-11. [Release Process](#release-process)
-
----
-
-## Code of Conduct
-
-### Our Pledge
-
-We are committed to providing a welcoming and inspiring community for all. Please be respectful and constructive in all interactions.
-
-### Our Standards
-
-- Use welcoming and inclusive language
-- Be respectful of differing viewpoints
-- Accept constructive criticism gracefully
-- Focus on what is best for the community
-- Show empathy towards other community members
-
----
-
-## Getting Started
+## شروع کار
 
 ### Prerequisites
 
-- Node.js 18+ or 20+
-- npm, yarn, or pnpm
-- Git
-- Code editor (VS Code recommended)
+- Node.js >= 18
+- pnpm >= 8
 
-### First Time Setup
-
-1. **Fork the repository**
-
-   ```bash
-   # Click "Fork" on GitHub
-   ```
-
-2. **Clone your fork**
-
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/rhuds-pro.git
-   cd rhuds-pro
-   ```
-
-3. **Add upstream remote**
-
-   ```bash
-   git remote add upstream https://github.com/original/rhuds-pro.git
-   ```
-
-4. **Install dependencies**
-
-   ```bash
-   npm install
-   ```
-
-5. **Build packages**
-
-   ```bash
-   npm run build
-   ```
-
-6. **Run tests**
-   ```bash
-   npm test
-   ```
-
----
-
-## Cold War Design Guidelines
-
-### Color Palette
-
-All new components must use the Cold War tactical color palette:
-
-```typescript
-// Primary Colors
---cw-color-primary: #FFB000;        // Tactical Amber
---cw-color-secondary: #33FF00;      // Phosphor Green
---cw-color-error: #FF3333;          // Muted Red
---cw-color-background: #0a0a0c;     // Deep Black
---cw-color-surface: #1a1a1f;        // Surface Gray
---cw-color-text: #f0f0f0;           // Off-White
-```
-
-### Typography
-
-All components must use the Cold War monospace font stack:
-
-```css
-font-family: 'Share Tech Mono', 'Roboto Mono', 'Courier New', monospace;
-```
-
-Font sizes and weights:
-
-- **Headers**: 24px, weight 700, letter-spacing 0.05em, uppercase
-- **Body**: 14px, weight 400, letter-spacing 0.01em
-- **Buttons**: 14px, weight 600, letter-spacing 0.03em, uppercase
-- **Code**: 12px, weight 400, letter-spacing 0.02em
-
-### Geometry
-
-All components must use chamfered corners with clip-path:
-
-```css
-/* Button (8px chamfer) */
-clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
-
-/* Input (12px chamfer) */
-clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
-
-/* Card (12px chamfer) */
-clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
-```
-
-### Animations
-
-All animations must use tactical easing and timing:
-
-```css
-/* Timing */
---cw-timing-fast: 100ms;
---cw-timing-normal: 150ms;
---cw-timing-slow: 250ms;
-
-/* Easing */
---cw-easing-tactical: cubic-bezier(0.68, -0.55, 0.265, 1.55);
---cw-easing-snappy: cubic-bezier(0.34, 1.56, 0.64, 1);
---cw-easing-smooth: cubic-bezier(0.25, 0.46, 0.45, 0.94);
-
-/* Usage */
-transition: all var(--cw-timing-normal) var(--cw-easing-tactical);
-```
-
-### Effects
-
-Components should support Cold War effects:
-
-- **Glow**: `box-shadow: 0 0 10px rgba(255, 176, 0, 0.5);`
-- **Scanlines**: Repeating linear gradient overlay
-- **Flicker**: CRT flicker animation (150ms)
-- **Phosphor**: Soft glow with blur layers
-
-### Component Structure
-
-New components should follow this structure:
-
-```typescript
-import React from 'react';
-import { getComponentChamferClip } from '@rhuds/core';
-import { THEME_VARIANTS } from '@rhuds/core';
-import { ANIMATION_TOKENS } from '@rhuds/core';
-
-export interface ColdWarComponentProps {
-  /** Component variant */
-  variant?: 'primary' | 'secondary' | 'tactical';
-  /** Component size */
-  size?: 'sm' | 'md' | 'lg';
-  /** Theme variant */
-  theme?: keyof typeof THEME_VARIANTS;
-  /** Apply glow effect */
-  glow?: boolean;
-  /** Apply scanlines effect */
-  scanlines?: boolean;
-  /** Additional CSS classes */
-  className?: string;
-  /** Additional inline styles */
-  style?: React.CSSProperties;
-}
-
-export const ColdWarComponent: React.FC<ColdWarComponentProps> = ({
-  variant = 'primary',
-  size = 'md',
-  theme = 'perseus',
-  glow = true,
-  scanlines = false,
-  className = '',
-  style = {},
-}) => {
-  const baseStyles: React.CSSProperties = {
-    fontFamily: "'Share Tech Mono', 'Roboto Mono', 'Courier New', monospace",
-    clipPath: getComponentChamferClip('component'),
-    transition: `all ${ANIMATION_TOKENS.timing.hover} ${ANIMATION_TOKENS.easing.tactical}`,
-    ...style,
-  };
-
-  return (
-    <div className={className} style={baseStyles}>
-      {/* Component content */}
-    </div>
-  );
-};
-```
-
-### Testing Cold War Components
-
-All Cold War components must include:
-
-1. **Visual tests** - Verify colors, geometry, and effects
-2. **Accessibility tests** - Verify WCAG AA compliance
-3. **Animation tests** - Verify 60fps performance
-4. **Responsive tests** - Verify mobile/tablet/desktop
-
-```typescript
-describe('ColdWarComponent', () => {
-  it('should render with correct colors', () => {
-    const { container } = render(<ColdWarComponent />);
-    const element = container.querySelector('[data-testid="component"]');
-    expect(element).toHaveStyle('color: #FFB000');
-  });
-
-  it('should have correct clip-path', () => {
-    const { container } = render(<ColdWarComponent />);
-    const element = container.querySelector('[data-testid="component"]');
-    expect(element).toHaveStyle('clip-path: polygon(...)');
-  });
-
-  it('should meet WCAG AA contrast', () => {
-    // Use axe-core for accessibility testing
-    const results = await axe(container);
-    expect(results.violations).toHaveLength(0);
-  });
-
-  it('should animate at 60fps', () => {
-    // Use performance monitoring
-    const startTime = performance.now();
-    // Trigger animation
-    const endTime = performance.now();
-    expect(endTime - startTime).toBeLessThan(16.67); // 60fps = 16.67ms per frame
-  });
-});
-```
-
----
-
-## Development Setup
-
-### Recommended VS Code Extensions
-
-- ESLint
-- Prettier
-- TypeScript and JavaScript Language Features
-- GitLens
-
-### Environment Setup
+### Setup
 
 ```bash
-# Create .env file (if needed)
-cp .env.example .env
+# Clone repository
+git clone https://github.com/yourusername/rhuds-pro.git
+cd rhuds-pro
 
-# Install git hooks
-npm run prepare
+# Install dependencies
+pnpm install
+
+# Start development
+pnpm dev
 ```
-
----
-
-## Project Structure
-
-```
-rhuds-pro/
-├── packages/
-│   ├── core/           # Core systems (theme, animation, audio)
-│   ├── components/     # UI components
-│   ├── frames/         # Frame rendering
-│   ├── backgrounds/    # Background effects
-│   ├── hooks/          # Custom hooks
-│   ├── sfx/            # Sound effects
-│   ├── cli/            # CLI tools
-│   └── demo-app/       # Demo application
-├── docs/               # Documentation
-├── .github/            # GitHub workflows
-└── turbo.json          # Turborepo configuration
-```
-
-### Package Dependencies
-
-```
-@rhuds/core (base)
-  ↓
-@rhuds/components → @rhuds/hooks
-  ↓
-@rhuds/frames, @rhuds/backgrounds
-  ↓
-@rhuds/demo-app
-```
-
----
 
 ## Development Workflow
 
-### 1. Create a Branch
+### 1. Create a branch
 
 ```bash
-# Update main branch
-git checkout main
-git pull upstream main
-
-# Create feature branch
 git checkout -b feature/your-feature-name
-
-# Or bug fix branch
-git checkout -b fix/bug-description
 ```
 
-### Branch Naming Convention
+### 2. Make changes
 
-- `feature/` - New features
-- `fix/` - Bug fixes
-- `docs/` - Documentation changes
-- `refactor/` - Code refactoring
-- `test/` - Test additions/changes
-- `chore/` - Maintenance tasks
+- Follow the code style (ESLint + Prettier)
+- Add tests for new features
+- Update documentation
 
-### 2. Make Changes
+### 3. Run checks
 
 ```bash
-# Make your changes
-# ...
+# Lint
+pnpm lint
 
-# Run tests
-npm test
+# Format
+pnpm format
 
-# Run linter
-npm run lint
+# Type check
+pnpm type-check
 
-# Format code
-npm run format
+# Test
+pnpm test:run
+
+# Check for duplicate exports
+pnpm check:duplicates
 ```
 
-### 3. Commit Changes
-
-We use conventional commits:
+### 4. Commit
 
 ```bash
-# Format: <type>(<scope>): <subject>
-
-git commit -m "feat(components): add new Button variant"
-git commit -m "fix(theme): resolve color contrast issue"
-git commit -m "docs(hooks): update useTheme documentation"
+git add .
+git commit -m "feat: description of changes"
 ```
 
-**Commit Types:**
-
-- `feat` - New feature
-- `fix` - Bug fix
-- `docs` - Documentation
-- `style` - Code style (formatting)
-- `refactor` - Code refactoring
-- `test` - Tests
-- `chore` - Maintenance
-
-### 4. Push Changes
+### 5. Push and create PR
 
 ```bash
 git push origin feature/your-feature-name
 ```
 
-### 5. Create Pull Request
-
-1. Go to GitHub
-2. Click "New Pull Request"
-3. Fill in the PR template
-4. Request review
-
----
-
-## Coding Standards
+## Code Style
 
 ### TypeScript
 
-- Use TypeScript for all new code
-- Define proper types and interfaces
-- Avoid `any` type
 - Use strict mode
-
-```typescript
-// Good
-interface ButtonProps {
-  variant: 'primary' | 'secondary';
-  onClick: () => void;
-}
-
-// Bad
-interface ButtonProps {
-  variant: any;
-  onClick: any;
-}
-```
+- Add explicit return types
+- Use interfaces for props
 
 ### React Components
 
-- Use functional components
-- Use hooks for state management
-- Implement proper prop types
-- Add JSDoc comments
+```typescript
+interface ComponentProps {
+  children?: ReactNode;
+  className?: string;
+  // ... other props
+}
+
+export const Component: React.FC<ComponentProps> = ({
+  children,
+  className,
+}) => {
+  return <div className={className}>{children}</div>;
+};
+```
+
+### Hooks
 
 ```typescript
-/**
- * Button component with multiple variants
- *
- * @param variant - Button style variant
- * @param onClick - Click handler
- */
-export function Button({ variant, onClick }: ButtonProps) {
-  // Implementation
+export function useMyHook() {
+  const [state, setState] = useState(null);
+
+  useEffect(() => {
+    // cleanup
+    return () => {
+      // cleanup code
+    };
+  }, []);
+
+  return state;
 }
 ```
 
-### File Naming
+## Testing
 
-- Components: `PascalCase.tsx`
-- Hooks: `camelCase.ts`
-- Utilities: `camelCase.ts`
-- Tests: `*.test.tsx` or `*.test.ts`
-
-### Code Style
-
-- Use 2 spaces for indentation
-- Use single quotes for strings
-- Add trailing commas
-- Max line length: 100 characters
+### Unit Tests
 
 ```typescript
-// Good
-const config = {
-  name: 'example',
-  value: 42,
-};
-
-// Bad
-const config = {
-  name: 'example',
-  value: 42,
-};
-```
-
----
-
-## Testing Guidelines
-
-### Test Structure
-
-```typescript
-import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import { Button } from './Button';
-
-describe('Button', () => {
-  it('renders with text', () => {
-    render(<Button>Click me</Button>);
-    expect(screen.getByText('Click me')).toBeInTheDocument();
-  });
-
-  it('calls onClick when clicked', () => {
-    const onClick = vi.fn();
-    render(<Button onClick={onClick}>Click me</Button>);
-    screen.getByText('Click me').click();
-    expect(onClick).toHaveBeenCalled();
+describe('Component', () => {
+  it('should render', () => {
+    render(<Component />);
+    expect(screen.getByText('text')).toBeInTheDocument();
   });
 });
 ```
 
-### Test Coverage
+### Property-Based Tests
 
-- Aim for 80%+ coverage
-- Test all public APIs
-- Test edge cases
-- Test error handling
+```typescript
+import fc from 'fast-check';
 
-### Running Tests
-
-```bash
-# Run all tests
-npm test
-
-# Run specific package tests
-npm test --workspace=@rhuds/components
-
-# Run with coverage
-npm test -- --coverage
-
-# Watch mode
-npm test -- --watch
+it('should handle any string', () => {
+  fc.assert(
+    fc.property(fc.string(), (str) => {
+      expect(typeof str).toBe('string');
+    })
+  );
+});
 ```
-
----
 
 ## Documentation
 
-### Code Documentation
+### JSDoc Comments
 
-- Add JSDoc comments to all public APIs
-- Include examples in documentation
-- Document parameters and return types
-
-````typescript
+```typescript
 /**
- * Create a new theme
+ * Brief description
  *
- * @param config - Theme configuration
- * @returns Complete theme object
- *
+ * @param prop1 - Description of prop1
+ * @param prop2 - Description of prop2
+ * @returns Description of return value
  * @example
- * ```typescript
- * const theme = createTheme({
- *   name: 'dark',
- *   colors: { primary: '#0066cc' }
- * });
- * ```
+ * const result = myFunction('value');
  */
-export function createTheme(config: ThemeConfig): Theme {
-  // Implementation
+export function myFunction(prop1: string, prop2: number): string {
+  // ...
 }
-````
+```
 
-### README Files
+### Component Documentation
 
-- Each package should have a README
-- Include installation instructions
-- Provide usage examples
-- Document all exports
+- Add README.md in component directory
+- Include usage examples
+- Document all props
+- Include screenshots if applicable
 
-### API Documentation
+## Package Structure
 
-- Update API docs when adding features
-- Keep examples up to date
-- Document breaking changes
+When adding a new component:
 
----
+```
+packages/components/src/Category/
+├── Component.tsx          # Main component
+├── Component.test.tsx     # Tests
+├── Component.demo.tsx     # Demo/example
+├── types.ts              # Type definitions
+└── README.md             # Documentation
+```
+
+## Commit Message Format
+
+```
+<type>(<scope>): <subject>
+
+<body>
+
+<footer>
+```
+
+### Types
+
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation
+- `style`: Code style
+- `refactor`: Code refactoring
+- `perf`: Performance improvement
+- `test`: Test addition/modification
+- `chore`: Build/dependency changes
+
+### Example
+
+```
+feat(components): add new Button variant
+
+- Added CyberButton component
+- Added tests
+- Updated documentation
+
+Closes #123
+```
 
 ## Pull Request Process
 
-### Before Submitting
+1. Update documentation
+2. Add/update tests
+3. Ensure all checks pass
+4. Request review from maintainers
+5. Address feedback
+6. Merge when approved
 
-- [ ] Tests pass locally
-- [ ] Code is formatted
-- [ ] No linting errors
-- [ ] Documentation is updated
-- [ ] Commit messages follow convention
-- [ ] Branch is up to date with main
+## Reporting Issues
 
-### PR Template
+### Bug Report
 
-```markdown
-## Description
+- Describe the bug
+- Steps to reproduce
+- Expected behavior
+- Actual behavior
+- Screenshots/videos if applicable
 
-Brief description of changes
+### Feature Request
 
-## Type of Change
+- Describe the feature
+- Use cases
+- Proposed implementation (optional)
 
-- [ ] Bug fix
-- [ ] New feature
-- [ ] Breaking change
-- [ ] Documentation update
+## Questions?
 
-## Testing
+- Check existing issues/discussions
+- Read documentation
+- Ask in GitHub discussions
 
-How has this been tested?
+## Code of Conduct
 
-## Checklist
+- Be respectful
+- Be inclusive
+- Be constructive
+- Report inappropriate behavior
 
-- [ ] Tests added/updated
-- [ ] Documentation updated
-- [ ] No breaking changes
-- [ ] Follows coding standards
-```
-
-### Review Process
-
-1. Automated checks run (CI/CD)
-2. Code review by maintainers
-3. Address feedback
-4. Approval and merge
-
-### After Merge
-
-- Delete your branch
-- Update your fork
-- Celebrate! 🎉
-
----
-
-## Release Process
-
-### Versioning
-
-We use Semantic Versioning (SemVer):
-
-- **MAJOR**: Breaking changes
-- **MINOR**: New features (backward compatible)
-- **PATCH**: Bug fixes
-
-### Release Steps
-
-1. Update version in package.json
-2. Update CHANGELOG.md
-3. Create git tag
-4. Push to npm
-5. Create GitHub release
-
----
-
-## Getting Help
-
-### Resources
-
-- [Documentation](./docs)
-- [API Reference](./packages/components/COMPONENTS_API.md)
-- [GitHub Issues](https://github.com/yourusername/rhuds-pro/issues)
-- [GitHub Discussions](https://github.com/yourusername/rhuds-pro/discussions)
-
-### Questions?
-
-- Open a discussion on GitHub
-- Ask in issues (use "question" label)
-- Check existing documentation
-
----
-
-## Recognition
-
-Contributors will be:
-
-- Listed in CONTRIBUTORS.md
-- Mentioned in release notes
-- Credited in documentation
-
----
-
-## License
-
-By contributing, you agree that your contributions will be licensed under the MIT License.
-
----
-
-Thank you for contributing to RHUDS Pro! 🚀
+Thank you for contributing! 🎉

@@ -3,8 +3,8 @@
  * Typing text animation with cursor - terminal-style loading
  */
 
-import React, { CSSProperties, useState, useEffect } from 'react';
-import { THEME_VARIANTS, ANIMATION_TOKENS, getComponentChamferClip } from '@rhuds/core';
+import React, { CSSProperties, useState } from 'react';
+import { THEME_VARIANTS, ANIMATION_TOKENS, getComponentChamferClip, useTimeout } from '@rhuds/core';
 import { getRgbString, generateTechCode } from '../utils/coldWarUtils';
 import { ScanlinesOverlay } from '../utils/ScanlinesOverlay';
 import { GlowOverlay } from '../utils/GlowOverlay';
@@ -57,24 +57,22 @@ export const ColdWarHackerLoader: React.FC<ColdWarHackerLoaderProps> = ({
   };
   const sizes = sizeMap[size];
 
-  useEffect(() => {
-    const currentMessage = messages[currentMessageIndex];
+  const currentMessage = messages[currentMessageIndex];
+  const isTyping = currentCharIndex < currentMessage.length;
 
-    if (currentCharIndex < currentMessage.length) {
-      const timeout = setTimeout(() => {
+  useTimeout(
+    () => {
+      if (isTyping) {
         setDisplayText(currentMessage.substring(0, currentCharIndex + 1));
         setCurrentCharIndex(currentCharIndex + 1);
-      }, typingSpeed);
-      return () => clearTimeout(timeout);
-    } else {
-      const timeout = setTimeout(() => {
+      } else {
         setCurrentMessageIndex((currentMessageIndex + 1) % messages.length);
         setCurrentCharIndex(0);
         setDisplayText('');
-      }, 1000);
-      return () => clearTimeout(timeout);
-    }
-  }, [currentCharIndex, currentMessageIndex, messages, typingSpeed]);
+      }
+    },
+    isTyping ? typingSpeed : 1000
+  );
 
   const containerStyles: CSSProperties = {
     position: 'relative',

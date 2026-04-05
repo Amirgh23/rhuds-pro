@@ -6,6 +6,7 @@
  */
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { useInterval } from '@rhuds/core';
 import './ColdWarChartsPage.css';
 import { isNearDataPoint } from './ColdWarChartsTooltipLogic';
 import {

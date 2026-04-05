@@ -4,7 +4,12 @@
  */
 
 import React, { CSSProperties, useState, useEffect } from 'react';
-import { THEME_VARIANTS, ANIMATION_TOKENS, getComponentChamferClip } from '@rhuds/core';
+import {
+  THEME_VARIANTS,
+  ANIMATION_TOKENS,
+  getComponentChamferClip,
+  useInterval,
+} from '@rhuds/core';
 import { getRgbString, generateTechCode } from '../utils/coldWarUtils';
 import { ScanlinesOverlay } from '../utils/ScanlinesOverlay';
 import { GlowOverlay } from '../utils/GlowOverlay';
@@ -49,27 +54,27 @@ export const ColdWarProgressLoader: React.FC<ColdWarProgressLoaderProps> = ({
   const sizes = sizeMap[size];
 
   useEffect(() => {
-    if (animated) {
-      const duration = 500;
-      const steps = 30;
-      const increment = (progress - displayProgress) / steps;
-      let currentStep = 0;
-
-      const interval = setInterval(() => {
-        currentStep++;
-        if (currentStep >= steps) {
-          setDisplayProgress(progress);
-          clearInterval(interval);
-        } else {
-          setDisplayProgress((prev) => prev + increment);
-        }
-      }, duration / steps);
-
-      return () => clearInterval(interval);
-    } else {
+    if (!animated) {
       setDisplayProgress(progress);
     }
   }, [progress, animated]);
+
+  const duration = 500;
+  const steps = 30;
+  const increment = (progress - displayProgress) / steps;
+  let currentStep = 0;
+
+  useInterval(
+    () => {
+      currentStep++;
+      if (currentStep >= steps) {
+        setDisplayProgress(progress);
+      } else {
+        setDisplayProgress((prev) => prev + increment);
+      }
+    },
+    animated && currentStep < steps ? duration / steps : null
+  );
 
   const containerStyles: CSSProperties = {
     position: 'relative',
@@ -80,7 +85,7 @@ export const ColdWarProgressLoader: React.FC<ColdWarProgressLoaderProps> = ({
     justifyContent: 'center',
     background: 'rgba(10, 10, 20, 0.95)',
     border: `1px solid ${themeColors.primary}`,
-    clipPath: getComponentChamferClip(8),
+    clipPath: getComponentChamferClip('card'),
     fontFamily: "'Share Tech Mono', 'Roboto Mono', monospace",
     overflow: 'hidden',
     ...style,
