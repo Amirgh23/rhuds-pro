@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
-export const AnimatedBackground: React.FC = () => {
+const AnimatedBackgroundComponent: React.FC = () => {
+  // Memoize particle array to prevent recreation on every render
+  const particles = useMemo(() => [...Array(20)], []);
   return (
     <>
       <div
@@ -110,7 +112,7 @@ export const AnimatedBackground: React.FC = () => {
             overflow: 'hidden',
           }}
         >
-          {[...Array(20)].map((_, i) => (
+          {particles.map((_, i) => (
             <div
               key={i}
               style={{
@@ -186,3 +188,5 @@ export const AnimatedBackground: React.FC = () => {
     </>
   );
 };
+
+export const AnimatedBackground = React.memo(AnimatedBackgroundComponent);

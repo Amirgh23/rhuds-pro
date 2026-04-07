@@ -3,13 +3,22 @@
  * Error tracking and monitoring setup
  */
 
-import * as Sentry from '@sentry/react';
-import { BrowserTracing } from '@sentry/tracing';
+let Sentry: any = null;
+let BrowserTracing: any = null;
+
+try {
+  Sentry = require('@sentry/react');
+  BrowserTracing = require('@sentry/tracing').BrowserTracing;
+} catch (e) {
+  console.warn('Sentry not available - error tracking disabled');
+}
 
 /**
  * Initialize Sentry for error tracking and performance monitoring
  */
 export const initializeSentry = () => {
+  if (!Sentry) return;
+
   const isDevelopment = import.meta.env.DEV;
   const isProduction = import.meta.env.PROD;
 
@@ -35,7 +44,7 @@ export const initializeSentry = () => {
     ],
 
     // Error filtering
-    beforeSend(event, hint) {
+    beforeSend(event: any, hint: any) {
       // Filter out certain errors
       if (event.exception) {
         const error = hint.originalException;
@@ -57,7 +66,7 @@ export const initializeSentry = () => {
     },
 
     // Breadcrumb filtering
-    beforeBreadcrumb(breadcrumb, hint) {
+    beforeBreadcrumb(breadcrumb: any, hint: any) {
       // Filter out certain breadcrumbs
       if (breadcrumb.category === 'console' && breadcrumb.level === 'debug') {
         return null;
@@ -130,6 +139,7 @@ export const initializeSentry = () => {
  * Capture exception
  */
 export const captureException = (error: Error, context?: Record<string, any>) => {
+  if (!Sentry) return;
   if (context) {
     Sentry.captureException(error, {
       contexts: {
@@ -144,7 +154,8 @@ export const captureException = (error: Error, context?: Record<string, any>) =>
 /**
  * Capture message
  */
-export const captureMessage = (message: string, level: Sentry.SeverityLevel = 'info') => {
+export const captureMessage = (message: string, level: string = 'info') => {
+  if (!Sentry) return;
   Sentry.captureMessage(message, level);
 };
 
@@ -152,6 +163,7 @@ export const captureMessage = (message: string, level: Sentry.SeverityLevel = 'i
  * Set user context
  */
 export const setSentryUser = (userId: string, email?: string, username?: string) => {
+  if (!Sentry) return;
   Sentry.setUser({
     id: userId,
     email,
@@ -163,6 +175,7 @@ export const setSentryUser = (userId: string, email?: string, username?: string)
  * Clear user context
  */
 export const clearSentryUser = () => {
+  if (!Sentry) return;
   Sentry.setUser(null);
 };
 
@@ -172,9 +185,10 @@ export const clearSentryUser = () => {
 export const addBreadcrumb = (
   message: string,
   category: string = 'custom',
-  level: Sentry.SeverityLevel = 'info',
+  level: string = 'info',
   data?: Record<string, any>
 ) => {
+  if (!Sentry) return;
   Sentry.addBreadcrumb({
     message,
     category,
@@ -187,6 +201,7 @@ export const addBreadcrumb = (
  * Start transaction
  */
 export const startTransaction = (name: string, op: string = 'http.request') => {
+  if (!Sentry) return null;
   return Sentry.startTransaction({
     name,
     op,
@@ -197,6 +212,7 @@ export const startTransaction = (name: string, op: string = 'http.request') => {
  * Set context
  */
 export const setContext = (name: string, context: Record<string, any>) => {
+  if (!Sentry) return;
   Sentry.setContext(name, context);
 };
 
@@ -204,13 +220,15 @@ export const setContext = (name: string, context: Record<string, any>) => {
  * Set tag
  */
 export const setTag = (key: string, value: string | number | boolean) => {
+  if (!Sentry) return;
   Sentry.setTag(key, value);
 };
 
 /**
  * Set level
  */
-export const setLevel = (level: Sentry.SeverityLevel) => {
+export const setLevel = (level: string) => {
+  if (!Sentry) return;
   Sentry.setLevel(level);
 };
 

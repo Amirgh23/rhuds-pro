@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Offline - RHUDS Pro</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'system-ui', '-apple-system', 'sans-serif';
+        background: linear-gradient(135deg, #0a1225 0%, #1a2a4a 100%);
+        color: #29f2df;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      .offline-container {
+        text-align: center;
+        max-width: 600px;
+        animation: fadeIn 0.6s ease-in;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .offline-icon {
+        font-size: 80px;
+        margin-bottom: 20px;
+        animation: pulse 2s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+          text-shadow: 0 0 10px rgba(41, 242, 223, 0.5);
+        }
+        50% {
+          opacity: 0.7;
+          text-shadow: 0 0 20px rgba(41, 242, 223, 0.8);
+        }
+      }
+
+      h1 {
+        font-size: 2.5em;
+        margin-bottom: 10px;
+        text-shadow: 0 0 20px rgba(41, 242, 223, 0.5);
+      }
+
+      p {
+        font-size: 1.1em;
+        margin-bottom: 30px;
+        color: #c8d8e8;
+        line-height: 1.6;
+      }
+
+      .status {
+        background: rgba(41, 242, 223, 0.1);
+        border: 2px solid rgba(41, 242, 223, 0.3);
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 30px;
+        font-family: 'Courier New', monospace;
+        font-size: 0.9em;
+      }
+
+      .status-item {
+        display: flex;
+        justify-content: space-between;
+        margin: 10px 0;
+        padding: 5px 0;
+        border-bottom: 1px solid rgba(41, 242, 223, 0.2);
+      }
+
+      .status-item:last-child {
+        border-bottom: none;
+      }
+
+      .status-label {
+        text-align: left;
+        color: #29f2df;
+      }
+
+      .status-value {
+        text-align: right;
+        color: #ef3ef1;
+      }
+
+      .actions {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      button {
+        padding: 12px 30px;
+        font-size: 1em;
+        border: 2px solid #29f2df;
+        background: transparent;
+        color: #29f2df;
+        cursor: pointer;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      button:hover {
+        background: rgba(41, 242, 223, 0.2);
+        box-shadow: 0 0 15px rgba(41, 242, 223, 0.5);
+        transform: translateY(-2px);
+      }
+
+      button:active {
+        transform: translateY(0);
+      }
+
+      .secondary {
+        border-color: #1c7fa6;
+        color: #1c7fa6;
+      }
+
+      .secondary:hover {
+        background: rgba(28, 127, 166, 0.2);
+        box-shadow: 0 0 15px rgba(28, 127, 166, 0.5);
+      }
+
+      .tips {
+        margin-top: 40px;
+        text-align: left;
+        background: rgba(28, 127, 166, 0.1);
+        border-left: 4px solid #1c7fa6;
+        padding: 20px;
+        border-radius: 4px;
+      }
+
+      .tips h3 {
+        color: #1c7fa6;
+        margin-bottom: 10px;
+        font-size: 1.1em;
+      }
+
+      .tips ul {
+        list-style: none;
+        color: #c8d8e8;
+      }
+
+      .tips li {
+        margin: 8px 0;
+        padding-left: 20px;
+        position: relative;
+      }
+
+      .tips li:before {
+        content: '▸';
+        position: absolute;
+        left: 0;
+        color: #1c7fa6;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="offline-container">
+      <div class="offline-icon">📡</div>
+      <h1>You're Offline</h1>
+      <p>
+        It looks like you've lost your internet connection. Don't worry, you can still access cached
+        content.
+      </p>
+
+      <div class="status">
+        <div class="status-item">
+          <span class="status-label">Connection Status:</span>
+          <span class="status-value" id="connection-status">Offline</span>
+        </div>
+        <div class="status-item">
+          <span class="status-label">Last Sync:</span>
+          <span class="status-value" id="last-sync">--:--:--</span>
+        </div>
+        <div class="status-item">
+          <span class="status-label">Cached Pages:</span>
+          <span class="status-value" id="cached-pages">Loading...</span>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button onclick="location.reload()">Retry Connection</button>
+        <button class="secondary" onclick="goHome()">Go Home</button>
+      </div>
+
+      <div class="tips">
+        <h3>💡 What You Can Do</h3>
+        <ul>
+          <li>Check your internet connection</li>
+          <li>Try refreshing the page</li>
+          <li>Access previously visited pages from cache</li>
+          <li>Wait for connection to be restored</li>
+        </ul>
+      </div>
+    </div>
+
+    <script>
+      // Update connection status
+      function updateConnectionStatus() {
+        const status = navigator.onLine ? 'Online' : 'Offline';
+        const statusElement = document.getElementById('connection-status');
+        if (statusElement) {
+          statusElement.textContent = status;
+          statusElement.style.color = navigator.onLine ? '#29f2df' : '#ef3ef1';
+        }
+      }
+
+      // Update last sync time
+      function updateLastSync() {
+        const now = new Date();
+        const time = now.toLocaleTimeString();
+        const syncElement = document.getElementById('last-sync');
+        if (syncElement) {
+          syncElement.textContent = time;
+        }
+      }
+
+      // Count cached pages
+      async function updateCachedPages() {
+        if ('caches' in window) {
+          try {
+            const cacheNames = await caches.keys();
+            let totalCached = 0;
+            for (const cacheName of cacheNames) {
+              const cache = await caches.open(cacheName);
+              const keys = await cache.keys();
+              totalCached += keys.length;
+            }
+            const cachedElement = document.getElementById('cached-pages');
+            if (cachedElement) {
+              cachedElement.textContent = totalCached;
+            }
+          } catch (error) {
+            console.error('Error counting cached pages:', error);
+          }
+        }
+      }
+
+      // Go home
+      function goHome() {
+        window.location.href = '/';
+      }
+
+      // Initialize
+      updateConnectionStatus();
+      updateLastSync();
+      updateCachedPages();
+
+      // Listen for connection changes
+      window.addEventListener('online', () => {
+        updateConnectionStatus();
+        // Optionally reload when connection is restored
+        // location.reload();
+      });
+
+      window.addEventListener('offline', updateConnectionStatus);
+
+      // Update sync time every second
+      setInterval(updateLastSync, 1000);
+    </script>
+  </body>
+</html>

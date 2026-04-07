@@ -1,0 +1,88 @@
+/* Critical CSS - Above the fold styles */
+/* Inline this in index.html for best performance */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #000;
+  color: #29f2df;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Critical animations */
+@keyframes hud-border-glow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 10px rgba(41, 242, 223, 0.3),
+      inset 0 0 10px rgba(41, 242, 223, 0.1);
+  }
+  50% {
+    box-shadow:
+      0 0 20px rgba(41, 242, 223, 0.5),
+      inset 0 0 20px rgba(41, 242, 223, 0.2);
+  }
+}
+
+.animate-hud-border-glow {
+  animation: hud-border-glow 3s ease-in-out infinite;
+}
+
+/* Scrollbar - critical for UX */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.8);
+  border-left: 1px solid rgba(41, 242, 223, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #29f2df 0%, #0096ff 100%);
+  border-radius: 4px;
+  box-shadow: 0 0 10px rgba(41, 242, 223, 0.3);
+}
+
+/* Selection - critical for accessibility */
+::selection {
+  background: #29f2df;
+  color: #000;
+}
+
+::-moz-selection {
+  background: #29f2df;
+  color: #000;
+}
+
+/* Focus visible - critical for accessibility */
+:focus-visible {
+  outline: 2px solid #29f2df;
+  outline-offset: 2px;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { HudBox, RadarHud, HackerLoader } from '@rhuds/components';
 import { ColdWarButton, ColdWarInput, ColdWarCard } from '@rhuds/components';
@@ -96,7 +96,7 @@ const coldWarStyles = `
   }
 `;
 
-export default function IntroPageFuturistic() {
+function IntroPageFuturisticComponent() {
   const navigate = useNavigate();
   const featuresRef = useRef<HTMLDivElement>(null);
   const terminalRef = useRef<HTMLDivElement>(null);
@@ -151,33 +151,39 @@ export default function IntroPageFuturistic() {
   const [subscribed, setSubscribed] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
 
-  const sections = [
-    'hero',
-    'features',
-    'terminal',
-    'preview',
-    'stats',
-    'code-playground',
-    'github-stats',
-    'theme-switcher',
-    'testimonials',
-    'comparison',
-    'newsletter',
-    'roadmap',
-    'performance',
-  ];
+  const sections = useMemo(
+    () => [
+      'hero',
+      'features',
+      'terminal',
+      'preview',
+      'stats',
+      'code-playground',
+      'github-stats',
+      'theme-switcher',
+      'testimonials',
+      'comparison',
+      'newsletter',
+      'roadmap',
+      'performance',
+    ],
+    []
+  );
 
-  const codeLines = [
-    '$ npm install @rhuds/core @rhuds/components',
-    '',
-    'import { Button, HudBox } from "@rhuds/components";',
-    '',
-    '<HudBox variant="neon">',
-    '  <Button glow>Launch System</Button>',
-    '</HudBox>',
-  ];
+  const codeLines = useMemo(
+    () => [
+      '$ npm install @rhuds/core @rhuds/components',
+      '',
+      'import { Button, HudBox } from "@rhuds/components";',
+      '',
+      '<HudBox variant="neon">',
+      '  <Button glow>Launch System</Button>',
+      '</HudBox>',
+    ],
+    []
+  );
 
-  const installCommand = 'npm install @rhuds/core @rhuds/components';
+  const installCommand = useMemo(() => 'npm install @rhuds/core @rhuds/components', []);
 
   // Loading animation
   const [shouldRunLoading, setShouldRunLoading] = useState(true);
@@ -313,20 +319,23 @@ export default function IntroPageFuturistic() {
     shouldResetCopied ? 2000 : null
   );
 
-  const handleCopy = () => {
+  const handleCopy = useCallback(() => {
     navigator.clipboard.writeText(installCommand);
     setCopied(true);
     setShouldResetCopied(true);
-  };
+  }, [installCommand]);
 
-  const scrollToSection = (index: number) => {
-    const element = document.getElementById(sections[index]);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
+  const scrollToSection = useCallback(
+    (index: number) => {
+      const element = document.getElementById(sections[index]);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    },
+    [sections]
+  );
 
-  const runCode = () => {
+  const runCode = useCallback(() => {
     try {
       // Try to render the component based on the code
       if (code.includes('HudBox')) {
@@ -376,20 +385,21 @@ export default function IntroPageFuturistic() {
     } catch (error) {
       setOutput(`✗ Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
-  };
+  }, [code]);
 
-  const codeExamples = [
-    {
-      title: 'HudBox Example',
-      code: `import { HudBox, Button } from '@rhuds/components';
+  const codeExamples = useMemo(
+    () => [
+      {
+        title: 'HudBox Example',
+        code: `import { HudBox, Button } from '@rhuds/components';
 
 <HudBox variant="neon" animated>
   <Button glow>Launch System</Button>
 </HudBox>`,
-    },
-    {
-      title: 'RadarHud Example',
-      code: `import { RadarHud } from '@rhuds/components';
+      },
+      {
+        title: 'RadarHud Example',
+        code: `import { RadarHud } from '@rhuds/components';
 
 <RadarHud
   coordinates="51° 30' N; 0° 7' W"
@@ -398,75 +408,92 @@ export default function IntroPageFuturistic() {
   color="#29F2DF"
   size={240}
 />`,
-    },
-    {
-      title: 'HackerLoader Example',
-      code: `import { HackerLoader } from '@rhuds/components';
+      },
+      {
+        title: 'HackerLoader Example',
+        code: `import { HackerLoader } from '@rhuds/components';
 
 <HackerLoader 
   text="LOADING" 
   color="#29F2DF" 
 />`,
+      },
+    ],
+    []
+  );
+
+  const themes = useMemo(
+    () => ({
+      cyan: { primary: '#29F2DF', secondary: '#1C7FA6', name: 'Cyan' },
+      purple: { primary: '#EF3EF1', secondary: '#9D4EDD', name: 'Purple' },
+      blue: { primary: '#4CC9F0', secondary: '#4361EE', name: 'Blue' },
+    }),
+    []
+  );
+
+  const testimonials = useMemo(
+    () => [
+      {
+        name: 'Development Team',
+        role: 'Core Developers',
+        avatar: '👨‍💻',
+        text: 'Built with passion for creating the most advanced HUD component library for React applications.',
+        company: 'RHUDS Project',
+      },
+      {
+        name: 'Open Source',
+        role: 'Community Driven',
+        avatar: '🌟',
+        text: 'Designed to be extensible, customizable, and easy to integrate into any React project.',
+        company: 'MIT License',
+      },
+      {
+        name: 'Modern Stack',
+        role: 'Latest Technologies',
+        avatar: '⚡',
+        text: 'Leveraging React 18, TypeScript, WebGL, and modern animation techniques for peak performance.',
+        company: 'Tech Stack',
+      },
+    ],
+    []
+  );
+
+  const handleSubscribe = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      if (email) {
+        setSubscribed(true);
+        setTimeout(() => {
+          setEmail('');
+          setSubscribed(false);
+        }, 3000);
+      }
     },
-  ];
+    [email]
+  );
 
-  const themes = {
-    cyan: { primary: '#29F2DF', secondary: '#1C7FA6', name: 'Cyan' },
-    purple: { primary: '#EF3EF1', secondary: '#9D4EDD', name: 'Purple' },
-    blue: { primary: '#4CC9F0', secondary: '#4361EE', name: 'Blue' },
-  };
+  const comparisonData = useMemo(
+    () => [
+      { feature: 'Components', rhuds: '51+', libA: 'Arwes (30+)', libB: 'React-HUD (20+)' },
+      { feature: 'TypeScript', rhuds: true, libA: true, libB: false },
+      { feature: 'Animations', rhuds: true, libA: true, libB: false },
+      { feature: 'HUD Styling', rhuds: true, libA: true, libB: true },
+      { feature: 'WebGL Support', rhuds: true, libA: false, libB: false },
+      { feature: 'Themes', rhuds: true, libA: true, libB: false },
+    ],
+    []
+  );
 
-  const testimonials = [
-    {
-      name: 'Development Team',
-      role: 'Core Developers',
-      avatar: '👨‍💻',
-      text: 'Built with passion for creating the most advanced HUD component library for React applications.',
-      company: 'RHUDS Project',
-    },
-    {
-      name: 'Open Source',
-      role: 'Community Driven',
-      avatar: '🌟',
-      text: 'Designed to be extensible, customizable, and easy to integrate into any React project.',
-      company: 'MIT License',
-    },
-    {
-      name: 'Modern Stack',
-      role: 'Latest Technologies',
-      avatar: '⚡',
-      text: 'Leveraging React 18, TypeScript, WebGL, and modern animation techniques for peak performance.',
-      company: 'Tech Stack',
-    },
-  ];
-
-  const handleSubscribe = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (email) {
-      setSubscribed(true);
-      setTimeout(() => {
-        setEmail('');
-        setSubscribed(false);
-      }, 3000);
-    }
-  };
-
-  const comparisonData = [
-    { feature: 'Components', rhuds: '51+', libA: 'Arwes (30+)', libB: 'React-HUD (20+)' },
-    { feature: 'TypeScript', rhuds: true, libA: true, libB: false },
-    { feature: 'Animations', rhuds: true, libA: true, libB: false },
-    { feature: 'HUD Styling', rhuds: true, libA: true, libB: true },
-    { feature: 'WebGL Support', rhuds: true, libA: false, libB: false },
-    { feature: 'Themes', rhuds: true, libA: true, libB: false },
-  ];
-
-  const roadmapData = [
-    { title: 'Core Components', status: 'completed', date: 'March 2026' },
-    { title: 'Animation System', status: 'completed', date: 'March 2026' },
-    { title: 'Documentation', status: 'in-progress', date: 'March 2026' },
-    { title: 'NPM Publication', status: 'planned', date: 'April 2026' },
-    { title: 'Community Release', status: 'planned', date: 'May 2026' },
-  ];
+  const roadmapData = useMemo(
+    () => [
+      { title: 'Core Components', status: 'completed', date: 'March 2026' },
+      { title: 'Animation System', status: 'completed', date: 'March 2026' },
+      { title: 'Documentation', status: 'in-progress', date: 'March 2026' },
+      { title: 'NPM Publication', status: 'planned', date: 'April 2026' },
+      { title: 'Community Release', status: 'planned', date: 'May 2026' },
+    ],
+    []
+  );
 
   return (
     <>
@@ -1415,3 +1442,5 @@ export default function IntroPageFuturistic() {
     </>
   );
 }
+
+export default React.memo(IntroPageFuturisticComponent);

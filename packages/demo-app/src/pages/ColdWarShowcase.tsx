@@ -183,7 +183,7 @@ const THEME_CONFIGS: Record<ThemeVariant, ThemeConfig> = {
   },
 };
 
-export const ColdWarShowcase: React.FC = () => {
+const ColdWarShowcaseComponent: React.FC = () => {
   const [theme, setTheme] = React.useState<ThemeVariant>('perseus');
   const [activeTab, setActiveTab] = React.useState(0);
   const [inputValue, setInputValue] = React.useState('');
@@ -191,7 +191,9 @@ export const ColdWarShowcase: React.FC = () => {
   const [bgTheme, setBgTheme] = React.useState<ColdWarTheme>('perseus');
   const [bgIntensity, setBgIntensity] = React.useState<ColdWarIntensity>('medium');
   const { contextMenu, handleContextMenu, handleCloseContextMenu } = useColdWarContextMenu();
-  const themeConfig = THEME_CONFIGS[theme];
+
+  // Memoize theme config to prevent recalculation
+  const themeConfig = React.useMemo(() => THEME_CONFIGS[theme], [theme]);
 
   // Scroll to top when tab changes
   React.useEffect(() => {
@@ -2420,5 +2422,8 @@ export const ColdWarShowcase: React.FC = () => {
     </div>
   );
 };
+
+// Wrap with React.memo to prevent unnecessary re-renders
+export const ColdWarShowcase = React.memo(ColdWarShowcaseComponent);
 
 export default ColdWarShowcase;

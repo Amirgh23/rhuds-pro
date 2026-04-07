@@ -689,3 +689,7 @@ export type { ColorPickerProps } from './Specialized/types';
 // Visualization Components
 export { Chart } from './Visualization/Chart';
 export type { ChartProps, ChartDataPoint } from './Visualization/types';
+
+export { BubbleChart } from './Visualization/BubbleChart';
+export { RhudsBubbleChart, RhudsBubbleChartStyled } from './Visualization/BubbleChart.rhuds';
+export type { BubbleChartProps, BubbleDataPoint } from './Visualization/BubbleChart';

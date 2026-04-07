@@ -4,13 +4,29 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>RHUDS - Reactive HUD UI Design System</title>
-    <!-- Professional Fonts -->
+    <!-- Professional Fonts - Optimized with font-display: swap -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Critical fonts only - loaded with swap strategy -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&family=Orbitron:wght@400;700;900&family=Space+Mono:wght@400;700&family=Audiowide&family=Michroma&family=Electrolize&family=Rajdhani:wght@400;500;600;700&family=Oxanium:wght@400;600;700;800&family=Rubik+Mono+One&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;700&family=Audiowide&display=swap"
       rel="stylesheet"
     />
+    <!-- Secondary fonts - loaded asynchronously with print media trick -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Mono:wght@400;700&family=Michroma&family=Electrolize&family=Rajdhani:wght@400;500;600;700&family=Oxanium:wght@400;600;700;800&family=Rubik+Mono+One&display=swap"
+      rel="stylesheet"
+      media="print"
+      onload="this.media = 'all'"
+    />
+    <!-- Resource Hints for Performance -->
+    <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="//fonts.gstatic.com" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Prefetch critical images -->
+    <link rel="prefetch" href="/images-optimized/logo.webp" as="image" />
+    <link rel="prefetch" href="/images-optimized/hero.webp" as="image" />
     <style>
       * {
         box-sizing: border-box;

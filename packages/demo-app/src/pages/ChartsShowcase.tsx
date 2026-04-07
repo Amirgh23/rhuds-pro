@@ -1,5 +1,4 @@
 /**
-export default ChartsShowcase;
 // ==================== OTHER CHART TYPES ====================
 // Add these functions before drawMixedChart
 
@@ -728,7 +727,7 @@ const drawStackedBarLine = (canvas: HTMLCanvasElement, progress: number = 1) => 
  * Full Chart.js equivalent implementation
  */
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import './ChartsShowcase.css';
 
 type ChartVariant = 'r-huds' | 'coldwar';
@@ -751,7 +750,7 @@ interface ChartDataset {
   visible: boolean;
 }
 
-const ChartsShowcase: React.FC = () => {
+const ChartsShowcaseComponent: React.FC = () => {
   const [variant, setVariant] = useState<ChartVariant>('r-huds');
   const [animationProgress, setAnimationProgress] = useState<number>(0);
   const [isAnimating, setIsAnimating] = useState<boolean>(true);
@@ -778,11 +777,11 @@ const ChartsShowcase: React.FC = () => {
   ]);
 
   // Toggle dataset visibility for Line Chart
-  const toggleLineDataset = (index: number) => {
+  const toggleLineDataset = useCallback((index: number) => {
     setLineDatasets((prev) =>
       prev.map((ds, i) => (i === index ? { ...ds, visible: !ds.visible } : ds))
     );
-  };
+  }, []);
 
   // Multiple datasets state for Bar Chart
   const [barDatasets, setBarDatasets] = useState<ChartDataset[]>([
@@ -791,80 +790,89 @@ const ChartsShowcase: React.FC = () => {
   ]);
 
   // Toggle dataset visibility for Bar Chart
-  const toggleBarDataset = (index: number) => {
+  const toggleBarDataset = useCallback((index: number) => {
     setBarDatasets((prev) =>
       prev.map((ds, i) => (i === index ? { ...ds, visible: !ds.visible } : ds))
     );
-  };
+  }, []);
 
   // Toggle dataset visibility for Legend Events
-  const toggleLegendEventDataset = (index: number) => {
+  const toggleLegendEventDataset = useCallback((index: number) => {
     setLegendEventDatasets((prev) =>
       prev.map((ds, i) => (i === index ? { ...ds, visible: !ds.visible } : ds))
     );
-  };
+  }, []);
 
-  // Grid customization options
-  const [gridOptions] = useState({
-    display: true,
-    color: 'rgba(41, 242, 223, 0.2)',
-    lineWidth: 1,
-    drawBorder: true,
-    drawTicks: true,
-    tickLength: 8,
-    borderDash: [] as number[], // Empty for solid, [5, 5] for dashed
-  });
+  // Grid customization options - memoized to prevent recalculation
+  const gridOptions = useMemo(
+    () => ({
+      display: true,
+      color: 'rgba(41, 242, 223, 0.2)',
+      lineWidth: 1,
+      drawBorder: true,
+      drawTicks: true,
+      tickLength: 8,
+      borderDash: [] as number[], // Empty for solid, [5, 5] for dashed
+    }),
+    []
+  );
 
-  // Title customization options
-  const [titleOptions] = useState({
-    display: true,
-    position: 'top' as 'top' | 'bottom',
-    align: 'center' as 'start' | 'center' | 'end',
-    font: {
-      size: 14,
-      weight: 'bold' as 'normal' | 'bold',
-      family: 'monospace',
-    },
-    padding: 10,
-  });
+  // Title customization options - memoized to prevent recalculation
+  const titleOptions = useMemo(
+    () => ({
+      display: true,
+      position: 'top' as 'top' | 'bottom',
+      align: 'center' as 'start' | 'center' | 'end',
+      font: {
+        size: 14,
+        weight: 'bold' as 'normal' | 'bold',
+        family: 'monospace',
+      },
+      padding: 10,
+    }),
+    []
+  );
 
-  // Animation callbacks
-  const onAnimationProgress = (progress: number) => {
+  // Animation callbacks - memoized to prevent recreation
+  const onAnimationProgress = useCallback((progress: number) => {
     // Callback during animation - can be used for custom effects
     // console.log('Animation progress:', progress);
-  };
+  }, []);
 
-  const onAnimationComplete = () => {
+  const onAnimationComplete = useCallback(() => {
     // Callback when animation completes
     // console.log('Animation complete!');
-  };
+  }, []);
 
-  // Export chart to PNG
-  const exportToPNG = (canvasRef: React.RefObject<HTMLCanvasElement>, filename: string) => {
-    if (!canvasRef.current) return;
+  // Export chart to PNG - memoized to prevent recreation
+  const exportToPNG = useCallback(
+    (canvasRef: React.RefObject<HTMLCanvasElement>, filename: string) => {
+      if (!canvasRef.current) return;
 
-    try {
-      // Convert canvas to blob
-      canvasRef.current.toBlob((blob) => {
-        if (!blob) return;
+      try {
+        // Convert canvas to blob
+        canvasRef.current.toBlob((blob) => {
+          if (!blob) return;
 
-        // Create download link
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.download = `${filename}.png`;
-        link.href = url;
-        link.click();
+          // Create download link
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.download = `${filename}.png`;
+          link.href = url;
+          link.click();
 
-        // Cleanup
-        URL.revokeObjectURL(url);
-      });
-    } catch (error) {
-      console.error('Export to PNG failed:', error);
-    }
-  };
+          // Cleanup
+          URL.revokeObjectURL(url);
+        });
+      } catch (error) {
+        console.error('Export to PNG failed:', error);
+      }
+    },
+    []
+  );
 
-  // Copy chart to clipboard
-  const copyToClipboard = async (canvasRef: React.RefObject<HTMLCanvasElement>) => {
+  // Copy chart to clipboard - memoized to prevent recreation
+  const copyToClipboard = useCallback(async (canvasRef: React.RefObject<HTMLCanvasElement>) => {
     if (!canvasRef.current) return;
 
     try {
@@ -883,44 +891,47 @@ const ChartsShowcase: React.FC = () => {
       console.error('Copy to clipboard failed:', error);
       alert('Failed to copy chart. Your browser may not support this feature.');
     }
-  };
+  }, []);
 
-  // Export chart to SVG (simplified version)
-  const exportToSVG = (canvasRef: React.RefObject<HTMLCanvasElement>, filename: string) => {
-    if (!canvasRef.current) return;
+  // Export chart to SVG - memoized to prevent recreation
+  const exportToSVG = useCallback(
+    (canvasRef: React.RefObject<HTMLCanvasElement>, filename: string) => {
+      if (!canvasRef.current) return;
 
-    try {
-      const canvas = canvasRef.current;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
+      try {
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
 
-      // Get image data from canvas
-      const dataURL = canvas.toDataURL('image/png');
+        // Get image data from canvas
+        const dataURL = canvas.toDataURL('image/png');
 
-      // Create SVG with embedded image
-      const svg = `<?xml version="1.0" encoding="UTF-8"?>
+        // Create SVG with embedded image
+        const svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
      width="${canvas.width}" height="${canvas.height}" viewBox="0 0 ${canvas.width} ${canvas.height}">
   <image width="${canvas.width}" height="${canvas.height}" xlink:href="${dataURL}"/>
 </svg>`;
 
-      // Create download link
-      const blob = new Blob([svg], { type: 'image/svg+xml' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.download = `${filename}.svg`;
-      link.href = url;
-      link.click();
+        // Create download link
+        const blob = new Blob([svg], { type: 'image/svg+xml' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.download = `${filename}.svg`;
+        link.href = url;
+        link.click();
 
-      // Cleanup
-      URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Export to SVG failed:', error);
-    }
-  };
+        // Cleanup
+        URL.revokeObjectURL(url);
+      } catch (error) {
+        console.error('Export to SVG failed:', error);
+      }
+    },
+    []
+  );
 
-  // Data decimation for performance
-  const decimateData = (data: number[], maxPoints: number = 100): number[] => {
+  // Data decimation for performance - memoized to prevent recreation
+  const decimateData = useCallback((data: number[], maxPoints: number = 100): number[] => {
     if (data.length <= maxPoints) return data;
 
     const decimated: number[] = [];
@@ -932,7 +943,7 @@ const ChartsShowcase: React.FC = () => {
     }
 
     return decimated;
-  };
+  }, []);
 
   // Responsive state
   const [chartDimensions, setChartDimensions] = useState({ width: 400, height: 300 });
@@ -1026,38 +1037,41 @@ const ChartsShowcase: React.FC = () => {
   const easeInOutCubic = (t: number) =>
     t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
 
-  // Mouse tracking for tooltips
-  const handleMouseMove = (
-    event: React.MouseEvent<HTMLCanvasElement>,
-    chartType: string,
-    data: any[],
-    labels?: string[]
-  ) => {
-    const canvas = event.currentTarget;
-    const rect = canvas.getBoundingClientRect();
-    const mouseX = event.clientX - rect.left;
-    const mouseY = event.clientY - rect.top;
+  // Mouse tracking for tooltips - memoized to prevent recreation
+  const handleMouseMove = useCallback(
+    (
+      event: React.MouseEvent<HTMLCanvasElement>,
+      chartType: string,
+      data: any[],
+      labels?: string[]
+    ) => {
+      const canvas = event.currentTarget;
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = event.clientX - rect.left;
+      const mouseY = event.clientY - rect.top;
 
-    // Hit detection based on chart type
-    const hitResult = detectHit(canvas, mouseX, mouseY, chartType, data, labels);
+      // Hit detection based on chart type
+      const hitResult = detectHit(canvas, mouseX, mouseY, chartType, data, labels);
 
-    if (hitResult) {
-      setTooltip({
-        x: event.clientX,
-        y: event.clientY,
-        label: hitResult.label,
-        value: hitResult.value,
-        color: hitResult.color,
-        visible: true,
-      });
-    } else {
-      setTooltip((prev) => ({ ...prev, visible: false }));
-    }
-  };
+      if (hitResult) {
+        setTooltip({
+          x: event.clientX,
+          y: event.clientY,
+          label: hitResult.label,
+          value: hitResult.value,
+          color: hitResult.color,
+          visible: true,
+        });
+      } else {
+        setTooltip((prev) => ({ ...prev, visible: false }));
+      }
+    },
+    [variant]
+  );
 
-  const handleMouseLeave = () => {
+  const handleMouseLeave = useCallback(() => {
     setTooltip((prev) => ({ ...prev, visible: false }));
-  };
+  }, []);
 
   // Hit detection for different chart types
   const detectHit = (
@@ -10084,4 +10098,4 @@ const ChartsShowcase: React.FC = () => {
   );
 };
 
-export default ChartsShowcase;
+export default React.memo(ChartsShowcaseComponent);

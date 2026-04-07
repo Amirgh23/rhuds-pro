@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { RhudsBubbleChartStyled, ColdWarBubbleChartStyled } from '@rhuds/components/Visualization';
+import { RhudsBubbleChartStyled, ColdWarBubbleChartStyled } from '@rhuds/components';
 
 export const BubbleChartShowcase: React.FC = () => {
   const [activeTheme, setActiveTheme] = useState<'rhuds' | 'coldwar'>('rhuds');

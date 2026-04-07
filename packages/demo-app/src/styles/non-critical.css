@@ -1,0 +1,100 @@
+/* Non-critical CSS - Deferred loading */
+/* Load with media="print" onload="this.media='all'" for async loading */
+
+/* Extended animations */
+@keyframes scan-line {
+  0% {
+    top: 0;
+  }
+  100% {
+    top: 100vh;
+  }
+}
+
+@keyframes scanlines-move {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 4px;
+  }
+}
+
+@keyframes hex-scroll {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes neon-text-glow {
+  0%,
+  100% {
+    text-shadow: 0 0 10px rgba(41, 242, 223, 0.5);
+  }
+  50% {
+    text-shadow:
+      0 0 20px rgba(41, 242, 223, 0.8),
+      0 0 40px rgba(41, 242, 223, 0.3);
+  }
+}
+
+.animate-scan-line {
+  animation: scan-line 8s linear infinite;
+}
+
+.animate-hex-scroll {
+  animation: hex-scroll linear infinite;
+}
+
+.animate-neon-text-glow {
+  animation: neon-text-glow 3s ease-in-out infinite;
+}
+
+/* Font classes */
+.font-orbitron {
+  font-family: 'Orbitron', sans-serif;
+}
+
+.font-rajdhani {
+  font-family: 'Rajdhani', sans-serif;
+}
+
+/* Scrollbar hover state */
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #ef3ef1 0%, #29f2df 100%);
+  box-shadow: 0 0 15px rgba(239, 62, 241, 0.5);
+}
+
+/* Focus visible extended */
+:focus-visible {
+  box-shadow: 0 0 10px rgba(41, 242, 223, 0.4);
+}
+
+/* Responsive typography */
+@media (max-width: 640px) {
+  body {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 768px) {
+  body {
+    font-size: 15px;
+  }
+}
+
+/* Backdrop filter support */
+@supports (backdrop-filter: blur(1px)) {
+  .neon-glass {
+    backdrop-filter: blur(20px);
+  }
+}
+
+@supports (-webkit-backdrop-filter: blur(1px)) {
+  .neon-glass {
+    -webkit-backdrop-filter: blur(20px);
+  }
+}

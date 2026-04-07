@@ -41,6 +41,56 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: true,
+    assetsInlineLimit: 4096,
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true,
+      },
+    },
+    rollupOptions: {
+      input: {
+        main: resolve(__dirname, 'src/main.tsx'),
+        'service-worker': resolve(__dirname, 'src/service-worker.ts'),
+      },
+      output: {
+        entryFileNames: (chunkInfo) => {
+          if (chunkInfo.name === 'service-worker') {
+            return 'service-worker.js';
+          }
+          return '[name].[hash].js';
+        },
+        chunkFileNames: '[name].[hash].js',
+        assetFileNames: (assetInfo) => {
+          const info = assetInfo.name.split('.');
+          const ext = info[info.length - 1];
+          if (/png|jpe?g|gif|svg|webp|avif/.test(ext)) {
+            return `images/[name].[hash][extname]`;
+          }
+          return `assets/[name].[hash][extname]`;
+        },
+      },
+      manualChunks: {
+        // Vendor chunks
+        'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+        'vendor-rhuds': [
+          '@rhuds/core',
+          '@rhuds/components',
+          '@rhuds/hooks',
+          '@rhuds/backgrounds',
+          '@rhuds/frames',
+        ],
+        'vendor-utils': ['gsap', 'framer-motion'],
+
+        // Route chunks
+        'route-showcase': ['./src/pages/ShowcasePage.tsx'],
+        'route-playground': ['./src/pages/InteractivePlayground.tsx'],
+        'route-docs': ['./src/pages/DocsPage.tsx'],
+        'route-coldwar': ['./src/pages/ColdWarShowcase.tsx'],
+        'route-charts': ['./src/pages/ChartsShowcase.tsx'],
+      },
+    },
   },
   test: {
     globals: true,
