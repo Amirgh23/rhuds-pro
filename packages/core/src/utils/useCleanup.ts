@@ -127,34 +127,34 @@ export function useAbortController() {
  * Hook to manage multiple timers/intervals
  */
 export function useTimerManager() {
-  const timersRef = useRef<Set<NodeJS.Timeout>>(new Set());
-  const intervalsRef = useRef<Set<NodeJS.Timeout>>(new Set());
+  const timersRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
+  const intervalsRef = useRef<Set<ReturnType<typeof setInterval>>>(new Set());
 
-  const setTimeout = (callback: () => void, delay: number) => {
-    const id = global.setTimeout(callback, delay);
+  const setTimeoutFn = (callback: () => void, delay: number) => {
+    const id = setTimeout(callback, delay);
     timersRef.current.add(id);
     return id;
   };
 
-  const setInterval = (callback: () => void, delay: number) => {
-    const id = global.setInterval(callback, delay);
+  const setIntervalFn = (callback: () => void, delay: number) => {
+    const id = setInterval(callback, delay);
     intervalsRef.current.add(id);
     return id;
   };
 
-  const clearTimer = (id: NodeJS.Timeout) => {
-    global.clearTimeout(id);
+  const clearTimer = (id: ReturnType<typeof setTimeout>) => {
+    clearTimeout(id);
     timersRef.current.delete(id);
   };
 
-  const clearInterval = (id: NodeJS.Timeout) => {
-    global.clearInterval(id);
+  const clearIntervalFn = (id: ReturnType<typeof setInterval>) => {
+    clearInterval(id);
     intervalsRef.current.delete(id);
   };
 
   const cleanup = () => {
-    timersRef.current.forEach((id) => global.clearTimeout(id));
-    intervalsRef.current.forEach((id) => global.clearInterval(id));
+    timersRef.current.forEach((id) => clearTimeout(id));
+    intervalsRef.current.forEach((id) => clearInterval(id));
     timersRef.current.clear();
     intervalsRef.current.clear();
   };
@@ -163,5 +163,11 @@ export function useTimerManager() {
     return cleanup;
   }, []);
 
-  return { setTimeout, setInterval, clearTimer, clearInterval, cleanup };
+  return {
+    setTimeout: setTimeoutFn,
+    setInterval: setIntervalFn,
+    clearTimer,
+    clearInterval: clearIntervalFn,
+    cleanup,
+  };
 }

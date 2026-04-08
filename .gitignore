@@ -97,3 +97,6 @@ packages/*/src/__tests__/*.demo.ts
 setup.ps1
 fix-theme-tokens.ps1
 fix_all_themes.py
+
+# Local Netlify folder
+.netlify

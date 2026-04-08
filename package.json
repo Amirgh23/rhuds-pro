@@ -44,8 +44,15 @@
     "archive:docs": "pwsh scripts/archive-docs.ps1"
   },
   "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "@vitejs/plugin-react": "^4.0.0",
+    "styled-components": "^6.0.0",
+    "terser": "^5.46.1",
     "turbo": "latest",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "vite": "^4.0.0"
   },
   "engines": {
     "node": ">=18.0.0",

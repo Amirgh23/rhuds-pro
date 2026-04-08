@@ -23,13 +23,13 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@rhuds/core': resolve(__dirname, '../core/src'),
-      '@rhuds/components': resolve(__dirname, '../components/src'),
-      '@rhuds/hooks': resolve(__dirname, '../hooks/src'),
-      '@rhuds/sfx': resolve(__dirname, '../sfx/src'),
-      '@rhuds/backgrounds': resolve(__dirname, '../backgrounds/src'),
-      '@rhuds/frames': resolve(__dirname, '../frames/src'),
-      '@rhuds/webgl': resolve(__dirname, '../webgl/src'),
+      '@rhuds/core': resolve(__dirname, '../core/dist/index.js'),
+      '@rhuds/components': resolve(__dirname, '../components/dist/index.js'),
+      '@rhuds/hooks': resolve(__dirname, '../hooks/dist/index.js'),
+      '@rhuds/sfx': resolve(__dirname, '../sfx/dist/index.js'),
+      '@rhuds/backgrounds': resolve(__dirname, '../backgrounds/dist/index.js'),
+      '@rhuds/frames': resolve(__dirname, '../frames/dist/index.js'),
+      '@rhuds/webgl': resolve(__dirname, '../webgl/dist/index.js'),
     },
   },
   server: {
@@ -51,7 +51,7 @@ export default defineConfig({
     },
     rollupOptions: {
       input: {
-        main: resolve(__dirname, 'src/main.tsx'),
+        main: resolve(__dirname, 'index.html'),
         'service-worker': resolve(__dirname, 'src/service-worker.ts'),
       },
       output: {
@@ -74,21 +74,8 @@ export default defineConfig({
       manualChunks: {
         // Vendor chunks
         'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-        'vendor-rhuds': [
-          '@rhuds/core',
-          '@rhuds/components',
-          '@rhuds/hooks',
-          '@rhuds/backgrounds',
-          '@rhuds/frames',
-        ],
+        'vendor-rhuds': ['@rhuds/core', '@rhuds/components', '@rhuds/hooks'],
         'vendor-utils': ['gsap', 'framer-motion'],
-
-        // Route chunks
-        'route-showcase': ['./src/pages/ShowcasePage.tsx'],
-        'route-playground': ['./src/pages/InteractivePlayground.tsx'],
-        'route-docs': ['./src/pages/DocsPage.tsx'],
-        'route-coldwar': ['./src/pages/ColdWarShowcase.tsx'],
-        'route-charts': ['./src/pages/ChartsShowcase.tsx'],
       },
     },
   },

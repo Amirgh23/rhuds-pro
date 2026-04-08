@@ -33,7 +33,7 @@
     "src"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "vite build",
     "test": "vitest",
     "test:run": "vitest --run",
     "type-check": "tsc --noEmit"

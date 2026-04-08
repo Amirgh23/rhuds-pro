@@ -9,11 +9,14 @@
     "sourceMap": true,
     "noEmit": false,
     "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
     "noImplicitAny": false,
     "jsx": "react-jsx",
     "strict": false,
     "noUnusedLocals": false,
-    "noUnusedParameters": false
+    "noUnusedParameters": false,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
   },
   "include": ["src"],
   "exclude": ["dist", "node_modules", "src/**/__tests__", "src/**/*.test.ts", "src/**/*.test.tsx"]

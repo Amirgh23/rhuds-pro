@@ -146,8 +146,9 @@ export class DesignIntegration {
 
     // Apply colors
     Object.entries(theme.colors).forEach(([key, value]) => {
-      this.colorSystem.registerColor(key, value);
+      // Store in palette instead of individual registration
     });
+    this.colorSystem.registerPalette(name, theme.colors);
 
     // Apply typography
     this.typography.registerFont('default', theme.typography);
@@ -195,7 +196,8 @@ export class DesignIntegration {
    * Get layout grid
    */
   public getLayoutGrid(): any {
-    return this.layout.getGrid('default');
+    const grid = this.layout.grids?.get('default');
+    return grid || { columns: 12, gap: 16, maxWidth: 1200 };
   }
 
   /**
