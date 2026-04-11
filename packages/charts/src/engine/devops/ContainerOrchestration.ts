@@ -1,6 +1,6 @@
 /**
- * Container Orchestration Manager
- * Manages containerized application deployment and scaling
+ * Container Orchestration
+ * Manages container deployment and orchestration
  */
 
 export interface ContainerImage {
@@ -11,436 +11,308 @@ export interface ContainerImage {
   digest: string;
   size: number;
   createdAt: number;
-  layers: string[];
-  metadata: Record<string, any>;
 }
 
-export interface ContainerSpec {
-  image: string;
-  tag: string;
-  ports: { containerPort: number; hostPort: number; protocol: string }[];
-  environment: Record<string, string>;
-  resources: {
-    requests: { cpu: string; memory: string };
-    limits: { cpu: string; memory: string };
-  };
-  healthCheck?: {
-    type: 'http' | 'tcp' | 'exec';
-    interval: number;
-    timeout: number;
-    retries: number;
-  };
-  volumeMounts?: { name: string; mountPath: string; readOnly: boolean }[];
-}
-
-export interface ServiceDefinition {
+export interface ContainerService {
   id: string;
   name: string;
-  namespace: string;
+  image: ContainerImage;
   replicas: number;
-  containers: ContainerSpec[];
-  labels: Record<string, string>;
-  annotations: Record<string, string>;
-  strategy: 'rolling' | 'blue-green' | 'canary';
-  status: 'pending' | 'running' | 'updating' | 'failed';
-  createdAt: number;
-  updatedAt: number;
+  ports: number[];
+  environment: Record<string, string>;
+  resources: ResourceRequirements;
+  healthCheck?: HealthCheck;
 }
 
-export interface Pod {
+export interface ResourceRequirements {
+  cpu: string;
+  memory: string;
+  storage?: string;
+}
+
+export interface HealthCheck {
+  type: 'http' | 'tcp' | 'exec';
+  interval: number;
+  timeout: number;
+  retries: number;
+  endpoint?: string;
+  command?: string;
+}
+
+export interface ServiceInstance {
   id: string;
   serviceId: string;
-  name: string;
-  status: 'pending' | 'running' | 'succeeded' | 'failed' | 'unknown';
+  status: 'running' | 'pending' | 'failed' | 'stopped';
   node: string;
-  containers: {
-    name: string;
-    image: string;
-    status: string;
-    restartCount: number;
-    lastState?: any;
-  }[];
-  createdAt: number;
-  startedAt?: number;
-  logs: string[];
-}
-
-export interface Deployment {
-  id: string;
-  serviceId: string;
-  status: 'pending' | 'in_progress' | 'success' | 'failed' | 'rolled_back';
-  strategy: 'rolling' | 'blue-green' | 'canary';
   startTime: number;
-  endTime?: number;
-  duration?: number;
-  oldReplicas: number;
-  newReplicas: number;
-  readyReplicas: number;
-  updatedReplicas: number;
-  operations: DeploymentOperation[];
-  logs: string[];
+  lastHealthCheck?: number;
+  healthStatus: 'healthy' | 'unhealthy' | 'unknown';
 }
 
-export interface DeploymentOperation {
-  podId: string;
-  action: 'create' | 'update' | 'delete';
-  status: 'pending' | 'in_progress' | 'success' | 'failed';
-  startTime: number;
-  endTime?: number;
-  output: any;
-  error?: string;
-}
-
+/**
+ * Container Orchestration Manager
+ * Manages container deployment and orchestration
+ */
 export class ContainerOrchestration {
-  private images: Map<string, ContainerImage> = new Map();
-  private services: Map<string, ServiceDefinition> = new Map();
-  private pods: Map<string, Pod> = new Map();
-  private deployments: Map<string, Deployment> = new Map();
-  private deploymentHistory: Deployment[] = [];
-  private nodes: Map<string, any> = new Map();
-  private eventEmitter: any;
-
-  constructor() {
-    this.initializeEventEmitter();
-    this.initializeNodes();
-  }
-
-  private initializeEventEmitter(): void {
-    this.eventEmitter = {
-      listeners: new Map<string, Function[]>(),
-      on: (event: string, handler: Function) => {
-        if (!this.eventEmitter.listeners.has(event)) {
-          this.eventEmitter.listeners.set(event, []);
-        }
-        this.eventEmitter.listeners.get(event).push(handler);
-      },
-      emit: (event: string, data: any) => {
-        const handlers = this.eventEmitter.listeners.get(event) || [];
-        handlers.forEach((h: Function) => h(data));
-      },
-    };
-  }
-
-  private initializeNodes(): void {
-    // Initialize cluster nodes
-    for (let i = 0; i < 3; i++) {
-      this.nodes.set(`node-${i}`, {
-        id: `node-${i}`,
-        status: 'ready',
-        capacity: { cpu: '4', memory: '8Gi' },
-        allocatable: { cpu: '3.5', memory: '7Gi' },
-        pods: 0,
-      });
-    }
-  }
+  private services: Map<string, ContainerService> = new Map();
+  private instances: Map<string, ServiceInstance> = new Map();
+  private nodes: Map<string, NodeInfo> = new Map();
 
   /**
-   * Push container image
+   * Register node
    */
-  pushImage(image: ContainerImage): void {
-    this.images.set(`${image.registry}/${image.name}:${image.tag}`, image);
-    this.eventEmitter.emit('image:pushed', { imageId: image.id });
-  }
-
-  /**
-   * Get image
-   */
-  getImage(registry: string, name: string, tag: string): ContainerImage | undefined {
-    return this.images.get(`${registry}/${name}:${tag}`);
-  }
-
-  /**
-   * List images
-   */
-  listImages(): ContainerImage[] {
-    return Array.from(this.images.values());
-  }
-
-  /**
-   * Create service
-   */
-  createService(definition: ServiceDefinition): ServiceDefinition {
-    this.services.set(definition.id, definition);
-    this.eventEmitter.emit('service:created', { serviceId: definition.id });
-    return definition;
-  }
-
-  /**
-   * Get service
-   */
-  getService(serviceId: string): ServiceDefinition | undefined {
-    return this.services.get(serviceId);
-  }
-
-  /**
-   * List services
-   */
-  listServices(namespace?: string): ServiceDefinition[] {
-    let services = Array.from(this.services.values());
-    if (namespace) {
-      services = services.filter((s) => s.namespace === namespace);
-    }
-    return services;
+  public registerNode(nodeId: string, capacity: ResourceRequirements): void {
+    this.nodes.set(nodeId, {
+      id: nodeId,
+      capacity,
+      available: { ...capacity },
+      instances: [],
+    });
   }
 
   /**
    * Deploy service
    */
-  async deployService(serviceId: string): Promise<Deployment> {
-    const service = this.services.get(serviceId);
-    if (!service) {
-      throw new Error(`Service not found: ${serviceId}`);
+  public async deployService(service: ContainerService): Promise<ServiceInstance[]> {
+    this.services.set(service.id, service);
+    const instances: ServiceInstance[] = [];
+
+    for (let i = 0; i < service.replicas; i++) {
+      const instance = await this.createInstance(service);
+      instances.push(instance);
     }
 
-    const deployment: Deployment = {
-      id: `deploy-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      serviceId,
-      status: 'pending',
-      strategy: service.strategy,
-      startTime: Date.now(),
-      oldReplicas: 0,
-      newReplicas: service.replicas,
-      readyReplicas: 0,
-      updatedReplicas: 0,
-      operations: [],
-      logs: [],
-    };
-
-    this.deployments.set(deployment.id, deployment);
-    this.eventEmitter.emit('deployment:started', { deploymentId: deployment.id });
-
-    try {
-      deployment.status = 'in_progress';
-
-      // Create pods based on replicas
-      for (let i = 0; i < service.replicas; i++) {
-        const pod = await this.createPod(service, i);
-        const operation: DeploymentOperation = {
-          podId: pod.id,
-          action: 'create',
-          status: 'success',
-          startTime: Date.now(),
-          endTime: Date.now(),
-          output: { podId: pod.id },
-        };
-        deployment.operations.push(operation);
-        deployment.readyReplicas++;
-        deployment.updatedReplicas++;
-      }
-
-      deployment.status = 'success';
-      service.status = 'running';
-      deployment.logs.push(`Service deployed successfully with ${service.replicas} replicas`);
-    } catch (error) {
-      deployment.status = 'failed';
-      service.status = 'failed';
-      deployment.logs.push(`Deployment failed: ${error}`);
-    }
-
-    deployment.endTime = Date.now();
-    deployment.duration = deployment.endTime - deployment.startTime;
-
-    this.deploymentHistory.push(deployment);
-    this.eventEmitter.emit('deployment:completed', {
-      deploymentId: deployment.id,
-      status: deployment.status,
-    });
-
-    return deployment;
+    return instances;
   }
 
   /**
-   * Create pod
+   * Create service instance
    */
-  private async createPod(service: ServiceDefinition, index: number): Promise<Pod> {
-    const nodeId = `node-${index % this.nodes.size}`;
-    const pod: Pod = {
-      id: `pod-${Date.now()}-${index}`,
+  private async createInstance(service: ContainerService): Promise<ServiceInstance> {
+    // Find suitable node
+    const node = this.findSuitableNode(service.resources);
+    if (!node) {
+      throw new Error('No suitable node available');
+    }
+
+    const instance: ServiceInstance = {
+      id: `instance-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       serviceId: service.id,
-      name: `${service.name}-${index}`,
-      status: 'running',
-      node: nodeId,
-      containers: service.containers.map((c) => ({
-        name: c.image.split('/').pop() || 'container',
-        image: `${c.image}:${c.tag}`,
-        status: 'running',
-        restartCount: 0,
-      })),
-      createdAt: Date.now(),
-      startedAt: Date.now(),
-      logs: [],
+      status: 'pending',
+      node: node.id,
+      startTime: Date.now(),
+      healthStatus: 'unknown',
     };
 
-    this.pods.set(pod.id, pod);
-    return pod;
+    this.instances.set(instance.id, instance);
+    node.instances.push(instance.id);
+
+    // Simulate container startup
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    instance.status = 'running';
+
+    return instance;
+  }
+
+  /**
+   * Find suitable node for deployment
+   */
+  private findSuitableNode(requirements: ResourceRequirements): NodeInfo | null {
+    for (const node of this.nodes.values()) {
+      if (this.canFitResources(node.available, requirements)) {
+        return node;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Check if resources can fit
+   */
+  private canFitResources(
+    available: ResourceRequirements,
+    required: ResourceRequirements
+  ): boolean {
+    const parseResource = (res: string): number => {
+      if (res.endsWith('m')) return parseInt(res) / 1000;
+      if (res.endsWith('Gi')) return parseInt(res) * 1024;
+      return parseInt(res);
+    };
+
+    return (
+      parseResource(available.cpu) >= parseResource(required.cpu) &&
+      parseResource(available.memory) >= parseResource(required.memory)
+    );
   }
 
   /**
    * Scale service
    */
-  async scaleService(serviceId: string, replicas: number): Promise<Deployment> {
+  public async scaleService(serviceId: string, replicas: number): Promise<ServiceInstance[]> {
     const service = this.services.get(serviceId);
     if (!service) {
       throw new Error(`Service not found: ${serviceId}`);
     }
 
-    const oldReplicas = service.replicas;
-    service.replicas = replicas;
-    service.updatedAt = Date.now();
+    const currentInstances = Array.from(this.instances.values()).filter(
+      (i) => i.serviceId === serviceId
+    );
 
-    const deployment: Deployment = {
-      id: `scale-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      serviceId,
-      status: 'in_progress',
-      strategy: 'rolling',
-      startTime: Date.now(),
-      oldReplicas,
-      newReplicas: replicas,
-      readyReplicas: 0,
-      updatedReplicas: 0,
-      operations: [],
-      logs: [],
+    if (replicas > currentInstances.length) {
+      // Scale up
+      const newInstances: ServiceInstance[] = [];
+      for (let i = 0; i < replicas - currentInstances.length; i++) {
+        const instance = await this.createInstance(service);
+        newInstances.push(instance);
+      }
+      return newInstances;
+    } else if (replicas < currentInstances.length) {
+      // Scale down
+      const toRemove = currentInstances.slice(replicas);
+      for (const instance of toRemove) {
+        this.removeInstance(instance.id);
+      }
+    }
+
+    service.replicas = replicas;
+    return currentInstances.slice(0, replicas);
+  }
+
+  /**
+   * Remove instance
+   */
+  private removeInstance(instanceId: string): void {
+    const instance = this.instances.get(instanceId);
+    if (instance) {
+      const node = this.nodes.get(instance.node);
+      if (node) {
+        node.instances = node.instances.filter((id) => id !== instanceId);
+      }
+      this.instances.delete(instanceId);
+    }
+  }
+
+  /**
+   * Check service health
+   */
+  public async checkServiceHealth(serviceId: string): Promise<Record<string, unknown>> {
+    const instances = Array.from(this.instances.values()).filter((i) => i.serviceId === serviceId);
+
+    const healthStatus = {
+      healthy: 0,
+      unhealthy: 0,
+      unknown: 0,
     };
 
-    this.deployments.set(deployment.id, deployment);
-
-    try {
-      if (replicas > oldReplicas) {
-        // Scale up
-        for (let i = oldReplicas; i < replicas; i++) {
-          const pod = await this.createPod(service, i);
-          deployment.operations.push({
-            podId: pod.id,
-            action: 'create',
-            status: 'success',
-            startTime: Date.now(),
-            endTime: Date.now(),
-            output: { podId: pod.id },
-          });
-          deployment.readyReplicas++;
-        }
-      } else {
-        // Scale down
-        const podsToDelete = Array.from(this.pods.values())
-          .filter((p) => p.serviceId === serviceId)
-          .slice(replicas);
-
-        for (const pod of podsToDelete) {
-          this.pods.delete(pod.id);
-          deployment.operations.push({
-            podId: pod.id,
-            action: 'delete',
-            status: 'success',
-            startTime: Date.now(),
-            endTime: Date.now(),
-            output: { podId: pod.id },
-          });
-        }
-      }
-
-      deployment.status = 'success';
-      deployment.updatedReplicas = replicas;
-      deployment.logs.push(`Service scaled from ${oldReplicas} to ${replicas} replicas`);
-    } catch (error) {
-      deployment.status = 'failed';
-      deployment.logs.push(`Scaling failed: ${error}`);
+    for (const instance of instances) {
+      instance.lastHealthCheck = Date.now();
+      // Simulate health check
+      const isHealthy = Math.random() > 0.1; // 90% healthy
+      instance.healthStatus = isHealthy ? 'healthy' : 'unhealthy';
+      healthStatus[instance.healthStatus]++;
     }
-
-    deployment.endTime = Date.now();
-    deployment.duration = deployment.endTime - deployment.startTime;
-
-    this.deploymentHistory.push(deployment);
-    return deployment;
-  }
-
-  /**
-   * Get pod logs
-   */
-  getPodLogs(podId: string): string[] {
-    const pod = this.pods.get(podId);
-    if (!pod) {
-      throw new Error(`Pod not found: ${podId}`);
-    }
-    return pod.logs;
-  }
-
-  /**
-   * Get service pods
-   */
-  getServicePods(serviceId: string): Pod[] {
-    return Array.from(this.pods.values()).filter((p) => p.serviceId === serviceId);
-  }
-
-  /**
-   * Get deployment
-   */
-  getDeployment(deploymentId: string): Deployment | undefined {
-    return this.deployments.get(deploymentId);
-  }
-
-  /**
-   * Get deployment history
-   */
-  getDeploymentHistory(serviceId?: string, limit: number = 50): Deployment[] {
-    let history = this.deploymentHistory;
-    if (serviceId) {
-      history = history.filter((d) => d.serviceId === serviceId);
-    }
-    return history.slice(-limit);
-  }
-
-  /**
-   * Rollback deployment
-   */
-  async rollbackDeployment(deploymentId: string): Promise<void> {
-    const deployment = this.deployments.get(deploymentId);
-    if (!deployment) {
-      throw new Error(`Deployment not found: ${deploymentId}`);
-    }
-
-    deployment.status = 'rolled_back';
-    this.eventEmitter.emit('deployment:rolled_back', { deploymentId });
-  }
-
-  /**
-   * Get cluster status
-   */
-  getClusterStatus(): {
-    nodes: number;
-    readyNodes: number;
-    totalPods: number;
-    runningPods: number;
-    services: number;
-  } {
-    const nodes = Array.from(this.nodes.values());
-    const readyNodes = nodes.filter((n) => n.status === 'ready').length;
-    const pods = Array.from(this.pods.values());
-    const runningPods = pods.filter((p) => p.status === 'running').length;
 
     return {
-      nodes: nodes.length,
-      readyNodes,
-      totalPods: pods.length,
-      runningPods,
-      services: this.services.size,
+      serviceId,
+      totalInstances: instances.length,
+      healthStatus,
+      timestamp: Date.now(),
     };
   }
 
   /**
-   * Get resource usage
+   * Get service instances
    */
-  getResourceUsage(): {
-    cpuUsage: number;
-    memoryUsage: number;
-    storageUsage: number;
-  } {
-    const pods = Array.from(this.pods.values());
-    const cpuUsage = pods.length * 0.5; // Simplified calculation
-    const memoryUsage = pods.length * 512; // MB
-    const storageUsage = pods.length * 10; // GB
+  public getServiceInstances(serviceId: string): ServiceInstance[] {
+    return Array.from(this.instances.values()).filter((i) => i.serviceId === serviceId);
+  }
 
-    return { cpuUsage, memoryUsage, storageUsage };
+  /**
+   * Get node status
+   */
+  public getNodeStatus(nodeId: string): Record<string, unknown> {
+    const node = this.nodes.get(nodeId);
+    if (!node) {
+      throw new Error(`Node not found: ${nodeId}`);
+    }
+
+    return {
+      nodeId: node.id,
+      capacity: node.capacity,
+      available: node.available,
+      instances: node.instances.length,
+      status: 'ready',
+    };
+  }
+
+  /**
+   * Get all nodes
+   */
+  public getNodes(): NodeInfo[] {
+    return Array.from(this.nodes.values());
+  }
+
+  /**
+   * Update service
+   */
+  public async updateService(serviceId: string, updates: Partial<ContainerService>): Promise<void> {
+    const service = this.services.get(serviceId);
+    if (!service) {
+      throw new Error(`Service not found: ${serviceId}`);
+    }
+
+    Object.assign(service, updates);
+
+    // Restart instances with new configuration
+    const instances = this.getServiceInstances(serviceId);
+    for (const instance of instances) {
+      instance.status = 'pending';
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      instance.status = 'running';
+    }
+  }
+
+  /**
+   * Get service status
+   */
+  public getServiceStatus(serviceId: string): Record<string, unknown> {
+    const service = this.services.get(serviceId);
+    if (!service) {
+      throw new Error(`Service not found: ${serviceId}`);
+    }
+
+    const instances = this.getServiceInstances(serviceId);
+    const runningCount = instances.filter((i) => i.status === 'running').length;
+
+    return {
+      serviceId,
+      name: service.name,
+      desiredReplicas: service.replicas,
+      runningReplicas: runningCount,
+      instances: instances.map((i) => ({
+        id: i.id,
+        status: i.status,
+        node: i.node,
+        healthStatus: i.healthStatus,
+      })),
+    };
+  }
+
+  /**
+   * Delete service
+   */
+  public deleteService(serviceId: string): void {
+    const instances = this.getServiceInstances(serviceId);
+    for (const instance of instances) {
+      this.removeInstance(instance.id);
+    }
+    this.services.delete(serviceId);
   }
 }
 
-export default ContainerOrchestration;
+interface NodeInfo {
+  id: string;
+  capacity: ResourceRequirements;
+  available: ResourceRequirements;
+  instances: string[];
+}

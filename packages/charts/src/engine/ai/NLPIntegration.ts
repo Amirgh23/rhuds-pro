@@ -1,17 +1,19 @@
 /**
  * Natural Language Processing Integration
- * NLP capabilities for text analysis and understanding
- *
- * ادغام پردازش زبان طبیعی
- * قابلیت های NLP برای تجزیه و تحلیل و درک متن
+ * Text analysis, sentiment analysis, entity extraction, and more
  */
 
-import { EventEmitter } from 'events';
+export interface TextClassificationResult {
+  text: string;
+  category: string;
+  confidence: number;
+  scores: Record<string, number>;
+}
 
 export interface SentimentResult {
   text: string;
   sentiment: 'positive' | 'negative' | 'neutral';
-  score: number;
+  score: number; // -1 to 1
   confidence: number;
 }
 
@@ -23,15 +25,8 @@ export interface Entity {
   confidence: number;
 }
 
-export interface TextClassificationResult {
-  text: string;
-  category: string;
-  probability: number;
-  alternatives: Array<{ category: string; probability: number }>;
-}
-
 export interface Topic {
-  id: string;
+  name: string;
   keywords: string[];
   weight: number;
 }
@@ -42,420 +37,280 @@ export interface LanguageDetectionResult {
   alternatives: Array<{ language: string; confidence: number }>;
 }
 
-export class NLPIntegration extends EventEmitter {
-  private sentimentLexicon: Map<string, number> = new Map();
-  private entityPatterns: Map<string, RegExp> = new Map();
-  private classifiers: Map<string, any> = new Map();
-  private topicModels: Map<string, Topic[]> = new Map();
-  private languageModels: Map<string, any> = new Map();
+/**
+ * NLPIntegration - Natural Language Processing capabilities
+ */
+export class NLPIntegration {
+  private stopWords = new Set([
+    'the',
+    'a',
+    'an',
+    'and',
+    'or',
+    'but',
+    'in',
+    'on',
+    'at',
+    'to',
+    'for',
+    'of',
+    'with',
+    'is',
+    'are',
+    'was',
+    'were',
+    'be',
+    'been',
+    'being',
+  ]);
 
-  constructor() {
-    super();
-    this.initializeSentimentLexicon();
-    this.initializeEntityPatterns();
-    this.initializeLanguageModels();
+  private sentimentWords: Record<string, number> = {
+    excellent: 0.9,
+    good: 0.7,
+    great: 0.8,
+    amazing: 0.9,
+    wonderful: 0.85,
+    terrible: -0.9,
+    bad: -0.7,
+    awful: -0.85,
+    horrible: -0.9,
+    poor: -0.7,
+  };
+
+  /**
+   * Classify text into categories
+   */
+  classifyText(text: string, categories: string[]): TextClassificationResult {
+    const words = this.tokenize(text);
+    const scores: Record<string, number> = {};
+
+    for (const category of categories) {
+      const categoryWords = category.toLowerCase().split(' ');
+      let score = 0;
+
+      for (const word of words) {
+        if (categoryWords.includes(word)) {
+          score += 1;
+        }
+      }
+
+      scores[category] = score / Math.max(words.length, 1);
+    }
+
+    const maxCategory = Object.entries(scores).sort(([, a], [, b]) => b - a)[0];
+
+    return {
+      text,
+      category: maxCategory[0],
+      confidence: maxCategory[1],
+      scores,
+    };
   }
 
   /**
    * Analyze sentiment of text
    */
   analyzeSentiment(text: string): SentimentResult {
-    const words = text.toLowerCase().split(/\s+/);
-    let score = 0;
-    let count = 0;
+    const words = this.tokenize(text);
+    let sentimentScore = 0;
+    let matchCount = 0;
 
     for (const word of words) {
-      const sentiment = this.sentimentLexicon.get(word);
-      if (sentiment !== undefined) {
-        score += sentiment;
-        count++;
+      if (this.sentimentWords[word]) {
+        sentimentScore += this.sentimentWords[word];
+        matchCount++;
       }
     }
 
-    const normalizedScore = count > 0 ? score / count : 0;
-    const sentiment =
-      normalizedScore > 0.1 ? 'positive' : normalizedScore < -0.1 ? 'negative' : 'neutral';
-    const confidence = Math.min(1, Math.abs(normalizedScore) + 0.5);
-
-    this.emit('sentiment:analyzed', {
-      text: text.substring(0, 50),
-      sentiment,
-      score: normalizedScore,
-    });
+    const score = matchCount > 0 ? sentimentScore / matchCount : 0;
+    const sentiment = score > 0.1 ? 'positive' : score < -0.1 ? 'negative' : 'neutral';
 
     return {
       text,
       sentiment,
-      score: normalizedScore,
-      confidence,
+      score,
+      confidence: Math.min(1, Math.abs(score) + matchCount * 0.1),
     };
   }
 
   /**
-   * Extract entities from text
+   * Extract named entities from text
    */
   extractEntities(text: string): Entity[] {
     const entities: Entity[] = [];
+    const patterns = [
+      {
+        type: 'PERSON' as const,
+        regex: /\b[A-Z][a-z]+ [A-Z][a-z]+\b/g,
+      },
+      {
+        type: 'DATE' as const,
+        regex: /\b\d{1,2}\/\d{1,2}\/\d{4}\b/g,
+      },
+      {
+        type: 'MONEY' as const,
+        regex: /\$\d+(?:,\d{3})*(?:\.\d{2})?\b/g,
+      },
+      {
+        type: 'ORGANIZATION' as const,
+        regex: /\b[A-Z][a-z]+ (?:Inc|Corp|Ltd|LLC)\b/g,
+      },
+    ];
 
-    // Person names (simple pattern)
-    const personPattern = /\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b/g;
-    let match;
-    while ((match = personPattern.exec(text)) !== null) {
-      entities.push({
-        text: match[0],
-        type: 'PERSON',
-        start: match.index,
-        end: match.index + match[0].length,
-        confidence: 0.7,
-      });
-    }
-
-    // Dates
-    const datePattern = /\b\d{1,2}\/\d{1,2}\/\d{4}\b|\b\d{4}-\d{2}-\d{2}\b/g;
-    while ((match = datePattern.exec(text)) !== null) {
-      entities.push({
-        text: match[0],
-        type: 'DATE',
-        start: match.index,
-        end: match.index + match[0].length,
-        confidence: 0.95,
-      });
-    }
-
-    // Money amounts
-    const moneyPattern =
-      /\$\d+(?:,\d{3})*(?:\.\d{2})?|\d+(?:,\d{3})*(?:\.\d{2})?\s*(?:USD|EUR|GBP)/g;
-    while ((match = moneyPattern.exec(text)) !== null) {
-      entities.push({
-        text: match[0],
-        type: 'MONEY',
-        start: match.index,
-        end: match.index + match[0].length,
-        confidence: 0.9,
-      });
-    }
-
-    // Organizations (capitalized words)
-    const orgPattern = /\b[A-Z]{2,}\b/g;
-    while ((match = orgPattern.exec(text)) !== null) {
-      if (!entities.some((e) => e.start === match.index)) {
+    for (const pattern of patterns) {
+      let match;
+      const regex = new RegExp(pattern.regex);
+      while ((match = regex.exec(text)) !== null) {
         entities.push({
           text: match[0],
-          type: 'ORGANIZATION',
+          type: pattern.type,
           start: match.index,
           end: match.index + match[0].length,
-          confidence: 0.6,
+          confidence: 0.85,
         });
       }
     }
 
-    this.emit('entities:extracted', { text: text.substring(0, 50), count: entities.length });
     return entities;
   }
 
   /**
-   * Classify text into categories
+   * Extract topics from text
    */
-  classifyText(classifierId: string, text: string): TextClassificationResult {
-    const classifier = this.classifiers.get(classifierId);
-    if (!classifier) throw new Error(`Classifier ${classifierId} not found`);
+  extractTopics(text: string, topCount: number = 5): Topic[] {
+    const words = this.tokenize(text);
+    const wordFreq: Record<string, number> = {};
 
-    const words = text.toLowerCase().split(/\s+/);
-    const scores: Record<string, number> = {};
-
-    // Initialize scores
-    for (const category of classifier.categories) {
-      scores[category] = 0;
-    }
-
-    // Calculate scores based on keywords
     for (const word of words) {
-      for (const category of classifier.categories) {
-        const keywords = classifier.keywords[category] || [];
-        if (keywords.includes(word)) {
-          scores[category] += 1;
-        }
+      if (!this.stopWords.has(word) && word.length > 3) {
+        wordFreq[word] = (wordFreq[word] || 0) + 1;
       }
     }
 
-    // Normalize scores
-    const maxScore = Math.max(...Object.values(scores));
-    const normalized: Record<string, number> = {};
-    for (const category of classifier.categories) {
-      normalized[category] =
-        maxScore > 0 ? scores[category] / maxScore : 1 / classifier.categories.length;
-    }
+    const sorted = Object.entries(wordFreq)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, topCount);
 
-    // Sort by probability
-    const sorted = Object.entries(normalized)
-      .map(([category, probability]) => ({ category, probability }))
-      .sort((a, b) => b.probability - a.probability);
+    const maxFreq = sorted[0]?.[1] || 1;
 
-    this.emit('text:classified', {
-      text: text.substring(0, 50),
-      category: sorted[0].category,
-    });
-
-    return {
-      text,
-      category: sorted[0].category,
-      probability: sorted[0].probability,
-      alternatives: sorted.slice(1),
-    };
-  }
-
-  /**
-   * Train text classifier
-   */
-  trainClassifier(
-    classifierId: string,
-    trainingData: Array<{ text: string; category: string }>
-  ): void {
-    const categories = [...new Set(trainingData.map((d) => d.category))];
-    const keywords: Record<string, Set<string>> = {};
-
-    for (const category of categories) {
-      keywords[category] = new Set();
-    }
-
-    // Extract keywords for each category
-    for (const item of trainingData) {
-      const words = item.text.toLowerCase().split(/\s+/);
-      for (const word of words) {
-        if (word.length > 3) {
-          keywords[item.category].add(word);
-        }
-      }
-    }
-
-    // Convert sets to arrays
-    const keywordArrays: Record<string, string[]> = {};
-    for (const category of categories) {
-      keywordArrays[category] = Array.from(keywords[category]);
-    }
-
-    this.classifiers.set(classifierId, {
-      categories,
-      keywords: keywordArrays,
-    });
-
-    this.emit('classifier:trained', { classifierId, categories: categories.length });
-  }
-
-  /**
-   * Extract topics from text collection
-   */
-  extractTopics(modelId: string, texts: string[], topicCount: number = 5): Topic[] {
-    const allWords: Record<string, number> = {};
-
-    // Count word frequencies
-    for (const text of texts) {
-      const words = text.toLowerCase().split(/\s+/);
-      for (const word of words) {
-        if (word.length > 3) {
-          allWords[word] = (allWords[word] || 0) + 1;
-        }
-      }
-    }
-
-    // Sort by frequency and get top words
-    const topWords = Object.entries(allWords)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, topicCount * 5)
-      .map(([word]) => word);
-
-    // Create topics
-    const topics: Topic[] = [];
-    for (let i = 0; i < topicCount; i++) {
-      const start = i * 5;
-      const end = Math.min(start + 5, topWords.length);
-      topics.push({
-        id: `topic-${i}`,
-        keywords: topWords.slice(start, end),
-        weight: 1 / topicCount,
-      });
-    }
-
-    this.topicModels.set(modelId, topics);
-    this.emit('topics:extracted', { modelId, count: topics.length });
-    return topics;
+    return sorted.map(([word, freq]) => ({
+      name: word,
+      keywords: [word],
+      weight: freq / maxFreq,
+    }));
   }
 
   /**
    * Detect language of text
    */
   detectLanguage(text: string): LanguageDetectionResult {
+    const languagePatterns: Record<string, RegExp> = {
+      en: /\b(the|and|or|is|are|be|been|being)\b/gi,
+      es: /\b(el|la|de|que|y|o|es|son|ser)\b/gi,
+      fr: /\b(le|la|de|et|ou|est|sont|être)\b/gi,
+      de: /\b(der|die|das|und|oder|ist|sind|sein)\b/gi,
+      fa: /[\u0600-\u06FF]/g,
+    };
+
     const scores: Record<string, number> = {};
 
-    // Simple language detection based on character patterns
-    const languages = ['en', 'fa', 'ar', 'fr', 'de', 'es'];
-    for (const lang of languages) {
-      scores[lang] = 0;
+    for (const [lang, pattern] of Object.entries(languagePatterns)) {
+      const matches = text.match(pattern) || [];
+      scores[lang] = matches.length;
     }
 
-    // Check for Persian characters
-    if (/[\u0600-\u06FF]/.test(text)) {
-      scores['fa'] += 0.8;
-      scores['ar'] += 0.3;
-    }
-
-    // Check for Arabic characters
-    if (/[\u0600-\u06FF]/.test(text) && !/[\u0600-\u06FF]{2,}/.test(text)) {
-      scores['ar'] += 0.5;
-    }
-
-    // Check for common English patterns
-    if (/[a-z]{2,}/.test(text.toLowerCase())) {
-      scores['en'] += 0.7;
-    }
-
-    // Check for French patterns
-    if (/\b(le|la|de|et|un|une)\b/i.test(text)) {
-      scores['fr'] += 0.5;
-    }
-
-    // Check for German patterns
-    if (/\b(der|die|das|und|ein|eine)\b/i.test(text)) {
-      scores['de'] += 0.5;
-    }
-
-    // Check for Spanish patterns
-    if (/\b(el|la|de|y|un|una)\b/i.test(text)) {
-      scores['es'] += 0.5;
-    }
-
-    // Normalize scores
-    const total = Object.values(scores).reduce((sum, s) => sum + s, 0);
-    const normalized: Record<string, number> = {};
-    for (const lang of languages) {
-      normalized[lang] = total > 0 ? scores[lang] / total : 1 / languages.length;
-    }
-
-    // Sort by confidence
-    const sorted = Object.entries(normalized)
-      .map(([language, confidence]) => ({ language, confidence }))
-      .sort((a, b) => b.confidence - a.confidence);
-
-    this.emit('language:detected', {
-      text: text.substring(0, 30),
-      language: sorted[0].language,
-    });
+    const sorted = Object.entries(scores).sort(([, a], [, b]) => b - a);
+    const topLanguage = sorted[0];
 
     return {
-      language: sorted[0].language,
-      confidence: sorted[0].confidence,
-      alternatives: sorted.slice(1),
+      language: topLanguage[0],
+      confidence: topLanguage[1] / Math.max(text.length / 5, 1),
+      alternatives: sorted.slice(1, 3).map(([lang, score]) => ({
+        language: lang,
+        confidence: score / Math.max(text.length / 5, 1),
+      })),
     };
   }
 
   /**
-   * Tokenize text
+   * Tokenize text into words
    */
-  tokenize(text: string): string[] {
+  private tokenize(text: string): string[] {
     return text
       .toLowerCase()
       .split(/\s+/)
-      .filter((token) => token.length > 0);
+      .map((word) => word.replace(/[^\w]/g, ''))
+      .filter((word) => word.length > 0);
   }
 
   /**
-   * Remove stopwords
-   */
-  removeStopwords(tokens: string[], language: string = 'en'): string[] {
-    const stopwords: Record<string, Set<string>> = {
-      en: new Set([
-        'the',
-        'a',
-        'an',
-        'and',
-        'or',
-        'but',
-        'in',
-        'on',
-        'at',
-        'to',
-        'for',
-        'of',
-        'is',
-        'are',
-      ]),
-      fa: new Set(['و', 'در', 'به', 'از', 'که', 'این', 'آن', 'است', 'هستند']),
-    };
-
-    const stops = stopwords[language] || stopwords['en'];
-    return tokens.filter((token) => !stops.has(token));
-  }
-
-  /**
-   * Calculate text similarity (Jaccard similarity)
+   * Calculate text similarity using cosine similarity
    */
   calculateSimilarity(text1: string, text2: string): number {
-    const tokens1 = new Set(this.tokenize(text1));
-    const tokens2 = new Set(this.tokenize(text2));
+    const words1 = this.tokenize(text1);
+    const words2 = this.tokenize(text2);
 
-    const intersection = new Set([...tokens1].filter((t) => tokens2.has(t)));
-    const union = new Set([...tokens1, ...tokens2]);
+    const set1 = new Set(words1);
+    const set2 = new Set(words2);
 
-    return union.size > 0 ? intersection.size / union.size : 0;
+    const intersection = new Set([...set1].filter((x) => set2.has(x)));
+    const union = new Set([...set1, ...set2]);
+
+    return intersection.size / union.size;
   }
 
   /**
-   * Private helper: Initialize sentiment lexicon
+   * Generate text summary
    */
-  private initializeSentimentLexicon(): void {
-    const positive = [
-      'good',
-      'great',
-      'excellent',
-      'amazing',
-      'wonderful',
-      'fantastic',
-      'love',
-      'best',
-      'awesome',
-      'perfect',
-    ];
-    const negative = [
-      'bad',
-      'terrible',
-      'awful',
-      'horrible',
-      'hate',
-      'worst',
-      'poor',
-      'disappointing',
-      'useless',
-      'broken',
-    ];
+  summarizeText(text: string, sentenceCount: number = 3): string {
+    const sentences = text.split(/[.!?]+/).filter((s) => s.trim().length > 0);
 
-    for (const word of positive) {
-      this.sentimentLexicon.set(word, 1);
+    if (sentences.length <= sentenceCount) {
+      return text;
     }
-    for (const word of negative) {
-      this.sentimentLexicon.set(word, -1);
+
+    // Score sentences by keyword frequency
+    const words = this.tokenize(text);
+    const wordFreq: Record<string, number> = {};
+
+    for (const word of words) {
+      if (!this.stopWords.has(word)) {
+        wordFreq[word] = (wordFreq[word] || 0) + 1;
+      }
     }
+
+    const scoredSentences = sentences.map((sentence, index) => {
+      const sentenceWords = this.tokenize(sentence);
+      const score = sentenceWords.reduce((sum, word) => sum + (wordFreq[word] || 0), 0);
+      return { sentence: sentence.trim(), score, index };
+    });
+
+    return scoredSentences
+      .sort((a, b) => b.score - a.score)
+      .slice(0, sentenceCount)
+      .sort((a, b) => a.index - b.index)
+      .map((s) => s.sentence)
+      .join('. ');
   }
 
   /**
-   * Private helper: Initialize entity patterns
+   * Extract keywords from text
    */
-  private initializeEntityPatterns(): void {
-    this.entityPatterns.set('PERSON', /\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b/g);
-    this.entityPatterns.set('DATE', /\b\d{1,2}\/\d{1,2}\/\d{4}\b/g);
-    this.entityPatterns.set('MONEY', /\$\d+(?:,\d{3})*(?:\.\d{2})?/g);
-  }
+  extractKeywords(text: string, count: number = 10): string[] {
+    const words = this.tokenize(text);
+    const wordFreq: Record<string, number> = {};
 
-  /**
-   * Private helper: Initialize language models
-   */
-  private initializeLanguageModels(): void {
-    this.languageModels.set('en', {
-      name: 'English',
-      patterns: [/[a-z]{2,}/i],
-    });
-    this.languageModels.set('fa', {
-      name: 'Persian',
-      patterns: [/[\u0600-\u06FF]{2,}/],
-    });
+    for (const word of words) {
+      if (!this.stopWords.has(word) && word.length > 3) {
+        wordFreq[word] = (wordFreq[word] || 0) + 1;
+      }
+    }
+
+    return Object.entries(wordFreq)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, count)
+      .map(([word]) => word);
   }
 }
+
+export default NLPIntegration;

@@ -1,12 +1,235 @@
 /**
- * Auto-Scaling Manager
- * مدیر مقیاس‌پذیری خودکار برای مدیریت بار
- * 
- * Features:
- * - Load monitoring
- * - Scaling policies
- * - Resource allocation
- * - Predictive scaling
+ * Auto Scaling Manager
+ * Automatic resource scaling based on demand and performance metrics
  */
 
-export interface ScalingPolicy {\n  name: string;\n  metric: string;\n  threshold: number;\n  action: 'scale-up' | 'scale-down';\n  cooldown: number;\n}\n\nexport interface ScalingEvent {\n  id: string;\n  timestamp: number;\n  type: 'scale-up' | 'scale-down';\n  reason: string;\n  previousCapacity: number;\n  newCapacity: number;\n}\n\nexport interface LoadMetrics {\n  cpuUsage: number;\n  memoryUsage: number;\n  requestsPerSecond: number;\n  averageLatency: number;\n  errorRate: number;\n}\n\nexport class AutoScalingManager {\n  private policies: Map<string, ScalingPolicy>;\n  private scalingEvents: ScalingEvent[];\n  private currentCapacity: number;\n  private minCapacity: number;\n  private maxCapacity: number;\n  private stats: {\n    scaleUpEvents: number;\n    scaleDownEvents: number;\n    totalScalingTime: number;\n  };\n  private lastScalingTime: number;\n\n  constructor(minCapacity: number = 1, maxCapacity: number = 10) {\n    this.policies = new Map();\n    this.scalingEvents = [];\n    this.currentCapacity = minCapacity;\n    this.minCapacity = minCapacity;\n    this.maxCapacity = maxCapacity;\n    this.lastScalingTime = Date.now();\n    this.stats = {\n      scaleUpEvents: 0,\n      scaleDownEvents: 0,\n      totalScalingTime: 0,\n    };\n\n    this.registerDefaultPolicies();\n  }\n\n  /**\n   * Register default scaling policies\n   */\n  private registerDefaultPolicies(): void {\n    this.registerPolicy({\n      name: 'High CPU Usage',\n      metric: 'cpuUsage',\n      threshold: 80,\n      action: 'scale-up',\n      cooldown: 60000,\n    });\n\n    this.registerPolicy({\n      name: 'High Memory Usage',\n      metric: 'memoryUsage',\n      threshold: 85,\n      action: 'scale-up',\n      cooldown: 60000,\n    });\n\n    this.registerPolicy({\n      name: 'High Request Rate',\n      metric: 'requestsPerSecond',\n      threshold: 1000,\n      action: 'scale-up',\n      cooldown: 60000,\n    });\n\n    this.registerPolicy({\n      name: 'Low CPU Usage',\n      metric: 'cpuUsage',\n      threshold: 20,\n      action: 'scale-down',\n      cooldown: 300000,\n    });\n  }\n\n  /**\n   * Register scaling policy\n   */\n  public registerPolicy(policy: ScalingPolicy): void {\n    this.policies.set(policy.name, policy);\n  }\n\n  /**\n   * Evaluate metrics and trigger scaling\n   */\n  public evaluateMetrics(metrics: LoadMetrics): ScalingEvent | null {\n    const now = Date.now();\n\n    for (const policy of this.policies.values()) {\n      const metricValue = (metrics as any)[policy.metric];\n\n      if (metricValue === undefined) continue;\n\n      const shouldScale = policy.action === 'scale-up' \n        ? metricValue > policy.threshold \n        : metricValue < policy.threshold;\n\n      if (shouldScale && now - this.lastScalingTime > policy.cooldown) {\n        return this.executeScaling(policy, metrics);\n      }\n    }\n\n    return null;\n  }\n\n  /**\n   * Execute scaling action\n   */\n  private executeScaling(policy: ScalingPolicy, metrics: LoadMetrics): ScalingEvent {\n    const previousCapacity = this.currentCapacity;\n    let newCapacity = this.currentCapacity;\n\n    if (policy.action === 'scale-up') {\n      newCapacity = Math.min(this.currentCapacity + 2, this.maxCapacity);\n      this.stats.scaleUpEvents++;\n    } else {\n      newCapacity = Math.max(this.currentCapacity - 1, this.minCapacity);\n      this.stats.scaleDownEvents++;\n    }\n\n    this.currentCapacity = newCapacity;\n    this.lastScalingTime = Date.now();\n\n    const event: ScalingEvent = {\n      id: `scale-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,\n      timestamp: Date.now(),\n      type: policy.action,\n      reason: policy.name,\n      previousCapacity,\n      newCapacity,\n    };\n\n    this.scalingEvents.push(event);\n    this.stats.totalScalingTime += Date.now() - this.lastScalingTime;\n\n    return event;\n  }\n\n  /**\n   * Predict future scaling needs\n   */\n  public predictScaling(historicalMetrics: LoadMetrics[]): { predictedCapacity: number; confidence: number } {\n    if (historicalMetrics.length === 0) {\n      return { predictedCapacity: this.currentCapacity, confidence: 0 };\n    }\n\n    // Simple trend analysis\n    const avgCpu = historicalMetrics.reduce((sum, m) => sum + m.cpuUsage, 0) / historicalMetrics.length;\n    const avgMemory = historicalMetrics.reduce((sum, m) => sum + m.memoryUsage, 0) / historicalMetrics.length;\n    const avgRps = historicalMetrics.reduce((sum, m) => sum + m.requestsPerSecond, 0) / historicalMetrics.length;\n\n    let predictedCapacity = this.currentCapacity;\n    let confidence = 0.5;\n\n    if (avgCpu > 75 || avgMemory > 80 || avgRps > 900) {\n      predictedCapacity = Math.min(this.currentCapacity + 1, this.maxCapacity);\n      confidence = 0.8;\n    } else if (avgCpu < 30 && avgMemory < 40 && avgRps < 500) {\n      predictedCapacity = Math.max(this.currentCapacity - 1, this.minCapacity);\n      confidence = 0.7;\n    }\n\n    return { predictedCapacity, confidence };\n  }\n\n  /**\n   * Get current capacity\n   */\n  public getCurrentCapacity(): number {\n    return this.currentCapacity;\n  }\n\n  /**\n   * Get scaling history\n   */\n  public getScalingHistory(limit: number = 10): ScalingEvent[] {\n    return this.scalingEvents.slice(-limit);\n  }\n\n  /**\n   * Get statistics\n   */\n  public getStats() {\n    return {\n      ...this.stats,\n      currentCapacity: this.currentCapacity,\n      minCapacity: this.minCapacity,\n      maxCapacity: this.maxCapacity,\n      totalScalingEvents: this.scalingEvents.length,\n      averageScalingTime: this.stats.scaleUpEvents + this.stats.scaleDownEvents > 0 \n        ? this.stats.totalScalingTime / (this.stats.scaleUpEvents + this.stats.scaleDownEvents) \n        : 0,\n    };\n  }\n}\n
+export interface ScalingPolicy {
+  minInstances: number;
+  maxInstances: number;
+  targetCPU: number;
+  targetMemory: number;
+  scaleUpThreshold: number;
+  scaleDownThreshold: number;
+  cooldownPeriod: number;
+}
+
+export interface ResourceMetrics {
+  cpuUsage: number;
+  memoryUsage: number;
+  requestsPerSecond: number;
+  responseTime: number;
+  errorRate: number;
+}
+
+export interface ScalingEvent {
+  id: string;
+  timestamp: number;
+  type: 'scale-up' | 'scale-down';
+  fromInstances: number;
+  toInstances: number;
+  reason: string;
+  metrics: ResourceMetrics;
+}
+
+/**
+ * Auto Scaling Manager
+ * Manages automatic scaling of resources based on metrics
+ */
+export class AutoScalingManager {
+  private policy: ScalingPolicy;
+  private currentInstances: number;
+  private scalingEvents: ScalingEvent[] = [];
+  private metricsHistory: ResourceMetrics[] = [];
+  private lastScalingTime: number = 0;
+  private predictedLoad: number = 0;
+
+  constructor(policy: ScalingPolicy) {
+    this.policy = policy;
+    this.currentInstances = policy.minInstances;
+  }
+
+  /**
+   * Evaluate metrics and determine if scaling is needed
+   */
+  public evaluateMetrics(metrics: ResourceMetrics): ScalingEvent | null {
+    this.metricsHistory.push(metrics);
+
+    // Keep only last 100 metrics
+    if (this.metricsHistory.length > 100) {
+      this.metricsHistory.shift();
+    }
+
+    // Check if in cooldown period
+    if (Date.now() - this.lastScalingTime < this.policy.cooldownPeriod) {
+      return null;
+    }
+
+    // Calculate average metrics
+    const avgMetrics = this.calculateAverageMetrics();
+
+    // Determine if scaling is needed
+    const shouldScaleUp =
+      avgMetrics.cpuUsage > this.policy.scaleUpThreshold ||
+      avgMetrics.memoryUsage > this.policy.scaleUpThreshold ||
+      avgMetrics.requestsPerSecond > this.policy.targetCPU;
+
+    const shouldScaleDown =
+      avgMetrics.cpuUsage < this.policy.scaleDownThreshold &&
+      avgMetrics.memoryUsage < this.policy.scaleDownThreshold &&
+      avgMetrics.requestsPerSecond < this.policy.targetCPU * 0.5;
+
+    if (shouldScaleUp && this.currentInstances < this.policy.maxInstances) {
+      return this.scaleUp(metrics, 'High resource utilization');
+    }
+
+    if (shouldScaleDown && this.currentInstances > this.policy.minInstances) {
+      return this.scaleDown(metrics, 'Low resource utilization');
+    }
+
+    return null;
+  }
+
+  /**
+   * Scale up instances
+   */
+  private scaleUp(metrics: ResourceMetrics, reason: string): ScalingEvent {
+    const fromInstances = this.currentInstances;
+    const toInstances = Math.min(this.currentInstances + 1, this.policy.maxInstances);
+
+    this.currentInstances = toInstances;
+    this.lastScalingTime = Date.now();
+
+    const event: ScalingEvent = {
+      id: `scale-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      timestamp: Date.now(),
+      type: 'scale-up',
+      fromInstances,
+      toInstances,
+      reason,
+      metrics,
+    };
+
+    this.scalingEvents.push(event);
+    return event;
+  }
+
+  /**
+   * Scale down instances
+   */
+  private scaleDown(metrics: ResourceMetrics, reason: string): ScalingEvent {
+    const fromInstances = this.currentInstances;
+    const toInstances = Math.max(this.currentInstances - 1, this.policy.minInstances);
+
+    this.currentInstances = toInstances;
+    this.lastScalingTime = Date.now();
+
+    const event: ScalingEvent = {
+      id: `scale-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      timestamp: Date.now(),
+      type: 'scale-down',
+      fromInstances,
+      toInstances,
+      reason,
+      metrics,
+    };
+
+    this.scalingEvents.push(event);
+    return event;
+  }
+
+  /**
+   * Calculate average metrics
+   */
+  private calculateAverageMetrics(): ResourceMetrics {
+    if (this.metricsHistory.length === 0) {
+      return {
+        cpuUsage: 0,
+        memoryUsage: 0,
+        requestsPerSecond: 0,
+        responseTime: 0,
+        errorRate: 0,
+      };
+    }
+
+    const sum = this.metricsHistory.reduce(
+      (acc, m) => ({
+        cpuUsage: acc.cpuUsage + m.cpuUsage,
+        memoryUsage: acc.memoryUsage + m.memoryUsage,
+        requestsPerSecond: acc.requestsPerSecond + m.requestsPerSecond,
+        responseTime: acc.responseTime + m.responseTime,
+        errorRate: acc.errorRate + m.errorRate,
+      }),
+      {
+        cpuUsage: 0,
+        memoryUsage: 0,
+        requestsPerSecond: 0,
+        responseTime: 0,
+        errorRate: 0,
+      }
+    );
+
+    const count = this.metricsHistory.length;
+    return {
+      cpuUsage: sum.cpuUsage / count,
+      memoryUsage: sum.memoryUsage / count,
+      requestsPerSecond: sum.requestsPerSecond / count,
+      responseTime: sum.responseTime / count,
+      errorRate: sum.errorRate / count,
+    };
+  }
+
+  /**
+   * Predict future load
+   */
+  public predictLoad(hoursAhead: number = 1): number {
+    if (this.metricsHistory.length < 2) return this.currentInstances;
+
+    // Simple linear regression for prediction
+    const recent = this.metricsHistory.slice(-10);
+    const avgRps = recent.reduce((sum, m) => sum + m.requestsPerSecond, 0) / recent.length;
+
+    // Assume 10% growth per hour
+    this.predictedLoad = avgRps * Math.pow(1.1, hoursAhead);
+    return this.predictedLoad;
+  }
+
+  /**
+   * Get current instances
+   */
+  public getCurrentInstances(): number {
+    return this.currentInstances;
+  }
+
+  /**
+   * Get scaling events
+   */
+  public getScalingEvents(limit: number = 100): ScalingEvent[] {
+    return this.scalingEvents.slice(-limit);
+  }
+
+  /**
+   * Get scaling statistics
+   */
+  public getStatistics(): Record<string, unknown> {
+    const scaleUpCount = this.scalingEvents.filter((e) => e.type === 'scale-up').length;
+    const scaleDownCount = this.scalingEvents.filter((e) => e.type === 'scale-down').length;
+
+    return {
+      currentInstances: this.currentInstances,
+      minInstances: this.policy.minInstances,
+      maxInstances: this.policy.maxInstances,
+      totalScalingEvents: this.scalingEvents.length,
+      scaleUpCount,
+      scaleDownCount,
+      predictedLoad: this.predictedLoad,
+      averageMetrics: this.calculateAverageMetrics(),
+    };
+  }
+
+  /**
+   * Update scaling policy
+   */
+  public updatePolicy(policy: Partial<ScalingPolicy>): void {
+    this.policy = { ...this.policy, ...policy };
+  }
+}

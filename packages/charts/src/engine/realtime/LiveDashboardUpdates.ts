@@ -1,264 +1,289 @@
 /**
  * Live Dashboard Updates
- * Real-time dashboard updates with automatic refresh
- *
- * به روزرسانی های بلادرنگ داشبورد
- * به روزرسانی های بلادرنگ داشبورد با تازه سازی خودکار
+ * Real-time dashboard updates with automatic refresh and change detection
  */
 
-import { EventEmitter } from 'events';
-
-export interface DashboardWidget {
+export interface DashboardData {
   id: string;
-  type: string;
-  title: string;
-  data: any;
-  lastUpdated: number;
-  refreshInterval?: number;
-  autoRefresh?: boolean;
+  timestamp: Date;
+  values: Record<string, unknown>;
+  metadata?: Record<string, unknown>;
 }
 
 export interface DashboardUpdate {
-  widgetId: string;
-  data: any;
-  timestamp: number;
-  changeDetected: boolean;
+  id: string;
+  timestamp: Date;
+  changes: Record<string, { old: unknown; new: unknown }>;
+  type: 'update' | 'create' | 'delete';
 }
 
-export interface DashboardState {
-  widgets: Map<string, DashboardWidget>;
-  updateQueue: DashboardUpdate[];
+export interface UpdateBatch {
+  updates: DashboardUpdate[];
+  timestamp: Date;
   batchSize: number;
-  batchInterval: number;
 }
 
-export class LiveDashboardUpdates extends EventEmitter {
-  private widgets: Map<string, DashboardWidget> = new Map();
+/**
+ * LiveDashboardUpdates - Real-time dashboard updates
+ */
+export class LiveDashboardUpdates {
+  private dashboards: Map<string, DashboardData> = new Map();
+  private updateListeners: Map<string, Set<(update: DashboardUpdate) => void>> = new Map();
+  private batchListeners: Set<(batch: UpdateBatch) => void> = new Set();
+  private changeDetectors: Map<string, (old: unknown, new_: unknown) => boolean> = new Map();
   private updateQueue: DashboardUpdate[] = [];
-  private refreshTimers: Map<string, NodeJS.Timeout> = new Map();
   private batchTimer: NodeJS.Timeout | null = null;
-  private batchSize: number = 10;
-  private batchInterval: number = 100;
-  private changeDetectionEnabled: boolean = true;
+  private batchInterval: number = 100; // ms
 
-  constructor() {
-    super();
+  /**
+   * Register dashboard
+   */
+  registerDashboard(id: string, data: DashboardData): void {
+    this.dashboards.set(id, data);
   }
 
   /**
-   * Register widget
+   * Update dashboard data
    */
-  registerWidget(widget: DashboardWidget): void {
-    this.widgets.set(widget.id, {
-      ...widget,
-      lastUpdated: Date.now(),
-    });
-
-    if (widget.autoRefresh && widget.refreshInterval) {
-      this.setupAutoRefresh(widget.id, widget.refreshInterval);
+  updateDashboard(id: string, values: Record<string, unknown>): void {
+    const dashboard = this.dashboards.get(id);
+    if (!dashboard) {
+      throw new Error(`Dashboard ${id} not found`);
     }
 
-    this.emit('widget:registered', widget);
+    const changes: Record<string, { old: unknown; new: unknown }> = {};
+    let hasChanges = false;
+
+    for (const [key, newValue] of Object.entries(values)) {
+      const oldValue = dashboard.values[key];
+
+      if (this.hasChanged(key, oldValue, newValue)) {
+        changes[key] = { old: oldValue, new: newValue };
+        dashboard.values[key] = newValue;
+        hasChanges = true;
+      }
+    }
+
+    if (hasChanges) {
+      const update: DashboardUpdate = {
+        id: `${id}-${Date.now()}`,
+        timestamp: new Date(),
+        changes,
+        type: 'update',
+      };
+
+      this.queueUpdate(id, update);
+    }
+
+    dashboard.timestamp = new Date();
   }
 
   /**
-   * Update widget data
+   * Subscribe to dashboard updates
    */
-  updateWidget(widgetId: string, data: any): void {
-    const widget = this.widgets.get(widgetId);
-    if (!widget) throw new Error(`Widget ${widgetId} not found`);
+  subscribe(id: string, callback: (update: DashboardUpdate) => void): () => void {
+    if (!this.updateListeners.has(id)) {
+      this.updateListeners.set(id, new Set());
+    }
 
-    const changeDetected = this.changeDetectionEnabled && this.detectChange(widget.data, data);
+    this.updateListeners.get(id)!.add(callback);
 
-    const update: DashboardUpdate = {
-      widgetId,
-      data,
-      timestamp: Date.now(),
-      changeDetected,
+    return () => {
+      this.updateListeners.get(id)?.delete(callback);
+    };
+  }
+
+  /**
+   * Subscribe to batch updates
+   */
+  onBatch(callback: (batch: UpdateBatch) => void): () => void {
+    this.batchListeners.add(callback);
+
+    return () => {
+      this.batchListeners.delete(callback);
+    };
+  }
+
+  /**
+   * Register change detector
+   */
+  registerChangeDetector(key: string, detector: (old: unknown, new_: unknown) => boolean): void {
+    this.changeDetectors.set(key, detector);
+  }
+
+  /**
+   * Check if value has changed
+   */
+  private hasChanged(key: string, oldValue: unknown, newValue: unknown): boolean {
+    const detector = this.changeDetectors.get(key);
+
+    if (detector) {
+      return detector(oldValue, newValue);
+    }
+
+    // Default comparison
+    if (typeof oldValue === 'object' && typeof newValue === 'object') {
+      return JSON.stringify(oldValue) !== JSON.stringify(newValue);
+    }
+
+    return oldValue !== newValue;
+  }
+
+  /**
+   * Queue update
+   */
+  private queueUpdate(dashboardId: string, update: DashboardUpdate): void {
+    this.updateQueue.push(update);
+
+    // Notify immediate listeners
+    const listeners = this.updateListeners.get(dashboardId);
+    if (listeners) {
+      listeners.forEach((listener) => {
+        try {
+          listener(update);
+        } catch (error) {
+          console.error('Update listener error:', error);
+        }
+      });
+    }
+
+    // Schedule batch processing
+    if (!this.batchTimer) {
+      this.batchTimer = setTimeout(() => this.processBatch(), this.batchInterval);
+    }
+  }
+
+  /**
+   * Process batch
+   */
+  private processBatch(): void {
+    if (this.updateQueue.length === 0) {
+      this.batchTimer = null;
+      return;
+    }
+
+    const batch: UpdateBatch = {
+      updates: [...this.updateQueue],
+      timestamp: new Date(),
+      batchSize: this.updateQueue.length,
     };
 
-    widget.data = data;
-    widget.lastUpdated = Date.now();
-
-    this.updateQueue.push(update);
-    this.emit('widget:updated', update);
-
-    // Batch updates
-    if (this.updateQueue.length >= this.batchSize) {
-      this.flushUpdates();
-    } else if (!this.batchTimer) {
-      this.batchTimer = setTimeout(() => this.flushUpdates(), this.batchInterval);
-    }
-  }
-
-  /**
-   * Batch update multiple widgets
-   */
-  batchUpdate(updates: Array<{ widgetId: string; data: any }>): void {
-    for (const update of updates) {
-      this.updateWidget(update.widgetId, update.data);
-    }
-  }
-
-  /**
-   * Get widget data
-   */
-  getWidget(widgetId: string): DashboardWidget | null {
-    return this.widgets.get(widgetId) || null;
-  }
-
-  /**
-   * Get all widgets
-   */
-  getAllWidgets(): DashboardWidget[] {
-    return Array.from(this.widgets.values());
-  }
-
-  /**
-   * Remove widget
-   */
-  removeWidget(widgetId: string): void {
-    this.widgets.delete(widgetId);
-    this.stopAutoRefresh(widgetId);
-    this.emit('widget:removed', { widgetId });
-  }
-
-  /**
-   * Setup auto refresh
-   */
-  setupAutoRefresh(widgetId: string, interval: number): void {
-    this.stopAutoRefresh(widgetId);
-
-    const timer = setInterval(() => {
-      this.emit('widget:refresh-requested', { widgetId });
-    }, interval);
-
-    this.refreshTimers.set(widgetId, timer);
-  }
-
-  /**
-   * Stop auto refresh
-   */
-  stopAutoRefresh(widgetId: string): void {
-    const timer = this.refreshTimers.get(widgetId);
-    if (timer) {
-      clearInterval(timer);
-      this.refreshTimers.delete(widgetId);
-    }
-  }
-
-  /**
-   * Enable change detection
-   */
-  enableChangeDetection(enabled: boolean): void {
-    this.changeDetectionEnabled = enabled;
-  }
-
-  /**
-   * Detect data change
-   */
-  private detectChange(oldData: any, newData: any): boolean {
-    if (typeof oldData !== typeof newData) return true;
-
-    if (typeof oldData === 'object' && oldData !== null && newData !== null) {
-      const oldKeys = Object.keys(oldData);
-      const newKeys = Object.keys(newData);
-
-      if (oldKeys.length !== newKeys.length) return true;
-
-      for (const key of oldKeys) {
-        if (oldData[key] !== newData[key]) return true;
-      }
-
-      return false;
-    }
-
-    return oldData !== newData;
-  }
-
-  /**
-   * Flush update queue
-   */
-  private flushUpdates(): void {
-    if (this.batchTimer) {
-      clearTimeout(this.batchTimer);
-      this.batchTimer = null;
-    }
-
-    if (this.updateQueue.length === 0) return;
-
-    const updates = [...this.updateQueue];
     this.updateQueue = [];
 
-    this.emit('updates:flushed', {
-      count: updates.length,
-      timestamp: Date.now(),
-      updates,
+    // Notify batch listeners
+    this.batchListeners.forEach((listener) => {
+      try {
+        listener(batch);
+      } catch (error) {
+        console.error('Batch listener error:', error);
+      }
     });
+
+    this.batchTimer = null;
   }
 
   /**
-   * Set batch configuration
+   * Get dashboard data
    */
-  setBatchConfig(size: number, interval: number): void {
-    this.batchSize = size;
+  getDashboard(id: string): DashboardData | undefined {
+    return this.dashboards.get(id);
+  }
+
+  /**
+   * Get all dashboards
+   */
+  getAllDashboards(): DashboardData[] {
+    return Array.from(this.dashboards.values());
+  }
+
+  /**
+   * Set batch interval
+   */
+  setBatchInterval(interval: number): void {
     this.batchInterval = interval;
   }
 
   /**
-   * Get dashboard state
+   * Force batch processing
    */
-  getState(): {
-    widgetCount: number;
-    queuedUpdates: number;
-    activeRefreshes: number;
-  } {
-    return {
-      widgetCount: this.widgets.size,
-      queuedUpdates: this.updateQueue.length,
-      activeRefreshes: this.refreshTimers.size,
-    };
-  }
-
-  /**
-   * Clear all widgets
-   */
-  clearAll(): void {
-    this.widgets.clear();
-    this.updateQueue = [];
-    this.refreshTimers.forEach((timer) => clearInterval(timer));
-    this.refreshTimers.clear();
-
+  flushBatch(): UpdateBatch | null {
     if (this.batchTimer) {
       clearTimeout(this.batchTimer);
       this.batchTimer = null;
     }
 
-    this.emit('dashboard:cleared', {});
-  }
-
-  /**
-   * Get update history
-   */
-  getUpdateHistory(widgetId: string, limit: number = 10): DashboardUpdate[] {
-    // This would typically be stored separately
-    // For now, return empty array
-    return [];
-  }
-
-  /**
-   * Optimize rendering
-   */
-  optimizeRendering(widgetId: string): void {
-    const widget = this.widgets.get(widgetId);
-    if (!widget) return;
-
-    // Reduce refresh interval for better performance
-    if (widget.refreshInterval && widget.refreshInterval > 100) {
-      widget.refreshInterval = Math.max(100, widget.refreshInterval / 2);
-      this.setupAutoRefresh(widgetId, widget.refreshInterval);
+    if (this.updateQueue.length === 0) {
+      return null;
     }
 
-    this.emit('widget:optimized', { widgetId });
+    const batch: UpdateBatch = {
+      updates: [...this.updateQueue],
+      timestamp: new Date(),
+      batchSize: this.updateQueue.length,
+    };
+
+    this.updateQueue = [];
+
+    // Notify batch listeners
+    this.batchListeners.forEach((listener) => {
+      try {
+        listener(batch);
+      } catch (error) {
+        console.error('Batch listener error:', error);
+      }
+    });
+
+    return batch;
+  }
+
+  /**
+   * Get pending updates count
+   */
+  getPendingUpdatesCount(): number {
+    return this.updateQueue.length;
+  }
+
+  /**
+   * Clear dashboard
+   */
+  clearDashboard(id: string): void {
+    this.dashboards.delete(id);
+    this.updateListeners.delete(id);
+  }
+
+  /**
+   * Clear all dashboards
+   */
+  clearAll(): void {
+    this.dashboards.clear();
+    this.updateListeners.clear();
+    this.updateQueue = [];
+
+    if (this.batchTimer) {
+      clearTimeout(this.batchTimer);
+      this.batchTimer = null;
+    }
+  }
+
+  /**
+   * Get update statistics
+   */
+  getStatistics(): {
+    dashboardCount: number;
+    pendingUpdates: number;
+    listenerCount: number;
+  } {
+    let listenerCount = 0;
+    this.updateListeners.forEach((listeners) => {
+      listenerCount += listeners.size;
+    });
+
+    return {
+      dashboardCount: this.dashboards.size,
+      pendingUpdates: this.updateQueue.length,
+      listenerCount,
+    };
   }
 }
+
+export default LiveDashboardUpdates;

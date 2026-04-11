@@ -1,23 +1,21 @@
 /**
- * Advanced AI Model Management
- * Comprehensive AI model lifecycle management with versioning and deployment
- *
- * مدیریت پیشرفته مدل های هوش مصنوعی
- * مدیریت کامل چرخه حیات مدل با نسخه بندی و استقرار
+ * Advanced AI Model Management System
+ * Handles model versioning, deployment, A/B testing, and performance tracking
  */
-
-import { EventEmitter } from 'events';
 
 export interface AIModel {
   id: string;
   name: string;
   version: string;
-  type: 'regression' | 'classification' | 'clustering' | 'custom';
-  status: 'training' | 'deployed' | 'archived' | 'failed';
+  type: 'classification' | 'regression' | 'clustering' | 'nlp' | 'vision';
+  status: 'draft' | 'training' | 'deployed' | 'archived';
   accuracy: number;
+  precision: number;
+  recall: number;
+  f1Score: number;
   createdAt: Date;
   updatedAt: Date;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
 }
 
 export interface ModelVersion {
@@ -30,187 +28,143 @@ export interface ModelVersion {
     recall: number;
     f1Score: number;
   };
-  parameters: Record<string, any>;
+  parameters: Record<string, unknown>;
+  status: 'active' | 'inactive';
 }
 
 export interface ABTestConfig {
-  modelAId: string;
-  modelBId: string;
-  trafficSplit: number; // 0-100 for model A
-  duration: number;
+  modelA: string;
+  modelB: string;
+  splitRatio: number; // 0-1
+  duration: number; // milliseconds
   metrics: string[];
 }
 
-export class AIModelManager extends EventEmitter {
+export interface ModelPerformance {
+  modelId: string;
+  timestamp: Date;
+  predictions: number;
+  accuracy: number;
+  latency: number;
+  errors: number;
+}
+
+/**
+ * AIModelManager - Comprehensive AI model lifecycle management
+ */
+export class AIModelManager {
   private models: Map<string, AIModel> = new Map();
   private versions: Map<string, ModelVersion[]> = new Map();
   private abTests: Map<string, ABTestConfig> = new Map();
-  private deployedModel: string | null = null;
-
-  constructor() {
-    super();
-  }
+  private performance: ModelPerformance[] = [];
+  private activeModel: string | null = null;
 
   /**
-   * Create a new AI model
+   * Register a new AI model
    */
-  createModel(config: {
-    name: string;
-    type: AIModel['type'];
-    metadata?: Record<string, any>;
-  }): AIModel {
-    const model: AIModel = {
-      id: `model-${Date.now()}`,
-      name: config.name,
-      version: '1.0.0',
-      type: config.type,
-      status: 'training',
-      accuracy: 0,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      metadata: config.metadata || {},
-    };
-
+  registerModel(model: AIModel): void {
     this.models.set(model.id, model);
     this.versions.set(model.id, []);
-
-    this.emit('model:created', model);
-    return model;
   }
 
   /**
-   * Train a model
+   * Deploy a model version
    */
-  async trainModel(
+  deployModel(modelId: string, version: string): void {
+    const model = this.models.get(modelId);
+    if (!model) throw new Error(`Model ${modelId} not found`);
+
+    model.status = 'deployed';
+    model.version = version;
+    this.activeModel = modelId;
+  }
+
+  /**
+   * Create a new model version
+   */
+  createVersion(
     modelId: string,
-    trainingData: any[],
-    options?: {
-      epochs?: number;
-      batchSize?: number;
-      learningRate?: number;
-    }
-  ): Promise<AIModel> {
-    const model = this.models.get(modelId);
-    if (!model) throw new Error(`Model ${modelId} not found`);
-
-    model.status = 'training';
-    this.emit('model:training:started', { modelId, dataSize: trainingData.length });
-
-    try {
-      // Simulate training
-      const accuracy = Math.random() * 0.4 + 0.6; // 60-100%
-      model.accuracy = accuracy;
-      model.status = 'deployed';
-      model.updatedAt = new Date();
-
-      // Create version
-      this.createVersion(modelId, {
-        accuracy,
-        precision: accuracy * 0.95,
-        recall: accuracy * 0.92,
-        f1Score: accuracy * 0.93,
-      });
-
-      this.emit('model:training:completed', { modelId, accuracy });
-      return model;
-    } catch (error) {
-      model.status = 'failed';
-      this.emit('model:training:failed', { modelId, error });
-      throw error;
-    }
-  }
-
-  /**
-   * Create a model version
-   */
-  private createVersion(modelId: string, metrics: ModelVersion['metrics']): ModelVersion {
-    const model = this.models.get(modelId);
-    if (!model) throw new Error(`Model ${modelId} not found`);
-
-    const version: ModelVersion = {
-      version: model.version,
+    version: string,
+    metrics: ModelVersion['metrics'],
+    parameters: Record<string, unknown>
+  ): void {
+    const modelVersion: ModelVersion = {
+      version,
       modelId,
       timestamp: new Date(),
       metrics,
-      parameters: model.metadata,
+      parameters,
+      status: 'inactive',
     };
 
     const versions = this.versions.get(modelId) || [];
-    versions.push(version);
+    versions.push(modelVersion);
     this.versions.set(modelId, versions);
-
-    return version;
   }
 
   /**
-   * Deploy a model
+   * Setup A/B testing between two models
    */
-  deployModel(modelId: string): AIModel {
-    const model = this.models.get(modelId);
-    if (!model) throw new Error(`Model ${modelId} not found`);
-
-    this.deployedModel = modelId;
-    model.status = 'deployed';
-    model.updatedAt = new Date();
-
-    this.emit('model:deployed', model);
-    return model;
-  }
-
-  /**
-   * Setup A/B test
-   */
-  setupABTest(config: ABTestConfig): void {
+  setupABTest(config: ABTestConfig): string {
     const testId = `ab-test-${Date.now()}`;
     this.abTests.set(testId, config);
+    return testId;
+  }
 
-    this.emit('ab-test:started', {
-      testId,
-      modelA: config.modelAId,
-      modelB: config.modelBId,
-      split: config.trafficSplit,
+  /**
+   * Get model for A/B test
+   */
+  getABTestModel(testId: string): string {
+    const config = this.abTests.get(testId);
+    if (!config) throw new Error(`A/B test ${testId} not found`);
+
+    return Math.random() < config.splitRatio ? config.modelA : config.modelB;
+  }
+
+  /**
+   * Track model performance
+   */
+  trackPerformance(
+    modelId: string,
+    predictions: number,
+    accuracy: number,
+    latency: number,
+    errors: number
+  ): void {
+    this.performance.push({
+      modelId,
+      timestamp: new Date(),
+      predictions,
+      accuracy,
+      latency,
+      errors,
     });
   }
 
   /**
-   * Get A/B test results
+   * Get model performance metrics
    */
-  getABTestResults(testId: string): any {
-    const test = this.abTests.get(testId);
-    if (!test) throw new Error(`A/B test ${testId} not found`);
-
-    const modelA = this.models.get(test.modelAId);
-    const modelB = this.models.get(test.modelBId);
-
-    return {
-      testId,
-      modelA: modelA?.accuracy || 0,
-      modelB: modelB?.accuracy || 0,
-      winner: (modelA?.accuracy || 0) > (modelB?.accuracy || 0) ? test.modelAId : test.modelBId,
-      metrics: test.metrics,
-    };
+  getPerformanceMetrics(modelId: string, hours: number = 24): ModelPerformance[] {
+    const cutoff = new Date(Date.now() - hours * 60 * 60 * 1000);
+    return this.performance.filter((p) => p.modelId === modelId && p.timestamp > cutoff);
   }
 
   /**
-   * Get model performance
+   * Automatic model retraining trigger
    */
-  getModelPerformance(modelId: string): any {
-    const model = this.models.get(modelId);
-    if (!model) throw new Error(`Model ${modelId} not found`);
+  shouldRetrain(modelId: string, accuracyThreshold: number = 0.85): boolean {
+    const metrics = this.getPerformanceMetrics(modelId, 24);
+    if (metrics.length === 0) return false;
 
-    const versions = this.versions.get(modelId) || [];
-    const latestVersion = versions[versions.length - 1];
+    const avgAccuracy = metrics.reduce((sum, m) => sum + m.accuracy, 0) / metrics.length;
+    return avgAccuracy < accuracyThreshold;
+  }
 
-    return {
-      modelId,
-      name: model.name,
-      currentAccuracy: model.accuracy,
-      status: model.status,
-      latestMetrics: latestVersion?.metrics,
-      versionCount: versions.length,
-      createdAt: model.createdAt,
-      updatedAt: model.updatedAt,
-    };
+  /**
+   * Get model by ID
+   */
+  getModel(modelId: string): AIModel | undefined {
+    return this.models.get(modelId);
   }
 
   /**
@@ -221,45 +175,52 @@ export class AIModelManager extends EventEmitter {
   }
 
   /**
-   * Get deployed model
-   */
-  getDeployedModel(): AIModel | null {
-    if (!this.deployedModel) return null;
-    return this.models.get(this.deployedModel) || null;
-  }
-
-  /**
-   * Archive model
-   */
-  archiveModel(modelId: string): AIModel {
-    const model = this.models.get(modelId);
-    if (!model) throw new Error(`Model ${modelId} not found`);
-
-    model.status = 'archived';
-    model.updatedAt = new Date();
-
-    this.emit('model:archived', model);
-    return model;
-  }
-
-  /**
    * Get model versions
    */
-  getModelVersions(modelId: string): ModelVersion[] {
+  getVersions(modelId: string): ModelVersion[] {
     return this.versions.get(modelId) || [];
   }
 
   /**
-   * Rollback to previous version
+   * Archive a model
    */
-  rollbackModel(modelId: string, version: string): AIModel {
+  archiveModel(modelId: string): void {
     const model = this.models.get(modelId);
-    if (!model) throw new Error(`Model ${modelId} not found`);
+    if (model) {
+      model.status = 'archived';
+    }
+  }
 
-    model.version = version;
-    model.updatedAt = new Date();
+  /**
+   * Get active model
+   */
+  getActiveModel(): AIModel | undefined {
+    return this.activeModel ? this.models.get(this.activeModel) : undefined;
+  }
 
-    this.emit('model:rolled-back', { modelId, version });
-    return model;
+  /**
+   * Compare model versions
+   */
+  compareVersions(modelId: string, v1: string, v2: string): Record<string, unknown> {
+    const versions = this.versions.get(modelId) || [];
+    const version1 = versions.find((v) => v.version === v1);
+    const version2 = versions.find((v) => v.version === v2);
+
+    if (!version1 || !version2) {
+      throw new Error('One or both versions not found');
+    }
+
+    return {
+      version1: version1.metrics,
+      version2: version2.metrics,
+      improvement: {
+        accuracy: version2.metrics.accuracy - version1.metrics.accuracy,
+        precision: version2.metrics.precision - version1.metrics.precision,
+        recall: version2.metrics.recall - version1.metrics.recall,
+        f1Score: version2.metrics.f1Score - version1.metrics.f1Score,
+      },
+    };
   }
 }
+
+export default AIModelManager;

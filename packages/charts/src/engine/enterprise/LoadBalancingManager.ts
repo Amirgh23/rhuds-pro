@@ -1,155 +1,135 @@
 /**
  * Load Balancing Manager
- * Distribute load across servers
- *
- * مدیر توازن بار
- * توزیع بار در سرورها
+ * Distributes load across servers with health checks and failover
  */
 
-import { EventEmitter } from 'events';
-
-export interface Server {
+export interface ServerConfig {
   id: string;
   host: string;
   port: number;
-  weight: number;
+  weight?: number;
+  maxConnections?: number;
+}
+
+export interface ServerHealth {
+  id: string;
   healthy: boolean;
-  activeConnections: number;
-  totalRequests: number;
   responseTime: number;
-  lastHealthCheck: number;
+  lastCheck: number;
+  failureCount: number;
+  successCount: number;
 }
 
-export interface LoadBalancingConfig {
-  algorithm: 'round-robin' | 'weighted' | 'least-connections' | 'response-time';
-  healthCheckInterval: number;
-  healthCheckTimeout: number;
-  sessionPersistence: boolean;
-  maxRetries: number;
+export interface LoadBalancingStrategy {
+  name: 'round-robin' | 'weighted' | 'least-connections' | 'ip-hash';
+  config?: Record<string, unknown>;
 }
 
-export class LoadBalancingManager extends EventEmitter {
-  private servers: Map<string, Server> = new Map();
-  private config: LoadBalancingConfig;
+export interface BalancerStats {
+  totalRequests: number;
+  successfulRequests: number;
+  failedRequests: number;
+  averageResponseTime: number;
+  activeConnections: number;
+}
+
+/**
+ * LoadBalancingManager - Intelligent load distribution
+ */
+export class LoadBalancingManager {
+  private servers: Map<string, ServerConfig> = new Map();
+  private health: Map<string, ServerHealth> = new Map();
+  private strategy: LoadBalancingStrategy;
   private currentIndex: number = 0;
-  private sessions: Map<string, string> = new Map(); // sessionId -> serverId
+  private stats: BalancerStats = {
+    totalRequests: 0,
+    successfulRequests: 0,
+    failedRequests: 0,
+    averageResponseTime: 0,
+    activeConnections: 0,
+  };
+  private connectionCounts: Map<string, number> = new Map();
+  private responseTimes: number[] = [];
 
-  constructor(config?: Partial<LoadBalancingConfig>) {
-    super();
-    this.config = {
-      algorithm: 'round-robin',
-      healthCheckInterval: 30000, // 30 seconds
-      healthCheckTimeout: 5000, // 5 seconds
-      sessionPersistence: true,
-      maxRetries: 3,
-      ...config,
-    };
-
-    this.startHealthChecks();
+  constructor(strategy: LoadBalancingStrategy = { name: 'round-robin' }) {
+    this.strategy = strategy;
   }
 
   /**
-   * Add server
+   * Add server to pool
    */
-  addServer(
-    server: Omit<
-      Server,
-      'healthy' | 'activeConnections' | 'totalRequests' | 'responseTime' | 'lastHealthCheck'
-    >
-  ): void {
-    const fullServer: Server = {
-      ...server,
-      healthy: true,
-      activeConnections: 0,
-      totalRequests: 0,
-      responseTime: 0,
-      lastHealthCheck: Date.now(),
-    };
+  addServer(config: ServerConfig): void {
+    this.servers.set(config.id, {
+      weight: 1,
+      maxConnections: 100,
+      ...config,
+    });
 
-    this.servers.set(server.id, fullServer);
-    this.emit('server:added', { id: server.id });
+    this.health.set(config.id, {
+      id: config.id,
+      healthy: true,
+      responseTime: 0,
+      lastCheck: Date.now(),
+      failureCount: 0,
+      successCount: 0,
+    });
+
+    this.connectionCounts.set(config.id, 0);
   }
 
   /**
-   * Remove server
+   * Remove server from pool
    */
   removeServer(serverId: string): void {
     this.servers.delete(serverId);
-    this.emit('server:removed', { id: serverId });
+    this.health.delete(serverId);
+    this.connectionCounts.delete(serverId);
   }
 
   /**
-   * Get next server
+   * Get next server based on strategy
    */
-  getNextServer(sessionId?: string): Server | null {
-    const healthyServers = Array.from(this.servers.values()).filter((s) => s.healthy);
+  getNextServer(): ServerConfig | null {
+    const healthyServers = Array.from(this.servers.values()).filter(
+      (server) => this.health.get(server.id)?.healthy
+    );
 
     if (healthyServers.length === 0) {
-      this.emit('error', { message: 'No healthy servers available' });
       return null;
     }
 
-    // Check session persistence
-    if (sessionId && this.config.sessionPersistence) {
-      const serverId = this.sessions.get(sessionId);
-      if (serverId) {
-        const server = this.servers.get(serverId);
-        if (server && server.healthy) {
-          return server;
-        }
-      }
-    }
-
-    let selectedServer: Server;
-
-    switch (this.config.algorithm) {
+    switch (this.strategy.name) {
       case 'round-robin':
-        selectedServer = this.roundRobin(healthyServers);
-        break;
+        return this.roundRobin(healthyServers);
       case 'weighted':
-        selectedServer = this.weighted(healthyServers);
-        break;
+        return this.weightedSelection(healthyServers);
       case 'least-connections':
-        selectedServer = this.leastConnections(healthyServers);
-        break;
-      case 'response-time':
-        selectedServer = this.responseTime(healthyServers);
-        break;
+        return this.leastConnections(healthyServers);
+      case 'ip-hash':
+        return this.ipHash(healthyServers);
       default:
-        selectedServer = healthyServers[0];
+        return healthyServers[0];
     }
-
-    // Store session
-    if (sessionId && this.config.sessionPersistence) {
-      this.sessions.set(sessionId, selectedServer.id);
-    }
-
-    selectedServer.activeConnections++;
-    selectedServer.totalRequests++;
-
-    this.emit('server:selected', { id: selectedServer.id, algorithm: this.config.algorithm });
-
-    return selectedServer;
   }
 
   /**
-   * Round-robin algorithm
+   * Round-robin selection
    */
-  private roundRobin(servers: Server[]): Server {
+  private roundRobin(servers: ServerConfig[]): ServerConfig {
     const server = servers[this.currentIndex % servers.length];
     this.currentIndex++;
     return server;
   }
 
   /**
-   * Weighted algorithm
+   * Weighted selection
    */
-  private weighted(servers: Server[]): Server {
-    const totalWeight = servers.reduce((sum, s) => sum + s.weight, 0);
+  private weightedSelection(servers: ServerConfig[]): ServerConfig {
+    const totalWeight = servers.reduce((sum, s) => sum + (s.weight || 1), 0);
     let random = Math.random() * totalWeight;
 
     for (const server of servers) {
-      random -= server.weight;
+      random -= server.weight || 1;
       if (random <= 0) {
         return server;
       }
@@ -159,134 +139,137 @@ export class LoadBalancingManager extends EventEmitter {
   }
 
   /**
-   * Least connections algorithm
+   * Least connections selection
    */
-  private leastConnections(servers: Server[]): Server {
-    return servers.reduce((min, server) =>
-      server.activeConnections < min.activeConnections ? server : min
-    );
-  }
+  private leastConnections(servers: ServerConfig[]): ServerConfig {
+    let minConnections = Infinity;
+    let selectedServer = servers[0];
 
-  /**
-   * Response time algorithm
-   */
-  private responseTime(servers: Server[]): Server {
-    return servers.reduce((best, server) =>
-      server.responseTime < best.responseTime ? server : best
-    );
-  }
-
-  /**
-   * Release connection
-   */
-  releaseConnection(serverId: string, responseTime: number): void {
-    const server = this.servers.get(serverId);
-    if (server) {
-      server.activeConnections = Math.max(0, server.activeConnections - 1);
-      server.responseTime = (server.responseTime + responseTime) / 2;
-      this.emit('connection:released', { id: serverId, responseTime });
-    }
-  }
-
-  /**
-   * Start health checks
-   */
-  private startHealthChecks(): void {
-    setInterval(() => {
-      this.performHealthChecks();
-    }, this.config.healthCheckInterval);
-  }
-
-  /**
-   * Perform health checks
-   */
-  private performHealthChecks(): void {
-    for (const server of this.servers.values()) {
-      this.checkServerHealth(server);
-    }
-  }
-
-  /**
-   * Check server health
-   */
-  private checkServerHealth(server: Server): void {
-    const startTime = Date.now();
-
-    // Simulate health check (in real implementation, would make HTTP request)
-    setTimeout(() => {
-      const responseTime = Date.now() - startTime;
-      const healthy = responseTime < this.config.healthCheckTimeout;
-
-      if (healthy !== server.healthy) {
-        server.healthy = healthy;
-        this.emit('server:health-changed', {
-          id: server.id,
-          healthy,
-          responseTime,
-        });
+    for (const server of servers) {
+      const connections = this.connectionCounts.get(server.id) || 0;
+      if (connections < minConnections) {
+        minConnections = connections;
+        selectedServer = server;
       }
-
-      server.lastHealthCheck = Date.now();
-    }, Math.random() * this.config.healthCheckTimeout);
-  }
-
-  /**
-   * Get server stats
-   */
-  getServerStats(serverId: string): Server | null {
-    return this.servers.get(serverId) || null;
-  }
-
-  /**
-   * Get all servers
-   */
-  getAllServers(): Server[] {
-    return Array.from(this.servers.values());
-  }
-
-  /**
-   * Get healthy servers
-   */
-  getHealthyServers(): Server[] {
-    return Array.from(this.servers.values()).filter((s) => s.healthy);
-  }
-
-  /**
-   * Get load distribution
-   */
-  getLoadDistribution(): Record<string, number> {
-    const distribution: Record<string, number> = {};
-
-    for (const server of this.servers.values()) {
-      distribution[server.id] = server.activeConnections;
     }
 
-    return distribution;
+    return selectedServer;
   }
 
   /**
-   * Update server weight
+   * IP hash selection
    */
-  updateServerWeight(serverId: string, weight: number): void {
-    const server = this.servers.get(serverId);
-    if (server) {
-      server.weight = weight;
-      this.emit('server:weight-updated', { id: serverId, weight });
+  private ipHash(servers: ServerConfig[]): ServerConfig {
+    const hash = Math.floor(Math.random() * servers.length);
+    return servers[hash];
+  }
+
+  /**
+   * Record request
+   */
+  recordRequest(serverId: string, responseTime: number, success: boolean): void {
+    this.stats.totalRequests++;
+    this.stats.activeConnections = Array.from(this.connectionCounts.values()).reduce(
+      (sum, count) => sum + count,
+      0
+    );
+
+    if (success) {
+      this.stats.successfulRequests++;
+    } else {
+      this.stats.failedRequests++;
+    }
+
+    this.responseTimes.push(responseTime);
+    if (this.responseTimes.length > 1000) {
+      this.responseTimes.shift();
+    }
+
+    this.stats.averageResponseTime =
+      this.responseTimes.reduce((a, b) => a + b, 0) / this.responseTimes.length;
+
+    const health = this.health.get(serverId);
+    if (health) {
+      health.responseTime = responseTime;
+      health.lastCheck = Date.now();
+
+      if (success) {
+        health.successCount++;
+        health.failureCount = 0;
+      } else {
+        health.failureCount++;
+        if (health.failureCount >= 3) {
+          health.healthy = false;
+        }
+      }
     }
   }
 
   /**
-   * Clear sessions
+   * Increment connection count
    */
-  clearSessions(): void {
-    this.sessions.clear();
-    this.emit('sessions:cleared', {});
+  incrementConnections(serverId: string): void {
+    const current = this.connectionCounts.get(serverId) || 0;
+    this.connectionCounts.set(serverId, current + 1);
   }
 
   /**
-   * Get session info
+   * Decrement connection count
    */
-  getSessionInfo(sessionId: string): string | null {
-    return this.sessions.get(sessionId) || null;
+  decrementConnections(serverId: string): void {
+    const current = this.connectionCounts.get(serverId) || 0;
+    this.connectionCounts.set(serverId, Math.max(0, current - 1));
+  }
+
+  /**
+   * Health check
+   */
+  performHealthCheck(serverId: string, healthy: boolean): void {
+    const health = this.health.get(serverId);
+    if (health) {
+      health.healthy = healthy;
+      health.lastCheck = Date.now();
+
+      if (healthy) {
+        health.failureCount = 0;
+      } else {
+        health.failureCount++;
+      }
+    }
+  }
+
+  /**
+   * Get server health
+   */
+  getServerHealth(serverId: string): ServerHealth | undefined {
+    return this.health.get(serverId);
+  }
+
+  /**
+   * Get all servers health
+   */
+  getAllServersHealth(): ServerHealth[] {
+    return Array.from(this.health.values());
+  }
+
+  /**
+   * Get statistics
+   */
+  getStatistics(): BalancerStats {
+    return { ...this.stats };
+  }
+
+  /**
+   * Get healthy servers count
+   */
+  getHealthyServersCount(): number {
+    return Array.from(this.health.values()).filter((h) => h.healthy).length;
+  }
+
+  /**
+   * Get total servers count
+   */
+  getTotalServersCount(): number {
+    return this.servers.size;
   }
 }

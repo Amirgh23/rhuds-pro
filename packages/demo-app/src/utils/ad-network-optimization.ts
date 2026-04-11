@@ -41,6 +41,16 @@ export interface AdResponse {
 }
 
 /**
+ * Ad data from API response
+ */
+export interface AdData {
+  html: string;
+  impressions?: number;
+  clicks?: number;
+  ctr?: number;
+}
+
+/**
  * Ad Network Optimization Manager
  */
 export class AdNetworkOptimizationManager {
@@ -233,7 +243,7 @@ export class AdNetworkOptimizationManager {
       const loadTime = performance.now() - startTime;
 
       // Process responses
-      data.ads.forEach((ad: any, index: number) => {
+      data.ads.forEach((ad: AdData, index: number) => {
         const request = batch[index];
         const adResponse: AdResponse = {
           id: request.id,

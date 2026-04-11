@@ -1,5 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, DependencyList } from 'react';
 
+/**
+ * Return type for useAsync hook
+ * @template T - The type of data returned by the async function
+ */
 export interface UseAsyncReturn<T> {
   data: T | null;
   loading: boolean;
@@ -7,9 +11,16 @@ export interface UseAsyncReturn<T> {
   execute: () => Promise<void>;
 }
 
+/**
+ * Hook for handling async operations
+ * @template T - The type of data returned by the async function
+ * @param asyncFunction - The async function to execute
+ * @param dependencies - Dependency list for the effect (default: [])
+ * @returns Object containing data, loading state, error, and execute function
+ */
 export function useAsync<T>(
   asyncFunction: () => Promise<T>,
-  dependencies: any[] = []
+  dependencies: DependencyList = []
 ): UseAsyncReturn<T> {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);

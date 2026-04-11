@@ -1,458 +1,300 @@
 /**
  * Anomaly Detection System
- * Detect unusual patterns in data with multiple algorithms
- *
- * سیستم تشخیص ناهنجاری
- * تشخیص الگوهای غیرعادی در داده ها با الگوریتم های متعدد
+ * Detect unusual patterns in data using statistical and ML methods
  */
 
-import { EventEmitter } from 'events';
-
 export interface AnomalyScore {
-  timestamp: number;
+  timestamp: Date;
   value: number;
   anomalyScore: number;
   isAnomaly: boolean;
-  method: string;
-  confidence: number;
+  severity: 'low' | 'medium' | 'high' | 'critical';
 }
 
 export interface AnomalyAlert {
   id: string;
-  timestamp: number;
+  timestamp: Date;
+  anomalyScore: number;
   severity: 'low' | 'medium' | 'high' | 'critical';
   message: string;
-  anomalyScore: number;
+  rootCause?: string;
   suggestedAction?: string;
 }
 
-export interface RootCauseAnalysis {
-  anomalyId: string;
-  possibleCauses: Array<{
-    cause: string;
-    probability: number;
-    evidence: string[];
-  }>;
-  recommendations: string[];
-}
-
 export interface AnomalyPattern {
-  id: string;
   type: 'spike' | 'dip' | 'trend' | 'seasonal' | 'outlier';
-  startTime: number;
-  endTime: number;
+  startTime: Date;
+  endTime: Date;
   severity: number;
   description: string;
 }
 
-export class AnomalyDetectionSystem extends EventEmitter {
-  private dataStreams: Map<string, number[]> = new Map();
-  private baselineModels: Map<string, any> = new Map();
-  private anomalyThresholds: Map<string, number> = new Map();
-  private detectedAnomalies: Map<string, AnomalyScore[]> = new Map();
-  private alerts: Map<string, AnomalyAlert[]> = new Map();
-  private patterns: Map<string, AnomalyPattern[]> = new Map();
-
-  constructor() {
-    super();
-  }
+/**
+ * AnomalyDetectionSystem - Detect unusual patterns in data
+ */
+export class AnomalyDetectionSystem {
+  private baselineWindow: number = 30; // days
+  private sensitivityThreshold: number = 2.5; // standard deviations
+  private alerts: AnomalyAlert[] = [];
 
   /**
-   * Add data point to stream
+   * Detect anomalies using statistical methods
    */
-  addDataPoint(streamId: string, value: number, timestamp: number = Date.now()): void {
-    const stream = this.dataStreams.get(streamId) || [];
-    stream.push(value);
+  detectStatisticalAnomalies(
+    data: Array<{ timestamp: Date; value: number }>,
+    threshold: number = 2.5
+  ): AnomalyScore[] {
+    if (data.length < 2) return [];
 
-    // Keep only last 1000 points
-    if (stream.length > 1000) {
-      stream.shift();
-    }
+    const values = data.map((d) => d.value);
+    const mean = values.reduce((a, b) => a + b, 0) / values.length;
+    const variance = values.reduce((sum, x) => sum + (x - mean) ** 2, 0) / values.length;
+    const stdDev = Math.sqrt(variance);
 
-    this.dataStreams.set(streamId, stream);
-    this.emit('data:added', { streamId, value, timestamp });
-  }
+    return data.map((d, index) => {
+      const zscore = (d.value - mean) / stdDev;
+      const anomalyScore = Math.abs(zscore);
+      const isAnomaly = anomalyScore > threshold;
 
-  /**
-   * Detect anomalies using statistical method (Z-score)
-   */
-  detectAnomaliesStatistical(streamId: string, threshold: number = 3): AnomalyScore[] {
-    const data = this.dataStreams.get(streamId);
-    if (!data || data.length < 2) {
-      throw new Error(`Stream ${streamId} not found or insufficient data`);
-    }
+      let severity: 'low' | 'medium' | 'high' | 'critical' = 'low';
+      if (anomalyScore > 4) severity = 'critical';
+      else if (anomalyScore > 3) severity = 'high';
+      else if (anomalyScore > 2) severity = 'medium';
 
-    const mean = data.reduce((sum, v) => sum + v, 0) / data.length;
-    const variance = data.reduce((sum, v) => sum + Math.pow(v - mean, 2), 0) / data.length;
-    const std = Math.sqrt(variance);
-
-    const anomalies: AnomalyScore[] = [];
-    const timestamp = Date.now();
-
-    for (let i = 0; i < data.length; i++) {
-      const zScore = std > 0 ? Math.abs((data[i] - mean) / std) : 0;
-      const isAnomaly = zScore > threshold;
-
-      anomalies.push({
-        timestamp: timestamp - (data.length - i) * 1000,
-        value: data[i],
-        anomalyScore: Math.min(1, zScore / threshold),
+      return {
+        timestamp: d.timestamp,
+        value: d.value,
+        anomalyScore,
         isAnomaly,
-        method: 'z-score',
-        confidence: Math.min(1, zScore / (threshold * 2)),
-      });
-    }
-
-    this.detectedAnomalies.set(streamId, anomalies);
-    this.emit('anomalies:detected', {
-      streamId,
-      method: 'statistical',
-      count: anomalies.filter((a) => a.isAnomaly).length,
+        severity,
+      };
     });
-
-    return anomalies;
   }
 
   /**
-   * Detect anomalies using Isolation Forest method
+   * Detect anomalies using isolation forest algorithm
    */
-  detectAnomaliesIsolationForest(streamId: string, contamination: number = 0.1): AnomalyScore[] {
-    const data = this.dataStreams.get(streamId);
-    if (!data || data.length < 2) {
-      throw new Error(`Stream ${streamId} not found or insufficient data`);
-    }
+  detectIsolationForestAnomalies(
+    data: number[][],
+    contamination: number = 0.1
+  ): Array<{ index: number; anomalyScore: number; isAnomaly: boolean }> {
+    if (data.length === 0) return [];
 
-    const anomalies: AnomalyScore[] = [];
-    const timestamp = Date.now();
-    const threshold = 1 - contamination;
-
-    // Simplified Isolation Forest
-    const sorted = [...data].sort((a, b) => a - b);
-    const q1 = sorted[Math.floor(sorted.length * 0.25)];
-    const q3 = sorted[Math.floor(sorted.length * 0.75)];
-    const iqr = q3 - q1;
-    const lowerBound = q1 - 1.5 * iqr;
-    const upperBound = q3 + 1.5 * iqr;
-
-    for (let i = 0; i < data.length; i++) {
-      const value = data[i];
+    const results = data.map((point, index) => {
+      // Simplified isolation forest scoring
       let anomalyScore = 0;
 
-      if (value < lowerBound || value > upperBound) {
-        anomalyScore = Math.min(
-          1,
-          Math.abs(value - (value < lowerBound ? lowerBound : upperBound)) / (iqr || 1)
-        );
+      // Calculate distance to nearest neighbors
+      let minDistance = Infinity;
+      for (let i = 0; i < data.length; i++) {
+        if (i === index) continue;
+
+        const distance = Math.sqrt(point.reduce((sum, val, j) => sum + (val - data[i][j]) ** 2, 0));
+        minDistance = Math.min(minDistance, distance);
       }
 
-      anomalies.push({
-        timestamp: timestamp - (data.length - i) * 1000,
-        value,
-        anomalyScore,
-        isAnomaly: anomalyScore > threshold,
-        method: 'isolation-forest',
-        confidence: anomalyScore,
-      });
-    }
+      anomalyScore = 1 / (1 + minDistance);
 
-    this.emit('anomalies:detected', {
-      streamId,
-      method: 'isolation-forest',
-      count: anomalies.filter((a) => a.isAnomaly).length,
+      return {
+        index,
+        anomalyScore,
+        isAnomaly: anomalyScore > 1 - contamination,
+      };
     });
 
-    return anomalies;
+    return results;
   }
 
   /**
-   * Detect anomalies using LSTM-based method
+   * Detect time series anomalies
    */
-  detectAnomaliesLSTM(
-    streamId: string,
-    windowSize: number = 10,
-    threshold: number = 0.7
+  detectTimeSeriesAnomalies(
+    data: Array<{ timestamp: Date; value: number }>,
+    windowSize: number = 7
   ): AnomalyScore[] {
-    const data = this.dataStreams.get(streamId);
-    if (!data || data.length < windowSize) {
-      throw new Error(`Stream ${streamId} not found or insufficient data`);
+    if (data.length < windowSize) {
+      return this.detectStatisticalAnomalies(data);
     }
 
-    const anomalies: AnomalyScore[] = [];
-    const timestamp = Date.now();
+    const results: AnomalyScore[] = [];
 
-    // Simplified LSTM-like anomaly detection using moving average
     for (let i = windowSize; i < data.length; i++) {
-      const window = data.slice(i - windowSize, i);
-      const predicted = window.reduce((sum, v) => sum + v, 0) / windowSize;
-      const actual = data[i];
-      const error = Math.abs(actual - predicted) / (Math.abs(predicted) || 1);
-      const anomalyScore = Math.min(1, error);
+      const window = data.slice(i - windowSize, i).map((d) => d.value);
+      const current = data[i].value;
 
-      anomalies.push({
-        timestamp: timestamp - (data.length - i) * 1000,
-        value: actual,
+      const mean = window.reduce((a, b) => a + b, 0) / window.length;
+      const variance = window.reduce((sum, x) => sum + (x - mean) ** 2, 0) / window.length;
+      const stdDev = Math.sqrt(variance);
+
+      const zscore = (current - mean) / stdDev;
+      const anomalyScore = Math.abs(zscore);
+      const isAnomaly = anomalyScore > this.sensitivityThreshold;
+
+      let severity: 'low' | 'medium' | 'high' | 'critical' = 'low';
+      if (anomalyScore > 4) severity = 'critical';
+      else if (anomalyScore > 3) severity = 'high';
+      else if (anomalyScore > 2) severity = 'medium';
+
+      results.push({
+        timestamp: data[i].timestamp,
+        value: current,
         anomalyScore,
-        isAnomaly: anomalyScore > threshold,
-        method: 'lstm',
-        confidence: anomalyScore,
+        isAnomaly,
+        severity,
       });
     }
 
-    this.emit('anomalies:detected', {
-      streamId,
-      method: 'lstm',
-      count: anomalies.filter((a) => a.isAnomaly).length,
-    });
-
-    return anomalies;
+    return results;
   }
 
   /**
-   * Generate alert for anomaly
+   * Detect pattern anomalies
    */
-  generateAlert(streamId: string, anomaly: AnomalyScore): AnomalyAlert {
-    const severity = this.calculateSeverity(anomaly.anomalyScore);
-    const alert: AnomalyAlert = {
-      id: `alert-${Date.now()}`,
-      timestamp: anomaly.timestamp,
-      severity,
-      message: `Anomaly detected in ${streamId}: ${anomaly.method} score ${(anomaly.anomalyScore * 100).toFixed(1)}%`,
-      anomalyScore: anomaly.anomalyScore,
-      suggestedAction: this.getSuggestedAction(severity),
-    };
+  detectPatternAnomalies(data: Array<{ timestamp: Date; value: number }>): AnomalyPattern[] {
+    const patterns: AnomalyPattern[] = [];
+    const values = data.map((d) => d.value);
 
-    const alerts = this.alerts.get(streamId) || [];
-    alerts.push(alert);
-    this.alerts.set(streamId, alerts);
+    // Detect spikes
+    for (let i = 1; i < values.length - 1; i++) {
+      const prev = values[i - 1];
+      const current = values[i];
+      const next = values[i + 1];
 
-    this.emit('alert:generated', {
-      alertId: alert.id,
-      severity,
-      streamId,
-    });
-
-    return alert;
-  }
-
-  /**
-   * Analyze root cause of anomaly
-   */
-  analyzeRootCause(anomalyId: string, streamId: string): RootCauseAnalysis {
-    const data = this.dataStreams.get(streamId);
-    if (!data || data.length < 2) {
-      throw new Error(`Stream ${streamId} not found`);
-    }
-
-    const possibleCauses = [];
-
-    // Check for sudden spike
-    if (data.length >= 2) {
-      const recent = data[data.length - 1];
-      const previous = data[data.length - 2];
-      const change = Math.abs(recent - previous) / (Math.abs(previous) || 1);
+      const change = Math.abs(current - prev) / Math.max(Math.abs(prev), 1);
 
       if (change > 0.5) {
-        possibleCauses.push({
-          cause: 'Sudden spike or drop',
-          probability: 0.8,
-          evidence: [`Change of ${(change * 100).toFixed(1)}%`],
+        patterns.push({
+          type: current > prev ? 'spike' : 'dip',
+          startTime: data[i - 1].timestamp,
+          endTime: data[i + 1].timestamp,
+          severity: Math.min(1, change),
+          description: `${current > prev ? 'Spike' : 'Dip'} detected: ${change.toFixed(2)}x change`,
         });
       }
     }
 
-    // Check for trend change
-    if (data.length >= 5) {
-      const recent = data.slice(-5);
-      const previous = data.slice(-10, -5);
+    // Detect trends
+    if (values.length > 5) {
+      const firstHalf = values.slice(0, Math.floor(values.length / 2));
+      const secondHalf = values.slice(Math.floor(values.length / 2));
 
-      const recentTrend = recent[recent.length - 1] - recent[0];
-      const previousTrend = previous[previous.length - 1] - previous[0];
+      const firstMean = firstHalf.reduce((a, b) => a + b, 0) / firstHalf.length;
+      const secondMean = secondHalf.reduce((a, b) => a + b, 0) / secondHalf.length;
 
-      if (Math.sign(recentTrend) !== Math.sign(previousTrend)) {
-        possibleCauses.push({
-          cause: 'Trend reversal',
-          probability: 0.6,
-          evidence: ['Direction changed'],
+      const trendChange = Math.abs(secondMean - firstMean) / Math.max(firstMean, 1);
+
+      if (trendChange > 0.3) {
+        patterns.push({
+          type: 'trend',
+          startTime: data[0].timestamp,
+          endTime: data[data.length - 1].timestamp,
+          severity: Math.min(1, trendChange),
+          description: `Trend change detected: ${trendChange.toFixed(2)}x`,
         });
       }
     }
-
-    // Check for seasonal anomaly
-    possibleCauses.push({
-      cause: 'Seasonal variation',
-      probability: 0.4,
-      evidence: ['Pattern differs from historical data'],
-    });
-
-    // Check for external factors
-    possibleCauses.push({
-      cause: 'External event or system change',
-      probability: 0.3,
-      evidence: ['Unusual behavior detected'],
-    });
-
-    const analysis: RootCauseAnalysis = {
-      anomalyId,
-      possibleCauses: possibleCauses.sort((a, b) => b.probability - a.probability),
-      recommendations: [
-        'Investigate the most probable cause',
-        'Check system logs and metrics',
-        'Review recent changes or deployments',
-        'Monitor for similar patterns',
-      ],
-    };
-
-    this.emit('root-cause:analyzed', {
-      anomalyId,
-      topCause: possibleCauses[0]?.cause,
-    });
-
-    return analysis;
-  }
-
-  /**
-   * Detect patterns in anomalies
-   */
-  detectPatterns(streamId: string): AnomalyPattern[] {
-    const anomalies = this.detectedAnomalies.get(streamId) || [];
-    const patterns: AnomalyPattern[] = [];
-
-    if (anomalies.length === 0) return patterns;
-
-    let currentPattern: AnomalyPattern | null = null;
-
-    for (let i = 0; i < anomalies.length; i++) {
-      const anomaly = anomalies[i];
-
-      if (anomaly.isAnomaly) {
-        if (!currentPattern) {
-          currentPattern = {
-            id: `pattern-${Date.now()}-${i}`,
-            type: this.classifyAnomalyType(anomaly.value, anomalies[i - 1]?.value),
-            startTime: anomaly.timestamp,
-            endTime: anomaly.timestamp,
-            severity: anomaly.anomalyScore,
-            description: '',
-          };
-        } else {
-          currentPattern.endTime = anomaly.timestamp;
-          currentPattern.severity = Math.max(currentPattern.severity, anomaly.anomalyScore);
-        }
-      } else if (currentPattern) {
-        currentPattern.description = `${currentPattern.type} anomaly detected`;
-        patterns.push(currentPattern);
-        currentPattern = null;
-      }
-    }
-
-    if (currentPattern) {
-      currentPattern.description = `${currentPattern.type} anomaly detected`;
-      patterns.push(currentPattern);
-    }
-
-    this.patterns.set(streamId, patterns);
-    this.emit('patterns:detected', { streamId, count: patterns.length });
 
     return patterns;
   }
 
   /**
+   * Generate anomaly alert
+   */
+  generateAlert(anomalyScore: AnomalyScore, context?: Record<string, unknown>): AnomalyAlert {
+    const alert: AnomalyAlert = {
+      id: `alert-${Date.now()}`,
+      timestamp: anomalyScore.timestamp,
+      anomalyScore: anomalyScore.anomalyScore,
+      severity: anomalyScore.severity,
+      message: `Anomaly detected with severity: ${anomalyScore.severity}`,
+    };
+
+    // Suggest root cause and action based on severity
+    if (anomalyScore.severity === 'critical') {
+      alert.rootCause = 'Potential system failure or data corruption';
+      alert.suggestedAction = 'Immediate investigation required';
+    } else if (anomalyScore.severity === 'high') {
+      alert.rootCause = 'Unusual pattern detected';
+      alert.suggestedAction = 'Review recent changes and monitor closely';
+    }
+
+    this.alerts.push(alert);
+    return alert;
+  }
+
+  /**
+   * Get recent alerts
+   */
+  getRecentAlerts(hours: number = 24): AnomalyAlert[] {
+    const cutoff = new Date(Date.now() - hours * 60 * 60 * 1000);
+    return this.alerts.filter((a) => a.timestamp > cutoff);
+  }
+
+  /**
+   * Analyze anomaly root cause
+   */
+  analyzeRootCause(
+    anomaly: AnomalyScore,
+    historicalData: Array<{ timestamp: Date; value: number }>
+  ): string {
+    const recentValues = historicalData
+      .filter((d) => d.timestamp <= anomaly.timestamp)
+      .slice(-10)
+      .map((d) => d.value);
+
+    if (recentValues.length === 0) return 'Insufficient data';
+
+    const mean = recentValues.reduce((a, b) => a + b, 0) / recentValues.length;
+    const variance =
+      recentValues.reduce((sum, x) => sum + (x - mean) ** 2, 0) / recentValues.length;
+    const stdDev = Math.sqrt(variance);
+
+    if (anomaly.value > mean + 3 * stdDev) {
+      return 'Extreme spike detected - possible system overload';
+    } else if (anomaly.value < mean - 3 * stdDev) {
+      return 'Extreme dip detected - possible system failure';
+    } else if (anomaly.anomalyScore > 2) {
+      return 'Significant deviation from baseline pattern';
+    }
+
+    return 'Unknown anomaly pattern';
+  }
+
+  /**
+   * Set sensitivity threshold
+   */
+  setSensitivityThreshold(threshold: number): void {
+    this.sensitivityThreshold = Math.max(1, Math.min(5, threshold));
+  }
+
+  /**
    * Get anomaly statistics
    */
-  getAnomalyStatistics(streamId: string): {
-    totalPoints: number;
-    anomalyCount: number;
-    anomalyRate: number;
+  getAnomalyStatistics(anomalies: AnomalyScore[]): {
+    totalAnomalies: number;
+    criticalCount: number;
+    highCount: number;
+    mediumCount: number;
+    lowCount: number;
     averageScore: number;
-    maxScore: number;
   } {
-    const data = this.dataStreams.get(streamId) || [];
-    const anomalies = this.detectedAnomalies.get(streamId) || [];
+    const critical = anomalies.filter((a) => a.severity === 'critical').length;
+    const high = anomalies.filter((a) => a.severity === 'high').length;
+    const medium = anomalies.filter((a) => a.severity === 'medium').length;
+    const low = anomalies.filter((a) => a.severity === 'low').length;
 
-    const anomalyCount = anomalies.filter((a) => a.isAnomaly).length;
-    const averageScore =
-      anomalies.length > 0
-        ? anomalies.reduce((sum, a) => sum + a.anomalyScore, 0) / anomalies.length
-        : 0;
-    const maxScore = anomalies.length > 0 ? Math.max(...anomalies.map((a) => a.anomalyScore)) : 0;
+    const avgScore =
+      anomalies.reduce((sum, a) => sum + a.anomalyScore, 0) / Math.max(anomalies.length, 1);
 
     return {
-      totalPoints: data.length,
-      anomalyCount,
-      anomalyRate: data.length > 0 ? anomalyCount / data.length : 0,
-      averageScore,
-      maxScore,
+      totalAnomalies: anomalies.length,
+      criticalCount: critical,
+      highCount: high,
+      mediumCount: medium,
+      lowCount: low,
+      averageScore: avgScore,
     };
   }
-
-  /**
-   * Set anomaly threshold
-   */
-  setThreshold(streamId: string, threshold: number): void {
-    this.anomalyThresholds.set(streamId, threshold);
-    this.emit('threshold:set', { streamId, threshold });
-  }
-
-  /**
-   * Get alerts for stream
-   */
-  getAlerts(streamId: string, limit: number = 10): AnomalyAlert[] {
-    const alerts = this.alerts.get(streamId) || [];
-    return alerts.slice(-limit);
-  }
-
-  /**
-   * Clear old data
-   */
-  clearOldData(streamId: string, maxAge: number = 86400000): void {
-    const data = this.dataStreams.get(streamId) || [];
-    const now = Date.now();
-
-    // Keep only recent data
-    const recentData = data.slice(-1000);
-    this.dataStreams.set(streamId, recentData);
-
-    this.emit('data:cleared', { streamId, remaining: recentData.length });
-  }
-
-  /**
-   * Private helper: Calculate severity
-   */
-  private calculateSeverity(score: number): 'low' | 'medium' | 'high' | 'critical' {
-    if (score >= 0.9) return 'critical';
-    if (score >= 0.7) return 'high';
-    if (score >= 0.5) return 'medium';
-    return 'low';
-  }
-
-  /**
-   * Private helper: Get suggested action
-   */
-  private getSuggestedAction(severity: string): string {
-    switch (severity) {
-      case 'critical':
-        return 'Immediate investigation required. Consider escalating to on-call team.';
-      case 'high':
-        return 'Investigate within 1 hour. Check related systems and logs.';
-      case 'medium':
-        return 'Monitor closely. Investigate if pattern continues.';
-      default:
-        return 'Log for analysis. No immediate action required.';
-    }
-  }
-
-  /**
-   * Private helper: Classify anomaly type
-   */
-  private classifyAnomalyType(current: number, previous?: number): AnomalyPattern['type'] {
-    if (!previous) return 'outlier';
-
-    const change = Math.abs(current - previous) / (Math.abs(previous) || 1);
-
-    if (change > 0.5) {
-      return current > previous ? 'spike' : 'dip';
-    }
-
-    return 'outlier';
-  }
 }
+
+export default AnomalyDetectionSystem;

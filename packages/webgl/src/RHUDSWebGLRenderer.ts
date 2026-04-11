@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { OrbitControls } from './controls/OrbitControls';
+import { OrbitControls, OrbitControlsConfig } from './controls/OrbitControls';
 
 export interface WebGLRendererConfig {
   width?: number;
@@ -31,7 +31,7 @@ export class RHUDSWebGLRenderer {
     this.renderer.setSize(width, height);
     this.renderer.setPixelRatio(config.pixelRatio || window.devicePixelRatio);
     this.renderer.shadowMap.enabled = config.shadowMap ?? true;
-    this.renderer.shadowMap.type = config.shadowMapType ?? THREE.PCFShadowShadowMap;
+    this.renderer.shadowMap.type = config.shadowMapType ?? THREE.PCFShadowMap;
     container.appendChild(this.renderer.domElement);
 
     // Create scene
@@ -67,7 +67,12 @@ export class RHUDSWebGLRenderer {
     return this.renderer;
   }
 
-  setupOrbitControls(config?: any): OrbitControls {
+  /**
+   * Setup orbit controls with optional configuration
+   * @param config - OrbitControls configuration options
+   * @returns The configured OrbitControls instance
+   */
+  setupOrbitControls(config?: OrbitControlsConfig): OrbitControls {
     this.controls = new OrbitControls(this.camera, this.renderer.domElement, config);
     return this.controls;
   }

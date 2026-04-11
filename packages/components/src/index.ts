@@ -693,3 +693,57 @@ export type { ChartProps, ChartDataPoint } from './Visualization/types';
 export { BubbleChart } from './Visualization/BubbleChart';
 export { RhudsBubbleChart, RhudsBubbleChartStyled } from './Visualization/BubbleChart.rhuds';
 export type { BubbleChartProps, BubbleDataPoint } from './Visualization/BubbleChart';
+
+// ============================================================================
+// PHASE 4: WRAPPER COMPONENTS FOR BACKWARD COMPATIBILITY
+// ============================================================================
+// These wrappers provide backward compatibility while using the new base
+// components internally. They maintain the original API while benefiting
+// from the consolidated, type-safe base implementations.
+
+// Button Wrappers
+export {
+  Button as ButtonWrapper,
+  HudButton as HudButtonWrapper,
+  NeonButton as NeonButtonWrapper,
+  ColdWarButton as ColdWarButtonWrapper,
+  GlitchButton as GlitchButtonWrapper,
+  CyberpunkButton as CyberpunkButtonWrapper,
+  GlowButton as GlowButtonWrapper,
+  HoloButton as HoloButtonWrapper,
+} from './Button/Button.wrapper';
+
+// Input Wrappers
+export {
+  Input as InputWrapper,
+  HackerInput as HackerInputWrapper,
+  AiHudInput as AiHudInputWrapper,
+  HoloInput as HoloInputWrapper,
+  BashInput as BashInputWrapper,
+  ColdWarInput as ColdWarInputWrapper,
+  CyberpunkAccessInput as CyberpunkAccessInputWrapper,
+  FloatingLabelInput as FloatingLabelInputWrapper,
+  GradientSearchInput as GradientSearchInputWrapper,
+} from './Input/Input.wrapper';
+
+// Checkbox Wrappers
+export {
+  Checkbox as CheckboxWrapper,
+  NeonCheckbox as NeonCheckboxWrapper,
+  GlowingNeonCheckbox as GlowingNeonCheckboxWrapper,
+  CyberpunkCheckbox as CyberpunkCheckboxWrapper,
+  BubbleCheckbox as BubbleCheckboxWrapper,
+  ColdWarCheckbox as ColdWarCheckboxWrapper,
+  GlitchCheckbox as GlitchCheckboxWrapper,
+  HoloCheckbox as HoloCheckboxWrapper,
+} from './Form/Checkbox.wrapper';
+
+// Theme Provider (from @rhuds/core)
+export {
+  ThemeProvider,
+  useThemeContext,
+  useCurrentTheme,
+  useThemeConfig,
+  useSwitchTheme,
+} from '@rhuds/core';
+export type { Theme, ThemeConfig } from '@rhuds/core';

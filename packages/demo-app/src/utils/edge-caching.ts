@@ -23,9 +23,9 @@ export interface CacheMetrics {
   originLatency: number;
 }
 
-export interface CacheEntry {
+export interface CacheEntry<T = unknown> {
   key: string;
-  value: any;
+  value: T;
   timestamp: number;
   ttl: number;
   hits: number;
@@ -128,7 +128,7 @@ export function getCacheConfigForUrl(url: string): CacheConfig {
 /**
  * Edge cache manager
  */
-export class EdgeCacheManager {
+export class EdgeCacheManager<T = unknown> {
   private metrics: CacheMetrics = {
     hits: 0,
     misses: 0,
@@ -139,12 +139,12 @@ export class EdgeCacheManager {
     originLatency: 0,
   };
 
-  private cache: Map<string, CacheEntry> = new Map();
+  private cache: Map<string, CacheEntry<T>> = new Map();
 
   /**
    * Get from cache
    */
-  get(key: string): any | null {
+  get(key: string): T | null {
     const entry = this.cache.get(key);
 
     if (!entry) {
@@ -176,7 +176,7 @@ export class EdgeCacheManager {
   /**
    * Set in cache
    */
-  set(key: string, value: any, ttl: number = 3600): void {
+  set(key: string, value: T, ttl: number = 3600): void {
     this.cache.set(key, {
       key,
       value,
@@ -227,7 +227,7 @@ export class EdgeCacheManager {
   /**
    * Get cache entries
    */
-  getEntries(): CacheEntry[] {
+  getEntries(): CacheEntry<T>[] {
     return Array.from(this.cache.values());
   }
 
@@ -276,7 +276,7 @@ export class EdgeCacheManager {
 /**
  * Global edge cache manager instance
  */
-export const edgeCacheManager = new EdgeCacheManager();
+export const edgeCacheManager = new EdgeCacheManager<string>();
 
 /**
  * Fetch with edge caching

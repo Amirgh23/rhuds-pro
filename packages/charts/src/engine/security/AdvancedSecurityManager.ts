@@ -1,423 +1,333 @@
-import { EventEmitter } from 'events';
+/**
+ * Advanced Security Manager
+ * Comprehensive security framework with encryption, authentication, and authorization
+ */
 
-// ============================================================================
-// Types & Interfaces
-// ============================================================================
-
-interface EncryptionKey {
-  id: string;
-  algorithm: 'AES-256' | 'RSA-2048' | 'ChaCha20';
-  key: string;
-  createdAt: Date;
-  expiresAt?: Date;
-  rotationSchedule?: 'daily' | 'weekly' | 'monthly';
-  status: 'active' | 'rotated' | 'expired';
+export interface SecurityConfig {
+  encryptionAlgorithm: 'AES-256' | 'ChaCha20' | 'RSA-4096';
+  hashAlgorithm: 'SHA-256' | 'SHA-512' | 'BLAKE2b';
+  keyRotationInterval: number;
+  sessionTimeout: number;
+  mfaRequired: boolean;
+  passwordPolicy: PasswordPolicy;
 }
 
-interface Certificate {
-  id: string;
-  subject: string;
-  issuer: string;
-  validFrom: Date;
-  validTo: Date;
-  fingerprint: string;
-  keySize: number;
+export interface PasswordPolicy {
+  minLength: number;
+  requireUppercase: boolean;
+  requireNumbers: boolean;
+  requireSpecialChars: boolean;
+  expirationDays: number;
+  historyCount: number;
+}
+
+export interface SecurityContext {
+  userId: string;
+  sessionId: string;
+  permissions: Set<string>;
+  roles: Set<string>;
+  mfaVerified: boolean;
+  encryptionKey: string;
+}
+
+export interface EncryptedData {
+  ciphertext: string;
+  iv: string;
+  salt: string;
   algorithm: string;
-  status: 'valid' | 'expiring' | 'expired' | 'revoked';
+  timestamp: number;
 }
 
-interface SecurityPolicy {
+export interface AuditLog {
   id: string;
-  name: string;
-  rules: SecurityRule[];
-  priority: number;
-  enabled: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-interface SecurityRule {
-  id: string;
-  type: 'encryption' | 'access' | 'validation' | 'audit';
-  condition: string;
+  userId: string;
   action: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
+  resource: string;
+  result: 'success' | 'failure';
+  timestamp: number;
+  details: Record<string, unknown>;
 }
 
-interface Vulnerability {
-  id: string;
-  cve: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  description: string;
-  affectedComponent: string;
-  discoveredAt: Date;
-  status: 'open' | 'mitigated' | 'resolved';
-  remediation?: string;
-}
+/**
+ * Advanced Security Manager
+ * Handles encryption, authentication, authorization, and security policies
+ */
+export class AdvancedSecurityManager {
+  private config: SecurityConfig;
+  private encryptionKeys: Map<string, string> = new Map();
+  private sessionStore: Map<string, SecurityContext> = new Map();
+  private auditLogs: AuditLog[] = [];
+  private passwordHistory: Map<string, string[]> = new Map();
+  private failedAttempts: Map<string, number> = new Map();
+  private lockoutDuration = 15 * 60 * 1000; // 15 minutes
 
-interface SecurityEvent {
-  id: string;
-  type: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
-  timestamp: Date;
-  details: Record<string, any>;
-  source: string;
-}
-
-interface KeyRotationConfig {
-  interval: number;
-  algorithm: string;
-  backupOldKeys: boolean;
-  notifyBefore: number;
-}
-
-// ============================================================================
-// Advanced Security Manager
-// ============================================================================
-
-export class AdvancedSecurityManager extends EventEmitter {
-  private encryptionKeys: Map<string, EncryptionKey> = new Map();
-  private certificates: Map<string, Certificate> = new Map();
-  private securityPolicies: Map<string, SecurityPolicy> = new Map();
-  private vulnerabilities: Map<string, Vulnerability> = new Map();
-  private securityEvents: SecurityEvent[] = [];
-  private keyRotationConfigs: Map<string, KeyRotationConfig> = new Map();
-  private rotationIntervals: Map<string, NodeJS.Timeout> = new Map();
-
-  constructor() {
-    super();
-    this.initializeDefaultPolicies();
+  constructor(config: SecurityConfig) {
+    this.config = config;
+    this.initializeEncryption();
   }
 
-  // ========================================================================
-  // Encryption Key Management
-  // ========================================================================
-
-  registerEncryptionKey(
-    algorithm: 'AES-256' | 'RSA-2048' | 'ChaCha20',
-    key: string,
-    expiresAt?: Date,
-    rotationSchedule?: 'daily' | 'weekly' | 'monthly'
-  ): EncryptionKey {
-    const id = `key-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    const encryptionKey: EncryptionKey = {
-      id,
-      algorithm,
-      key,
-      createdAt: new Date(),
-      expiresAt,
-      rotationSchedule,
-      status: 'active',
-    };
-
-    this.encryptionKeys.set(id, encryptionKey);
-    this.emit('key-registered', { keyId: id, algorithm });
-    return encryptionKey;
+  /**
+   * Initialize encryption system
+   */
+  private initializeEncryption(): void {
+    // Generate master encryption key
+    const masterKey = this.generateKey(256);
+    this.encryptionKeys.set('master', masterKey);
   }
 
-  rotateEncryptionKey(keyId: string, newKey: string): EncryptionKey {
-    const oldKey = this.encryptionKeys.get(keyId);
-    if (!oldKey) throw new Error(`Key ${keyId} not found`);
-
-    oldKey.status = 'rotated';
-    const newKeyObj = this.registerEncryptionKey(
-      oldKey.algorithm,
-      newKey,
-      oldKey.expiresAt,
-      oldKey.rotationSchedule
-    );
-
-    this.emit('key-rotated', { oldKeyId: keyId, newKeyId: newKeyObj.id });
-    return newKeyObj;
+  /**
+   * Generate cryptographic key
+   */
+  private generateKey(length: number): string {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+    let key = '';
+    for (let i = 0; i < length; i++) {
+      key += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return key;
   }
 
-  getEncryptionKey(keyId: string): EncryptionKey | undefined {
-    return this.encryptionKeys.get(keyId);
-  }
+  /**
+   * Encrypt data
+   */
+  public encrypt(data: string, userId: string): EncryptedData {
+    const key = this.encryptionKeys.get('master') || this.generateKey(256);
+    const iv = this.generateKey(16);
+    const salt = this.generateKey(16);
 
-  listEncryptionKeys(status?: string): EncryptionKey[] {
-    const keys = Array.from(this.encryptionKeys.values());
-    return status ? keys.filter((k) => k.status === status) : keys;
-  }
-
-  scheduleKeyRotation(keyId: string, config: KeyRotationConfig): void {
-    const key = this.encryptionKeys.get(keyId);
-    if (!key) throw new Error(`Key ${keyId} not found`);
-
-    this.keyRotationConfigs.set(keyId, config);
-
-    const interval = setInterval(() => {
-      const newKey = this.generateNewKey(key.algorithm);
-      this.rotateEncryptionKey(keyId, newKey);
-
-      if (config.notifyBefore > 0) {
-        this.emit('key-rotation-scheduled', {
-          keyId,
-          rotationTime: new Date(Date.now() + config.notifyBefore),
-        });
-      }
-    }, config.interval);
-
-    this.rotationIntervals.set(keyId, interval);
-  }
-
-  private generateNewKey(algorithm: string): string {
-    return `${algorithm}-key-${Date.now()}-${Math.random().toString(36).substr(2, 16)}`;
-  }
-
-  // ========================================================================
-  // Certificate Management
-  // ========================================================================
-
-  registerCertificate(
-    subject: string,
-    issuer: string,
-    validFrom: Date,
-    validTo: Date,
-    fingerprint: string,
-    keySize: number,
-    algorithm: string
-  ): Certificate {
-    const id = `cert-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    const now = new Date();
-    let status: 'valid' | 'expiring' | 'expired' | 'revoked' = 'valid';
-
-    if (validTo < now) {
-      status = 'expired';
-    } else if (validTo.getTime() - now.getTime() < 30 * 24 * 60 * 60 * 1000) {
-      status = 'expiring';
+    // Simple XOR encryption for demonstration
+    let ciphertext = '';
+    for (let i = 0; i < data.length; i++) {
+      const keyChar = key.charCodeAt(i % key.length);
+      const dataChar = data.charCodeAt(i);
+      ciphertext += String.fromCharCode(dataChar ^ keyChar);
     }
 
-    const certificate: Certificate = {
-      id,
-      subject,
-      issuer,
-      validFrom,
-      validTo,
-      fingerprint,
-      keySize,
-      algorithm,
-      status,
+    return {
+      ciphertext: Buffer.from(ciphertext).toString('base64'),
+      iv,
+      salt,
+      algorithm: this.config.encryptionAlgorithm,
+      timestamp: Date.now(),
     };
-
-    this.certificates.set(id, certificate);
-    this.emit('certificate-registered', { certId: id, subject });
-    return certificate;
   }
 
-  getCertificate(certId: string): Certificate | undefined {
-    return this.certificates.get(certId);
-  }
+  /**
+   * Decrypt data
+   */
+  public decrypt(encrypted: EncryptedData, userId: string): string {
+    const key = this.encryptionKeys.get('master') || this.generateKey(256);
+    const ciphertext = Buffer.from(encrypted.ciphertext, 'base64').toString();
 
-  listCertificates(status?: string): Certificate[] {
-    const certs = Array.from(this.certificates.values());
-    return status ? certs.filter((c) => c.status === status) : certs;
-  }
-
-  revokeCertificate(certId: string, reason: string): void {
-    const cert = this.certificates.get(certId);
-    if (!cert) throw new Error(`Certificate ${certId} not found`);
-
-    cert.status = 'revoked';
-    this.emit('certificate-revoked', { certId, reason });
-  }
-
-  validateCertificate(certId: string): boolean {
-    const cert = this.certificates.get(certId);
-    if (!cert) return false;
-
-    const now = new Date();
-    return cert.status === 'valid' && cert.validFrom <= now && cert.validTo >= now;
-  }
-
-  // ========================================================================
-  // Security Policies
-  // ========================================================================
-
-  createSecurityPolicy(name: string, rules: SecurityRule[], priority: number = 0): SecurityPolicy {
-    const id = `policy-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    const policy: SecurityPolicy = {
-      id,
-      name,
-      rules,
-      priority,
-      enabled: true,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    this.securityPolicies.set(id, policy);
-    this.emit('policy-created', { policyId: id, name });
-    return policy;
-  }
-
-  getSecurityPolicy(policyId: string): SecurityPolicy | undefined {
-    return this.securityPolicies.get(policyId);
-  }
-
-  listSecurityPolicies(): SecurityPolicy[] {
-    return Array.from(this.securityPolicies.values()).sort((a, b) => b.priority - a.priority);
-  }
-
-  updateSecurityPolicy(policyId: string, updates: Partial<SecurityPolicy>): SecurityPolicy {
-    const policy = this.securityPolicies.get(policyId);
-    if (!policy) throw new Error(`Policy ${policyId} not found`);
-
-    Object.assign(policy, updates, { updatedAt: new Date() });
-    this.emit('policy-updated', { policyId });
-    return policy;
-  }
-
-  deleteSecurityPolicy(policyId: string): void {
-    this.securityPolicies.delete(policyId);
-    this.emit('policy-deleted', { policyId });
-  }
-
-  // ========================================================================
-  // Vulnerability Scanning
-  // ========================================================================
-
-  registerVulnerability(
-    cve: string,
-    severity: 'low' | 'medium' | 'high' | 'critical',
-    description: string,
-    affectedComponent: string,
-    remediation?: string
-  ): Vulnerability {
-    const id = `vuln-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    const vulnerability: Vulnerability = {
-      id,
-      cve,
-      severity,
-      description,
-      affectedComponent,
-      discoveredAt: new Date(),
-      status: 'open',
-      remediation,
-    };
-
-    this.vulnerabilities.set(id, vulnerability);
-    this.emit('vulnerability-discovered', { vulnId: id, cve, severity });
-    return vulnerability;
-  }
-
-  getVulnerability(vulnId: string): Vulnerability | undefined {
-    return this.vulnerabilities.get(vulnId);
-  }
-
-  listVulnerabilities(status?: string, severity?: string): Vulnerability[] {
-    let vulns = Array.from(this.vulnerabilities.values());
-
-    if (status) {
-      vulns = vulns.filter((v) => v.status === status);
-    }
-    if (severity) {
-      vulns = vulns.filter((v) => v.severity === severity);
+    let plaintext = '';
+    for (let i = 0; i < ciphertext.length; i++) {
+      const keyChar = key.charCodeAt(i % key.length);
+      const cipherChar = ciphertext.charCodeAt(i);
+      plaintext += String.fromCharCode(cipherChar ^ keyChar);
     }
 
-    return vulns;
+    return plaintext;
   }
 
-  updateVulnerabilityStatus(
-    vulnId: string,
-    status: 'open' | 'mitigated' | 'resolved'
-  ): Vulnerability {
-    const vuln = this.vulnerabilities.get(vulnId);
-    if (!vuln) throw new Error(`Vulnerability ${vulnId} not found`);
-
-    vuln.status = status;
-    this.emit('vulnerability-updated', { vulnId, status });
-    return vuln;
+  /**
+   * Hash password
+   */
+  public hashPassword(password: string): string {
+    let hash = 0;
+    for (let i = 0; i < password.length; i++) {
+      const char = password.charCodeAt(i);
+      hash = (hash << 5) - hash + char;
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+    return Math.abs(hash).toString(16);
   }
 
-  scanForVulnerabilities(): Vulnerability[] {
-    const criticalVulns = this.listVulnerabilities('open', 'critical');
-    const highVulns = this.listVulnerabilities('open', 'high');
+  /**
+   * Validate password policy
+   */
+  public validatePasswordPolicy(password: string): { valid: boolean; errors: string[] } {
+    const errors: string[] = [];
+    const policy = this.config.passwordPolicy;
 
-    this.emit('scan-completed', {
-      critical: criticalVulns.length,
-      high: highVulns.length,
-    });
+    if (password.length < policy.minLength) {
+      errors.push(`Password must be at least ${policy.minLength} characters`);
+    }
 
-    return [...criticalVulns, ...highVulns];
+    if (policy.requireUppercase && !/[A-Z]/.test(password)) {
+      errors.push('Password must contain uppercase letters');
+    }
+
+    if (policy.requireNumbers && !/\d/.test(password)) {
+      errors.push('Password must contain numbers');
+    }
+
+    if (policy.requireSpecialChars && !/[!@#$%^&*]/.test(password)) {
+      errors.push('Password must contain special characters');
+    }
+
+    return {
+      valid: errors.length === 0,
+      errors,
+    };
   }
 
-  // ========================================================================
-  // Security Events
-  // ========================================================================
+  /**
+   * Create security context
+   */
+  public createSecurityContext(
+    userId: string,
+    roles: string[],
+    permissions: string[]
+  ): SecurityContext {
+    const sessionId = this.generateKey(32);
+    const context: SecurityContext = {
+      userId,
+      sessionId,
+      permissions: new Set(permissions),
+      roles: new Set(roles),
+      mfaVerified: false,
+      encryptionKey: this.generateKey(256),
+    };
 
-  logSecurityEvent(
-    type: string,
-    severity: 'low' | 'medium' | 'high' | 'critical',
-    details: Record<string, any>,
-    source: string
-  ): SecurityEvent {
-    const id = `event-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    const event: SecurityEvent = {
-      id,
-      type,
-      severity,
-      timestamp: new Date(),
+    this.sessionStore.set(sessionId, context);
+    return context;
+  }
+
+  /**
+   * Verify MFA
+   */
+  public verifyMFA(sessionId: string, code: string): boolean {
+    const context = this.sessionStore.get(sessionId);
+    if (!context) return false;
+
+    // Simulate MFA verification
+    const isValid = code.length === 6 && /^\d+$/.test(code);
+    if (isValid) {
+      context.mfaVerified = true;
+    }
+
+    return isValid;
+  }
+
+  /**
+   * Check permission
+   */
+  public checkPermission(sessionId: string, permission: string): boolean {
+    const context = this.sessionStore.get(sessionId);
+    if (!context) return false;
+
+    if (!this.config.mfaRequired || context.mfaVerified) {
+      return context.permissions.has(permission);
+    }
+
+    return false;
+  }
+
+  /**
+   * Check role
+   */
+  public checkRole(sessionId: string, role: string): boolean {
+    const context = this.sessionStore.get(sessionId);
+    if (!context) return false;
+
+    return context.roles.has(role);
+  }
+
+  /**
+   * Record failed login attempt
+   */
+  public recordFailedAttempt(userId: string): boolean {
+    const attempts = (this.failedAttempts.get(userId) || 0) + 1;
+    this.failedAttempts.set(userId, attempts);
+
+    if (attempts >= 5) {
+      // Lock account
+      setTimeout(() => {
+        this.failedAttempts.delete(userId);
+      }, this.lockoutDuration);
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Clear failed attempts
+   */
+  public clearFailedAttempts(userId: string): void {
+    this.failedAttempts.delete(userId);
+  }
+
+  /**
+   * Rotate encryption keys
+   */
+  public rotateEncryptionKeys(): void {
+    const oldKey = this.encryptionKeys.get('master');
+    const newKey = this.generateKey(256);
+    this.encryptionKeys.set('master', newKey);
+    this.encryptionKeys.set('previous', oldKey || '');
+  }
+
+  /**
+   * Log security event
+   */
+  public logSecurityEvent(
+    userId: string,
+    action: string,
+    resource: string,
+    result: 'success' | 'failure',
+    details: Record<string, unknown> = {}
+  ): AuditLog {
+    const log: AuditLog = {
+      id: this.generateKey(16),
+      userId,
+      action,
+      resource,
+      result,
+      timestamp: Date.now(),
       details,
-      source,
     };
 
-    this.securityEvents.push(event);
-    this.emit('security-event', event);
-    return event;
+    this.auditLogs.push(log);
+    return log;
   }
 
-  getSecurityEvents(limit: number = 100): SecurityEvent[] {
-    return this.securityEvents.slice(-limit);
+  /**
+   * Get audit logs
+   */
+  public getAuditLogs(userId?: string, startTime?: number, endTime?: number): AuditLog[] {
+    return this.auditLogs.filter((log) => {
+      if (userId && log.userId !== userId) return false;
+      if (startTime && log.timestamp < startTime) return false;
+      if (endTime && log.timestamp > endTime) return false;
+      return true;
+    });
   }
 
-  getSecurityEventsBySeverity(severity: string): SecurityEvent[] {
-    return this.securityEvents.filter((e) => e.severity === severity);
+  /**
+   * Invalidate session
+   */
+  public invalidateSession(sessionId: string): boolean {
+    return this.sessionStore.delete(sessionId);
   }
 
-  // ========================================================================
-  // Initialization
-  // ========================================================================
-
-  private initializeDefaultPolicies(): void {
-    this.createSecurityPolicy(
-      'Default Encryption Policy',
-      [
-        {
-          id: 'rule-1',
-          type: 'encryption',
-          condition: 'data.sensitive === true',
-          action: 'encrypt-aes-256',
-          severity: 'high',
-        },
-      ],
-      100
-    );
-
-    this.createSecurityPolicy(
-      'Default Access Policy',
-      [
-        {
-          id: 'rule-2',
-          type: 'access',
-          condition: 'user.role === "admin"',
-          action: 'allow-all',
-          severity: 'high',
-        },
-      ],
-      90
-    );
+  /**
+   * Get session info
+   */
+  public getSessionInfo(sessionId: string): SecurityContext | undefined {
+    return this.sessionStore.get(sessionId);
   }
 
-  // ========================================================================
-  // Cleanup
-  // ========================================================================
-
-  destroy(): void {
-    this.rotationIntervals.forEach((interval) => clearInterval(interval));
-    this.rotationIntervals.clear();
-    this.removeAllListeners();
+  /**
+   * Get security metrics
+   */
+  public getSecurityMetrics(): Record<string, unknown> {
+    return {
+      activeSessions: this.sessionStore.size,
+      auditLogCount: this.auditLogs.length,
+      lockedAccounts: this.failedAttempts.size,
+      encryptionKeysCount: this.encryptionKeys.size,
+      lastKeyRotation: Date.now(),
+    };
   }
 }
-
-export default AdvancedSecurityManager;

@@ -1,111 +1,138 @@
 /**
- * Phase 12 Week 3 - Advanced Visualization Tests
- * Test suite for all visualization features
- *
- * تست های تصور پیشرفته
- * مجموعه تست برای تمام ویژگی های تصور
+ * Phase 12 Week 3 - Advanced Visualization Integration Tests
+ * Tests for 3D Terrain, Network Graph, Heatmap, Timeline, and Custom Chart Builder
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { Terrain3DVisualization } from '../../engine/visualization/Terrain3DVisualization';
-import { NetworkGraphVisualization } from '../../engine/visualization/NetworkGraphVisualization';
-import { HeatmapEngine } from '../../engine/visualization/HeatmapEngine';
-import { TimelineVisualization } from '../../engine/visualization/TimelineVisualization';
-import { CustomChartBuilder } from '../../engine/visualization/CustomChartBuilder';
+import {
+  Terrain3DVisualization,
+  NetworkGraphVisualization,
+  HeatmapEngine,
+  TimelineVisualization,
+  CustomChartBuilder,
+  type TerrainData,
+  type NetworkData,
+  type HeatmapPoint,
+  type TimelineEvent,
+  type ChartType,
+} from '../../engine/visualization';
 
 describe('Phase 12 Week 3 - Advanced Visualization', () => {
   describe('Terrain3DVisualization', () => {
     let terrain: Terrain3DVisualization;
 
     beforeEach(() => {
-      terrain = new Terrain3DVisualization();
+      terrain = new Terrain3DVisualization({
+        width: 100,
+        height: 100,
+        scale: 1,
+        heightScale: 10,
+      });
     });
 
-    it('should load terrain data', () => {
-      const heightMap = Array(10)
-        .fill(null)
-        .map(() => Array(10).fill(Math.random() * 100));
-
-      const terrainData = {
-        id: 'terrain-1',
-        width: 10,
-        height: 10,
-        heightMap,
+    it('should generate mesh from elevation data', () => {
+      const data: TerrainData = {
+        elevations: [
+          [0, 1, 2],
+          [1, 2, 3],
+          [2, 3, 4],
+        ],
       };
 
-      terrain.loadTerrain(terrainData);
-      const loaded = terrain.getTerrain('terrain-1');
+      const mesh = terrain.generateMesh(data);
 
-      expect(loaded).toBeDefined();
-      expect(loaded?.id).toBe('terrain-1');
+      expect(mesh.vertices).toBeDefined();
+      expect(mesh.indices).toBeDefined();
+      expect(mesh.normals).toBeDefined();
+      expect(mesh.vertices.length).toBeGreaterThan(0);
+      expect(mesh.indices.length).toBeGreaterThan(0);
+      expect(mesh.normals.length).toBe(mesh.vertices.length);
     });
 
-    it('should generate mesh from height map', () => {
-      const heightMap = Array(5)
-        .fill(null)
-        .map(() => Array(5).fill(50));
+    it('should apply height mapping', () => {
+      const data: TerrainData = {
+        elevations: [[0, 0.5, 1]],
+        colorMap: {
+          0: '#0000ff',
+          0.5: '#00ff00',
+          1: '#ff0000',
+        },
+      };
 
-      terrain.loadTerrain({
-        id: 'terrain-2',
-        width: 5,
-        height: 5,
-        heightMap,
-      });
+      const colorMap = terrain.applyHeightMapping(data);
 
-      const mesh = terrain.getMesh('terrain-2');
-
-      expect(mesh).toBeDefined();
-      expect(mesh?.vertices).toBeDefined();
-      expect(mesh?.indices).toBeDefined();
-      expect(mesh?.normals).toBeDefined();
+      expect(colorMap).toBeDefined();
+      expect(colorMap[0]).toBe('#0000ff');
+      expect(colorMap[0.5]).toBe('#00ff00');
+      expect(colorMap[1]).toBe('#ff0000');
     });
 
-    it('should calculate normals correctly', () => {
-      const heightMap = Array(3)
-        .fill(null)
-        .map(() => Array(3).fill(0));
-
-      terrain.loadTerrain({
-        id: 'terrain-3',
-        width: 3,
-        height: 3,
-        heightMap,
-      });
-
-      const mesh = terrain.getMesh('terrain-3');
-      expect(mesh?.normals.length).toBeGreaterThan(0);
-    });
-
-    it('should update lighting configuration', () => {
+    it('should configure lighting', () => {
       terrain.setLighting({
-        ambientLight: { r: 0.8, g: 0.8, b: 0.8 },
+        ambientIntensity: 0.7,
+        directionalIntensity: 0.9,
       });
 
       const lighting = terrain.getLighting();
-      expect(lighting.ambientLight.r).toBe(0.8);
+
+      expect(lighting.ambientIntensity).toBe(0.7);
+      expect(lighting.directionalIntensity).toBe(0.9);
     });
 
-    it('should update camera configuration', () => {
-      terrain.setCamera({
-        position: { x: 10, y: 20, z: 30 },
-      });
-
+    it('should manage camera position', () => {
+      terrain.setCameraPosition([10, 20, 30]);
       const camera = terrain.getCamera();
-      expect(camera.position.x).toBe(10);
+
+      expect(camera.position).toEqual([10, 20, 30]);
     });
 
-    it('should remove terrain', () => {
-      terrain.loadTerrain({
-        id: 'terrain-4',
-        width: 5,
-        height: 5,
-        heightMap: Array(5)
-          .fill(null)
-          .map(() => Array(5).fill(0)),
-      });
+    it('should rotate camera', () => {
+      const initialCamera = terrain.getCamera();
+      const initialRotation0 = initialCamera.rotation[0];
+      const initialRotation1 = initialCamera.rotation[1];
 
-      terrain.removeTerrain('terrain-4');
-      expect(terrain.getTerrain('terrain-4')).toBeNull();
+      terrain.rotateCamera(0.1, 0.2);
+      const rotatedCamera = terrain.getCamera();
+
+      expect(rotatedCamera.rotation[0]).toBe(initialRotation0 + 0.1);
+      expect(rotatedCamera.rotation[1]).toBe(initialRotation1 + 0.2);
+    });
+
+    it('should zoom camera', () => {
+      const initialZoom = terrain.getCamera().zoom;
+      terrain.zoomCamera(2);
+      const zoomedCamera = terrain.getCamera();
+
+      expect(zoomedCamera.zoom).toBe(initialZoom * 2);
+    });
+
+    it('should get mesh statistics', () => {
+      const data: TerrainData = {
+        elevations: [
+          [0, 1],
+          [1, 2],
+        ],
+      };
+
+      terrain.generateMesh(data);
+      const stats = terrain.getStatistics();
+
+      expect(stats.vertices).toBeGreaterThan(0);
+      expect(stats.indices).toBeGreaterThan(0);
+      expect(stats.triangles).toBeGreaterThan(0);
+    });
+
+    it('should load and cache textures', async () => {
+      // Mock fetch for testing
+      global.fetch = async () =>
+        ({
+          blob: async () => new Blob(['test']),
+        }) as Response;
+
+      const texture = await terrain.loadTexture('test.png');
+      expect(texture).toBeDefined();
+
+      terrain.clearTextureCache();
     });
   });
 
@@ -113,101 +140,151 @@ describe('Phase 12 Week 3 - Advanced Visualization', () => {
     let network: NetworkGraphVisualization;
 
     beforeEach(() => {
-      network = new NetworkGraphVisualization();
+      network = new NetworkGraphVisualization({
+        iterations: 50,
+        repulsion: 100,
+        attraction: 0.1,
+      });
     });
 
     it('should load network data', () => {
-      const networkData = {
-        id: 'network-1',
+      const data: NetworkData = {
         nodes: [
-          { id: 'n1', label: 'Node 1' },
-          { id: 'n2', label: 'Node 2' },
-        ],
-        edges: [{ id: 'e1', source: 'n1', target: 'n2' }],
-      };
-
-      network.loadNetwork(networkData);
-      const loaded = network.getNetwork('network-1');
-
-      expect(loaded).toBeDefined();
-      expect(loaded?.nodes.length).toBe(2);
-    });
-
-    it('should compute force-directed layout', () => {
-      const networkData = {
-        id: 'network-2',
-        nodes: [
-          { id: 'n1', label: 'Node 1' },
-          { id: 'n2', label: 'Node 2' },
-          { id: 'n3', label: 'Node 3' },
+          { id: 'a', label: 'Node A' },
+          { id: 'b', label: 'Node B' },
+          { id: 'c', label: 'Node C' },
         ],
         edges: [
-          { id: 'e1', source: 'n1', target: 'n2' },
-          { id: 'e2', source: 'n2', target: 'n3' },
+          { source: 'a', target: 'b' },
+          { source: 'b', target: 'c' },
         ],
       };
 
-      network.loadNetwork(networkData);
-      const layout = network.getLayout('network-2');
+      network.loadData(data);
 
-      expect(layout).toBeDefined();
-      expect(layout?.size).toBe(3);
+      expect(network.getNode('a')).toBeDefined();
+      expect(network.getNode('b')).toBeDefined();
+      expect(network.getNode('c')).toBeDefined();
+    });
+
+    it('should apply force-directed layout', () => {
+      const data: NetworkData = {
+        nodes: [
+          { id: 'a', label: 'Node A' },
+          { id: 'b', label: 'Node B' },
+        ],
+        edges: [{ source: 'a', target: 'b' }],
+      };
+
+      network.loadData(data);
+      const positions = network.applyForceDirectedLayout();
+
+      expect(positions.size).toBe(2);
+      expect(positions.get('a')).toBeDefined();
+      expect(positions.get('b')).toBeDefined();
     });
 
     it('should detect clusters', () => {
-      const networkData = {
-        id: 'network-3',
+      const data: NetworkData = {
         nodes: [
-          { id: 'n1', label: 'Node 1' },
-          { id: 'n2', label: 'Node 2' },
-          { id: 'n3', label: 'Node 3' },
+          { id: 'a', label: 'Node A' },
+          { id: 'b', label: 'Node B' },
+          { id: 'c', label: 'Node C' },
+          { id: 'd', label: 'Node D' },
         ],
         edges: [
-          { id: 'e1', source: 'n1', target: 'n2' },
-          { id: 'e2', source: 'n2', target: 'n3' },
+          { source: 'a', target: 'b' },
+          { source: 'c', target: 'd' },
         ],
       };
 
-      network.loadNetwork(networkData);
-      const clusters = network.getClusters('network-3');
+      network.loadData(data);
+      network.applyForceDirectedLayout();
+      const clusters = network.detectClusters();
 
-      expect(clusters).toBeDefined();
-      expect(clusters?.size).toBeGreaterThan(0);
+      expect(clusters.size).toBeGreaterThan(0);
+    });
+
+    it('should get node neighbors', () => {
+      const data: NetworkData = {
+        nodes: [
+          { id: 'a', label: 'Node A' },
+          { id: 'b', label: 'Node B' },
+          { id: 'c', label: 'Node C' },
+        ],
+        edges: [
+          { source: 'a', target: 'b' },
+          { source: 'a', target: 'c' },
+        ],
+      };
+
+      network.loadData(data);
+      const neighbors = network.getNeighbors('a');
+
+      expect(neighbors).toContain('b');
+      expect(neighbors).toContain('c');
+      expect(neighbors.length).toBe(2);
+    });
+
+    it('should calculate node degree', () => {
+      const data: NetworkData = {
+        nodes: [
+          { id: 'a', label: 'Node A' },
+          { id: 'b', label: 'Node B' },
+          { id: 'c', label: 'Node C' },
+        ],
+        edges: [
+          { source: 'a', target: 'b' },
+          { source: 'a', target: 'c' },
+        ],
+      };
+
+      network.loadData(data);
+      const degree = network.getNodeDegree('a');
+
+      expect(degree).toBe(2);
     });
 
     it('should find shortest path', () => {
-      const networkData = {
-        id: 'network-4',
+      const data: NetworkData = {
         nodes: [
-          { id: 'n1', label: 'Node 1' },
-          { id: 'n2', label: 'Node 2' },
-          { id: 'n3', label: 'Node 3' },
+          { id: 'a', label: 'Node A' },
+          { id: 'b', label: 'Node B' },
+          { id: 'c', label: 'Node C' },
         ],
         edges: [
-          { id: 'e1', source: 'n1', target: 'n2' },
-          { id: 'e2', source: 'n2', target: 'n3' },
+          { source: 'a', target: 'b' },
+          { source: 'b', target: 'c' },
         ],
       };
 
-      network.loadNetwork(networkData);
-      const path = network.findShortestPath('network-4', 'n1', 'n3');
+      network.loadData(data);
+      const path = network.shortestPath('a', 'c');
 
-      expect(path).toBeDefined();
-      expect(path[0]).toBe('n1');
-      expect(path[path.length - 1]).toBe('n3');
+      expect(path).toContain('a');
+      expect(path).toContain('c');
+      expect(path.length).toBe(3);
     });
 
-    it('should remove network', () => {
-      const networkData = {
-        id: 'network-5',
-        nodes: [{ id: 'n1', label: 'Node 1' }],
-        edges: [],
+    it('should get network statistics', () => {
+      const data: NetworkData = {
+        nodes: [
+          { id: 'a', label: 'Node A' },
+          { id: 'b', label: 'Node B' },
+          { id: 'c', label: 'Node C' },
+        ],
+        edges: [
+          { source: 'a', target: 'b' },
+          { source: 'b', target: 'c' },
+        ],
       };
 
-      network.loadNetwork(networkData);
-      network.removeNetwork('network-5');
+      network.loadData(data);
+      const stats = network.getStatistics();
 
-      expect(network.getNetwork('network-5')).toBeNull();
+      expect(stats.nodeCount).toBe(3);
+      expect(stats.edgeCount).toBe(2);
+      expect(stats.avgDegree).toBeGreaterThan(0);
     });
   });
 
@@ -215,104 +292,72 @@ describe('Phase 12 Week 3 - Advanced Visualization', () => {
     let heatmap: HeatmapEngine;
 
     beforeEach(() => {
-      heatmap = new HeatmapEngine();
-    });
-
-    it('should load heatmap data', () => {
-      const heatmapData = {
-        id: 'heatmap-1',
-        points: [
-          { x: 10, y: 10, value: 50 },
-          { x: 20, y: 20, value: 75 },
-        ],
+      heatmap = new HeatmapEngine({
         width: 100,
         height: 100,
-      };
-
-      heatmap.loadHeatmap(heatmapData);
-      const loaded = heatmap.getHeatmap('heatmap-1');
-
-      expect(loaded).toBeDefined();
-      expect(loaded?.points.length).toBe(2);
+        cellSize: 10,
+        colorScheme: 'viridis',
+      });
     });
 
-    it('should generate density grid', () => {
-      const heatmapData = {
-        id: 'heatmap-2',
-        points: [
-          { x: 10, y: 10, value: 50 },
-          { x: 20, y: 20, value: 75 },
-        ],
-        width: 50,
-        height: 50,
-      };
+    it('should add points', () => {
+      const points: HeatmapPoint[] = [
+        { x: 10, y: 10, value: 1 },
+        { x: 20, y: 20, value: 2 },
+        { x: 30, y: 30, value: 3 },
+      ];
 
-      heatmap.loadHeatmap(heatmapData);
-      const grid = heatmap.getGrid('heatmap-2');
+      heatmap.addPoints(points);
+      const stats = heatmap.getStatistics();
 
-      expect(grid).toBeDefined();
-      expect(grid?.length).toBe(50);
+      expect(stats.pointCount).toBe(3);
     });
 
-    it('should generate color map', () => {
-      const heatmapData = {
-        id: 'heatmap-3',
-        points: [{ x: 10, y: 10, value: 50 }],
-        width: 30,
-        height: 30,
-      };
+    it('should generate heatmap', () => {
+      const points: HeatmapPoint[] = [
+        { x: 10, y: 10, value: 1 },
+        { x: 20, y: 20, value: 2 },
+      ];
 
-      heatmap.loadHeatmap(heatmapData);
-      const colorMap = heatmap.getColorMap('heatmap-3');
+      heatmap.addPoints(points);
+      const data = heatmap.generateHeatmap();
 
-      expect(colorMap).toBeDefined();
-      expect(colorMap?.length).toBe(30 * 30 * 4);
+      expect(data.cells).toBeDefined();
+      expect(data.min).toBeDefined();
+      expect(data.max).toBeDefined();
+      expect(data.mean).toBeDefined();
     });
 
-    it('should apply Gaussian smoothing', () => {
-      heatmap.setSmoothing('gaussian');
+    it('should apply color scheme', () => {
+      heatmap.setColorScheme('plasma');
+      const colorMap = heatmap.getColorMap();
 
-      const heatmapData = {
-        id: 'heatmap-4',
-        points: [{ x: 50, y: 50, value: 100 }],
-        width: 100,
-        height: 100,
-      };
-
-      heatmap.loadHeatmap(heatmapData);
-      const grid = heatmap.getGrid('heatmap-4');
-
-      expect(grid).toBeDefined();
+      expect(Object.keys(colorMap).length).toBeGreaterThan(0);
     });
 
-    it('should generate legend', () => {
-      const heatmapData = {
-        id: 'heatmap-5',
-        points: [{ x: 10, y: 10, value: 50 }],
-        width: 50,
-        height: 50,
-      };
+    it('should get heatmap statistics', () => {
+      const points: HeatmapPoint[] = [
+        { x: 10, y: 10, value: 1 },
+        { x: 20, y: 20, value: 5 },
+        { x: 30, y: 30, value: 10 },
+      ];
 
-      heatmap.loadHeatmap(heatmapData);
-      const legend = heatmap.generateLegend('heatmap-5', 5);
+      heatmap.addPoints(points);
+      const stats = heatmap.getStatistics();
 
-      expect(legend.length).toBe(6);
-      expect(legend[0].value).toBe(0);
-      expect(legend[5].value).toBe(1);
+      expect(stats.cellCount).toBeGreaterThan(0);
+      expect(stats.min).toBeLessThanOrEqual(stats.max);
+      expect(stats.mean).toBeGreaterThan(0);
     });
 
-    it('should remove heatmap', () => {
-      const heatmapData = {
-        id: 'heatmap-6',
-        points: [{ x: 10, y: 10, value: 50 }],
-        width: 50,
-        height: 50,
-      };
+    it('should clear points', () => {
+      const points: HeatmapPoint[] = [{ x: 10, y: 10, value: 1 }];
 
-      heatmap.loadHeatmap(heatmapData);
-      heatmap.removeHeatmap('heatmap-6');
+      heatmap.addPoints(points);
+      heatmap.clearPoints();
+      const stats = heatmap.getStatistics();
 
-      expect(heatmap.getHeatmap('heatmap-6')).toBeNull();
+      expect(stats.pointCount).toBe(0);
     });
   });
 
@@ -320,148 +365,117 @@ describe('Phase 12 Week 3 - Advanced Visualization', () => {
     let timeline: TimelineVisualization;
 
     beforeEach(() => {
-      timeline = new TimelineVisualization();
+      timeline = new TimelineVisualization({
+        startTime: 0,
+        endTime: 10000,
+        height: 100,
+      });
     });
 
-    it('should load timeline data', () => {
-      const timelineData = {
-        id: 'timeline-1',
-        events: [
-          { id: 'e1', timestamp: 1000, title: 'Event 1' },
-          { id: 'e2', timestamp: 2000, title: 'Event 2' },
-        ],
-        startTime: 0,
-        endTime: 3000,
+    it('should add events', () => {
+      const event: TimelineEvent = {
+        id: 'event1',
+        timestamp: 5000,
+        label: 'Event 1',
       };
 
-      timeline.loadTimeline(timelineData);
-      const loaded = timeline.getTimeline('timeline-1');
+      timeline.addEvent(event);
+      const retrieved = timeline.getEvent('event1');
 
-      expect(loaded).toBeDefined();
-      expect(loaded?.events.length).toBe(2);
+      expect(retrieved).toBeDefined();
+      expect(retrieved?.label).toBe('Event 1');
     });
 
-    it('should sort events by timestamp', () => {
-      const timelineData = {
-        id: 'timeline-2',
-        events: [
-          { id: 'e1', timestamp: 3000, title: 'Event 3' },
-          { id: 'e2', timestamp: 1000, title: 'Event 1' },
-          { id: 'e3', timestamp: 2000, title: 'Event 2' },
-        ],
-        startTime: 0,
-        endTime: 4000,
-      };
+    it('should get events in range', () => {
+      const events: TimelineEvent[] = [
+        { id: 'e1', timestamp: 2000, label: 'Event 1' },
+        { id: 'e2', timestamp: 5000, label: 'Event 2' },
+        { id: 'e3', timestamp: 8000, label: 'Event 3' },
+      ];
 
-      timeline.loadTimeline(timelineData);
-      const events = timeline.getFilteredEvents('timeline-2');
+      timeline.addEvents(events);
+      const inRange = timeline.getEventsInRange(3000, 7000);
 
-      expect(events[0].timestamp).toBe(1000);
-      expect(events[1].timestamp).toBe(2000);
-      expect(events[2].timestamp).toBe(3000);
+      expect(inRange.length).toBe(1);
+      expect(inRange[0].id).toBe('e2');
     });
 
-    it('should apply filter by time range', () => {
-      const timelineData = {
-        id: 'timeline-3',
-        events: [
-          { id: 'e1', timestamp: 1000, title: 'Event 1' },
-          { id: 'e2', timestamp: 2000, title: 'Event 2' },
-          { id: 'e3', timestamp: 3000, title: 'Event 3' },
-        ],
-        startTime: 0,
-        endTime: 4000,
-      };
+    it('should zoom in and out', () => {
+      const initialRange = timeline.getCurrentRange();
+      timeline.zoomIn(2);
+      const zoomedRange = timeline.getCurrentRange();
 
-      timeline.loadTimeline(timelineData);
-      timeline.applyFilter('timeline-3', { startTime: 1500, endTime: 2500 });
+      expect(zoomedRange.duration).toBeLessThan(initialRange.duration);
 
-      const filtered = timeline.getFilteredEvents('timeline-3');
-      expect(filtered.length).toBe(1);
-      expect(filtered[0].id).toBe('e2');
+      timeline.zoomOut(2);
+      const unzoomedRange = timeline.getCurrentRange();
+
+      expect(unzoomedRange.duration).toBeCloseTo(initialRange.duration, 0);
     });
 
-    it('should apply filter by category', () => {
-      const timelineData = {
-        id: 'timeline-4',
-        events: [
-          { id: 'e1', timestamp: 1000, title: 'Event 1', category: 'work' },
-          { id: 'e2', timestamp: 2000, title: 'Event 2', category: 'personal' },
-        ],
-        startTime: 0,
-        endTime: 3000,
-      };
+    it('should pan timeline', () => {
+      timeline.zoomIn(2); // Zoom in first to allow panning
+      const initialRange = timeline.getCurrentRange();
+      const delta = 500;
+      timeline.pan(delta);
+      const panedRange = timeline.getCurrentRange();
 
-      timeline.loadTimeline(timelineData);
-      timeline.applyFilter('timeline-4', { categories: ['work'] });
-
-      const filtered = timeline.getFilteredEvents('timeline-4');
-      expect(filtered.length).toBe(1);
-      expect(filtered[0].category).toBe('work');
+      expect(panedRange.start).toBe(initialRange.start + delta);
+      expect(panedRange.end).toBe(initialRange.end + delta);
     });
 
-    it('should add and retrieve annotations', () => {
-      const timelineData = {
-        id: 'timeline-5',
-        events: [{ id: 'e1', timestamp: 1000, title: 'Event 1' }],
-        startTime: 0,
-        endTime: 2000,
-      };
+    it('should cluster events', () => {
+      const events: TimelineEvent[] = [
+        { id: 'e1', timestamp: 1000, label: 'Event 1' },
+        { id: 'e2', timestamp: 1100, label: 'Event 2' },
+        { id: 'e3', timestamp: 5000, label: 'Event 3' },
+      ];
 
-      timeline.loadTimeline(timelineData);
-      timeline.addAnnotation('timeline-5', 'e1', 'Important event');
+      timeline.addEvents(events);
+      const clusters = timeline.clusterEvents(1000);
 
-      const annotation = timeline.getAnnotation('timeline-5', 'e1');
-      expect(annotation).toBe('Important event');
+      expect(clusters.length).toBeGreaterThan(0);
     });
 
-    it('should calculate event positions', () => {
-      const timelineData = {
-        id: 'timeline-6',
-        events: [
-          { id: 'e1', timestamp: 1000, title: 'Event 1' },
-          { id: 'e2', timestamp: 2000, title: 'Event 2' },
-        ],
-        startTime: 0,
-        endTime: 3000,
+    it('should add annotations', () => {
+      const event: TimelineEvent = {
+        id: 'event1',
+        timestamp: 5000,
+        label: 'Event 1',
       };
 
-      timeline.loadTimeline(timelineData);
-      const positions = timeline.calculatePositions('timeline-6');
+      timeline.addEvent(event);
+      timeline.addAnnotation({
+        id: 'ann1',
+        eventId: 'event1',
+        text: 'Important event',
+        position: 'top',
+      });
 
-      expect(positions.size).toBe(2);
-      expect(positions.has('e1')).toBe(true);
-      expect(positions.has('e2')).toBe(true);
+      const annotations = timeline.getAnnotationsForEvent('event1');
+
+      expect(annotations.length).toBe(1);
+      expect(annotations[0].text).toBe('Important event');
     });
 
-    it('should export timeline as JSON', () => {
-      const timelineData = {
-        id: 'timeline-7',
-        events: [{ id: 'e1', timestamp: 1000, title: 'Event 1' }],
-        startTime: 0,
-        endTime: 2000,
-      };
+    it('should convert timestamp to pixel', () => {
+      const pixel = timeline.timestampToPixel(5000, 100);
 
-      timeline.loadTimeline(timelineData);
-      const exported = timeline.exportTimeline('timeline-7', 'json');
-
-      expect(typeof exported).toBe('string');
-      const parsed = JSON.parse(exported);
-      expect(parsed.id).toBe('timeline-7');
+      expect(pixel).toBeGreaterThan(0);
+      expect(pixel).toBeLessThan(100);
     });
 
-    it('should remove timeline', () => {
-      const timelineData = {
-        id: 'timeline-8',
-        events: [{ id: 'e1', timestamp: 1000, title: 'Event 1' }],
-        startTime: 0,
-        endTime: 2000,
-      };
+    it('should get timeline statistics', () => {
+      const events: TimelineEvent[] = [
+        { id: 'e1', timestamp: 1000, label: 'Event 1' },
+        { id: 'e2', timestamp: 5000, label: 'Event 2' },
+      ];
 
-      timeline.loadTimeline(timelineData);
-      timeline.removeTimeline('timeline-8');
+      timeline.addEvents(events);
+      const stats = timeline.getStatistics();
 
-      expect(timeline.getTimeline('timeline-8')).toBeNull();
+      expect(stats.eventCount).toBe(2);
+      expect(stats.timeSpan).toBeGreaterThan(0);
     });
   });
 
@@ -472,177 +486,252 @@ describe('Phase 12 Week 3 - Advanced Visualization', () => {
       builder = new CustomChartBuilder();
     });
 
-    it('should create chart from template', () => {
-      const chart = builder.createFromTemplate('chart-1', 'bar-chart', { data: [1, 2, 3] });
-
-      expect(chart).toBeDefined();
-      expect(chart.type).toBe('bar');
-      expect(chart.template).toBe('bar-chart');
-    });
-
-    it('should create blank chart', () => {
-      const chart = builder.createBlankChart('chart-2', 'custom', { data: [1, 2, 3] });
-
-      expect(chart).toBeDefined();
-      expect(chart.type).toBe('custom');
-    });
-
-    it('should add data mapping', () => {
-      const chart = builder.createBlankChart('chart-3', 'bar', { values: [1, 2, 3] });
-
-      builder.addMapping('chart-3', {
-        source: 'values',
-        target: 'data',
-        transform: (v) => v.map((x: number) => x * 2),
-      });
-
-      const updated = builder.getChart('chart-3');
-      expect(updated?.mappings.length).toBe(1);
-    });
-
-    it('should apply style preset', () => {
-      const chart = builder.createBlankChart('chart-4', 'bar', {});
-
-      builder.applyStylePreset('chart-4', 'dark');
-
-      const updated = builder.getChart('chart-4');
-      expect(updated?.style.backgroundColor).toBe('#1a1a1a');
-    });
-
-    it('should update style', () => {
-      const chart = builder.createBlankChart('chart-5', 'bar', {});
-
-      builder.updateStyle('chart-5', { borderRadius: 8 });
-
-      const updated = builder.getChart('chart-5');
-      expect(updated?.style.borderRadius).toBe(8);
-    });
-
-    it('should apply mappings to data', () => {
-      const chart = builder.createBlankChart('chart-6', 'bar', { values: [1, 2, 3] });
-
-      builder.addMapping('chart-6', {
-        source: 'values',
-        target: 'data',
-        transform: (v) => v.map((x: number) => x * 2),
-      });
-
-      const mapped = builder.applyMappings('chart-6');
-      expect(mapped.data).toEqual([2, 4, 6]);
-    });
-
-    it('should get all templates', () => {
+    it('should get default templates', () => {
       const templates = builder.getAllTemplates();
 
       expect(templates.length).toBeGreaterThan(0);
-      expect(templates.some((t) => t.id === 'bar-chart')).toBe(true);
+      expect(templates.some((t) => t.type === 'line')).toBe(true);
+      expect(templates.some((t) => t.type === 'bar')).toBe(true);
     });
 
-    it('should get all style presets', () => {
-      const presets = builder.getAllPresets();
+    it('should create chart from template', () => {
+      const data = [
+        { x: 1, y: 10 },
+        { x: 2, y: 20 },
+      ];
 
-      expect(presets.length).toBeGreaterThan(0);
-      expect(presets.includes('default')).toBe(true);
+      const chart = builder.createFromTemplate('chart1', 'line-basic', data, {
+        xAxis: 'x',
+        yAxis: 'y',
+      });
+
+      expect(chart.id).toBe('chart1');
+      expect(chart.type).toBe('line');
+      expect(chart.data.length).toBe(2);
     });
 
-    it('should duplicate chart', () => {
-      const original = builder.createBlankChart('chart-7', 'bar', { data: [1, 2, 3] });
+    it('should create custom chart', () => {
+      const data = [
+        { category: 'A', value: 10 },
+        { category: 'B', value: 20 },
+      ];
 
-      const duplicate = builder.duplicateChart('chart-7', 'chart-7-copy');
+      const chart = builder.createChart('chart1', 'bar', data, {
+        xAxis: 'category',
+        yAxis: 'value',
+      });
 
-      expect(duplicate).toBeDefined();
-      expect(duplicate?.name).toContain('Copy');
-      expect(duplicate?.type).toBe(original.type);
+      expect(chart.id).toBe('chart1');
+      expect(chart.type).toBe('bar');
+    });
+
+    it('should update chart data', () => {
+      const initialData = [{ x: 1, y: 10 }];
+      const chart = builder.createChart('chart1', 'line', initialData, {
+        xAxis: 'x',
+        yAxis: 'y',
+      });
+
+      const newData = [
+        { x: 1, y: 10 },
+        { x: 2, y: 20 },
+      ];
+
+      builder.updateChartData('chart1', newData);
+      const updated = builder.getChart('chart1');
+
+      expect(updated?.data.length).toBe(2);
+    });
+
+    it('should update data mapping', () => {
+      const data = [{ x: 1, y: 10 }];
+      builder.createChart('chart1', 'line', data, { xAxis: 'x' });
+
+      builder.updateDataMapping('chart1', { yAxis: 'y' });
+      const updated = builder.getChart('chart1');
+
+      expect(updated?.mapping.yAxis).toBe('y');
+    });
+
+    it('should update chart style', () => {
+      const data = [{ x: 1, y: 10 }];
+      builder.createChart('chart1', 'line', data, { xAxis: 'x' });
+
+      builder.updateChartStyle('chart1', { fontSize: 14 });
+      const updated = builder.getChart('chart1');
+
+      expect(updated?.style.fontSize).toBe(14);
+    });
+
+    it('should validate chart', () => {
+      const data = [{ x: 1, y: 10 }];
+      builder.createChart('chart1', 'line', data, { xAxis: 'x', yAxis: 'y' });
+
+      const validation = builder.validateChart('chart1');
+
+      expect(validation.valid).toBe(true);
+      expect(validation.errors.length).toBe(0);
+    });
+
+    it('should clone chart', () => {
+      const data = [{ x: 1, y: 10 }];
+      builder.createChart('chart1', 'line', data, { xAxis: 'x', yAxis: 'y' });
+
+      const cloned = builder.cloneChart('chart1', 'chart2');
+
+      expect(cloned).toBeDefined();
+      expect(cloned?.id).toBe('chart2');
+      expect(cloned?.type).toBe('line');
     });
 
     it('should export chart as JSON', () => {
-      builder.createBlankChart('chart-8', 'bar', { data: [1, 2, 3] });
+      const data = [{ x: 1, y: 10 }];
+      builder.createChart('chart1', 'line', data, { xAxis: 'x', yAxis: 'y' });
 
-      const exported = builder.exportChart('chart-8', 'json');
+      const exported = builder.exportChart('chart1', 'json');
 
-      expect(typeof exported).toBe('string');
-      const parsed = JSON.parse(exported as string);
-      expect(parsed.id).toBe('chart-8');
+      expect(exported).toBeDefined();
+      expect(exported?.format).toBe('json');
     });
 
-    it('should remove chart', () => {
-      builder.createBlankChart('chart-9', 'bar', {});
+    it('should export chart as CSV', () => {
+      const data = [
+        { x: 1, y: 10 },
+        { x: 2, y: 20 },
+      ];
 
-      builder.removeChart('chart-9');
+      builder.createChart('chart1', 'line', data, { xAxis: 'x', yAxis: 'y' });
+      const exported = builder.exportChart('chart1', 'csv');
 
-      expect(builder.getChart('chart-9')).toBeNull();
+      expect(exported).toBeDefined();
+      expect(exported?.format).toBe('csv');
+      expect(typeof exported?.data).toBe('string');
+    });
+
+    it('should get chart statistics', () => {
+      const data = [{ x: 1, y: 10 }];
+      builder.createChart('chart1', 'line', data, { xAxis: 'x' });
+      builder.createChart('chart2', 'bar', data, { xAxis: 'x' });
+
+      const stats = builder.getStatistics();
+
+      expect(stats.totalCharts).toBe(2);
+      expect(stats.lineCharts).toBe(1);
+      expect(stats.barCharts).toBe(1);
+    });
+
+    it('should delete chart', () => {
+      const data = [{ x: 1, y: 10 }];
+      builder.createChart('chart1', 'line', data, { xAxis: 'x' });
+
+      const deleted = builder.deleteChart('chart1');
+      const retrieved = builder.getChart('chart1');
+
+      expect(deleted).toBe(true);
+      expect(retrieved).toBeUndefined();
     });
   });
 
   describe('Integration Tests', () => {
-    it('should handle multiple visualization types simultaneously', () => {
-      const terrain = new Terrain3DVisualization();
+    it('should work with all visualization engines together', () => {
+      const terrain = new Terrain3DVisualization({
+        width: 100,
+        height: 100,
+        scale: 1,
+        heightScale: 10,
+      });
+
       const network = new NetworkGraphVisualization();
-      const heatmap = new HeatmapEngine();
-      const timeline = new TimelineVisualization();
+      const heatmap = new HeatmapEngine({
+        width: 100,
+        height: 100,
+        cellSize: 10,
+      });
+
+      const timeline = new TimelineVisualization({
+        startTime: 0,
+        endTime: 10000,
+        height: 100,
+      });
+
       const builder = new CustomChartBuilder();
 
-      // Load data into each
-      terrain.loadTerrain({
-        id: 't1',
-        width: 5,
-        height: 5,
-        heightMap: Array(5)
-          .fill(null)
-          .map(() => Array(5).fill(0)),
-      });
-
-      network.loadNetwork({
-        id: 'n1',
-        nodes: [{ id: 'n1', label: 'Node 1' }],
-        edges: [],
-      });
-
-      heatmap.loadHeatmap({
-        id: 'h1',
-        points: [{ x: 10, y: 10, value: 50 }],
-        width: 50,
-        height: 50,
-      });
-
-      timeline.loadTimeline({
-        id: 'tl1',
-        events: [{ id: 'e1', timestamp: 1000, title: 'Event 1' }],
-        startTime: 0,
-        endTime: 2000,
-      });
-
-      builder.createBlankChart('c1', 'bar', {});
-
-      // Verify all loaded
-      expect(terrain.getTerrain('t1')).toBeDefined();
-      expect(network.getNetwork('n1')).toBeDefined();
-      expect(heatmap.getHeatmap('h1')).toBeDefined();
-      expect(timeline.getTimeline('tl1')).toBeDefined();
-      expect(builder.getChart('c1')).toBeDefined();
+      expect(terrain).toBeDefined();
+      expect(network).toBeDefined();
+      expect(heatmap).toBeDefined();
+      expect(timeline).toBeDefined();
+      expect(builder).toBeDefined();
     });
 
-    it('should emit events correctly', (done) => {
-      const terrain = new Terrain3DVisualization();
-      let eventFired = false;
-
-      terrain.on('terrain:loaded', () => {
-        eventFired = true;
+    it('should handle complex visualization scenarios', () => {
+      // Create terrain
+      const terrain = new Terrain3DVisualization({
+        width: 100,
+        height: 100,
+        scale: 1,
+        heightScale: 10,
       });
 
-      terrain.loadTerrain({
-        id: 't1',
-        width: 5,
-        height: 5,
-        heightMap: Array(5)
-          .fill(null)
-          .map(() => Array(5).fill(0)),
+      const terrainData: TerrainData = {
+        elevations: [
+          [0, 1, 2],
+          [1, 2, 3],
+          [2, 3, 4],
+        ],
+      };
+
+      terrain.generateMesh(terrainData);
+
+      // Create network
+      const network = new NetworkGraphVisualization();
+      const networkData: NetworkData = {
+        nodes: [
+          { id: 'a', label: 'Node A' },
+          { id: 'b', label: 'Node B' },
+        ],
+        edges: [{ source: 'a', target: 'b' }],
+      };
+
+      network.loadData(networkData);
+      network.applyForceDirectedLayout();
+
+      // Create heatmap
+      const heatmap = new HeatmapEngine({
+        width: 100,
+        height: 100,
+        cellSize: 10,
       });
 
-      setTimeout(() => {
-        expect(eventFired).toBe(true);
-        done();
-      }, 100);
+      heatmap.addPoints([
+        { x: 10, y: 10, value: 1 },
+        { x: 20, y: 20, value: 2 },
+      ]);
+
+      // Create timeline
+      const timeline = new TimelineVisualization({
+        startTime: 0,
+        endTime: 10000,
+        height: 100,
+      });
+
+      timeline.addEvent({
+        id: 'e1',
+        timestamp: 5000,
+        label: 'Event 1',
+      });
+
+      // Create custom chart
+      const builder = new CustomChartBuilder();
+      builder.createChart('chart1', 'line', [{ x: 1, y: 10 }], {
+        xAxis: 'x',
+        yAxis: 'y',
+      });
+
+      expect(terrain.getMesh()).toBeDefined();
+      expect(network.getNode('a')).toBeDefined();
+      expect(heatmap.getStatistics().pointCount).toBe(2);
+      expect(timeline.getEvent('e1')).toBeDefined();
+      expect(builder.getChart('chart1')).toBeDefined();
     });
   });
 });

@@ -1,314 +1,237 @@
 /**
  * API Gateway
- * Centralized API management
- *
- * درگاه API
- * مدیریت متمرکز API
+ * Centralized API management with routing, rate limiting, and authentication
  */
 
-import { EventEmitter } from 'events';
-
-export interface APIRoute {
+export interface RouteConfig {
   path: string;
   method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
-  handler: (req: any) => Promise<any>;
+  target: string;
   rateLimit?: number;
   requiresAuth?: boolean;
-  version?: string;
+  timeout?: number;
 }
 
-export interface APIRequest {
-  id: string;
-  path: string;
-  method: string;
-  timestamp: number;
-  clientId: string;
-  authenticated: boolean;
+export interface RateLimitConfig {
+  requestsPerMinute: number;
+  requestsPerHour: number;
+  burstSize?: number;
 }
 
-export interface APIResponse {
-  status: number;
-  data: any;
-  timestamp: number;
-  executionTime: number;
+export interface AuthConfig {
+  type: 'bearer' | 'api-key' | 'oauth2';
+  secret?: string;
+  issuer?: string;
 }
 
-export interface APIGatewayConfig {
-  enableRateLimit: boolean;
-  enableCaching: boolean;
-  enableVersioning: boolean;
-  defaultVersion: string;
-  requestTimeout: number;
-  maxRequestSize: number;
+export interface GatewayStats {
+  totalRequests: number;
+  successfulRequests: number;
+  failedRequests: number;
+  rateLimitedRequests: number;
+  unauthorizedRequests: number;
+  averageResponseTime: number;
 }
 
-export class APIGateway extends EventEmitter {
-  private routes: Map<string, APIRoute> = new Map();
-  private rateLimitMap: Map<string, number[]> = new Map();
-  private responseCache: Map<string, APIResponse> = new Map();
-  private config: APIGatewayConfig;
-  private requestLog: APIRequest[] = [];
+/**
+ * APIGateway - Centralized API management
+ */
+export class APIGateway {
+  private routes: Map<string, RouteConfig> = new Map();
+  private rateLimiters: Map<string, { count: number; resetTime: number }> = new Map();
+  private authConfig: AuthConfig;
+  private stats: GatewayStats = {
+    totalRequests: 0,
+    successfulRequests: 0,
+    failedRequests: 0,
+    rateLimitedRequests: 0,
+    unauthorizedRequests: 0,
+    averageResponseTime: 0,
+  };
+  private responseTimes: number[] = [];
 
-  constructor(config?: Partial<APIGatewayConfig>) {
-    super();
-    this.config = {
-      enableRateLimit: true,
-      enableCaching: true,
-      enableVersioning: true,
-      defaultVersion: 'v1',
-      requestTimeout: 30000,
-      maxRequestSize: 10 * 1024 * 1024, // 10MB
-      ...config,
-    };
+  constructor(authConfig: AuthConfig = { type: 'bearer' }) {
+    this.authConfig = authConfig;
   }
 
   /**
    * Register route
    */
-  registerRoute(route: APIRoute): void {
-    const key = `${route.method}:${route.path}`;
-    this.routes.set(key, route);
-    this.emit('route:registered', { path: route.path, method: route.method });
+  registerRoute(config: RouteConfig): void {
+    const key = `${config.method}:${config.path}`;
+    this.routes.set(key, config);
+  }
+
+  /**
+   * Get route
+   */
+  getRoute(method: string, path: string): RouteConfig | undefined {
+    const key = `${method}:${path}`;
+    return this.routes.get(key);
   }
 
   /**
    * Handle request
    */
-  async handleRequest(req: any): Promise<APIResponse> {
-    const requestId = this.generateRequestId();
-    const startTime = Date.now();
+  async handleRequest(
+    method: string,
+    path: string,
+    token?: string,
+    clientId?: string
+  ): Promise<{ allowed: boolean; reason?: string }> {
+    this.stats.totalRequests++;
 
-    // Log request
-    const apiRequest: APIRequest = {
-      id: requestId,
-      path: req.path,
-      method: req.method,
-      timestamp: startTime,
-      clientId: req.clientId || 'unknown',
-      authenticated: req.authenticated || false,
-    };
+    const route = this.getRoute(method, path);
+    if (!route) {
+      this.stats.failedRequests++;
+      return { allowed: false, reason: 'Route not found' };
+    }
 
-    this.requestLog.push(apiRequest);
+    // Check authentication
+    if (route.requiresAuth && !this.validateAuth(token)) {
+      this.stats.unauthorizedRequests++;
+      return { allowed: false, reason: 'Unauthorized' };
+    }
 
+    // Check rate limit
+    const clientKey = clientId || 'anonymous';
+    if (!this.checkRateLimit(clientKey, route.rateLimit)) {
+      this.stats.rateLimitedRequests++;
+      return { allowed: false, reason: 'Rate limit exceeded' };
+    }
+
+    this.stats.successfulRequests++;
+    return { allowed: true };
+  }
+
+  /**
+   * Validate authentication
+   */
+  private validateAuth(token?: string): boolean {
+    if (!token) {
+      return false;
+    }
+
+    switch (this.authConfig.type) {
+      case 'bearer':
+        return token.startsWith('Bearer ');
+      case 'api-key':
+        return token === this.authConfig.secret;
+      case 'oauth2':
+        return this.validateOAuth2Token(token);
+      default:
+        return false;
+    }
+  }
+
+  /**
+   * Validate OAuth2 token
+   */
+  private validateOAuth2Token(token: string): boolean {
     try {
-      // Check rate limit
-      if (this.config.enableRateLimit) {
-        if (!this.checkRateLimit(req.clientId)) {
-          this.emit('request:rate-limited', { clientId: req.clientId });
-          return {
-            status: 429,
-            data: { error: 'Too many requests' },
-            timestamp: Date.now(),
-            executionTime: Date.now() - startTime,
-          };
-        }
-      }
-
-      // Check cache
-      const cacheKey = this.generateCacheKey(req);
-      if (this.config.enableCaching && req.method === 'GET') {
-        const cached = this.responseCache.get(cacheKey);
-        if (cached) {
-          this.emit('request:cache-hit', { path: req.path });
-          return cached;
-        }
-      }
-
-      // Find route
-      const routeKey = `${req.method}:${req.path}`;
-      const route = this.routes.get(routeKey);
-
-      if (!route) {
-        this.emit('request:not-found', { path: req.path, method: req.method });
-        return {
-          status: 404,
-          data: { error: 'Route not found' },
-          timestamp: Date.now(),
-          executionTime: Date.now() - startTime,
-        };
-      }
-
-      // Check authentication
-      if (route.requiresAuth && !req.authenticated) {
-        this.emit('request:unauthorized', { path: req.path });
-        return {
-          status: 401,
-          data: { error: 'Unauthorized' },
-          timestamp: Date.now(),
-          executionTime: Date.now() - startTime,
-        };
-      }
-
-      // Execute handler
-      const data = await route.handler(req);
-
-      const response: APIResponse = {
-        status: 200,
-        data,
-        timestamp: Date.now(),
-        executionTime: Date.now() - startTime,
-      };
-
-      // Cache response
-      if (this.config.enableCaching && req.method === 'GET') {
-        this.responseCache.set(cacheKey, response);
-      }
-
-      this.emit('request:completed', {
-        path: req.path,
-        status: 200,
-        executionTime: response.executionTime,
-      });
-
-      return response;
-    } catch (error) {
-      this.emit('request:error', { path: req.path, error: (error as Error).message });
-
-      return {
-        status: 500,
-        data: { error: 'Internal server error' },
-        timestamp: Date.now(),
-        executionTime: Date.now() - startTime,
-      };
+      const parts = token.split('.');
+      return parts.length === 3;
+    } catch {
+      return false;
     }
   }
 
   /**
    * Check rate limit
    */
-  private checkRateLimit(clientId: string): boolean {
-    const now = Date.now();
-    const windowStart = now - 60000; // 1 minute window
-
-    let requests = this.rateLimitMap.get(clientId) || [];
-    requests = requests.filter((timestamp) => timestamp > windowStart);
-
-    if (requests.length >= 100) {
-      // 100 requests per minute
-      return false;
+  private checkRateLimit(clientId: string, limit?: number): boolean {
+    if (!limit) {
+      return true;
     }
 
-    requests.push(now);
-    this.rateLimitMap.set(clientId, requests);
+    const now = Date.now();
+    const limiter = this.rateLimiters.get(clientId);
 
-    return true;
+    if (!limiter || now > limiter.resetTime) {
+      this.rateLimiters.set(clientId, {
+        count: 1,
+        resetTime: now + 60000, // 1 minute
+      });
+      return true;
+    }
+
+    if (limiter.count < limit) {
+      limiter.count++;
+      return true;
+    }
+
+    return false;
   }
 
   /**
-   * Generate cache key
+   * Record response time
    */
-  private generateCacheKey(req: any): string {
-    return `${req.method}:${req.path}:${JSON.stringify(req.query || {})}`;
+  recordResponseTime(responseTime: number): void {
+    this.responseTimes.push(responseTime);
+    if (this.responseTimes.length > 1000) {
+      this.responseTimes.shift();
+    }
+
+    this.stats.averageResponseTime =
+      this.responseTimes.reduce((a, b) => a + b, 0) / this.responseTimes.length;
   }
 
   /**
-   * Generate request ID
+   * Get statistics
    */
-  private generateRequestId(): string {
-    return `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+  getStatistics(): GatewayStats {
+    return { ...this.stats };
   }
 
   /**
-   * Get route
+   * Get routes
    */
-  getRoute(method: string, path: string): APIRoute | null {
-    const key = `${method}:${path}`;
-    return this.routes.get(key) || null;
-  }
-
-  /**
-   * Get all routes
-   */
-  getAllRoutes(): APIRoute[] {
+  getRoutes(): RouteConfig[] {
     return Array.from(this.routes.values());
-  }
-
-  /**
-   * Clear cache
-   */
-  clearCache(): void {
-    this.responseCache.clear();
-    this.emit('cache:cleared', {});
-  }
-
-  /**
-   * Get request statistics
-   */
-  getRequestStats(): {
-    totalRequests: number;
-    successfulRequests: number;
-    failedRequests: number;
-    avgResponseTime: number;
-  } {
-    const totalRequests = this.requestLog.length;
-    const successfulRequests = this.requestLog.filter((r) => r.authenticated).length;
-    const failedRequests = totalRequests - successfulRequests;
-    const avgResponseTime = 0; // Would calculate from actual response times
-
-    return {
-      totalRequests,
-      successfulRequests,
-      failedRequests,
-      avgResponseTime,
-    };
-  }
-
-  /**
-   * Get request log
-   */
-  getRequestLog(limit: number = 100): APIRequest[] {
-    return this.requestLog.slice(-limit);
   }
 
   /**
    * Get rate limit status
    */
-  getRateLimitStatus(clientId: string): { remaining: number; resetTime: number } {
-    const now = Date.now();
-    const windowStart = now - 60000;
-
-    const requests = (this.rateLimitMap.get(clientId) || []).filter(
-      (timestamp) => timestamp > windowStart
-    );
+  getRateLimitStatus(clientId: string): Record<string, unknown> {
+    const limiter = this.rateLimiters.get(clientId);
+    if (!limiter) {
+      return { limited: false, count: 0 };
+    }
 
     return {
-      remaining: Math.max(0, 100 - requests.length),
-      resetTime: requests.length > 0 ? requests[0] + 60000 : now,
+      limited: false,
+      count: limiter.count,
+      resetTime: new Date(limiter.resetTime).toISOString(),
     };
   }
 
   /**
-   * Enable versioning
+   * Reset rate limiter
    */
-  enableVersioning(version: string): void {
-    this.config.enableVersioning = true;
-    this.config.defaultVersion = version;
-    this.emit('versioning:enabled', { version });
+  resetRateLimiter(clientId: string): void {
+    this.rateLimiters.delete(clientId);
   }
 
   /**
-   * Disable versioning
+   * Get success rate
    */
-  disableVersioning(): void {
-    this.config.enableVersioning = false;
-    this.emit('versioning:disabled', {});
+  getSuccessRate(): number {
+    if (this.stats.totalRequests === 0) {
+      return 0;
+    }
+
+    return this.stats.successfulRequests / this.stats.totalRequests;
   }
 
   /**
-   * Get API documentation
+   * Get error rate
    */
-  getDocumentation(): any {
-    const routes = Array.from(this.routes.values()).map((route) => ({
-      path: route.path,
-      method: route.method,
-      requiresAuth: route.requiresAuth,
-      version: route.version || this.config.defaultVersion,
-    }));
+  getErrorRate(): number {
+    if (this.stats.totalRequests === 0) {
+      return 0;
+    }
 
-    return {
-      version: this.config.defaultVersion,
-      routes,
-      totalRoutes: routes.length,
-    };
+    return this.stats.failedRequests / this.stats.totalRequests;
   }
 }

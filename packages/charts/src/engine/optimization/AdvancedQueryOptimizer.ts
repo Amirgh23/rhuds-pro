@@ -1,124 +1,142 @@
 /**
  * Advanced Query Optimizer
- * بهینه‌ساز پرس‌وجوی پیشرفته برای بهتری عملکرد
- *
- * Features:
- * - Query planning
- * - Index optimization
- * - Execution analysis
- * - Performance tuning
+ * Optimizes query execution and caching strategies
  */
 
 export interface QueryPlan {
   id: string;
   query: string;
   estimatedCost: number;
-  actualCost?: number;
-  steps: QueryStep[];
+  executionSteps: ExecutionStep[];
   optimizations: string[];
+  cacheStrategy: 'none' | 'memory' | 'disk' | 'hybrid';
 }
 
-export interface QueryStep {
+export interface ExecutionStep {
+  id: string;
   operation: string;
-  cost: number;
-  rows: number;
-  duration?: number;
+  estimatedRows: number;
+  estimatedCost: number;
+  filters?: Record<string, unknown>;
 }
 
-export interface IndexStrategy {
-  name: string;
-  columns: string[];
-  type: 'btree' | 'hash' | 'bitmap';
-  selectivity: number;
-  estimatedSize: number;
+export interface QueryResult<T = unknown> {
+  id: string;
+  query: string;
+  data: T[];
+  executionTime: number;
+  rowsScanned: number;
+  rowsReturned: number;
+  cacheHit: boolean;
+  plan: QueryPlan;
 }
 
-export class AdvancedQueryOptimizer {
-  private queryPlans: Map<string, QueryPlan>;
-  private indexStrategies: Map<string, IndexStrategy>;
-  private stats: {
-    queriesOptimized: number;
-    averageImprovement: number;
-    indexesCreated: number;
-  };
+export interface CacheEntry<T = unknown> {
+  id: string;
+  query: string;
+  result: T[];
+  createdAt: number;
+  lastAccessedAt: number;
+  accessCount: number;
+  size: number;
+  ttl: number;
+}
 
-  constructor() {
-    this.queryPlans = new Map();
-    this.indexStrategies = new Map();
-    this.stats = {
-      queriesOptimized: 0,
-      averageImprovement: 0,
-      indexesCreated: 0,
-    };
-  }
+/**
+ * Advanced Query Optimizer
+ * Optimizes query execution and manages caching
+ */
+export class AdvancedQueryOptimizer<T = unknown> {
+  private memoryCache: Map<string, CacheEntry<T>> = new Map();
+  private queryPlans: Map<string, QueryPlan> = new Map();
+  private executionStats: Map<string, Record<string, unknown>> = new Map();
+  private maxCacheSize: number = 100 * 1024 * 1024; // 100MB
+  private currentCacheSize: number = 0;
 
   /**
-   * Analyze and optimize query
+   * Create an optimized query plan
    */
-  public optimizeQuery(query: string): QueryPlan {
-    const planId = this.generatePlanId();
-    const steps = this.analyzeQuerySteps(query);
-    const estimatedCost = this.calculateCost(steps);
-    const optimizations = this.identifyOptimizations(query, steps);
+  public createQueryPlan(query: string, estimatedRows: number = 1000): QueryPlan {
+    const planId = `plan-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+    // Parse query and create execution steps
+    const steps = this.parseQuery(query, estimatedRows);
+
+    // Calculate total cost
+    const totalCost = steps.reduce((sum, step) => sum + step.estimatedCost, 0);
+
+    // Determine optimizations
+    const optimizations = this.determineOptimizations(query, steps);
+
+    // Determine cache strategy
+    const cacheStrategy = this.determineCacheStrategy(totalCost, estimatedRows);
 
     const plan: QueryPlan = {
       id: planId,
       query,
-      estimatedCost,
-      steps,
+      estimatedCost: totalCost,
+      executionSteps: steps,
       optimizations,
+      cacheStrategy,
     };
 
     this.queryPlans.set(planId, plan);
-    this.stats.queriesOptimized++;
-
     return plan;
   }
 
   /**
-   * Analyze query steps
+   * Parse query into execution steps
    */
-  private analyzeQuerySteps(query: string): QueryStep[] {
-    const steps: QueryStep[] = [];
+  private parseQuery(query: string, estimatedRows: number): ExecutionStep[] {
+    const steps: ExecutionStep[] = [];
 
-    // Parse query and identify operations
+    // Simple query parsing (in real implementation, would be more sophisticated)
     if (query.includes('SELECT')) {
       steps.push({
-        operation: 'SCAN',
-        cost: 100,
-        rows: 1000,
+        id: 'step-1',
+        operation: 'TableScan',
+        estimatedRows,
+        estimatedCost: estimatedRows * 0.1,
       });
     }
 
     if (query.includes('WHERE')) {
+      const filterCost = estimatedRows * 0.05;
       steps.push({
-        operation: 'FILTER',
-        cost: 50,
-        rows: 500,
+        id: 'step-2',
+        operation: 'Filter',
+        estimatedRows: Math.ceil(estimatedRows * 0.3),
+        estimatedCost: filterCost,
       });
     }
 
     if (query.includes('JOIN')) {
+      const joinCost = estimatedRows * 0.2;
       steps.push({
-        operation: 'JOIN',
-        cost: 200,
-        rows: 250,
+        id: 'step-3',
+        operation: 'Join',
+        estimatedRows: Math.ceil(estimatedRows * 0.5),
+        estimatedCost: joinCost,
       });
     }
 
     if (query.includes('GROUP BY')) {
+      const groupCost = estimatedRows * 0.15;
       steps.push({
-        operation: 'AGGREGATE',
-        cost: 75,
-        rows: 50,
+        id: 'step-4',
+        operation: 'GroupBy',
+        estimatedRows: Math.ceil(estimatedRows * 0.1),
+        estimatedCost: groupCost,
       });
     }
 
     if (query.includes('ORDER BY')) {
+      const sortCost = estimatedRows * Math.log2(estimatedRows) * 0.01;
       steps.push({
-        operation: 'SORT',
-        cost: 100,
-        rows: 50,
+        id: 'step-5',
+        operation: 'Sort',
+        estimatedRows,
+        estimatedCost: sortCost,
       });
     }
 
@@ -126,137 +144,269 @@ export class AdvancedQueryOptimizer {
   }
 
   /**
-   * Calculate query cost
+   * Determine optimizations for query
    */
-  private calculateCost(steps: QueryStep[]): number {
-    return steps.reduce((total, step) => total + step.cost, 0);
-  }
-
-  /**
-   * Identify optimizations
-   */
-  private identifyOptimizations(query: string, steps: QueryStep[]): string[] {
+  private determineOptimizations(query: string, steps: ExecutionStep[]): string[] {
     const optimizations: string[] = [];
 
+    // Check for index opportunities
     if (query.includes('WHERE') && !query.includes('INDEX')) {
-      optimizations.push('Add index on WHERE clause columns');
+      optimizations.push('Consider adding index on WHERE clause columns');
     }
 
-    if (query.includes('JOIN') && steps.length > 2) {
-      optimizations.push('Reorder JOIN operations');
+    // Check for join optimization
+    if (query.includes('JOIN')) {
+      optimizations.push('Consider using hash join for large datasets');
     }
 
-    if (query.includes('SELECT *')) {
-      optimizations.push('Select specific columns instead of *');
+    // Check for aggregation optimization
+    if (query.includes('GROUP BY')) {
+      optimizations.push('Consider pre-aggregating data');
     }
 
-    if (query.includes('DISTINCT')) {
-      optimizations.push('Consider using GROUP BY instead of DISTINCT');
+    // Check for sorting optimization
+    if (query.includes('ORDER BY')) {
+      optimizations.push('Consider using indexed sort');
     }
 
-    if (query.includes('LIKE')) {
-      optimizations.push('Use full-text search for LIKE queries');
+    // Check for caching opportunity
+    if (steps.length > 2) {
+      optimizations.push('Consider caching intermediate results');
     }
 
     return optimizations;
   }
 
   /**
-   * Suggest index strategy
+   * Determine cache strategy
    */
-  public suggestIndexStrategy(columns: string[], selectivity: number): IndexStrategy {
-    const strategyId = this.generateStrategyId();
-    let type: 'btree' | 'hash' | 'bitmap' = 'btree';
+  private determineCacheStrategy(
+    cost: number,
+    estimatedRows: number
+  ): 'none' | 'memory' | 'disk' | 'hybrid' {
+    if (cost < 10 && estimatedRows < 100) {
+      return 'none'; // Too cheap to cache
+    }
+    if (cost < 100 && estimatedRows < 1000) {
+      return 'memory';
+    }
+    if (cost < 1000) {
+      return 'hybrid';
+    }
+    return 'disk';
+  }
 
-    if (selectivity > 0.9) {
-      type = 'hash';
-    } else if (selectivity < 0.1) {
-      type = 'bitmap';
+  /**
+   * Execute query with optimization
+   */
+  public async executeQuery(
+    query: string,
+    executor: (q: string) => Promise<T[]>
+  ): Promise<QueryResult<T>> {
+    const resultId = `result-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const cacheKey = this.generateCacheKey(query);
+
+    // Check cache
+    const cached = this.memoryCache.get(cacheKey);
+    if (cached && !this.isCacheExpired(cached)) {
+      cached.lastAccessedAt = Date.now();
+      cached.accessCount++;
+
+      return {
+        id: resultId,
+        query,
+        data: cached.result,
+        executionTime: 0,
+        rowsScanned: cached.result.length,
+        rowsReturned: cached.result.length,
+        cacheHit: true,
+        plan: this.queryPlans.get(`plan-${cacheKey}`) || this.createQueryPlan(query),
+      };
     }
 
-    const strategy: IndexStrategy = {
-      name: `idx_${strategyId}`,
-      columns,
-      type,
-      selectivity,
-      estimatedSize: this.estimateIndexSize(columns),
+    // Execute query
+    const startTime = Date.now();
+    const data = await executor(query);
+    const executionTime = Date.now() - startTime;
+
+    // Create plan
+    const plan = this.createQueryPlan(query, data.length);
+
+    // Cache result
+    if (plan.cacheStrategy !== 'none') {
+      this.cacheResult(cacheKey, query, data, plan.cacheStrategy);
+    }
+
+    // Update statistics
+    this.updateStatistics(query, executionTime, data.length);
+
+    return {
+      id: resultId,
+      query,
+      data,
+      executionTime,
+      rowsScanned: data.length,
+      rowsReturned: data.length,
+      cacheHit: false,
+      plan,
+    };
+  }
+
+  /**
+   * Generate cache key
+   */
+  private generateCacheKey(query: string): string {
+    // Simple hash function
+    let hash = 0;
+    for (let i = 0; i < query.length; i++) {
+      const char = query.charCodeAt(i);
+      hash = (hash << 5) - hash + char;
+      hash = hash & hash; // Convert to 32bit integer
+    }
+    return `cache-${Math.abs(hash)}`;
+  }
+
+  /**
+   * Cache result
+   */
+  private cacheResult(key: string, query: string, result: T[], strategy: string): void {
+    const size = JSON.stringify(result).length;
+
+    // Check if we need to evict
+    if (this.currentCacheSize + size > this.maxCacheSize) {
+      this.evictCache(size);
+    }
+
+    const entry: CacheEntry<T> = {
+      id: key,
+      query,
+      result,
+      createdAt: Date.now(),
+      lastAccessedAt: Date.now(),
+      accessCount: 1,
+      size,
+      ttl: strategy === 'memory' ? 5 * 60 * 1000 : 30 * 60 * 1000, // 5 min or 30 min
     };
 
-    this.indexStrategies.set(strategy.name, strategy);
-    this.stats.indexesCreated++;
-
-    return strategy;
+    this.memoryCache.set(key, entry);
+    this.currentCacheSize += size;
   }
 
   /**
-   * Estimate index size
+   * Evict cache entries
    */
-  private estimateIndexSize(columns: string[]): number {
-    return columns.length * 1024 * 10; // Rough estimate
-  }
+  private evictCache(requiredSpace: number): void {
+    const entries = Array.from(this.memoryCache.values()).sort((a, b) => {
+      // LRU eviction: prioritize least recently used
+      return a.lastAccessedAt - b.lastAccessedAt;
+    });
 
-  /**
-   * Execute query with plan
-   */
-  public executeWithPlan(plan: QueryPlan): { duration: number; rows: number } {
-    const startTime = Date.now();
-    let totalRows = 0;
+    let freedSpace = 0;
+    for (const entry of entries) {
+      if (freedSpace >= requiredSpace) break;
 
-    for (const step of plan.steps) {
-      step.duration = Math.random() * 100;
-      totalRows = step.rows;
+      this.memoryCache.delete(entry.id);
+      this.currentCacheSize -= entry.size;
+      freedSpace += entry.size;
     }
+  }
 
-    const duration = Date.now() - startTime;
+  /**
+   * Check if cache is expired
+   */
+  private isCacheExpired(entry: CacheEntry<T>): boolean {
+    return Date.now() - entry.createdAt > entry.ttl;
+  }
 
-    plan.actualCost = duration;
+  /**
+   * Update statistics
+   */
+  private updateStatistics(query: string, executionTime: number, rowsReturned: number): void {
+    const key = this.generateCacheKey(query);
+    const stats = this.executionStats.get(key) || {
+      executionCount: 0,
+      totalTime: 0,
+      avgTime: 0,
+      minTime: Infinity,
+      maxTime: 0,
+      totalRows: 0,
+    };
 
-    return { duration, rows: totalRows };
+    stats.executionCount = (stats.executionCount as number) + 1;
+    stats.totalTime = (stats.totalTime as number) + executionTime;
+    stats.avgTime = (stats.totalTime as number) / (stats.executionCount as number);
+    stats.minTime = Math.min(stats.minTime as number, executionTime);
+    stats.maxTime = Math.max(stats.maxTime as number, executionTime);
+    stats.totalRows = (stats.totalRows as number) + rowsReturned;
+
+    this.executionStats.set(key, stats);
   }
 
   /**
    * Get query statistics
    */
-  public getQueryStats(planId: string) {
-    const plan = this.queryPlans.get(planId);
-    if (!plan) return null;
-
-    const improvement = plan.estimatedCost - (plan.actualCost || 0);
-    const improvementPercent = (improvement / plan.estimatedCost) * 100;
+  public getStatistics(): Record<string, unknown> {
+    const stats = Array.from(this.executionStats.values());
+    const totalExecutions = stats.reduce((sum, s) => sum + (s.executionCount as number), 0);
+    const totalTime = stats.reduce((sum, s) => sum + (s.totalTime as number), 0);
 
     return {
-      planId,
-      query: plan.query,
-      estimatedCost: plan.estimatedCost,
-      actualCost: plan.actualCost,
-      improvement,
-      improvementPercent,
-      optimizations: plan.optimizations,
+      totalQueries: this.executionStats.size,
+      totalExecutions,
+      totalTime,
+      averageTime: totalExecutions > 0 ? totalTime / totalExecutions : 0,
+      cacheSize: this.currentCacheSize,
+      cacheEntries: this.memoryCache.size,
+      maxCacheSize: this.maxCacheSize,
+      cacheUtilization: (this.currentCacheSize / this.maxCacheSize) * 100,
     };
   }
 
   /**
-   * Generate plan ID
+   * Get cache statistics
    */
-  private generatePlanId(): string {
-    return `plan-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-  }
+  public getCacheStatistics(): Record<string, unknown> {
+    const entries = Array.from(this.memoryCache.values());
+    const totalHits = entries.reduce((sum, e) => sum + e.accessCount, 0);
+    const avgAccessCount = entries.length > 0 ? totalHits / entries.length : 0;
 
-  /**
-   * Generate strategy ID
-   */
-  private generateStrategyId(): string {
-    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-  }
-
-  /**
-   * Get statistics
-   */
-  public getStats() {
     return {
-      ...this.stats,
-      totalPlans: this.queryPlans.size,
-      totalStrategies: this.indexStrategies.size,
+      entries: entries.length,
+      totalSize: this.currentCacheSize,
+      maxSize: this.maxCacheSize,
+      utilizationPercent: (this.currentCacheSize / this.maxCacheSize) * 100,
+      totalHits,
+      averageAccessCount: avgAccessCount,
+      oldestEntry: entries.length > 0 ? Math.min(...entries.map((e) => e.createdAt)) : null,
+      newestEntry: entries.length > 0 ? Math.max(...entries.map((e) => e.createdAt)) : null,
+    };
+  }
+
+  /**
+   * Clear cache
+   */
+  public clearCache(): void {
+    this.memoryCache.clear();
+    this.currentCacheSize = 0;
+  }
+
+  /**
+   * Get query plan
+   */
+  public getQueryPlan(query: string): QueryPlan {
+    const key = this.generateCacheKey(query);
+    return this.queryPlans.get(`plan-${key}`) || this.createQueryPlan(query);
+  }
+
+  /**
+   * Export optimization data
+   */
+  public exportData(): Record<string, unknown> {
+    return {
+      statistics: this.getStatistics(),
+      cacheStatistics: this.getCacheStatistics(),
+      queryPlans: Array.from(this.queryPlans.values()),
+      executionStats: Object.fromEntries(this.executionStats),
     };
   }
 }

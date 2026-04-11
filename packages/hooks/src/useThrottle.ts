@@ -1,9 +1,13 @@
 import { useCallback, useRef } from 'react';
 
-export function useThrottle<T extends (...args: any[]) => void>(
-  callback: T,
-  delay: number
-): T {
+/**
+ * Hook for throttling function calls
+ * @template T - The type of the callback function
+ * @param callback - The function to throttle
+ * @param delay - The minimum delay between function calls in milliseconds
+ * @returns A throttled version of the callback
+ */
+export function useThrottle<T extends (...args: unknown[]) => void>(callback: T, delay: number): T {
   const lastRun = useRef(Date.now());
 
   return useCallback(

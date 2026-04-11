@@ -1,6 +1,344 @@
 /**
  * Connection Pool Manager
- * مدیر استخر اتصالات برای مدیریت بهینه اتصالات
- * 
- * Features:
- * - Connection pooling\n * - Connection reuse\n * - Health checking\n * - Load balancing\n */\n\nexport interface PoolConnection {\n  id: string;\n  host: string;\n  port: number;\n  active: boolean;\n  lastUsed: number;\n  requestCount: number;\n  errorCount: number;\n}\n\nexport interface PoolStats {\n  totalConnections: number;\n  activeConnections: number;\n  idleConnections: number;\n  waitingRequests: number;\n  averageResponseTime: number;\n  errorRate: number;\n}\n\nexport interface ConnectionRequest {\n  id: string;\n  timestamp: number;\n  priority: 'low' | 'medium' | 'high';\n  completed: boolean;\n  duration?: number;\n}\n\nexport class ConnectionPoolManager {\n  private connections: Map<string, PoolConnection>;\n  private requestQueue: ConnectionRequest[];\n  private stats: {\n    totalRequests: number;\n    completedRequests: number;\n    failedRequests: number;\n    totalResponseTime: number;\n  };\n  private maxConnections: number;\n  private minConnections: number;\n\n  constructor(minConnections: number = 5, maxConnections: number = 20) {\n    this.connections = new Map();\n    this.requestQueue = [];\n    this.maxConnections = maxConnections;\n    this.minConnections = minConnections;\n    this.stats = {\n      totalRequests: 0,\n      completedRequests: 0,\n      failedRequests: 0,\n      totalResponseTime: 0,\n    };\n\n    this.initializePool();\n  }\n\n  /**\n   * Initialize connection pool\n   */\n  private initializePool(): void {\n    for (let i = 0; i < this.minConnections; i++) {\n      this.createConnection('localhost', 5432);\n    }\n  }\n\n  /**\n   * Create connection\n   */\n  private createConnection(host: string, port: number): string {\n    if (this.connections.size >= this.maxConnections) {\n      return '';\n    }\n\n    const connectionId = `conn-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;\n    this.connections.set(connectionId, {\n      id: connectionId,\n      host,\n      port,\n      active: false,\n      lastUsed: Date.now(),\n      requestCount: 0,\n      errorCount: 0,\n    });\n\n    return connectionId;\n  }\n\n  /**\n   * Get available connection\n   */\n  public getConnection(host: string, port: number): string | null {\n    // Find idle connection\n    for (const [connId, conn] of this.connections) {\n      if (!conn.active && conn.host === host && conn.port === port) {\n        conn.active = true;\n        conn.lastUsed = Date.now();\n        return connId;\n      }\n    }\n\n    // Create new connection if under limit\n    if (this.connections.size < this.maxConnections) {\n      const newConnId = this.createConnection(host, port);\n      if (newConnId) {\n        const conn = this.connections.get(newConnId);\n        if (conn) {\n          conn.active = true;\n        }\n        return newConnId;\n      }\n    }\n\n    return null;\n  }\n\n  /**\n   * Release connection\n   */\n  public releaseConnection(connectionId: string): void {\n    const conn = this.connections.get(connectionId);\n    if (conn) {\n      conn.active = false;\n      conn.lastUsed = Date.now();\n    }\n  }\n\n  /**\n   * Execute request\n   */\n  public executeRequest(connectionId: string, priority: 'low' | 'medium' | 'high' = 'medium'): string {\n    const requestId = `req-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;\n    const request: ConnectionRequest = {\n      id: requestId,\n      timestamp: Date.now(),\n      priority,\n      completed: false,\n    };\n\n    this.requestQueue.push(request);\n    this.stats.totalRequests++;\n\n    // Sort by priority\n    this.requestQueue.sort((a, b) => {\n      const priorityMap = { high: 3, medium: 2, low: 1 };\n      return priorityMap[b.priority] - priorityMap[a.priority];\n    });\n\n    return requestId;\n  }\n\n  /**\n   * Complete request\n   */\n  public completeRequest(requestId: string, success: boolean = true): void {\n    const request = this.requestQueue.find(r => r.id === requestId);\n    if (request) {\n      request.completed = true;\n      request.duration = Date.now() - request.timestamp;\n\n      if (success) {\n        this.stats.completedRequests++;\n        this.stats.totalResponseTime += request.duration;\n      } else {\n        this.stats.failedRequests++;\n      }\n\n      // Remove from queue\n      this.requestQueue = this.requestQueue.filter(r => r.id !== requestId);\n    }\n  }\n\n  /**\n   * Health check connections\n   */\n  public healthCheck(): { healthy: number; unhealthy: number } {\n    let healthy = 0;\n    let unhealthy = 0;\n\n    for (const conn of this.connections.values()) {\n      if (conn.errorCount > 5) {\n        unhealthy++;\n        // Remove unhealthy connection\n        this.connections.delete(conn.id);\n        // Create replacement\n        this.createConnection(conn.host, conn.port);\n      } else {\n        healthy++;\n      }\n    }\n\n    return { healthy, unhealthy };\n  }\n\n  /**\n   * Get pool statistics\n   */\n  public getPoolStats(): PoolStats {\n    const activeConnections = Array.from(this.connections.values()).filter(c => c.active).length;\n    const idleConnections = this.connections.size - activeConnections;\n    const averageResponseTime = this.stats.completedRequests > 0 \n      ? this.stats.totalResponseTime / this.stats.completedRequests \n      : 0;\n    const errorRate = this.stats.totalRequests > 0 \n      ? this.stats.failedRequests / this.stats.totalRequests \n      : 0;\n\n    return {\n      totalConnections: this.connections.size,\n      activeConnections,\n      idleConnections,\n      waitingRequests: this.requestQueue.length,\n      averageResponseTime,\n      errorRate,\n    };\n  }\n\n  /**\n   * Record connection error\n   */\n  public recordError(connectionId: string): void {\n    const conn = this.connections.get(connectionId);\n    if (conn) {\n      conn.errorCount++;\n    }\n  }\n\n  /**\n   * Get statistics\n   */\n  public getStats() {\n    return {\n      ...this.stats,\n      activeConnections: Array.from(this.connections.values()).filter(c => c.active).length,\n      totalConnections: this.connections.size,\n      queuedRequests: this.requestQueue.length,\n    };\n  }\n}\n
+ * Manages connection pooling for efficient resource reuse
+ */
+
+export interface PoolConfig {
+  minConnections: number;
+  maxConnections: number;
+  connectionTimeout: number;
+  idleTimeout: number;
+  validationInterval: number;
+}
+
+export interface Connection<T = unknown> {
+  id: string;
+  resource: T;
+  createdAt: number;
+  lastUsedAt: number;
+  isActive: boolean;
+  usageCount: number;
+}
+
+export interface PoolStatistics {
+  totalConnections: number;
+  activeConnections: number;
+  idleConnections: number;
+  waitingRequests: number;
+  totalAcquired: number;
+  totalReleased: number;
+  averageWaitTime: number;
+}
+
+/**
+ * Connection Pool Manager
+ * Manages a pool of reusable connections
+ */
+export class ConnectionPoolManager<T> {
+  private config: PoolConfig;
+  private connections: Map<string, Connection<T>> = new Map();
+  private availableConnections: string[] = [];
+  private waitingRequests: Array<{
+    resolve: (connection: Connection<T>) => void;
+    reject: (error: Error) => void;
+    timestamp: number;
+  }> = [];
+  private resourceFactory: () => Promise<T>;
+  private resourceValidator: (resource: T) => Promise<boolean>;
+  private resourceDestroyer: (resource: T) => Promise<void>;
+  private statistics = {
+    totalAcquired: 0,
+    totalReleased: 0,
+    waitTimes: [] as number[],
+  };
+
+  constructor(
+    config: PoolConfig,
+    resourceFactory: () => Promise<T>,
+    resourceValidator: (resource: T) => Promise<boolean>,
+    resourceDestroyer: (resource: T) => Promise<void>
+  ) {
+    this.config = config;
+    this.resourceFactory = resourceFactory;
+    this.resourceValidator = resourceValidator;
+    this.resourceDestroyer = resourceDestroyer;
+
+    this.initializePool();
+  }
+
+  /**
+   * Initialize the connection pool
+   */
+  private async initializePool(): Promise<void> {
+    for (let i = 0; i < this.config.minConnections; i++) {
+      try {
+        const resource = await this.resourceFactory();
+        const connection: Connection<T> = {
+          id: `conn-${Date.now()}-${i}`,
+          resource,
+          createdAt: Date.now(),
+          lastUsedAt: Date.now(),
+          isActive: false,
+          usageCount: 0,
+        };
+        this.connections.set(connection.id, connection);
+        this.availableConnections.push(connection.id);
+      } catch (error) {
+        console.error('Failed to initialize connection:', error);
+      }
+    }
+
+    // Start validation interval
+    this.startValidationInterval();
+  }
+
+  /**
+   * Acquire a connection from the pool
+   */
+  public async acquire(): Promise<Connection<T>> {
+    const startTime = Date.now();
+
+    // Try to get an available connection
+    while (this.availableConnections.length > 0) {
+      const connId = this.availableConnections.shift();
+      if (!connId) continue;
+
+      const connection = this.connections.get(connId);
+      if (!connection) continue;
+
+      // Validate connection
+      try {
+        const isValid = await this.resourceValidator(connection.resource);
+        if (isValid) {
+          connection.isActive = true;
+          connection.lastUsedAt = Date.now();
+          connection.usageCount++;
+          this.statistics.totalAcquired++;
+
+          const waitTime = Date.now() - startTime;
+          this.statistics.waitTimes.push(waitTime);
+          if (this.statistics.waitTimes.length > 1000) {
+            this.statistics.waitTimes.shift();
+          }
+
+          return connection;
+        }
+      } catch (error) {
+        // Connection is invalid, remove it
+        await this.removeConnection(connId);
+      }
+    }
+
+    // Create new connection if under limit
+    if (this.connections.size < this.config.maxConnections) {
+      try {
+        const resource = await this.resourceFactory();
+        const connection: Connection<T> = {
+          id: `conn-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          resource,
+          createdAt: Date.now(),
+          lastUsedAt: Date.now(),
+          isActive: true,
+          usageCount: 1,
+        };
+        this.connections.set(connection.id, connection);
+        this.statistics.totalAcquired++;
+
+        const waitTime = Date.now() - startTime;
+        this.statistics.waitTimes.push(waitTime);
+        if (this.statistics.waitTimes.length > 1000) {
+          this.statistics.waitTimes.shift();
+        }
+
+        return connection;
+      } catch (error) {
+        throw new Error(`Failed to create connection: ${error}`);
+      }
+    }
+
+    // Wait for available connection
+    return new Promise<Connection<T>>((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        const index = this.waitingRequests.findIndex((r) => r.resolve === resolve);
+        if (index >= 0) {
+          this.waitingRequests.splice(index, 1);
+        }
+        reject(new Error('Connection acquisition timeout'));
+      }, this.config.connectionTimeout);
+
+      this.waitingRequests.push({
+        resolve: (conn) => {
+          clearTimeout(timeout);
+          resolve(conn);
+        },
+        reject: (error) => {
+          clearTimeout(timeout);
+          reject(error);
+        },
+        timestamp: Date.now(),
+      });
+    });
+  }
+
+  /**
+   * Release a connection back to the pool
+   */
+  public async release(connection: Connection<T>): Promise<void> {
+    if (!this.connections.has(connection.id)) {
+      return;
+    }
+
+    connection.isActive = false;
+    connection.lastUsedAt = Date.now();
+    this.statistics.totalReleased++;
+
+    // Check if there are waiting requests
+    if (this.waitingRequests.length > 0) {
+      const request = this.waitingRequests.shift();
+      if (request) {
+        connection.isActive = true;
+        connection.usageCount++;
+        request.resolve(connection);
+        return;
+      }
+    }
+
+    // Return to available pool (only if not already there)
+    if (!this.availableConnections.includes(connection.id)) {
+      this.availableConnections.push(connection.id);
+    }
+  }
+
+  /**
+   * Remove a connection from the pool
+   */
+  private async removeConnection(connId: string): Promise<void> {
+    const connection = this.connections.get(connId);
+    if (connection) {
+      try {
+        await this.resourceDestroyer(connection.resource);
+      } catch (error) {
+        console.error('Error destroying connection:', error);
+      }
+      this.connections.delete(connId);
+    }
+
+    const index = this.availableConnections.indexOf(connId);
+    if (index >= 0) {
+      this.availableConnections.splice(index, 1);
+    }
+  }
+
+  /**
+   * Start validation interval
+   */
+  private startValidationInterval(): void {
+    setInterval(async () => {
+      const now = Date.now();
+      const connectionsToRemove: string[] = [];
+
+      for (const [connId, connection] of this.connections.entries()) {
+        // Check idle timeout
+        if (!connection.isActive && now - connection.lastUsedAt > this.config.idleTimeout) {
+          connectionsToRemove.push(connId);
+          continue;
+        }
+
+        // Validate connection
+        if (!connection.isActive) {
+          try {
+            const isValid = await this.resourceValidator(connection.resource);
+            if (!isValid) {
+              connectionsToRemove.push(connId);
+            }
+          } catch (error) {
+            connectionsToRemove.push(connId);
+          }
+        }
+      }
+
+      // Remove invalid connections
+      for (const connId of connectionsToRemove) {
+        await this.removeConnection(connId);
+      }
+
+      // Ensure minimum connections
+      while (this.connections.size < this.config.minConnections) {
+        try {
+          const resource = await this.resourceFactory();
+          const connection: Connection<T> = {
+            id: `conn-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            resource,
+            createdAt: Date.now(),
+            lastUsedAt: Date.now(),
+            isActive: false,
+            usageCount: 0,
+          };
+          this.connections.set(connection.id, connection);
+          this.availableConnections.push(connection.id);
+        } catch (error) {
+          console.error('Failed to create connection during validation:', error);
+        }
+      }
+    }, this.config.validationInterval);
+  }
+
+  /**
+   * Get pool statistics
+   */
+  public getStatistics(): PoolStatistics {
+    const activeConnections = Array.from(this.connections.values()).filter(
+      (c) => c.isActive
+    ).length;
+    const idleConnections = this.availableConnections.length;
+    const avgWaitTime =
+      this.statistics.waitTimes.length > 0
+        ? this.statistics.waitTimes.reduce((a, b) => a + b, 0) / this.statistics.waitTimes.length
+        : 0;
+
+    return {
+      totalConnections: this.connections.size,
+      activeConnections,
+      idleConnections,
+      waitingRequests: this.waitingRequests.length,
+      totalAcquired: this.statistics.totalAcquired,
+      totalReleased: this.statistics.totalReleased,
+      averageWaitTime: avgWaitTime,
+    };
+  }
+
+  /**
+   * Drain the pool
+   */
+  public async drain(): Promise<void> {
+    const connectionsToRemove = Array.from(this.connections.keys());
+
+    for (const connId of connectionsToRemove) {
+      await this.removeConnection(connId);
+    }
+
+    this.availableConnections = [];
+    this.waitingRequests = [];
+  }
+
+  /**
+   * Update pool configuration
+   */
+  public updateConfig(config: Partial<PoolConfig>): void {
+    this.config = { ...this.config, ...config };
+  }
+
+  /**
+   * Get connection details
+   */
+  public getConnectionDetails(): Array<Record<string, unknown>> {
+    return Array.from(this.connections.values()).map((conn) => ({
+      id: conn.id,
+      isActive: conn.isActive,
+      createdAt: conn.createdAt,
+      lastUsedAt: conn.lastUsedAt,
+      usageCount: conn.usageCount,
+      age: Date.now() - conn.createdAt,
+    }));
+  }
+}

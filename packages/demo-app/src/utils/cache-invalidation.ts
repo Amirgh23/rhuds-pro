@@ -148,7 +148,7 @@ export class CacheInvalidationManager {
   /**
    * Record invalidation event
    */
-  private recordEvent(event: InvalidationEvent): void {
+  recordEvent(event: InvalidationEvent): void {
     this.events.push(event);
 
     // Keep only last 100 events
@@ -309,13 +309,13 @@ export class VersionBasedInvalidation {
 /**
  * Event-based cache invalidation
  */
-export class EventBasedInvalidation {
-  private eventHandlers: Map<string, Set<(data?: any) => void>> = new Map();
+export class EventBasedInvalidation<T = unknown> {
+  private eventHandlers: Map<string, Set<(data?: T) => void>> = new Map();
 
   /**
    * Register event handler
    */
-  on(event: string, handler: (data?: any) => void): () => void {
+  on(event: string, handler: (data?: T) => void): () => void {
     if (!this.eventHandlers.has(event)) {
       this.eventHandlers.set(event, new Set());
     }
@@ -331,7 +331,7 @@ export class EventBasedInvalidation {
   /**
    * Emit event
    */
-  emit(event: string, data?: any): void {
+  emit(event: string, data?: T): void {
     const handlers = this.eventHandlers.get(event);
     if (!handlers) return;
 
@@ -354,7 +354,7 @@ export class EventBasedInvalidation {
   /**
    * Remove event handler
    */
-  off(event: string, handler: (data?: any) => void): void {
+  off(event: string, handler: (data?: T) => void): void {
     this.eventHandlers.get(event)?.delete(handler);
   }
 
@@ -369,6 +369,6 @@ export class EventBasedInvalidation {
 /**
  * Global event-based invalidation instance
  */
-export const eventBasedInvalidation = new EventBasedInvalidation();
+export const eventBasedInvalidation = new EventBasedInvalidation<unknown>();
 
 export default cacheInvalidationManager;

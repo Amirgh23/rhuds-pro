@@ -1,165 +1,156 @@
 /**
- * Real-Time Data Streaming
- * Stream data from multiple sources with buffering and backpressure handling
- *
- * جریان داده های بلادرنگ
- * جریان داده از منابع متعدد با بافرینگ و مدیریت فشار
+ * Real-Time Data Streaming System
+ * Stream data from multiple sources with buffering and error recovery
  */
 
-import { EventEmitter } from 'events';
-
-export interface StreamSource {
+export interface StreamSource<T> {
   id: string;
   name: string;
-  type: 'http' | 'websocket' | 'mqtt' | 'kafka' | 'custom';
+  type: 'api' | 'websocket' | 'file' | 'database' | 'custom';
   url?: string;
-  config?: Record<string, any>;
+  config?: Record<string, unknown>;
 }
 
-export interface StreamData {
+export interface StreamData<T> {
+  id: string;
   sourceId: string;
-  timestamp: number;
-  data: any;
-  metadata?: Record<string, any>;
+  timestamp: Date;
+  data: T;
+  sequence: number;
+  metadata?: Record<string, unknown>;
 }
 
-export interface StreamBuffer {
+export interface StreamBuffer<T> {
   sourceId: string;
-  data: StreamData[];
-  size: number;
+  data: StreamData<T>[];
   maxSize: number;
   overflow: number;
 }
 
 export interface StreamMetrics {
   sourceId: string;
-  messagesReceived: number;
-  messagesProcessed: number;
-  messagesDropped: number;
+  itemsReceived: number;
+  itemsProcessed: number;
+  itemsDropped: number;
   averageLatency: number;
-  currentThroughput: number;
-  bufferUtilization: number;
+  errors: number;
+  lastUpdate: Date;
 }
 
-export class RealtimeDataStreaming extends EventEmitter {
-  private sources: Map<string, StreamSource> = new Map();
-  private buffers: Map<string, StreamBuffer> = new Map();
+/**
+ * RealtimeDataStreaming - Stream data from multiple sources
+ */
+export class RealtimeDataStreaming<T = unknown> {
+  private sources: Map<string, StreamSource<T>> = new Map();
+  private buffers: Map<string, StreamBuffer<T>> = new Map();
   private metrics: Map<string, StreamMetrics> = new Map();
-  private activeStreams: Set<string> = new Set();
-  private backpressureThreshold: number = 0.8;
-  private bufferSize: number = 1000;
-
-  constructor() {
-    super();
-  }
+  private listeners: Map<string, Set<(data: StreamData<T>) => void>> = new Map();
+  private errorHandlers: Map<string, Set<(error: Error) => void>> = new Map();
+  private sequence: number = 0;
 
   /**
    * Register a data source
    */
-  registerSource(source: StreamSource): void {
+  registerSource(source: StreamSource<T>): void {
     this.sources.set(source.id, source);
     this.buffers.set(source.id, {
       sourceId: source.id,
       data: [],
-      size: 0,
-      maxSize: this.bufferSize,
+      maxSize: 1000,
       overflow: 0,
     });
     this.metrics.set(source.id, {
       sourceId: source.id,
-      messagesReceived: 0,
-      messagesProcessed: 0,
-      messagesDropped: 0,
+      itemsReceived: 0,
+      itemsProcessed: 0,
+      itemsDropped: 0,
       averageLatency: 0,
-      currentThroughput: 0,
-      bufferUtilization: 0,
+      errors: 0,
+      lastUpdate: new Date(),
     });
-
-    this.emit('source:registered', source);
   }
 
   /**
-   * Start streaming from a source
+   * Ingest data from a source
    */
-  startStream(sourceId: string): void {
-    const source = this.sources.get(sourceId);
-    if (!source) throw new Error(`Source ${sourceId} not found`);
-
-    this.activeStreams.add(sourceId);
-    this.emit('stream:started', { sourceId, source });
-  }
-
-  /**
-   * Stop streaming from a source
-   */
-  stopStream(sourceId: string): void {
-    this.activeStreams.delete(sourceId);
-    this.emit('stream:stopped', { sourceId });
-  }
-
-  /**
-   * Add data to stream
-   */
-  addData(sourceId: string, data: any, metadata?: Record<string, any>): boolean {
+  ingestData(sourceId: string, data: T, metadata?: Record<string, unknown>): void {
     const source = this.sources.get(sourceId);
     if (!source) throw new Error(`Source ${sourceId} not found`);
 
     const buffer = this.buffers.get(sourceId);
-    if (!buffer) throw new Error(`Buffer for ${sourceId} not found`);
+    if (!buffer) throw new Error(`Buffer for source ${sourceId} not found`);
 
-    const streamData: StreamData = {
+    const streamData: StreamData<T> = {
+      id: `${sourceId}-${this.sequence++}`,
       sourceId,
-      timestamp: Date.now(),
+      timestamp: new Date(),
       data,
+      sequence: this.sequence,
       metadata,
     };
 
-    // Check backpressure
-    const utilization = buffer.size / buffer.maxSize;
-    if (utilization > this.backpressureThreshold) {
-      this.emit('backpressure:warning', { sourceId, utilization });
-
-      // Drop oldest data if buffer is full
-      if (buffer.size >= buffer.maxSize) {
-        buffer.data.shift();
-        buffer.overflow++;
-        const metrics = this.metrics.get(sourceId);
-        if (metrics) metrics.messagesDropped++;
-        this.emit('data:dropped', { sourceId });
-        return false;
-      }
+    // Handle backpressure
+    if (buffer.data.length >= buffer.maxSize) {
+      buffer.overflow++;
+      buffer.data.shift(); // Remove oldest item
     }
 
     buffer.data.push(streamData);
-    buffer.size++;
 
     // Update metrics
     const metrics = this.metrics.get(sourceId);
     if (metrics) {
-      metrics.messagesReceived++;
-      metrics.bufferUtilization = utilization;
+      metrics.itemsReceived++;
+      metrics.lastUpdate = new Date();
     }
 
-    this.emit('data:received', { sourceId, size: buffer.size });
-    return true;
+    // Notify listeners
+    this.notifyListeners(sourceId, streamData);
+  }
+
+  /**
+   * Subscribe to data from a source
+   */
+  subscribe(sourceId: string, callback: (data: StreamData<T>) => void): () => void {
+    if (!this.listeners.has(sourceId)) {
+      this.listeners.set(sourceId, new Set());
+    }
+
+    this.listeners.get(sourceId)!.add(callback);
+
+    // Return unsubscribe function
+    return () => {
+      this.listeners.get(sourceId)?.delete(callback);
+    };
+  }
+
+  /**
+   * Subscribe to errors from a source
+   */
+  onError(sourceId: string, callback: (error: Error) => void): () => void {
+    if (!this.errorHandlers.has(sourceId)) {
+      this.errorHandlers.set(sourceId, new Set());
+    }
+
+    this.errorHandlers.get(sourceId)!.add(callback);
+
+    return () => {
+      this.errorHandlers.get(sourceId)?.delete(callback);
+    };
   }
 
   /**
    * Get buffered data
    */
-  getBufferedData(sourceId: string, limit?: number): StreamData[] {
+  getBufferedData(sourceId: string, limit?: number): StreamData<T>[] {
     const buffer = this.buffers.get(sourceId);
-    if (!buffer) throw new Error(`Buffer for ${sourceId} not found`);
+    if (!buffer) return [];
 
-    const data = limit ? buffer.data.slice(-limit) : [...buffer.data];
-
-    // Update metrics
-    const metrics = this.metrics.get(sourceId);
-    if (metrics) {
-      metrics.messagesProcessed += data.length;
+    if (limit) {
+      return buffer.data.slice(-limit);
     }
 
-    return data;
+    return [...buffer.data];
   }
 
   /**
@@ -167,62 +158,26 @@ export class RealtimeDataStreaming extends EventEmitter {
    */
   clearBuffer(sourceId: string): void {
     const buffer = this.buffers.get(sourceId);
-    if (!buffer) throw new Error(`Buffer for ${sourceId} not found`);
-
-    const clearedSize = buffer.size;
-    buffer.data = [];
-    buffer.size = 0;
-
-    this.emit('buffer:cleared', { sourceId, clearedSize });
+    if (buffer) {
+      buffer.data = [];
+    }
   }
 
   /**
-   * Handle backpressure
+   * Set buffer size
    */
-  handleBackpressure(sourceId: string): void {
+  setBufferSize(sourceId: string, size: number): void {
     const buffer = this.buffers.get(sourceId);
-    if (!buffer) return;
-
-    // Reduce buffer size by 50%
-    const newSize = Math.ceil(buffer.data.length / 2);
-    buffer.data = buffer.data.slice(-newSize);
-    buffer.size = newSize;
-
-    this.emit('backpressure:handled', { sourceId, newSize });
-  }
-
-  /**
-   * Validate data
-   */
-  validateData(data: any, schema?: Record<string, any>): boolean {
-    if (!data) return false;
-
-    if (schema) {
-      for (const key of Object.keys(schema)) {
-        if (!(key in data)) return false;
-      }
-    }
-
-    return true;
-  }
-
-  /**
-   * Transform data
-   */
-  transformData(data: any, transformer: (d: any) => any): any {
-    try {
-      return transformer(data);
-    } catch (error) {
-      this.emit('transform:error', { error, data });
-      return null;
+    if (buffer) {
+      buffer.maxSize = size;
     }
   }
 
   /**
-   * Get stream metrics
+   * Get metrics for a source
    */
-  getMetrics(sourceId: string): StreamMetrics | null {
-    return this.metrics.get(sourceId) || null;
+  getMetrics(sourceId: string): StreamMetrics | undefined {
+    return this.metrics.get(sourceId);
   }
 
   /**
@@ -233,54 +188,111 @@ export class RealtimeDataStreaming extends EventEmitter {
   }
 
   /**
-   * Set buffer size
+   * Handle error
    */
-  setBufferSize(sourceId: string, size: number): void {
-    const buffer = this.buffers.get(sourceId);
-    if (!buffer) throw new Error(`Buffer for ${sourceId} not found`);
+  handleError(sourceId: string, error: Error): void {
+    const metrics = this.metrics.get(sourceId);
+    if (metrics) {
+      metrics.errors++;
+    }
 
-    buffer.maxSize = size;
-    this.emit('buffer:resized', { sourceId, size });
+    const handlers = this.errorHandlers.get(sourceId);
+    if (handlers) {
+      handlers.forEach((handler) => handler(error));
+    }
   }
 
   /**
-   * Set backpressure threshold
+   * Validate data
    */
-  setBackpressureThreshold(threshold: number): void {
-    this.backpressureThreshold = Math.max(0, Math.min(1, threshold));
-    this.emit('backpressure:threshold-changed', { threshold: this.backpressureThreshold });
+  validateData(data: T, schema?: Record<string, unknown>): boolean {
+    if (!schema) return true;
+
+    // Simple validation - can be extended
+    if (typeof data !== 'object' || data === null) {
+      return false;
+    }
+
+    return true;
   }
 
   /**
-   * Get active streams
+   * Transform data
    */
-  getActiveStreams(): string[] {
-    return Array.from(this.activeStreams);
+  transformData(data: T, transformer: (data: T) => T): T {
+    try {
+      return transformer(data);
+    } catch (error) {
+      throw new Error(`Data transformation failed: ${error}`);
+    }
   }
 
   /**
-   * Get source info
+   * Notify listeners
    */
-  getSourceInfo(sourceId: string): StreamSource | null {
-    return this.sources.get(sourceId) || null;
+  private notifyListeners(sourceId: string, data: StreamData<T>): void {
+    const listeners = this.listeners.get(sourceId);
+    if (listeners) {
+      listeners.forEach((listener) => {
+        try {
+          listener(data);
+        } catch (error) {
+          this.handleError(sourceId, error as Error);
+        }
+      });
+    }
+
+    // Update processed count
+    const metrics = this.metrics.get(sourceId);
+    if (metrics) {
+      metrics.itemsProcessed++;
+    }
+  }
+
+  /**
+   * Get source
+   */
+  getSource(sourceId: string): StreamSource<T> | undefined {
+    return this.sources.get(sourceId);
   }
 
   /**
    * Get all sources
    */
-  getAllSources(): StreamSource[] {
+  getAllSources(): StreamSource<T>[] {
     return Array.from(this.sources.values());
   }
 
   /**
-   * Error recovery
+   * Remove source
    */
-  recoverFromError(sourceId: string): void {
-    const buffer = this.buffers.get(sourceId);
-    if (buffer) {
-      buffer.overflow = 0;
-    }
+  removeSource(sourceId: string): void {
+    this.sources.delete(sourceId);
+    this.buffers.delete(sourceId);
+    this.metrics.delete(sourceId);
+    this.listeners.delete(sourceId);
+    this.errorHandlers.delete(sourceId);
+  }
 
-    this.emit('stream:recovered', { sourceId });
+  /**
+   * Get buffer statistics
+   */
+  getBufferStats(sourceId: string): {
+    size: number;
+    maxSize: number;
+    overflow: number;
+    utilization: number;
+  } | null {
+    const buffer = this.buffers.get(sourceId);
+    if (!buffer) return null;
+
+    return {
+      size: buffer.data.length,
+      maxSize: buffer.maxSize,
+      overflow: buffer.overflow,
+      utilization: buffer.data.length / buffer.maxSize,
+    };
   }
 }
+
+export default RealtimeDataStreaming;

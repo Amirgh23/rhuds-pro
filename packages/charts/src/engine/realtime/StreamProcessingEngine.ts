@@ -1,343 +1,329 @@
 /**
  * Stream Processing Engine
- * Process streaming data in real-time
- *
- * موتور پردازش جریان
- * پردازش داده های جریانی بلادرنگ
+ * Process streaming data with transformations, windowing, and aggregations
  */
 
-import { EventEmitter } from 'events';
-
-export interface StreamTransformation {
+export interface StreamWindow<T> {
   id: string;
-  name: string;
-  type: 'map' | 'filter' | 'aggregate' | 'window' | 'join' | 'custom';
-  config: Record<string, any>;
-}
-
-export interface StreamWindow {
   type: 'tumbling' | 'sliding' | 'session';
   size: number;
-  slide?: number;
+  stride?: number;
   timeout?: number;
+  data: T[];
+  startTime: Date;
+  endTime?: Date;
 }
 
-export interface AggregationResult {
-  timestamp: number;
+export interface AggregationResult<T> {
   count: number;
   sum?: number;
   average?: number;
   min?: number;
   max?: number;
-  values: any[];
+  values: T[];
 }
 
-export interface ProcessingMetrics {
-  itemsProcessed: number;
-  itemsFiltered: number;
-  aggregations: number;
-  averageProcessingTime: number;
-  errors: number;
+export interface JoinResult<T, U> {
+  left: T;
+  right: U;
+  timestamp: Date;
 }
 
-export class StreamProcessingEngine extends EventEmitter {
-  private transformations: Map<string, StreamTransformation> = new Map();
-  private windows: Map<string, any[]> = new Map();
-  private aggregations: Map<string, AggregationResult> = new Map();
-  private metrics: ProcessingMetrics = {
-    itemsProcessed: 0,
-    itemsFiltered: 0,
-    aggregations: 0,
-    averageProcessingTime: 0,
-    errors: 0,
-  };
-  private processingTimes: number[] = [];
+/**
+ * StreamProcessingEngine - Process streaming data
+ */
+export class StreamProcessingEngine<T = unknown> {
+  private windows: Map<string, StreamWindow<T>> = new Map();
+  private transformers: Map<string, (data: T) => T> = new Map();
+  private aggregators: Map<string, (data: T[]) => AggregationResult<T>> = new Map();
+  private windowSequence: number = 0;
 
-  constructor() {
-    super();
+  /**
+   * Create tumbling window
+   */
+  createTumblingWindow(size: number): string {
+    const windowId = `window-${this.windowSequence++}`;
+    const window: StreamWindow<T> = {
+      id: windowId,
+      type: 'tumbling',
+      size,
+      data: [],
+      startTime: new Date(),
+    };
+
+    this.windows.set(windowId, window);
+    return windowId;
   }
 
   /**
-   * Add transformation
+   * Create sliding window
    */
-  addTransformation(transformation: StreamTransformation): void {
-    this.transformations.set(transformation.id, transformation);
-    this.emit('transformation:added', transformation);
+  createSlidingWindow(size: number, stride: number): string {
+    const windowId = `window-${this.windowSequence++}`;
+    const window: StreamWindow<T> = {
+      id: windowId,
+      type: 'sliding',
+      size,
+      stride,
+      data: [],
+      startTime: new Date(),
+    };
+
+    this.windows.set(windowId, window);
+    return windowId;
   }
 
   /**
-   * Remove transformation
+   * Create session window
    */
-  removeTransformation(transformationId: string): void {
-    this.transformations.delete(transformationId);
-    this.emit('transformation:removed', { transformationId });
+  createSessionWindow(timeout: number): string {
+    const windowId = `window-${this.windowSequence++}`;
+    const window: StreamWindow<T> = {
+      id: windowId,
+      type: 'session',
+      size: 0,
+      timeout,
+      data: [],
+      startTime: new Date(),
+    };
+
+    this.windows.set(windowId, window);
+    return windowId;
   }
 
   /**
-   * Process item through transformations
+   * Add data to window
    */
-  processItem(item: any): any {
-    const startTime = Date.now();
-    let result = item;
+  addToWindow(windowId: string, data: T): T[] | null {
+    const window = this.windows.get(windowId);
+    if (!window) {
+      throw new Error(`Window ${windowId} not found`);
+    }
 
-    try {
-      for (const transformation of this.transformations.values()) {
-        result = this.applyTransformation(result, transformation);
+    window.data.push(data);
 
-        if (result === null) {
-          this.metrics.itemsFiltered++;
-          this.emit('item:filtered', { item });
-          return null;
-        }
-      }
-
-      this.metrics.itemsProcessed++;
-      const processingTime = Date.now() - startTime;
-      this.processingTimes.push(processingTime);
-
-      if (this.processingTimes.length > 100) {
-        this.processingTimes.shift();
-      }
-
-      this.metrics.averageProcessingTime =
-        this.processingTimes.reduce((a, b) => a + b, 0) / this.processingTimes.length;
-
-      this.emit('item:processed', { item: result, processingTime });
+    // Check if window is full
+    if (window.type === 'tumbling' && window.data.length >= window.size) {
+      const result = [...window.data];
+      window.data = [];
+      window.startTime = new Date();
       return result;
-    } catch (error) {
-      this.metrics.errors++;
-      this.emit('processing:error', { error, item });
-      return null;
     }
+
+    if (window.type === 'sliding' && window.data.length >= window.size) {
+      const result = [...window.data];
+      window.data = window.data.slice(window.stride || 1);
+      return result;
+    }
+
+    return null;
   }
 
   /**
-   * Apply transformation
+   * Transform data
    */
-  private applyTransformation(item: any, transformation: StreamTransformation): any {
-    switch (transformation.type) {
-      case 'map':
-        return this.mapTransformation(item, transformation.config);
-
-      case 'filter':
-        return this.filterTransformation(item, transformation.config);
-
-      case 'aggregate':
-        return this.aggregateTransformation(item, transformation.config);
-
-      case 'window':
-        return this.windowTransformation(item, transformation.config);
-
-      case 'join':
-        return this.joinTransformation(item, transformation.config);
-
-      case 'custom':
-        return this.customTransformation(item, transformation.config);
-
-      default:
-        return item;
+  transform(data: T, transformerId: string): T {
+    const transformer = this.transformers.get(transformerId);
+    if (!transformer) {
+      throw new Error(`Transformer ${transformerId} not found`);
     }
+
+    return transformer(data);
   }
 
   /**
-   * Map transformation
+   * Register transformer
    */
-  private mapTransformation(item: any, config: Record<string, any>): any {
-    const { mapper } = config;
-    if (typeof mapper === 'function') {
-      return mapper(item);
+  registerTransformer(id: string, transformer: (data: T) => T): void {
+    this.transformers.set(id, transformer);
+  }
+
+  /**
+   * Aggregate window data
+   */
+  aggregate(windowId: string, aggregatorId?: string): AggregationResult<T> {
+    const window = this.windows.get(windowId);
+    if (!window) {
+      throw new Error(`Window ${windowId} not found`);
     }
 
-    // Simple field mapping
-    const result: Record<string, any> = {};
-    for (const [key, value] of Object.entries(config)) {
-      if (key !== 'mapper' && typeof value === 'string') {
-        result[key] = item[value];
+    if (aggregatorId) {
+      const aggregator = this.aggregators.get(aggregatorId);
+      if (!aggregator) {
+        throw new Error(`Aggregator ${aggregatorId} not found`);
       }
+
+      return aggregator(window.data);
+    }
+
+    // Default aggregation
+    return this.defaultAggregate(window.data);
+  }
+
+  /**
+   * Default aggregation
+   */
+  private defaultAggregate(data: T[]): AggregationResult<T> {
+    const result: AggregationResult<T> = {
+      count: data.length,
+      values: data,
+    };
+
+    // Try numeric aggregation
+    const numericValues = data
+      .map((d) => {
+        if (typeof d === 'number') return d;
+        if (typeof d === 'object' && d !== null && 'value' in d) {
+          return (d as Record<string, unknown>).value as number;
+        }
+        return null;
+      })
+      .filter((v) => v !== null) as number[];
+
+    if (numericValues.length > 0) {
+      result.sum = numericValues.reduce((a, b) => a + b, 0);
+      result.average = result.sum / numericValues.length;
+      result.min = Math.min(...numericValues);
+      result.max = Math.max(...numericValues);
     }
 
     return result;
   }
 
   /**
-   * Filter transformation
+   * Register aggregator
    */
-  private filterTransformation(item: any, config: Record<string, any>): any {
-    const { predicate } = config;
-    if (typeof predicate === 'function') {
-      return predicate(item) ? item : null;
-    }
+  registerAggregator(id: string, aggregator: (data: T[]) => AggregationResult<T>): void {
+    this.aggregators.set(id, aggregator);
+  }
 
-    // Simple field-based filtering
-    for (const [key, value] of Object.entries(config)) {
-      if (key !== 'predicate' && item[key] !== value) {
-        return null;
+  /**
+   * Join two streams
+   */
+  join<U>(
+    leftData: T[],
+    rightData: U[],
+    joinKey: (left: T, right: U) => boolean
+  ): JoinResult<T, U>[] {
+    const results: JoinResult<T, U>[] = [];
+
+    for (const left of leftData) {
+      for (const right of rightData) {
+        if (joinKey(left, right)) {
+          results.push({
+            left,
+            right,
+            timestamp: new Date(),
+          });
+        }
       }
     }
 
-    return item;
+    return results;
   }
 
   /**
-   * Aggregate transformation
+   * Filter stream
    */
-  private aggregateTransformation(item: any, config: Record<string, any>): any {
-    const { field, operation, windowId } = config;
-    const wId = windowId || 'default';
+  filter(data: T[], predicate: (item: T) => boolean): T[] {
+    return data.filter(predicate);
+  }
 
-    if (!this.aggregations.has(wId)) {
-      this.aggregations.set(wId, {
-        timestamp: Date.now(),
-        count: 0,
-        values: [],
-      });
+  /**
+   * Map stream
+   */
+  map<U>(data: T[], mapper: (item: T) => U): U[] {
+    return data.map(mapper);
+  }
+
+  /**
+   * Reduce stream
+   */
+  reduce(data: T[], reducer: (acc: T, item: T) => T, initial: T): T {
+    return data.reduce(reducer, initial);
+  }
+
+  /**
+   * Get window
+   */
+  getWindow(windowId: string): StreamWindow<T> | undefined {
+    return this.windows.get(windowId);
+  }
+
+  /**
+   * Get all windows
+   */
+  getAllWindows(): StreamWindow<T>[] {
+    return Array.from(this.windows.values());
+  }
+
+  /**
+   * Close window
+   */
+  closeWindow(windowId: string): T[] {
+    const window = this.windows.get(windowId);
+    if (!window) {
+      throw new Error(`Window ${windowId} not found`);
     }
 
-    const agg = this.aggregations.get(wId)!;
-    const value = field ? item[field] : item;
+    const data = [...window.data];
+    window.endTime = new Date();
 
-    agg.count++;
-    agg.values.push(value);
-
-    if (typeof value === 'number') {
-      agg.sum = (agg.sum || 0) + value;
-      agg.average = agg.sum / agg.count;
-      agg.min = Math.min(agg.min || value, value);
-      agg.max = Math.max(agg.max || value, value);
-    }
-
-    this.metrics.aggregations++;
-    this.emit('aggregation:updated', { windowId: wId, result: agg });
-
-    return agg;
+    return data;
   }
 
   /**
-   * Window transformation
+   * Delete window
    */
-  private windowTransformation(item: any, config: Record<string, any>): any {
-    const { windowId, windowConfig } = config;
-    const wId = windowId || 'default';
-
-    if (!this.windows.has(wId)) {
-      this.windows.set(wId, []);
-    }
-
-    const window = this.windows.get(wId)!;
-    window.push(item);
-
-    // Check window size
-    if (windowConfig.type === 'tumbling' && window.length >= windowConfig.size) {
-      const result = [...window];
-      this.windows.set(wId, []);
-      this.emit('window:complete', { windowId: wId, items: result });
-      return result;
-    }
-
-    return item;
-  }
-
-  /**
-   * Join transformation
-   */
-  private joinTransformation(item: any, config: Record<string, any>): any {
-    const { joinKey, otherStream } = config;
-
-    // Simple join implementation
-    if (otherStream && Array.isArray(otherStream)) {
-      const joinedItem = otherStream.find((o) => o[joinKey] === item[joinKey]);
-      if (joinedItem) {
-        return { ...item, ...joinedItem };
-      }
-    }
-
-    return item;
-  }
-
-  /**
-   * Custom transformation
-   */
-  private customTransformation(item: any, config: Record<string, any>): any {
-    const { transformer } = config;
-    if (typeof transformer === 'function') {
-      return transformer(item);
-    }
-
-    return item;
-  }
-
-  /**
-   * Get metrics
-   */
-  getMetrics(): ProcessingMetrics {
-    return { ...this.metrics };
-  }
-
-  /**
-   * Get aggregation result
-   */
-  getAggregation(windowId: string): AggregationResult | null {
-    return this.aggregations.get(windowId) || null;
-  }
-
-  /**
-   * Get window data
-   */
-  getWindow(windowId: string): any[] {
-    return this.windows.get(windowId) || [];
-  }
-
-  /**
-   * Clear window
-   */
-  clearWindow(windowId: string): void {
+  deleteWindow(windowId: string): void {
     this.windows.delete(windowId);
-    this.emit('window:cleared', { windowId });
   }
 
   /**
-   * Reset metrics
+   * Get window statistics
    */
-  resetMetrics(): void {
-    this.metrics = {
-      itemsProcessed: 0,
-      itemsFiltered: 0,
-      aggregations: 0,
-      averageProcessingTime: 0,
-      errors: 0,
+  getWindowStats(windowId: string): {
+    id: string;
+    type: string;
+    size: number;
+    dataCount: number;
+    duration: number;
+  } | null {
+    const window = this.windows.get(windowId);
+    if (!window) return null;
+
+    const endTime = window.endTime || new Date();
+    const duration = endTime.getTime() - window.startTime.getTime();
+
+    return {
+      id: window.id,
+      type: window.type,
+      size: window.size,
+      dataCount: window.data.length,
+      duration,
     };
-    this.processingTimes = [];
-    this.emit('metrics:reset', {});
   }
 
   /**
-   * Get all transformations
+   * Clear all windows
    */
-  getTransformations(): StreamTransformation[] {
-    return Array.from(this.transformations.values());
+  clearWindows(): void {
+    this.windows.clear();
   }
 
   /**
-   * Create pipeline
+   * Get transformer count
    */
-  createPipeline(transformations: StreamTransformation[]): string {
-    const pipelineId = `pipeline-${Date.now()}`;
-
-    for (const transformation of transformations) {
-      this.addTransformation({
-        ...transformation,
-        id: `${pipelineId}-${transformation.id}`,
-      });
-    }
-
-    this.emit('pipeline:created', { pipelineId, count: transformations.length });
-    return pipelineId;
+  getTransformerCount(): number {
+    return this.transformers.size;
   }
 
   /**
-   * Process batch
+   * Get aggregator count
    */
-  processBatch(items: any[]): any[] {
-    return items.map((item) => this.processItem(item)).filter((item) => item !== null);
+  getAggregatorCount(): number {
+    return this.aggregators.size;
   }
 }
+
+export default StreamProcessingEngine;

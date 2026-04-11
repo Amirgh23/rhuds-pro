@@ -1,12 +1,338 @@
 /**
  * Performance Profiler
- * پروفایلر عملکرد برای تحلیل و بهینه‌سازی
- * 
- * Features:
- * - CPU profiling
- * - Memory profiling
- * - Latency tracking
- * - Bottleneck detection
+ * Comprehensive performance profiling and bottleneck detection
  */
 
-export interface ProfileMetric {\n  name: string;\n  duration: number;\n  memory: number;\n  callCount: number;\n  averageTime: number;\n}\n\nexport interface PerformanceReport {\n  timestamp: number;\n  duration: number;\n  metrics: ProfileMetric[];\n  bottlenecks: string[];\n  recommendations: string[];\n}\n\nexport interface LatencyBucket {\n  range: string;\n  count: number;\n  percentage: number;\n}\n\nexport class PerformanceProfiler {\n  private metrics: Map<string, ProfileMetric>;\n  private reports: PerformanceReport[];\n  private startTime: number;\n  private stats: {\n    profilesRun: number;\n    totalDuration: number;\n    bottlenecksFound: number;\n  };\n\n  constructor() {\n    this.metrics = new Map();\n    this.reports = [];\n    this.startTime = Date.now();\n    this.stats = {\n      profilesRun: 0,\n      totalDuration: 0,\n      bottlenecksFound: 0,\n    };\n  }\n\n  /**\n   * Start profiling\n   */\n  public startProfiling(): string {\n    const profileId = `profile-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;\n    this.startTime = Date.now();\n    return profileId;\n  }\n\n  /**\n   * Record metric\n   */\n  public recordMetric(name: string, duration: number, memory: number = 0): void {\n    const existing = this.metrics.get(name);\n\n    if (existing) {\n      existing.duration += duration;\n      existing.memory += memory;\n      existing.callCount++;\n      existing.averageTime = existing.duration / existing.callCount;\n    } else {\n      this.metrics.set(name, {\n        name,\n        duration,\n        memory,\n        callCount: 1,\n        averageTime: duration,\n      });\n    }\n  }\n\n  /**\n   * End profiling and generate report\n   */\n  public endProfiling(): PerformanceReport {\n    const duration = Date.now() - this.startTime;\n    const metrics = Array.from(this.metrics.values());\n    const bottlenecks = this.identifyBottlenecks(metrics);\n    const recommendations = this.generateRecommendations(metrics, bottlenecks);\n\n    const report: PerformanceReport = {\n      timestamp: Date.now(),\n      duration,\n      metrics,\n      bottlenecks,\n      recommendations,\n    };\n\n    this.reports.push(report);\n    this.stats.profilesRun++;\n    this.stats.totalDuration += duration;\n    this.stats.bottlenecksFound += bottlenecks.length;\n\n    return report;\n  }\n\n  /**\n   * Identify bottlenecks\n   */\n  private identifyBottlenecks(metrics: ProfileMetric[]): string[] {\n    const bottlenecks: string[] = [];\n    const totalDuration = metrics.reduce((sum, m) => sum + m.duration, 0);\n    const threshold = totalDuration * 0.2; // 20% threshold\n\n    for (const metric of metrics) {\n      if (metric.duration > threshold) {\n        bottlenecks.push(`${metric.name}: ${metric.duration}ms (${((metric.duration / totalDuration) * 100).toFixed(2)}%)`);\n      }\n    }\n\n    return bottlenecks;\n  }\n\n  /**\n   * Generate recommendations\n   */\n  private generateRecommendations(metrics: ProfileMetric[], bottlenecks: string[]): string[] {\n    const recommendations: string[] = [];\n\n    for (const metric of metrics) {\n      if (metric.callCount > 100) {\n        recommendations.push(`Optimize ${metric.name}: called ${metric.callCount} times`);\n      }\n\n      if (metric.memory > 10 * 1024 * 1024) {\n        recommendations.push(`Reduce memory usage in ${metric.name}: ${(metric.memory / 1024 / 1024).toFixed(2)}MB`);\n      }\n\n      if (metric.averageTime > 100) {\n        recommendations.push(`Improve latency in ${metric.name}: ${metric.averageTime.toFixed(2)}ms average`);\n      }\n    }\n\n    if (bottlenecks.length > 0) {\n      recommendations.push('Focus optimization efforts on identified bottlenecks');\n    }\n\n    return recommendations;\n  }\n\n  /**\n   * Get latency distribution\n   */\n  public getLatencyDistribution(): LatencyBucket[] {\n    const buckets: LatencyBucket[] = [\n      { range: '0-10ms', count: 0, percentage: 0 },\n      { range: '10-50ms', count: 0, percentage: 0 },\n      { range: '50-100ms', count: 0, percentage: 0 },\n      { range: '100-500ms', count: 0, percentage: 0 },\n      { range: '500ms+', count: 0, percentage: 0 },\n    ];\n\n    let total = 0;\n    for (const metric of this.metrics.values()) {\n      total += metric.callCount;\n      const avgTime = metric.averageTime;\n\n      if (avgTime <= 10) buckets[0].count++;\n      else if (avgTime <= 50) buckets[1].count++;\n      else if (avgTime <= 100) buckets[2].count++;\n      else if (avgTime <= 500) buckets[3].count++;\n      else buckets[4].count++;\n    }\n\n    for (const bucket of buckets) {\n      bucket.percentage = total > 0 ? (bucket.count / total) * 100 : 0;\n    }\n\n    return buckets;\n  }\n\n  /**\n   * Compare reports\n   */\n  public compareReports(report1Id: number, report2Id: number) {\n    const r1 = this.reports[report1Id];\n    const r2 = this.reports[report2Id];\n\n    if (!r1 || !r2) return null;\n\n    const comparison = {\n      durationChange: r2.duration - r1.duration,\n      durationChangePercent: ((r2.duration - r1.duration) / r1.duration) * 100,\n      metricsImproved: 0,\n      metricsRegressed: 0,\n    };\n\n    return comparison;\n  }\n\n  /**\n   * Get statistics\n   */\n  public getStats() {\n    return {\n      ...this.stats,\n      totalMetrics: this.metrics.size,\n      totalReports: this.reports.length,\n      averageProfileDuration: this.stats.profilesRun > 0 ? this.stats.totalDuration / this.stats.profilesRun : 0,\n    };\n  }\n\n  /**\n   * Clear metrics\n   */\n  public clearMetrics(): void {\n    this.metrics.clear();\n  }\n}\n
+export interface PerformanceMetric {
+  name: string;
+  duration: number;
+  timestamp: number;
+  category: 'render' | 'compute' | 'io' | 'memory' | 'network';
+  metadata?: Record<string, unknown>;
+}
+
+export interface BottleneckAnalysis {
+  id: string;
+  metric: string;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  duration: number;
+  frequency: number;
+  impact: number;
+  recommendation: string;
+}
+
+export interface OptimizationRecommendation {
+  id: string;
+  title: string;
+  description: string;
+  priority: 'low' | 'medium' | 'high' | 'critical';
+  estimatedImprovement: number;
+  effort: 'low' | 'medium' | 'high';
+  category: string;
+}
+
+export interface ProfileSnapshot {
+  timestamp: number;
+  metrics: PerformanceMetric[];
+  bottlenecks: BottleneckAnalysis[];
+  recommendations: OptimizationRecommendation[];
+  summary: Record<string, unknown>;
+}
+
+/**
+ * Performance Profiler
+ * Profiles application performance and identifies bottlenecks
+ */
+export class PerformanceProfiler {
+  private metrics: PerformanceMetric[] = [];
+  private snapshots: ProfileSnapshot[] = [];
+  private thresholds: Record<string, number> = {
+    render: 16, // 60fps
+    compute: 100,
+    io: 1000,
+    memory: 50 * 1024 * 1024, // 50MB
+    network: 5000,
+  };
+
+  /**
+   * Record a performance metric
+   */
+  public recordMetric(metric: PerformanceMetric): void {
+    this.metrics.push(metric);
+
+    // Keep only last 1000 metrics
+    if (this.metrics.length > 1000) {
+      this.metrics.shift();
+    }
+  }
+
+  /**
+   * Analyze metrics for bottlenecks
+   */
+  public analyzeBottlenecks(): BottleneckAnalysis[] {
+    const bottlenecks: BottleneckAnalysis[] = [];
+    const metricsByName = this.groupMetricsByName();
+
+    for (const [name, metrics] of Object.entries(metricsByName)) {
+      const avgDuration = metrics.reduce((sum, m) => sum + m.duration, 0) / metrics.length;
+      const maxDuration = Math.max(...metrics.map((m) => m.duration));
+      const category = metrics[0]?.category || 'compute';
+
+      const threshold = this.thresholds[category] || 100;
+
+      if (maxDuration > threshold) {
+        const frequency = metrics.length;
+        const impact = (maxDuration / threshold) * frequency;
+
+        let severity: 'low' | 'medium' | 'high' | 'critical' = 'low';
+        if (impact > 1000) severity = 'critical';
+        else if (impact > 500) severity = 'high';
+        else if (impact > 200) severity = 'medium';
+
+        bottlenecks.push({
+          id: `bottleneck-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          metric: name,
+          severity,
+          duration: maxDuration,
+          frequency,
+          impact,
+          recommendation: this.getRecommendation(name, category, maxDuration),
+        });
+      }
+    }
+
+    return bottlenecks.sort((a, b) => b.impact - a.impact);
+  }
+
+  /**
+   * Generate optimization recommendations
+   */
+  public generateRecommendations(): OptimizationRecommendation[] {
+    const recommendations: OptimizationRecommendation[] = [];
+    const bottlenecks = this.analyzeBottlenecks();
+
+    for (const bottleneck of bottlenecks) {
+      const recommendation = this.createRecommendation(bottleneck);
+      recommendations.push(recommendation);
+    }
+
+    // Add general recommendations
+    recommendations.push(...this.getGeneralRecommendations());
+
+    return recommendations.sort((a, b) => {
+      const priorityMap = { critical: 4, high: 3, medium: 2, low: 1 };
+      return (
+        priorityMap[b.priority as keyof typeof priorityMap] -
+        priorityMap[a.priority as keyof typeof priorityMap]
+      );
+    });
+  }
+
+  /**
+   * Create a recommendation from bottleneck
+   */
+  private createRecommendation(bottleneck: BottleneckAnalysis): OptimizationRecommendation {
+    const priorityMap: Record<string, 'low' | 'medium' | 'high' | 'critical'> = {
+      low: 'low',
+      medium: 'medium',
+      high: 'high',
+      critical: 'critical',
+    };
+
+    return {
+      id: `rec-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      title: `Optimize ${bottleneck.metric}`,
+      description: bottleneck.recommendation,
+      priority: priorityMap[bottleneck.severity] || 'medium',
+      estimatedImprovement: Math.min(bottleneck.impact * 0.3, 100),
+      effort: bottleneck.severity === 'critical' ? 'high' : 'medium',
+      category: 'performance',
+    };
+  }
+
+  /**
+   * Get general recommendations
+   */
+  private getGeneralRecommendations(): OptimizationRecommendation[] {
+    const recommendations: OptimizationRecommendation[] = [];
+
+    // Check memory usage
+    if (this.metrics.length > 0) {
+      const memoryMetrics = this.metrics.filter((m) => m.category === 'memory');
+      if (memoryMetrics.length > 0) {
+        const avgMemory =
+          memoryMetrics.reduce((sum, m) => sum + (m.duration || 0), 0) / memoryMetrics.length;
+        if (avgMemory > 30 * 1024 * 1024) {
+          recommendations.push({
+            id: `rec-memory-${Date.now()}`,
+            title: 'Reduce Memory Usage',
+            description: 'Consider implementing memory pooling or lazy loading',
+            priority: 'high',
+            estimatedImprovement: 20,
+            effort: 'medium',
+            category: 'memory',
+          });
+        }
+      }
+    }
+
+    // Check render performance
+    const renderMetrics = this.metrics.filter((m) => m.category === 'render');
+    if (renderMetrics.length > 0) {
+      const slowRenders = renderMetrics.filter((m) => m.duration > 16).length;
+      if (slowRenders / renderMetrics.length > 0.1) {
+        recommendations.push({
+          id: `rec-render-${Date.now()}`,
+          title: 'Improve Render Performance',
+          description: 'Consider using React.memo, useMemo, or useCallback',
+          priority: 'medium',
+          estimatedImprovement: 15,
+          effort: 'medium',
+          category: 'rendering',
+        });
+      }
+    }
+
+    return recommendations;
+  }
+
+  /**
+   * Get recommendation for a specific metric
+   */
+  private getRecommendation(name: string, category: string, duration: number): string {
+    const recommendations: Record<string, string> = {
+      render: 'Consider optimizing component rendering with React.memo or useMemo',
+      compute: 'Consider breaking computation into smaller chunks or using Web Workers',
+      io: 'Consider implementing caching or batching I/O operations',
+      memory: 'Consider implementing memory pooling or garbage collection optimization',
+      network: 'Consider implementing request batching or compression',
+    };
+
+    return recommendations[category] || 'Consider optimizing this operation';
+  }
+
+  /**
+   * Group metrics by name
+   */
+  private groupMetricsByName(): Record<string, PerformanceMetric[]> {
+    const grouped: Record<string, PerformanceMetric[]> = {};
+
+    for (const metric of this.metrics) {
+      if (!grouped[metric.name]) {
+        grouped[metric.name] = [];
+      }
+      grouped[metric.name].push(metric);
+    }
+
+    return grouped;
+  }
+
+  /**
+   * Create a performance snapshot
+   */
+  public createSnapshot(): ProfileSnapshot {
+    const bottlenecks = this.analyzeBottlenecks();
+    const recommendations = this.generateRecommendations();
+
+    const summary = {
+      totalMetrics: this.metrics.length,
+      bottleneckCount: bottlenecks.length,
+      recommendationCount: recommendations.length,
+      averageDuration:
+        this.metrics.reduce((sum, m) => sum + m.duration, 0) / this.metrics.length || 0,
+      maxDuration: Math.max(...this.metrics.map((m) => m.duration), 0),
+      minDuration: Math.min(...this.metrics.map((m) => m.duration), 0),
+    };
+
+    const snapshot: ProfileSnapshot = {
+      timestamp: Date.now(),
+      metrics: [...this.metrics],
+      bottlenecks,
+      recommendations,
+      summary,
+    };
+
+    this.snapshots.push(snapshot);
+
+    // Keep only last 100 snapshots
+    if (this.snapshots.length > 100) {
+      this.snapshots.shift();
+    }
+
+    return snapshot;
+  }
+
+  /**
+   * Get performance statistics
+   */
+  public getStatistics(): Record<string, unknown> {
+    const metricsByCategory = this.groupMetricsByCategory();
+
+    return {
+      totalMetrics: this.metrics.length,
+      totalSnapshots: this.snapshots.length,
+      metricsByCategory: Object.entries(metricsByCategory).reduce(
+        (acc, [category, metrics]) => ({
+          ...acc,
+          [category]: {
+            count: metrics.length,
+            avgDuration: metrics.reduce((sum, m) => sum + m.duration, 0) / metrics.length,
+            maxDuration: Math.max(...metrics.map((m) => m.duration)),
+          },
+        }),
+        {}
+      ),
+      bottlenecks: this.analyzeBottlenecks().length,
+      recommendations: this.generateRecommendations().length,
+    };
+  }
+
+  /**
+   * Group metrics by category
+   */
+  private groupMetricsByCategory(): Record<string, PerformanceMetric[]> {
+    const grouped: Record<string, PerformanceMetric[]> = {};
+
+    for (const metric of this.metrics) {
+      if (!grouped[metric.category]) {
+        grouped[metric.category] = [];
+      }
+      grouped[metric.category].push(metric);
+    }
+
+    return grouped;
+  }
+
+  /**
+   * Set performance threshold
+   */
+  public setThreshold(category: string, threshold: number): void {
+    this.thresholds[category] = threshold;
+  }
+
+  /**
+   * Get recent snapshots
+   */
+  public getSnapshots(limit: number = 10): ProfileSnapshot[] {
+    return this.snapshots.slice(-limit);
+  }
+
+  /**
+   * Clear metrics
+   */
+  public clearMetrics(): void {
+    this.metrics = [];
+  }
+
+  /**
+   * Export profile data
+   */
+  public exportData(): Record<string, unknown> {
+    return {
+      metrics: this.metrics,
+      snapshots: this.snapshots,
+      thresholds: this.thresholds,
+      statistics: this.getStatistics(),
+    };
+  }
+}

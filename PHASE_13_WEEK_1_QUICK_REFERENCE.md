@@ -1,505 +1,305 @@
-# Phase 13 Week 1 - Quick Reference Guide
+# Phase 13 Week 1 - Quick API Reference
 
-**راهنمای سریع برای سیستم‌های توزیع شده**
-
----
-
-## 🚀 Quick Start
-
-### Distributed Cache Manager
+## DistributedCacheManager
 
 ```typescript
-import { DistributedCacheManager } from './engine/distributed/DistributedCacheManager';
+import { DistributedCacheManager } from '@rhuds/charts';
 
-const cache = new DistributedCacheManager({
-  backend: 'redis',
-  nodes: ['node1', 'node2', 'node3'],
-  ttl: 60000,
-  maxSize: 1000,
-  replicationFactor: 2,
-});
+const cache = new DistributedCacheManager();
 
-// Set value
-await cache.set('key1', { data: 'value' }, 60000);
+// Node Management
+cache.addNode({ id: 'node1', host: 'localhost', port: 6379 });
+cache.getNodes(): CacheNode[];
 
-// Get value
-const value = cache.get('key1');
+// Cache Operations
+cache.set<T>(key: string, value: T): void;
+cache.get<T>(key: string): T | undefined;
+cache.delete(key: string): boolean;
+cache.clear(): void;
 
-// Acquire lock
-const lock = await cache.acquireLock('resource', 'owner', 5000);
+// Pattern-based Operations
+cache.invalidateByPattern(pattern: string): number; // Returns count invalidated
 
-// Release lock
-await cache.releaseLock('resource', lock.token);
+// Distributed Locking
+cache.acquireLock(resource: string): boolean;
+cache.releaseLock(resource: string): void;
 
-// Get stats
-const stats = cache.getStats();
+// Replication
+cache.replicate(key: string, nodes: string[]): void;
+
+// Statistics
+cache.getStatistics(): {
+  hits: number;
+  misses: number;
+  evictions: number;
+  size: number;
+};
 ```
 
-### Cluster Coordinator
+## ClusterCoordinator
 
 ```typescript
-import { ClusterCoordinator } from './engine/distributed/ClusterCoordinator';
+import { ClusterCoordinator } from '@rhuds/charts';
 
-const coordinator = new ClusterCoordinator(
-  'node1',
-  {
-    algorithm: 'raft',
-    heartbeatInterval: 150,
-    electionTimeout: 300,
-    quorumSize: 2,
-  },
-  {
-    interval: 1000,
-    timeout: 500,
-    maxFailures: 3,
-  }
-);
-
-// Register node
-coordinator.registerNode({
-  id: 'node2',
-  address: 'localhost',
-  port: 8001,
-  status: 'healthy',
-  lastHeartbeat: Date.now(),
-  metadata: {},
+const coordinator = new ClusterCoordinator({
+  algorithm: 'raft',
+  heartbeatInterval: 1000,
+  electionTimeout: 3000,
 });
 
-// Get cluster status
-const status = coordinator.getClusterStatus();
+// Node Management
+coordinator.addNode({ id: 'node1', host: 'localhost', port: 3000 });
+coordinator.removeNode(nodeId: string): void;
+coordinator.getNode(nodeId: string): ClusterNode | null;
 
-// Append log
-const index = coordinator.appendLog({ action: 'set', key: 'key1' });
+// Leader Election
+coordinator.startElection(): void;
+coordinator.getLeader(): ClusterNode | null;
 
-// Commit log
-coordinator.commitLog(index);
+// Health Management
+coordinator.sendHeartbeat(): void;
+coordinator.checkNodeHealth(): void;
+coordinator.markNodeUnhealthy(nodeId: string): void;
+coordinator.markNodeHealthy(nodeId: string): void;
+
+// Node Queries
+coordinator.getHealthyNodes(): ClusterNode[];
+coordinator.getClusterState(): ClusterState;
+
+// Monitoring
+coordinator.start(): void;
+coordinator.stop(): void;
+coordinator.addListener(listener: (event: string, data: unknown) => void): void;
+coordinator.removeListener(listener: (event: string, data: unknown) => void): void;
+
+// Statistics
+coordinator.getStatistics(): {
+  totalNodes: number;
+  healthyNodes: number;
+  leader: string | null;
+  term: number;
+  lastElection: number;
+  uptime: number;
+};
 ```
 
-### Message Queue Integration
+## MessageQueueIntegration
 
 ```typescript
-import { MessageQueueIntegration } from './engine/distributed/MessageQueueIntegration';
+import { MessageQueueIntegration } from '@rhuds/charts';
 
 const queue = new MessageQueueIntegration({
-  broker: 'rabbitmq',
-  brokerUrl: 'amqp://localhost',
-  topics: ['events', 'commands'],
-  consumerGroup: 'test-group',
-  batchSize: 10,
-  batchTimeout: 100,
+  type: 'rabbitmq' | 'kafka',
+  host: 'localhost',
+  port: 5672,
 });
 
-// Register route
+// Route Management
 queue.registerRoute(
-  'events',
-  async (message) => {
-    console.log('Processing:', message);
-  },
-  0,
-  {
-    maxRetries: 3,
-    backoffMultiplier: 2,
-    initialDelay: 1000,
-    maxDelay: 30000,
-  }
-);
+  route: string,
+  handler: (message: unknown) => Promise<void>
+): void;
 
-// Publish message
-const messageId = await queue.publish('events', { type: 'test' });
+// Publishing
+queue.publish(route: string, message: unknown): Promise<string>; // Returns messageId
 
-// Get dead letter messages
-const dlMessages = queue.getDeadLetterMessages();
+// Subscription
+queue.subscribe(route: string): Promise<void>;
 
-// Requeue dead letter
-await queue.requeueDeadLetter(messageId);
+// Dead Letter Handling
+queue.handleDeadLetter(
+  route: string,
+  handler: (message: unknown) => Promise<void>
+): void;
+
+// Acknowledgment
+queue.acknowledge(messageId: string): void;
+queue.nack(messageId: string): void;
+
+// Statistics
+queue.getStatistics(): {
+  routes: number;
+  published: number;
+  consumed: number;
+  deadLetters: number;
+};
 ```
 
-### Distributed Tracing
+## DistributedTracing
 
 ```typescript
-import { DistributedTracing } from './engine/distributed/DistributedTracing';
+import { DistributedTracing } from '@rhuds/charts';
 
-const tracing = new DistributedTracing({
-  samplingRate: 1.0,
-  maxSpansPerTrace: 100,
-  maxLogSize: 50,
-  retentionTime: 3600000,
-});
+const tracing = new DistributedTracing();
 
-// Start trace
-const traceId = tracing.startTrace();
+// Trace Management
+tracing.startTrace(): string; // Returns traceId
+tracing.getTrace(traceId: string): Trace | null;
 
-// Start span
-const spanId = tracing.startSpan(traceId, 'operation1', 'service1');
+// Span Management
+tracing.startSpan(traceId: string, operation: string): string; // Returns spanId
+tracing.endSpan(spanId: string, status: 'success' | 'error'): void;
+tracing.getSpan(spanId: string): Span | null;
 
-// Add tag
-tracing.addTag('userId', '123');
+// Span Metadata
+tracing.addTag(spanId: string, key: string, value: unknown): void;
+tracing.addLog(spanId: string, message: string): void;
 
-// Add log
-tracing.addLog('Processing started', 'info');
+// Context Propagation
+tracing.getContext(traceId: string): Record<string, unknown>;
+tracing.setContext(traceId: string, context: Record<string, unknown>): void;
 
-// End span
-tracing.endSpan(spanId, 'success');
-
-// Complete trace
-tracing.completeTrace(traceId);
-
-// Get trace visualization
-const viz = tracing.getTraceVisualization(traceId);
-
-// Analyze trace
-const analysis = tracing.analyzeTrace(traceId);
+// Statistics
+tracing.getStatistics(): {
+  tracesCreated: number;
+  spansCreated: number;
+  averageSpanDuration: number;
+  errorRate: number;
+};
 ```
 
-### Service Mesh Integration
+## ServiceMeshIntegration
 
 ```typescript
-import { ServiceMeshIntegration } from './engine/distributed/ServiceMeshIntegration';
+import { ServiceMeshIntegration } from '@rhuds/charts';
 
-const mesh = new ServiceMeshIntegration({
-  meshType: 'istio',
-  namespace: 'default',
-  controlPlaneUrl: 'http://localhost:15000',
-  enableMTLS: true,
-});
+const mesh = new ServiceMeshIntegration();
 
-// Create virtual service
-mesh.createVirtualService({
-  name: 'api-service',
-  hosts: ['api.example.com'],
-  http: [
-    {
-      route: [
-        {
-          destination: { host: 'api-v1', port: 8080 },
-          weight: 80,
-        },
-        {
-          destination: { host: 'api-v2', port: 8080 },
-          weight: 20,
-        },
-      ],
-    },
-  ],
-});
+// Service Management
+mesh.registerService(service: {
+  name: string;
+  namespace: string;
+  port: number;
+  protocol: 'http' | 'grpc' | 'tcp';
+  replicas: number;
+}): void;
 
-// Create destination rule
-mesh.createDestinationRule({
-  name: 'api-rule',
-  host: 'api-service',
-  trafficPolicy: {
-    connectionPool: {
-      tcp: { maxConnections: 100 },
-      http: { http1MaxPendingRequests: 100 },
-    },
-  },
-});
+mesh.getService(name: string): Service | null;
+mesh.deregisterService(name: string): void;
 
-// Route request
-const result = await mesh.routeRequest('api-service', 'api-v1', {
-  uri: '/api/test',
-  method: 'GET',
-});
+// Traffic Management
+mesh.applyTrafficPolicy(service: string, policy: TrafficPolicy): void;
+mesh.getTrafficPolicy(service: string): TrafficPolicy | null;
 
-// Get mesh status
-const status = mesh.getMeshStatus();
+// Circuit Breaker
+mesh.configureCircuitBreaker(service: string, config: {
+  enabled: boolean;
+  threshold: number;
+  timeout: number;
+  halfOpenRequests: number;
+}): void;
+
+mesh.checkCircuitBreakerStatus(service: string): 'closed' | 'open' | 'half-open';
+
+// Load Balancing
+mesh.loadBalanceRequest(service: string): string; // Returns endpoint
+
+// Retry Policies
+mesh.configureRetryPolicy(service: string, policy: {
+  maxRetries: number;
+  backoffMs: number;
+  retryableStatusCodes: number[];
+}): void;
+
+// Statistics
+mesh.getStatistics(): {
+  totalServices: number;
+  activeConnections: number;
+  requestsPerSecond: number;
+  errorRate: number;
+};
 ```
 
----
+## Common Patterns
 
-## 📊 Performance Targets
-
-| Operation       | Target | Actual |
-| --------------- | ------ | ------ |
-| Cache Set       | < 50ms | ✅     |
-| Cache Get       | < 10ms | ✅     |
-| Lock Acquire    | < 50ms | ✅     |
-| Node Register   | < 50ms | ✅     |
-| Message Publish | < 50ms | ✅     |
-| Trace Start     | < 10ms | ✅     |
-| Route Request   | < 50ms | ✅     |
-
----
-
-## 🔧 Configuration Examples
-
-### High-Performance Cache
+### Distributed Cache with Locking
 
 ```typescript
-const cache = new DistributedCacheManager({
-  backend: 'redis',
-  nodes: ['redis1', 'redis2', 'redis3'],
-  ttl: 300000, // 5 minutes
-  maxSize: 10000,
-  replicationFactor: 3,
-});
-```
+const cache = new DistributedCacheManager();
 
-### Production Cluster
-
-```typescript
-const coordinator = new ClusterCoordinator(
-  'node1',
-  {
-    algorithm: 'raft',
-    heartbeatInterval: 100,
-    electionTimeout: 500,
-    quorumSize: 3,
-  },
-  {
-    interval: 5000,
-    timeout: 2000,
-    maxFailures: 5,
-  }
-);
-```
-
-### Reliable Message Queue
-
-```typescript
-const queue = new MessageQueueIntegration({
-  broker: 'rabbitmq',
-  brokerUrl: 'amqp://rabbitmq:5672',
-  topics: ['events', 'commands', 'notifications'],
-  consumerGroup: 'production-group',
-  batchSize: 100,
-  batchTimeout: 1000,
-});
-```
-
-### Comprehensive Tracing
-
-```typescript
-const tracing = new DistributedTracing({
-  samplingRate: 0.1, // 10% sampling
-  maxSpansPerTrace: 1000,
-  maxLogSize: 100,
-  retentionTime: 86400000, // 24 hours
-});
-```
-
-### Production Mesh
-
-```typescript
-const mesh = new ServiceMeshIntegration({
-  meshType: 'istio',
-  namespace: 'production',
-  controlPlaneUrl: 'http://istiod:15000',
-  enableMTLS: true,
-});
-```
-
----
-
-## 🎯 Common Patterns
-
-### Distributed Lock Pattern
-
-```typescript
-const lock = await cache.acquireLock('critical-section', 'worker-1', 10000);
-
-if (lock) {
+if (cache.acquireLock('resource')) {
   try {
-    // Critical section
-    await performCriticalOperation();
+    cache.set('key', 'value');
   } finally {
-    await cache.releaseLock('critical-section', lock.token);
+    cache.releaseLock('resource');
   }
 }
 ```
 
-### Message Processing Pattern
+### Cluster Monitoring
 
 ```typescript
-queue.registerRoute('orders', async (message) => {
-  const order = message.payload;
+const coordinator = new ClusterCoordinator();
 
-  // Process order
-  await processOrder(order);
+coordinator.addListener((event, data) => {
+  if (event === 'node_unhealthy') {
+    console.log('Node unhealthy:', data);
+  }
+});
 
-  // Publish event
-  await queue.publish('order-processed', { orderId: order.id });
+coordinator.start();
+```
+
+### Message Processing
+
+```typescript
+const queue = new MessageQueueIntegration({ type: 'rabbitmq' });
+
+queue.registerRoute('user.created', async (message) => {
+  try {
+    // Process message
+    queue.acknowledge(message.id);
+  } catch (error) {
+    queue.nack(message.id);
+  }
 });
 ```
 
-### Trace Propagation Pattern
+### Request Tracing
 
 ```typescript
-// In service A
+const tracing = new DistributedTracing();
+
 const traceId = tracing.startTrace();
-const spanId = tracing.startSpan(traceId, 'operation', 'service-a');
+const spanId = tracing.startSpan(traceId, 'api_call');
 
-const headers = {};
-tracing.injectSpanContext(headers);
+tracing.addTag(spanId, 'userId', 123);
+tracing.addLog(spanId, 'Request started');
 
-// Send to service B with headers
-await callServiceB(headers);
+// ... do work ...
 
-tracing.endSpan(spanId);
+tracing.endSpan(spanId, 'success');
 ```
 
-### Circuit Breaker Pattern
+### Service Mesh Setup
 
 ```typescript
-mesh.createDestinationRule({
-  name: 'api-rule',
-  host: 'api-service',
-  trafficPolicy: {
-    outlierDetection: {
-      consecutive5xxErrors: 5,
-      interval: '30s',
-      baseEjectionTime: '30s',
-      maxEjectionPercent: 50,
-    },
+const mesh = new ServiceMeshIntegration();
+
+mesh.registerService({
+  name: 'api-service',
+  namespace: 'production',
+  port: 3000,
+  protocol: 'http',
+  replicas: 3,
+});
+
+mesh.applyTrafficPolicy('api-service', {
+  loadBalancer: 'round-robin',
+  connectionPool: {
+    tcp: { maxConnections: 100 },
+    http: { http1MaxPendingRequests: 100 },
   },
 });
+
+mesh.configureCircuitBreaker('api-service', {
+  enabled: true,
+  threshold: 0.5,
+  timeout: 30000,
+  halfOpenRequests: 3,
+});
 ```
 
 ---
 
-## 📈 Monitoring
-
-### Cache Statistics
-
-```typescript
-const stats = cache.getStats();
-console.log(`Hit Rate: ${stats.hitRate * 100}%`);
-console.log(`Size: ${stats.size}/${cache.config.maxSize}`);
-console.log(`Evictions: ${stats.evictions}`);
-```
-
-### Cluster Status
-
-```typescript
-const status = coordinator.getClusterStatus();
-console.log(`Leader: ${status.leader}`);
-console.log(`Healthy Nodes: ${status.healthyNodes}/${status.totalNodes}`);
-console.log(`Committed: ${status.committed}`);
-```
-
-### Queue Statistics
-
-```typescript
-const stats = queue.getStats();
-console.log(`Published: ${stats.published}`);
-console.log(`Consumed: ${stats.consumed}`);
-console.log(`Dead Lettered: ${stats.deadLettered}`);
-console.log(`Buffer Size: ${stats.bufferSize}`);
-```
-
-### Trace Analysis
-
-```typescript
-const analysis = tracing.analyzeTrace(traceId);
-console.log(`Total Duration: ${analysis.totalDuration}ms`);
-console.log(`Span Count: ${analysis.spanCount}`);
-console.log(`Error Count: ${analysis.errorCount}`);
-console.log(`Slowest Span: ${analysis.slowestSpan?.operationName}`);
-```
-
-### Mesh Status
-
-```typescript
-const status = mesh.getMeshStatus();
-console.log(`Virtual Services: ${status.virtualServices}`);
-console.log(`Destination Rules: ${status.destinationRules}`);
-console.log(`Requests Routed: ${status.stats.requestsRouted}`);
-console.log(`Circuit Breaker Trips: ${status.stats.circuitBreakerTrips}`);
-```
-
----
-
-## 🐛 Troubleshooting
-
-### Cache Not Working
-
-```typescript
-// Check connection
-const stats = cache.getStats();
-if (stats.misses > stats.hits) {
-  console.log('Cache hit rate is low');
-}
-
-// Clear cache
-await cache.clear();
-```
-
-### Cluster Not Converging
-
-```typescript
-// Check node status
-const status = coordinator.getClusterStatus();
-console.log(`Healthy Nodes: ${status.healthyNodes}`);
-
-// Check if quorum is reached
-if (status.healthyNodes < coordinator.consensusConfig.quorumSize) {
-  console.log('Quorum not reached');
-}
-```
-
-### Messages Not Processing
-
-```typescript
-// Check dead letter queue
-const dlMessages = queue.getDeadLetterMessages();
-console.log(`Dead Letters: ${dlMessages.length}`);
-
-// Requeue messages
-for (const msg of dlMessages) {
-  await queue.requeueDeadLetter(msg.id);
-}
-```
-
-### Trace Not Showing
-
-```typescript
-// Check sampling rate
-if (Math.random() > tracing.config.samplingRate) {
-  console.log('Trace not sampled');
-}
-
-// Check trace exists
-const trace = tracing.getTrace(traceId);
-if (!trace) {
-  console.log('Trace not found');
-}
-```
-
-### Routing Failures
-
-```typescript
-// Check virtual service exists
-const status = mesh.getMeshStatus();
-console.log(`Virtual Services: ${status.virtualServices}`);
-
-// Check service status
-const svcStatus = mesh.getServiceStatus('api-v1');
-console.log(`Service Healthy: ${svcStatus.healthy}`);
-```
-
----
-
-## 📚 Files Reference
-
-| File                                  | Purpose              | Lines |
-| ------------------------------------- | -------------------- | ----- |
-| `DistributedCacheManager.ts`          | Cache management     | 280+  |
-| `ClusterCoordinator.ts`               | Cluster coordination | 320+  |
-| `MessageQueueIntegration.ts`          | Message queue        | 300+  |
-| `DistributedTracing.ts`               | Request tracing      | 350+  |
-| `ServiceMeshIntegration.ts`           | Service mesh         | 350+  |
-| `phase-13-week-1-distributed.test.ts` | Tests                | 500+  |
-
----
-
-## 🔗 Related Resources
-
-- `PHASE_13_PLANNING.md` - Full roadmap
-- `PHASE_13_WEEK_1_COMPLETION.md` - Detailed completion report
-- `ARCHITECTURE.md` - System architecture
-- `BEST_PRACTICES_FA.md` - Best practices
-
----
-
-**Last Updated**: 8 آپریل 2026  
-**Status**: ✅ COMPLETE
+**All components are production-ready and fully tested.**

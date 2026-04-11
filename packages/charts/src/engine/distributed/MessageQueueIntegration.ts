@@ -1,397 +1,255 @@
 /**
  * Message Queue Integration
- * ادغام صف پیام برای سیستم‌های توزیع شده
- *
- * Features:
- * - RabbitMQ/Kafka support
- * - Message routing
- * - Dead letter handling
- * - Acknowledgment management
+ * RabbitMQ/Kafka support with routing and dead letter handling
  */
 
-import { EventEmitter } from 'events';
-
-export interface Message<T = any> {
+export interface Message<T = unknown> {
   id: string;
   topic: string;
   payload: T;
   timestamp: number;
   retries: number;
   maxRetries: number;
-  headers: Record<string, string>;
-  correlationId?: string;
+  headers?: Record<string, string>;
 }
 
 export interface QueueConfig {
-  broker: 'rabbitmq' | 'kafka';
-  brokerUrl: string;
-  topics: string[];
-  consumerGroup: string;
-  batchSize: number;
-  batchTimeout: number;
+  type: 'rabbitmq' | 'kafka';
+  host: string;
+  port: number;
+  username?: string;
+  password?: string;
 }
 
 export interface RoutingRule {
   pattern: string;
   handler: (message: Message) => Promise<void>;
-  priority: number;
-  retryPolicy: RetryPolicy;
+  deadLetterQueue?: string;
 }
 
-export interface RetryPolicy {
-  maxRetries: number;
-  backoffMultiplier: number;
-  initialDelay: number;
-  maxDelay: number;
+export interface DeadLetterMessage extends Message {
+  reason: string;
+  failedAt: number;
 }
 
-export interface DeadLetterConfig {
-  enabled: boolean;
-  topic: string;
-  maxAge: number;
-}
-
-export class MessageQueueIntegration extends EventEmitter {
+/**
+ * MessageQueueIntegration - Distributed message handling
+ */
+export class MessageQueueIntegration {
   private config: QueueConfig;
-  private routingRules: Map<string, RoutingRule>;
-  private deadLetterConfig: DeadLetterConfig;
-  private messageBuffer: Message[];
-  private processingMessages: Set<string>;
-  private deadLetterQueue: Message[];
-  private batchTimer: NodeJS.Timeout | null;
-  private stats: {
-    published: number;
-    consumed: number;
-    failed: number;
-    deadLettered: number;
+  private routes: Map<string, RoutingRule> = new Map();
+  private deadLetterQueue: Map<string, DeadLetterMessage> = new Map();
+  private listeners: Set<(event: string, data: unknown) => void> = new Set();
+  private stats = {
+    published: 0,
+    consumed: 0,
+    failed: 0,
+    deadLettered: 0,
   };
 
-  constructor(config: QueueConfig, deadLetterConfig?: DeadLetterConfig) {
-    super();
+  constructor(config: QueueConfig) {
     this.config = config;
-    this.routingRules = new Map();
-    this.deadLetterConfig = deadLetterConfig || {
-      enabled: true,
-      topic: 'dead-letter-queue',
-      maxAge: 86400000, // 24 hours
-    };
-    this.messageBuffer = [];
-    this.processingMessages = new Set();
-    this.deadLetterQueue = [];
-    this.batchTimer = null;
-    this.stats = {
-      published: 0,
-      consumed: 0,
-      failed: 0,
-      deadLettered: 0,
-    };
-
-    this.initialize();
-  }
-
-  private initialize(): void {
-    this.connectToBroker();
-    this.startBatchProcessor();
-    this.emit('initialized', { broker: this.config.broker });
-  }
-
-  /**
-   * Connect to message broker
-   */
-  private connectToBroker(): void {
-    // Simulate broker connection
-    this.emit('connected', {
-      broker: this.config.broker,
-      url: this.config.brokerUrl,
-    });
   }
 
   /**
    * Register routing rule
    */
-  public registerRoute(
+  registerRoute(
     pattern: string,
     handler: (message: Message) => Promise<void>,
-    priority: number = 0,
-    retryPolicy?: RetryPolicy
+    deadLetterQueue?: string
   ): void {
-    const rule: RoutingRule = {
+    this.routes.set(pattern, {
       pattern,
       handler,
-      priority,
-      retryPolicy: retryPolicy || {
-        maxRetries: 3,
-        backoffMultiplier: 2,
-        initialDelay: 1000,
-        maxDelay: 30000,
-      },
-    };
+      deadLetterQueue,
+    });
 
-    this.routingRules.set(pattern, rule);
-    this.emit('route-registered', { pattern, priority });
+    this.emit('route_registered', { pattern });
   }
 
   /**
    * Publish message
    */
-  public async publish<T>(
-    topic: string,
-    payload: T,
-    headers?: Record<string, string>,
-    correlationId?: string
-  ): Promise<string> {
-    const messageId = this.generateMessageId();
+  async publish<T>(topic: string, payload: T, headers?: Record<string, string>): Promise<string> {
     const message: Message<T> = {
-      id: messageId,
+      id: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       topic,
       payload,
       timestamp: Date.now(),
       retries: 0,
       maxRetries: 3,
-      headers: headers || {},
-      correlationId,
+      headers,
     };
 
-    this.messageBuffer.push(message);
     this.stats.published++;
+    this.emit('message_published', message);
 
-    this.emit('message-published', {
-      messageId,
+    return message.id;
+  }
+
+  /**
+   * Consume message
+   */
+  async consume(topic: string): Promise<Message | null> {
+    const route = this.routes.get(topic);
+
+    if (!route) {
+      return null;
+    }
+
+    // Simulate message consumption
+    const message: Message = {
+      id: `msg_${Date.now()}`,
       topic,
-      timestamp: message.timestamp,
-    });
-
-    return messageId;
-  }
-
-  /**
-   * Subscribe to topic
-   */
-  public subscribe(topic: string): void {
-    // Simulate subscription
-    this.emit('subscribed', { topic });
-  }
-
-  /**
-   * Unsubscribe from topic
-   */
-  public unsubscribe(topic: string): void {
-    this.emit('unsubscribed', { topic });
-  }
-
-  /**
-   * Start batch processor
-   */
-  private startBatchProcessor(): void {
-    this.batchTimer = setInterval(() => {
-      this.processBatch();
-    }, this.config.batchTimeout);
-  }
-
-  /**
-   * Process batch of messages
-   */
-  private async processBatch(): Promise<void> {
-    if (this.messageBuffer.length === 0) {
-      return;
-    }
-
-    const batch = this.messageBuffer.splice(
-      0,
-      Math.min(this.config.batchSize, this.messageBuffer.length)
-    );
-
-    for (const message of batch) {
-      this.processMessage(message).catch((err) => {
-        this.emit('batch-processing-error', { error: err.message });
-      });
-    }
-  }
-
-  /**
-   * Process individual message
-   */
-  private async processMessage(message: Message): Promise<void> {
-    if (this.processingMessages.has(message.id)) {
-      return;
-    }
-
-    this.processingMessages.add(message.id);
+      payload: {},
+      timestamp: Date.now(),
+      retries: 0,
+      maxRetries: 3,
+    };
 
     try {
-      const rule = this.findMatchingRoute(message.topic);
-
-      if (!rule) {
-        throw new Error(`No route found for topic: ${message.topic}`);
-      }
-
-      await rule.handler(message);
+      await route.handler(message);
       this.stats.consumed++;
-
-      this.emit('message-processed', {
-        messageId: message.id,
-        topic: message.topic,
-      });
+      this.emit('message_consumed', message);
+      return message;
     } catch (error) {
-      await this.handleMessageError(message, error as Error);
-    } finally {
-      this.processingMessages.delete(message.id);
+      return this.handleMessageFailure(message, route, error as Error);
     }
   }
 
   /**
-   * Find matching route for topic
+   * Handle message failure
    */
-  private findMatchingRoute(topic: string): RoutingRule | undefined {
-    const rules = Array.from(this.routingRules.values())
-      .filter((rule) => this.matchPattern(rule.pattern, topic))
-      .sort((a, b) => b.priority - a.priority);
+  private async handleMessageFailure(
+    message: Message,
+    route: RoutingRule,
+    error: Error
+  ): Promise<Message | null> {
+    message.retries++;
 
-    return rules[0];
-  }
-
-  /**
-   * Match pattern against topic
-   */
-  private matchPattern(pattern: string, topic: string): boolean {
-    const regex = new RegExp(`^${pattern.replace(/\*/g, '.*')}$`);
-    return regex.test(topic);
-  }
-
-  /**
-   * Handle message error
-   */
-  private async handleMessageError(message: Message, error: Error): Promise<void> {
-    const rule = this.findMatchingRoute(message.topic);
-    const retryPolicy = rule?.retryPolicy || {
-      maxRetries: 3,
-      backoffMultiplier: 2,
-      initialDelay: 1000,
-      maxDelay: 30000,
-    };
-
-    if (message.retries < retryPolicy.maxRetries) {
-      message.retries++;
-      const delay = Math.min(
-        retryPolicy.initialDelay * Math.pow(retryPolicy.backoffMultiplier, message.retries - 1),
-        retryPolicy.maxDelay
-      );
-
-      setTimeout(() => {
-        this.messageBuffer.push(message);
-      }, delay);
-
-      this.emit('message-retry', {
-        messageId: message.id,
-        attempt: message.retries,
-        delay,
-      });
-    } else {
-      await this.sendToDeadLetter(message, error);
+    if (message.retries < message.maxRetries) {
+      // Retry
+      this.emit('message_retry', { message, attempt: message.retries });
+      return this.consume(message.topic);
     }
 
-    this.stats.failed++;
-  }
-
-  /**
-   * Send message to dead letter queue
-   */
-  private async sendToDeadLetter(message: Message, error: Error): Promise<void> {
-    if (!this.deadLetterConfig.enabled) {
-      return;
-    }
-
-    const dlMessage: Message = {
+    // Send to dead letter queue
+    const dlqMessage: DeadLetterMessage = {
       ...message,
-      topic: this.deadLetterConfig.topic,
-      headers: {
-        ...message.headers,
-        'x-original-topic': message.topic,
-        'x-error': error.message,
-        'x-dead-lettered-at': new Date().toISOString(),
-      },
+      reason: error.message,
+      failedAt: Date.now(),
     };
 
-    this.deadLetterQueue.push(dlMessage);
+    const dlqName = route.deadLetterQueue || `${message.topic}.dlq`;
+    this.deadLetterQueue.set(dlqMessage.id, dlqMessage);
     this.stats.deadLettered++;
 
-    this.emit('message-dead-lettered', {
-      messageId: message.id,
-      originalTopic: message.topic,
-      error: error.message,
-    });
+    this.emit('message_dead_lettered', dlqMessage);
+    return null;
   }
 
   /**
    * Get dead letter messages
    */
-  public getDeadLetterMessages(): Message[] {
-    const now = Date.now();
-    return this.deadLetterQueue.filter((msg) => now - msg.timestamp < this.deadLetterConfig.maxAge);
+  getDeadLetterMessages(): DeadLetterMessage[] {
+    return Array.from(this.deadLetterQueue.values());
   }
 
   /**
-   * Requeue dead letter message
+   * Retry dead letter message
    */
-  public async requeueDeadLetter(messageId: string): Promise<boolean> {
-    const index = this.deadLetterQueue.findIndex((msg) => msg.id === messageId);
+  async retryDeadLetterMessage(messageId: string): Promise<boolean> {
+    const dlqMessage = this.deadLetterQueue.get(messageId);
 
-    if (index === -1) {
+    if (!dlqMessage) {
       return false;
     }
 
-    const message = this.deadLetterQueue.splice(index, 1)[0];
-    message.topic = message.headers['x-original-topic'] || message.topic;
-    message.retries = 0;
+    const message: Message = {
+      ...dlqMessage,
+      retries: 0,
+    };
 
-    this.messageBuffer.push(message);
-    this.emit('dead-letter-requeued', { messageId });
+    this.deadLetterQueue.delete(messageId);
 
-    return true;
+    try {
+      const route = this.routes.get(message.topic);
+      if (route) {
+        await route.handler(message);
+        this.stats.consumed++;
+        this.emit('dlq_message_retried', message);
+        return true;
+      }
+    } catch (error) {
+      // Re-queue to DLQ
+      this.deadLetterQueue.set(messageId, dlqMessage);
+    }
+
+    return false;
   }
 
   /**
    * Acknowledge message
    */
-  public async acknowledge(messageId: string): Promise<void> {
-    this.emit('message-acknowledged', { messageId });
+  acknowledgeMessage(messageId: string): void {
+    this.emit('message_acknowledged', messageId);
   }
 
   /**
-   * Negative acknowledge message
+   * Get statistics
    */
-  public async nack(messageId: string): Promise<void> {
-    this.emit('message-nacked', { messageId });
-  }
-
-  /**
-   * Generate message ID
-   */
-  private generateMessageId(): string {
-    return `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-  }
-
-  /**
-   * Get queue statistics
-   */
-  public getStats() {
+  getStatistics() {
     return {
       ...this.stats,
-      bufferSize: this.messageBuffer.length,
-      processingCount: this.processingMessages.size,
-      deadLetterSize: this.deadLetterQueue.length,
-      routeCount: this.routingRules.size,
+      routes: this.routes.size,
+      deadLetterCount: this.deadLetterQueue.size,
+      failureRate: this.stats.failed / (this.stats.published || 1),
     };
   }
 
   /**
-   * Shutdown queue
+   * Emit event
    */
-  public shutdown(): void {
-    if (this.batchTimer) {
-      clearInterval(this.batchTimer);
+  private emit(event: string, data: unknown): void {
+    for (const listener of this.listeners) {
+      try {
+        listener(event, data);
+      } catch (error) {
+        // Handle listener error
+      }
     }
+  }
 
-    this.emit('shutdown', { timestamp: Date.now() });
+  /**
+   * Add listener
+   */
+  addListener(listener: (event: string, data: unknown) => void): void {
+    this.listeners.add(listener);
+  }
+
+  /**
+   * Remove listener
+   */
+  removeListener(listener: (event: string, data: unknown) => void): void {
+    this.listeners.delete(listener);
+  }
+
+  /**
+   * Connect to queue
+   */
+  async connect(): Promise<void> {
+    this.emit('connecting', this.config);
+    // Simulate connection
+    this.emit('connected', this.config);
+  }
+
+  /**
+   * Disconnect from queue
+   */
+  async disconnect(): Promise<void> {
+    this.emit('disconnecting', null);
+    // Simulate disconnection
+    this.emit('disconnected', null);
   }
 }

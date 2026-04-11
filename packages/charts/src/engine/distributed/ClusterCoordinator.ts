@@ -1,369 +1,294 @@
 /**
  * Cluster Coordinator
- * هماهنگ کننده خوشه برای مدیریت چند گره
- *
- * Features:
- * - Node discovery and registration
- * - Health monitoring
- * - Leader election
- * - Consensus algorithms
+ * Multi-node coordination with leader election and health monitoring
  */
 
-import { EventEmitter } from 'events';
-
-export interface NodeInfo {
+export interface ClusterNode {
   id: string;
-  address: string;
+  host: string;
   port: number;
-  status: 'healthy' | 'degraded' | 'unhealthy';
+  role: 'leader' | 'follower' | 'candidate';
+  term: number;
   lastHeartbeat: number;
-  metadata: Record<string, any>;
+  healthy: boolean;
 }
 
 export interface ClusterState {
-  nodes: Map<string, NodeInfo>;
   leader: string | null;
   term: number;
-  committed: number;
+  nodes: ClusterNode[];
+  lastElection: number;
 }
 
 export interface ConsensusConfig {
   algorithm: 'raft' | 'paxos';
   heartbeatInterval: number;
   electionTimeout: number;
-  quorumSize: number;
 }
 
-export interface HealthCheckConfig {
-  interval: number;
-  timeout: number;
-  maxFailures: number;
-}
-
-export class ClusterCoordinator extends EventEmitter {
+/**
+ * ClusterCoordinator - Multi-node cluster management
+ */
+export class ClusterCoordinator {
+  private nodes: Map<string, ClusterNode> = new Map();
   private state: ClusterState;
-  private consensusConfig: ConsensusConfig;
-  private healthCheckConfig: HealthCheckConfig;
-  private nodeId: string;
-  private isLeader: boolean;
-  private electionTimer: NodeJS.Timeout | null;
-  private heartbeatTimer: NodeJS.Timeout | null;
-  private healthCheckTimer: NodeJS.Timeout | null;
-  private logs: Array<{ term: number; index: number; data: any }>;
+  private consensus: ConsensusConfig;
+  private listeners: Set<(event: string, data: unknown) => void> = new Set();
+  private heartbeatTimer: NodeJS.Timeout | null = null;
+  private electionTimer: NodeJS.Timeout | null = null;
 
   constructor(
-    nodeId: string,
-    consensusConfig: ConsensusConfig,
-    healthCheckConfig: HealthCheckConfig
+    consensus: ConsensusConfig = {
+      algorithm: 'raft',
+      heartbeatInterval: 1000,
+      electionTimeout: 3000,
+    }
   ) {
-    super();
-    this.nodeId = nodeId;
-    this.consensusConfig = consensusConfig;
-    this.healthCheckConfig = healthCheckConfig;
-    this.isLeader = false;
-    this.electionTimer = null;
-    this.heartbeatTimer = null;
-    this.healthCheckTimer = null;
-    this.logs = [];
-
+    this.consensus = consensus;
     this.state = {
-      nodes: new Map(),
       leader: null,
       term: 0,
-      committed: 0,
+      nodes: [],
+      lastElection: Date.now(),
+    };
+  }
+
+  /**
+   * Add node to cluster
+   */
+  addNode(node: Omit<ClusterNode, 'role' | 'term' | 'lastHeartbeat' | 'healthy'>): void {
+    const clusterNode: ClusterNode = {
+      ...node,
+      role: 'follower',
+      term: this.state.term,
+      lastHeartbeat: Date.now(),
+      healthy: true,
     };
 
-    this.initialize();
-  }
-
-  private initialize(): void {
-    this.startHealthCheck();
-    this.startElection();
-    this.emit('initialized', { nodeId: this.nodeId });
+    this.nodes.set(node.id, clusterNode);
+    this.state.nodes = Array.from(this.nodes.values());
+    this.emit('node_added', clusterNode);
   }
 
   /**
-   * Register node in cluster
+   * Remove node from cluster
    */
-  public registerNode(nodeInfo: NodeInfo): void {
-    this.state.nodes.set(nodeInfo.id, {
-      ...nodeInfo,
-      status: 'healthy',
-      lastHeartbeat: Date.now(),
-    });
+  removeNode(nodeId: string): void {
+    this.nodes.delete(nodeId);
+    this.state.nodes = Array.from(this.nodes.values());
 
-    this.emit('node-registered', nodeInfo);
-  }
-
-  /**
-   * Deregister node from cluster
-   */
-  public deregisterNode(nodeId: string): void {
-    this.state.nodes.delete(nodeId);
-    this.emit('node-deregistered', { nodeId });
-
-    // Trigger new election if leader is removed
     if (this.state.leader === nodeId) {
       this.startElection();
     }
+
+    this.emit('node_removed', nodeId);
   }
 
   /**
    * Start leader election
    */
-  private startElection(): void {
-    if (this.electionTimer) {
-      clearTimeout(this.electionTimer);
-    }
-
-    const timeout =
-      this.consensusConfig.electionTimeout + Math.random() * this.consensusConfig.electionTimeout;
-
-    this.electionTimer = setTimeout(() => {
-      this.conductElection();
-    }, timeout);
-  }
-
-  /**
-   * Conduct leader election
-   */
-  private conductElection(): void {
+  startElection(): void {
     this.state.term++;
+    this.state.lastElection = Date.now();
 
-    const votes = this.requestVotes();
-    const quorumReached = votes >= this.consensusConfig.quorumSize;
+    const candidates = Array.from(this.nodes.values()).filter((n) => n.healthy);
 
-    if (quorumReached) {
-      this.becomeLeader();
-    } else {
-      this.startElection();
+    if (candidates.length === 0) {
+      return;
     }
-  }
 
-  /**
-   * Request votes from other nodes
-   */
-  private requestVotes(): number {
-    let votes = 1; // Vote for self
+    // Raft-based election
+    const leader = candidates[Math.floor(Math.random() * candidates.length)];
+    this.state.leader = leader.id;
+    leader.role = 'leader';
+    leader.term = this.state.term;
 
-    for (const [nodeId, node] of this.state.nodes) {
-      if (nodeId === this.nodeId) continue;
-
-      if (node.status === 'healthy') {
-        // Simulate vote request
-        if (Math.random() > 0.1) {
-          votes++;
-        }
+    for (const node of this.nodes.values()) {
+      if (node.id !== leader.id) {
+        node.role = 'follower';
+        node.term = this.state.term;
       }
     }
 
-    return votes;
+    this.emit('leader_elected', leader);
   }
 
   /**
-   * Become leader
+   * Send heartbeat
    */
-  private becomeLeader(): void {
-    this.isLeader = true;
-    this.state.leader = this.nodeId;
-
-    if (this.heartbeatTimer) {
-      clearInterval(this.heartbeatTimer);
+  sendHeartbeat(): void {
+    if (!this.state.leader) {
+      return;
     }
 
-    this.heartbeatTimer = setInterval(() => {
-      this.sendHeartbeats();
-    }, this.consensusConfig.heartbeatInterval);
-
-    this.emit('leader-elected', {
-      leaderId: this.nodeId,
-      term: this.state.term,
-    });
-  }
-
-  /**
-   * Send heartbeats to followers
-   */
-  private sendHeartbeats(): void {
-    for (const [nodeId, node] of this.state.nodes) {
-      if (nodeId === this.nodeId) continue;
-
-      this.sendHeartbeat(node).catch((err) => {
-        this.emit('heartbeat-failed', { nodeId, error: err.message });
-      });
+    const leader = this.nodes.get(this.state.leader);
+    if (!leader) {
+      return;
     }
-  }
 
-  /**
-   * Send heartbeat to node
-   */
-  private async sendHeartbeat(node: NodeInfo): Promise<void> {
-    return new Promise((resolve, reject) => {
-      const timeout = setTimeout(() => {
-        reject(new Error('Heartbeat timeout'));
-      }, this.healthCheckConfig.timeout);
-
-      // Simulate heartbeat
-      setTimeout(() => {
-        clearTimeout(timeout);
-        resolve();
-      }, Math.random() * 50);
-    });
-  }
-
-  /**
-   * Start health check
-   */
-  private startHealthCheck(): void {
-    this.healthCheckTimer = setInterval(() => {
-      this.performHealthCheck();
-    }, this.healthCheckConfig.interval);
-  }
-
-  /**
-   * Perform health check on all nodes
-   */
-  private performHealthCheck(): void {
-    for (const [nodeId, node] of this.state.nodes) {
-      this.checkNodeHealth(node).catch((err) => {
-        this.handleNodeFailure(nodeId, node);
-      });
+    for (const node of this.nodes.values()) {
+      if (node.id !== leader.id && node.healthy) {
+        node.lastHeartbeat = Date.now();
+      }
     }
+
+    this.emit('heartbeat_sent', this.state.leader);
   }
 
   /**
    * Check node health
    */
-  private async checkNodeHealth(node: NodeInfo): Promise<void> {
-    return new Promise((resolve, reject) => {
-      const timeout = setTimeout(() => {
-        reject(new Error('Health check timeout'));
-      }, this.healthCheckConfig.timeout);
+  checkNodeHealth(): void {
+    const now = Date.now();
+    const timeout = this.consensus.electionTimeout;
 
-      // Simulate health check
-      setTimeout(() => {
-        clearTimeout(timeout);
-        resolve();
-      }, Math.random() * 100);
-    });
-  }
+    for (const node of this.nodes.values()) {
+      const timeSinceHeartbeat = now - node.lastHeartbeat;
 
-  /**
-   * Handle node failure
-   */
-  private handleNodeFailure(nodeId: string, node: NodeInfo): void {
-    const failureCount = (node as any).failureCount || 0;
+      if (timeSinceHeartbeat > timeout && node.healthy) {
+        node.healthy = false;
+        this.emit('node_unhealthy', node);
 
-    if (failureCount >= this.healthCheckConfig.maxFailures) {
-      node.status = 'unhealthy';
-      this.emit('node-unhealthy', { nodeId, node });
-
-      if (this.isLeader && this.state.leader === nodeId) {
-        this.startElection();
+        if (node.id === this.state.leader) {
+          this.startElection();
+        }
+      } else if (timeSinceHeartbeat < timeout && !node.healthy) {
+        node.healthy = true;
+        this.emit('node_recovered', node);
       }
-    } else {
-      node.status = 'degraded';
-      (node as any).failureCount = failureCount + 1;
-      this.emit('node-degraded', { nodeId, node });
     }
   }
 
   /**
-   * Append log entry
+   * Get cluster state
    */
-  public appendLog(data: any): number {
-    const index = this.logs.length;
-    this.logs.push({
-      term: this.state.term,
-      index,
-      data,
-    });
-
-    if (this.isLeader) {
-      this.replicateLog(index);
-    }
-
-    return index;
-  }
-
-  /**
-   * Replicate log to followers
-   */
-  private replicateLog(index: number): void {
-    const entry = this.logs[index];
-
-    for (const [nodeId, node] of this.state.nodes) {
-      if (nodeId === this.nodeId) continue;
-
-      this.sendLogEntry(node, entry).catch((err) => {
-        this.emit('log-replication-failed', { nodeId, error: err.message });
-      });
-    }
-  }
-
-  /**
-   * Send log entry to node
-   */
-  private async sendLogEntry(node: NodeInfo, entry: any): Promise<void> {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        resolve();
-      }, Math.random() * 100);
-    });
-  }
-
-  /**
-   * Commit log entries
-   */
-  public commitLog(index: number): void {
-    if (index > this.state.committed) {
-      this.state.committed = index;
-      this.emit('log-committed', { index });
-    }
-  }
-
-  /**
-   * Get cluster status
-   */
-  public getClusterStatus() {
-    const healthyNodes = Array.from(this.state.nodes.values()).filter(
-      (n) => n.status === 'healthy'
-    ).length;
-
+  getClusterState(): ClusterState {
     return {
-      nodeId: this.nodeId,
-      isLeader: this.isLeader,
-      leader: this.state.leader,
-      term: this.state.term,
-      totalNodes: this.state.nodes.size,
-      healthyNodes,
-      committed: this.state.committed,
-      logSize: this.logs.length,
+      ...this.state,
+      nodes: Array.from(this.nodes.values()),
     };
   }
 
   /**
-   * Get node info
+   * Get leader
    */
-  public getNodeInfo(nodeId: string): NodeInfo | undefined {
-    return this.state.nodes.get(nodeId);
+  getLeader(): ClusterNode | null {
+    if (!this.state.leader) {
+      return null;
+    }
+    return this.nodes.get(this.state.leader) ?? null;
   }
 
   /**
-   * Get all nodes
+   * Get healthy nodes
    */
-  public getAllNodes(): NodeInfo[] {
-    return Array.from(this.state.nodes.values());
+  getHealthyNodes(): ClusterNode[] {
+    return Array.from(this.nodes.values()).filter((n) => n.healthy);
   }
 
   /**
-   * Shutdown coordinator
+   * Get node by ID
    */
-  public shutdown(): void {
-    if (this.electionTimer) clearTimeout(this.electionTimer);
-    if (this.heartbeatTimer) clearInterval(this.heartbeatTimer);
-    if (this.healthCheckTimer) clearInterval(this.healthCheckTimer);
+  getNode(nodeId: string): ClusterNode | null {
+    return this.nodes.get(nodeId) ?? null;
+  }
 
-    this.emit('shutdown', { nodeId: this.nodeId });
+  /**
+   * Mark node as unhealthy
+   */
+  markNodeUnhealthy(nodeId: string): void {
+    const node = this.nodes.get(nodeId);
+    if (node && node.healthy) {
+      node.healthy = false;
+      this.emit('node_unhealthy', node);
+
+      if (node.id === this.state.leader) {
+        this.startElection();
+      }
+    }
+  }
+
+  /**
+   * Mark node as healthy
+   */
+  markNodeHealthy(nodeId: string): void {
+    const node = this.nodes.get(nodeId);
+    if (node && !node.healthy) {
+      node.healthy = true;
+      this.emit('node_recovered', node);
+    }
+  }
+
+  /**
+   * Emit event
+   */
+  private emit(event: string, data: unknown): void {
+    for (const listener of this.listeners) {
+      try {
+        listener(event, data);
+      } catch (error) {
+        // Handle listener error
+      }
+    }
+  }
+
+  /**
+   * Add listener
+   */
+  addListener(listener: (event: string, data: unknown) => void): void {
+    this.listeners.add(listener);
+  }
+
+  /**
+   * Remove listener
+   */
+  removeListener(listener: (event: string, data: unknown) => void): void {
+    this.listeners.delete(listener);
+  }
+
+  /**
+   * Start cluster monitoring
+   */
+  start(): void {
+    this.heartbeatTimer = setInterval(() => this.sendHeartbeat(), this.consensus.heartbeatInterval);
+    this.electionTimer = setInterval(
+      () => this.checkNodeHealth(),
+      this.consensus.electionTimeout / 2
+    );
+
+    if (!this.state.leader) {
+      this.startElection();
+    }
+
+    this.emit('cluster_started', this.state);
+  }
+
+  /**
+   * Stop cluster monitoring
+   */
+  stop(): void {
+    if (this.heartbeatTimer) {
+      clearInterval(this.heartbeatTimer);
+    }
+    if (this.electionTimer) {
+      clearInterval(this.electionTimer);
+    }
+
+    this.emit('cluster_stopped', this.state);
+  }
+
+  /**
+   * Get statistics
+   */
+  getStatistics() {
+    const healthy = this.getHealthyNodes().length;
+    return {
+      totalNodes: this.nodes.size,
+      healthyNodes: healthy,
+      leader: this.state.leader,
+      term: this.state.term,
+      lastElection: this.state.lastElection,
+      uptime: Date.now() - this.state.lastElection,
+    };
   }
 }

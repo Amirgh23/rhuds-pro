@@ -1,29 +1,19 @@
 /**
  * Distributed Tracing
- * ردیابی توزیع شده برای تجزیه و تحلیل درخواست‌ها
- *
- * Features:
- * - Request correlation
- * - Span collection
- * - Trace visualization
- * - Performance analysis
+ * Request correlation, span collection, and trace visualization
  */
-
-import { EventEmitter } from 'events';
 
 export interface Span {
   traceId: string;
   spanId: string;
   parentSpanId?: string;
   operationName: string;
-  serviceName: string;
   startTime: number;
   endTime?: number;
   duration?: number;
+  tags: Record<string, unknown>;
+  logs: Array<{ timestamp: number; message: string }>;
   status: 'pending' | 'success' | 'error';
-  tags: Record<string, any>;
-  logs: Array<{ timestamp: number; message: string; level: string }>;
-  error?: Error;
 }
 
 export interface Trace {
@@ -37,119 +27,84 @@ export interface Trace {
 
 export interface TracingConfig {
   samplingRate: number;
-  maxSpansPerTrace: number;
-  maxLogSize: number;
-  retentionTime: number;
+  maxSpans: number;
+  exportInterval: number;
 }
 
-export interface SpanContext {
-  traceId: string;
-  spanId: string;
-  parentSpanId?: string;
-}
-
-export class DistributedTracing extends EventEmitter {
+/**
+ * DistributedTracing - Request tracing and analysis
+ */
+export class DistributedTracing {
+  private traces: Map<string, Trace> = new Map();
+  private spans: Map<string, Span> = new Map();
   private config: TracingConfig;
-  private traces: Map<string, Trace>;
-  private activeSpans: Map<string, Span>;
-  private spanStack: Span[];
-  private stats: {
-    tracesCreated: number;
-    spansCreated: number;
-    tracesCompleted: number;
-    errors: number;
+  private listeners: Set<(event: string, data: unknown) => void> = new Set();
+  private stats = {
+    tracesCreated: 0,
+    spansCreated: 0,
+    tracesCompleted: 0,
+    errors: 0,
   };
 
-  constructor(config: TracingConfig) {
-    super();
+  constructor(config: TracingConfig = { samplingRate: 0.1, maxSpans: 1000, exportInterval: 5000 }) {
     this.config = config;
-    this.traces = new Map();
-    this.activeSpans = new Map();
-    this.spanStack = [];
-    this.stats = {
-      tracesCreated: 0,
-      spansCreated: 0,
-      tracesCompleted: 0,
-      errors: 0,
-    };
-
-    this.initialize();
-  }
-
-  private initialize(): void {
-    this.startCleanup();
-    this.emit('initialized', { samplingRate: this.config.samplingRate });
   }
 
   /**
-   * Start a new trace
+   * Start trace
    */
-  public startTrace(): string {
-    if (Math.random() > this.config.samplingRate) {
-      return '';
-    }
+  startTrace(traceId?: string): string {
+    const id = traceId || `trace_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-    const traceId = this.generateTraceId();
     const trace: Trace = {
-      traceId,
+      traceId: id,
       spans: [],
       startTime: Date.now(),
       status: 'pending',
     };
 
-    this.traces.set(traceId, trace);
+    this.traces.set(id, trace);
     this.stats.tracesCreated++;
+    this.emit('trace_started', trace);
 
-    this.emit('trace-started', { traceId });
-    return traceId;
+    return id;
   }
 
   /**
-   * Start a new span
+   * Start span
    */
-  public startSpan(
-    traceId: string,
-    operationName: string,
-    serviceName: string,
-    parentSpanId?: string
-  ): string {
-    const spanId = this.generateSpanId();
+  startSpan(traceId: string, operationName: string, parentSpanId?: string): string {
+    const spanId = `span_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
     const span: Span = {
       traceId,
       spanId,
       parentSpanId,
       operationName,
-      serviceName,
       startTime: Date.now(),
-      status: 'pending',
       tags: {},
       logs: [],
+      status: 'pending',
     };
 
+    this.spans.set(spanId, span);
+
     const trace = this.traces.get(traceId);
-    if (trace && trace.spans.length < this.config.maxSpansPerTrace) {
+    if (trace) {
       trace.spans.push(span);
     }
 
-    this.activeSpans.set(spanId, span);
-    this.spanStack.push(span);
     this.stats.spansCreated++;
-
-    this.emit('span-started', {
-      traceId,
-      spanId,
-      operationName,
-      serviceName,
-    });
+    this.emit('span_started', span);
 
     return spanId;
   }
 
   /**
-   * End a span
+   * End span
    */
-  public endSpan(spanId: string, status: 'success' | 'error' = 'success', error?: Error): void {
-    const span = this.activeSpans.get(spanId);
+  endSpan(spanId: string, status: 'success' | 'error' = 'success'): void {
+    const span = this.spans.get(spanId);
 
     if (!span) {
       return;
@@ -159,276 +114,186 @@ export class DistributedTracing extends EventEmitter {
     span.duration = span.endTime - span.startTime;
     span.status = status;
 
-    if (error) {
-      span.error = error;
+    if (status === 'error') {
       this.stats.errors++;
     }
 
-    this.activeSpans.delete(spanId);
+    this.emit('span_ended', span);
 
-    if (this.spanStack.length > 0 && this.spanStack[this.spanStack.length - 1].spanId === spanId) {
-      this.spanStack.pop();
-    }
-
-    this.emit('span-ended', {
-      traceId: span.traceId,
-      spanId,
-      duration: span.duration,
-      status,
-    });
-  }
-
-  /**
-   * Add tag to current span
-   */
-  public addTag(key: string, value: any): void {
-    const currentSpan = this.spanStack[this.spanStack.length - 1];
-
-    if (currentSpan) {
-      currentSpan.tags[key] = value;
+    // Check if trace is complete
+    const trace = this.traces.get(span.traceId);
+    if (trace) {
+      this.checkTraceCompletion(trace);
     }
   }
 
   /**
-   * Add log to current span
+   * Add tag to span
    */
-  public addLog(message: string, level: string = 'info'): void {
-    const currentSpan = this.spanStack[this.spanStack.length - 1];
+  addTag(spanId: string, key: string, value: unknown): void {
+    const span = this.spans.get(spanId);
 
-    if (currentSpan && currentSpan.logs.length < this.config.maxLogSize) {
-      currentSpan.logs.push({
+    if (span) {
+      span.tags[key] = value;
+      this.emit('tag_added', { spanId, key, value });
+    }
+  }
+
+  /**
+   * Add log to span
+   */
+  addLog(spanId: string, message: string): void {
+    const span = this.spans.get(spanId);
+
+    if (span) {
+      span.logs.push({
         timestamp: Date.now(),
         message,
-        level,
       });
+
+      this.emit('log_added', { spanId, message });
     }
   }
 
   /**
-   * Get span context for propagation
+   * Check trace completion
    */
-  public getSpanContext(): SpanContext | null {
-    const currentSpan = this.spanStack[this.spanStack.length - 1];
+  private checkTraceCompletion(trace: Trace): void {
+    const allSpansEnded = trace.spans.every((s) => s.endTime);
 
-    if (!currentSpan) {
-      return null;
+    if (allSpansEnded && trace.spans.length > 0) {
+      trace.endTime = Math.max(...trace.spans.map((s) => s.endTime || 0));
+      trace.duration = trace.endTime - trace.startTime;
+      trace.status = trace.spans.some((s) => s.status === 'error') ? 'error' : 'success';
+
+      this.stats.tracesCompleted++;
+      this.emit('trace_completed', trace);
     }
-
-    return {
-      traceId: currentSpan.traceId,
-      spanId: currentSpan.spanId,
-      parentSpanId: currentSpan.parentSpanId,
-    };
-  }
-
-  /**
-   * Extract span context from headers
-   */
-  public extractSpanContext(headers: Record<string, string>): SpanContext | null {
-    const traceId = headers['x-trace-id'];
-    const spanId = headers['x-span-id'];
-    const parentSpanId = headers['x-parent-span-id'];
-
-    if (!traceId || !spanId) {
-      return null;
-    }
-
-    return {
-      traceId,
-      spanId,
-      parentSpanId,
-    };
-  }
-
-  /**
-   * Inject span context into headers
-   */
-  public injectSpanContext(headers: Record<string, string>): void {
-    const context = this.getSpanContext();
-
-    if (context) {
-      headers['x-trace-id'] = context.traceId;
-      headers['x-span-id'] = context.spanId;
-      if (context.parentSpanId) {
-        headers['x-parent-span-id'] = context.parentSpanId;
-      }
-    }
-  }
-
-  /**
-   * Complete a trace
-   */
-  public completeTrace(traceId: string, status: 'success' | 'error' = 'success'): void {
-    const trace = this.traces.get(traceId);
-
-    if (!trace) {
-      return;
-    }
-
-    trace.endTime = Date.now();
-    trace.duration = trace.endTime - trace.startTime;
-    trace.status = status;
-
-    this.stats.tracesCompleted++;
-
-    this.emit('trace-completed', {
-      traceId,
-      duration: trace.duration,
-      spanCount: trace.spans.length,
-      status,
-    });
   }
 
   /**
    * Get trace
    */
-  public getTrace(traceId: string): Trace | undefined {
-    return this.traces.get(traceId);
+  getTrace(traceId: string): Trace | null {
+    return this.traces.get(traceId) ?? null;
   }
 
   /**
-   * Get trace with visualization data
+   * Get span
    */
-  public getTraceVisualization(traceId: string) {
-    const trace = this.traces.get(traceId);
-
-    if (!trace) {
-      return null;
-    }
-
-    const spansByService = new Map<string, Span[]>();
-
-    for (const span of trace.spans) {
-      if (!spansByService.has(span.serviceName)) {
-        spansByService.set(span.serviceName, []);
-      }
-      spansByService.get(span.serviceName)!.push(span);
-    }
-
-    const timeline = trace.spans
-      .sort((a, b) => a.startTime - b.startTime)
-      .map((span) => ({
-        spanId: span.spanId,
-        operationName: span.operationName,
-        serviceName: span.serviceName,
-        startTime: span.startTime,
-        duration: span.duration || 0,
-        status: span.status,
-      }));
-
-    return {
-      traceId,
-      duration: trace.duration,
-      spanCount: trace.spans.length,
-      serviceCount: spansByService.size,
-      timeline,
-      services: Array.from(spansByService.keys()),
-    };
+  getSpan(spanId: string): Span | null {
+    return this.spans.get(spanId) ?? null;
   }
 
   /**
    * Analyze trace performance
    */
-  public analyzeTrace(traceId: string) {
+  analyzeTracePerformance(traceId: string): {
+    totalDuration: number;
+    spanCount: number;
+    criticalPath: number;
+    slowestSpan: Span | null;
+  } | null {
     const trace = this.traces.get(traceId);
 
-    if (!trace) {
+    if (!trace || trace.spans.length === 0) {
       return null;
     }
 
-    const analysis = {
-      totalDuration: trace.duration || 0,
-      spanCount: trace.spans.length,
-      errorCount: trace.spans.filter((s) => s.status === 'error').length,
-      slowestSpan: null as Span | null,
-      fastestSpan: null as Span | null,
-      averageSpanDuration: 0,
-      criticalPath: [] as Span[],
-    };
+    const totalDuration = trace.duration || 0;
+    const slowestSpan = trace.spans.reduce((max, span) => {
+      const spanDuration = span.duration || 0;
+      const maxDuration = max.duration || 0;
+      return spanDuration > maxDuration ? span : max;
+    });
 
-    let totalDuration = 0;
-    let slowestDuration = 0;
-    let fastestDuration = Infinity;
-
+    // Calculate critical path (longest chain of dependent spans)
+    let criticalPath = 0;
     for (const span of trace.spans) {
-      const duration = span.duration || 0;
-      totalDuration += duration;
+      let pathLength = span.duration || 0;
+      let current = span;
 
-      if (duration > slowestDuration) {
-        slowestDuration = duration;
-        analysis.slowestSpan = span;
+      while (current.parentSpanId) {
+        const parent = this.spans.get(current.parentSpanId);
+        if (parent) {
+          pathLength += parent.duration || 0;
+          current = parent;
+        } else {
+          break;
+        }
       }
 
-      if (duration < fastestDuration) {
-        fastestDuration = duration;
-        analysis.fastestSpan = span;
-      }
+      criticalPath = Math.max(criticalPath, pathLength);
     }
 
-    analysis.averageSpanDuration = totalDuration / trace.spans.length;
-
-    // Calculate critical path
-    const rootSpans = trace.spans.filter((s) => !s.parentSpanId);
-    for (const span of rootSpans) {
-      analysis.criticalPath.push(span);
-    }
-
-    return analysis;
-  }
-
-  /**
-   * Start cleanup timer
-   */
-  private startCleanup(): void {
-    setInterval(() => {
-      this.cleanupOldTraces();
-    }, 60000); // Every minute
-  }
-
-  /**
-   * Cleanup old traces
-   */
-  private cleanupOldTraces(): void {
-    const now = Date.now();
-    const toDelete: string[] = [];
-
-    for (const [traceId, trace] of this.traces) {
-      if (trace.endTime && now - trace.endTime > this.config.retentionTime) {
-        toDelete.push(traceId);
-      }
-    }
-
-    for (const traceId of toDelete) {
-      this.traces.delete(traceId);
-    }
-
-    if (toDelete.length > 0) {
-      this.emit('traces-cleaned', { count: toDelete.length });
-    }
-  }
-
-  /**
-   * Generate trace ID
-   */
-  private generateTraceId(): string {
-    return `trace-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-  }
-
-  /**
-   * Generate span ID
-   */
-  private generateSpanId(): string {
-    return `span-${Math.random().toString(36).substr(2, 9)}`;
+    return {
+      totalDuration,
+      spanCount: trace.spans.length,
+      criticalPath,
+      slowestSpan,
+    };
   }
 
   /**
    * Get statistics
    */
-  public getStats() {
+  getStatistics() {
     return {
       ...this.stats,
       activeTraces: this.traces.size,
-      activeSpans: this.activeSpans.size,
+      activeSpans: this.spans.size,
+      errorRate: this.stats.errors / (this.stats.spansCreated || 1),
     };
+  }
+
+  /**
+   * Emit event
+   */
+  private emit(event: string, data: unknown): void {
+    for (const listener of this.listeners) {
+      try {
+        listener(event, data);
+      } catch (error) {
+        // Handle listener error
+      }
+    }
+  }
+
+  /**
+   * Add listener
+   */
+  addListener(listener: (event: string, data: unknown) => void): void {
+    this.listeners.add(listener);
+  }
+
+  /**
+   * Remove listener
+   */
+  removeListener(listener: (event: string, data: unknown) => void): void {
+    this.listeners.delete(listener);
+  }
+
+  /**
+   * Export traces
+   */
+  exportTraces(): Trace[] {
+    return Array.from(this.traces.values());
+  }
+
+  /**
+   * Clear old traces
+   */
+  clearOldTraces(maxAge: number = 3600000): number {
+    const now = Date.now();
+    let cleared = 0;
+
+    for (const [traceId, trace] of this.traces.entries()) {
+      if (now - trace.startTime > maxAge) {
+        this.traces.delete(traceId);
+        cleared++;
+      }
+    }
+
+    return cleared;
   }
 }

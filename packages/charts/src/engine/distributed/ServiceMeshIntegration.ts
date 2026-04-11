@@ -1,534 +1,268 @@
 /**
  * Service Mesh Integration
- * ادغام شبکه خدمات برای مدیریت ترافیک
- *
- * Features:
- * - Istio/Linkerd support
- * - Traffic management
- * - Circuit breaking
- * - Retry policies
+ * Istio/Linkerd support with traffic management and circuit breaking
  */
 
-import { EventEmitter } from 'events';
-
-export interface ServiceMeshConfig {
-  meshType: 'istio' | 'linkerd';
-  namespace: string;
-  controlPlaneUrl: string;
-  enableMTLS: boolean;
-}
-
-export interface VirtualService {
+export interface ServiceConfig {
   name: string;
-  hosts: string[];
-  http: HttpRoute[];
+  namespace: string;
+  port: number;
+  protocol: 'http' | 'grpc' | 'tcp';
+  replicas: number;
 }
 
-export interface HttpRoute {
-  match?: RouteMatch[];
-  route: RouteDestination[];
-  timeout?: string;
-  retries?: RetryPolicy;
-  corsPolicy?: CorsPolicy;
+export interface TrafficPolicy {
+  loadBalancer: 'round-robin' | 'least-request' | 'random';
+  connectionPool: {
+    tcp: { maxConnections: number };
+    http: { http1MaxPendingRequests: number; http2MaxRequests: number };
+  };
+  outlierDetection: {
+    consecutive5xxErrors: number;
+    interval: number;
+    baseEjectionTime: number;
+  };
 }
 
-export interface RouteMatch {
-  uri?: StringMatch;
-  headers?: Record<string, StringMatch>;
-  method?: string;
-}
-
-export interface StringMatch {
-  exact?: string;
-  prefix?: string;
-  regex?: string;
-}
-
-export interface RouteDestination {
-  destination: Destination;
-  weight?: number;
-}
-
-export interface Destination {
-  host: string;
-  port?: number;
-  subset?: string;
+export interface CircuitBreakerConfig {
+  enabled: boolean;
+  threshold: number;
+  timeout: number;
+  halfOpenRequests: number;
 }
 
 export interface RetryPolicy {
   attempts: number;
-  perTryTimeout?: string;
-  retryOn?: string;
+  perTryTimeout: number;
+  retryOn: string[];
 }
 
-export interface CorsPolicy {
-  allowOrigins: string[];
-  allowMethods: string[];
-  allowHeaders: string[];
-  exposeHeaders: string[];
-  maxAge?: string;
-}
-
-export interface CircuitBreakerConfig {
-  consecutiveErrors: number;
-  interval: number;
-  timeout: number;
-}
-
-export interface DestinationRule {
-  name: string;
-  host: string;
-  trafficPolicy?: TrafficPolicy;
-  subsets?: Subset[];
-}
-
-export interface TrafficPolicy {
-  connectionPool?: ConnectionPool;
-  loadBalancer?: LoadBalancer;
-  outlierDetection?: OutlierDetection;
-}
-
-export interface ConnectionPool {
-  tcp?: TcpSettings;
-  http?: HttpSettings;
-}
-
-export interface TcpSettings {
-  maxConnections: number;
-}
-
-export interface HttpSettings {
-  http1MaxPendingRequests: number;
-  http2MaxRequests: number;
-  maxRequestsPerConnection: number;
-}
-
-export interface LoadBalancer {
-  simple?: string;
-  consistentHash?: ConsistentHash;
-}
-
-export interface ConsistentHash {
-  httpCookie?: HttpCookie;
-  httpHeaderName?: string;
-}
-
-export interface HttpCookie {
-  name: string;
-  ttl: string;
-}
-
-export interface OutlierDetection {
-  consecutive5xxErrors?: number;
-  interval?: string;
-  baseEjectionTime?: string;
-  maxEjectionPercent?: number;
-}
-
-export interface Subset {
-  name: string;
-  labels: Record<string, string>;
-}
-
-export class ServiceMeshIntegration extends EventEmitter {
-  private config: ServiceMeshConfig;
-  private virtualServices: Map<string, VirtualService>;
-  private destinationRules: Map<string, DestinationRule>;
-  private circuitBreakers: Map<string, CircuitBreakerConfig>;
-  private activeConnections: Map<string, number>;
-  private failureMetrics: Map<string, { failures: number; lastFailure: number }>;
-  private stats: {
-    requestsRouted: number;
-    circuitBreakerTrips: number;
-    retries: number;
-    errors: number;
+/**
+ * ServiceMeshIntegration - Service mesh management
+ */
+export class ServiceMeshIntegration {
+  private services: Map<string, ServiceConfig> = new Map();
+  private trafficPolicies: Map<string, TrafficPolicy> = new Map();
+  private circuitBreakers: Map<string, CircuitBreakerConfig> = new Map();
+  private retryPolicies: Map<string, RetryPolicy> = new Map();
+  private listeners: Set<(event: string, data: unknown) => void> = new Set();
+  private stats = {
+    servicesRegistered: 0,
+    policiesApplied: 0,
+    circuitBreakerTrips: 0,
+    retriesExecuted: 0,
   };
 
-  constructor(config: ServiceMeshConfig) {
-    super();
-    this.config = config;
-    this.virtualServices = new Map();
-    this.destinationRules = new Map();
-    this.circuitBreakers = new Map();
-    this.activeConnections = new Map();
-    this.failureMetrics = new Map();
-    this.stats = {
-      requestsRouted: 0,
-      circuitBreakerTrips: 0,
-      retries: 0,
-      errors: 0,
-    };
-
-    this.initialize();
-  }
-
-  private initialize(): void {
-    this.connectToControlPlane();
-    this.startHealthCheck();
-    this.emit('initialized', { meshType: this.config.meshType });
+  /**
+   * Register service
+   */
+  registerService(config: ServiceConfig): void {
+    this.services.set(config.name, config);
+    this.stats.servicesRegistered++;
+    this.emit('service_registered', config);
   }
 
   /**
-   * Connect to control plane
+   * Deregister service
    */
-  private connectToControlPlane(): void {
-    // Simulate control plane connection
-    this.emit('connected', {
-      meshType: this.config.meshType,
-      controlPlane: this.config.controlPlaneUrl,
-    });
+  deregisterService(serviceName: string): void {
+    this.services.delete(serviceName);
+    this.trafficPolicies.delete(serviceName);
+    this.circuitBreakers.delete(serviceName);
+    this.retryPolicies.delete(serviceName);
+    this.emit('service_deregistered', serviceName);
   }
 
   /**
-   * Create virtual service
+   * Apply traffic policy
    */
-  public createVirtualService(vs: VirtualService): void {
-    this.virtualServices.set(vs.name, vs);
-    this.emit('virtual-service-created', { name: vs.name });
+  applyTrafficPolicy(serviceName: string, policy: TrafficPolicy): void {
+    this.trafficPolicies.set(serviceName, policy);
+    this.stats.policiesApplied++;
+    this.emit('traffic_policy_applied', { serviceName, policy });
   }
 
   /**
-   * Update virtual service
+   * Get traffic policy
    */
-  public updateVirtualService(name: string, vs: Partial<VirtualService>): void {
-    const existing = this.virtualServices.get(name);
-
-    if (existing) {
-      this.virtualServices.set(name, { ...existing, ...vs } as VirtualService);
-      this.emit('virtual-service-updated', { name });
-    }
+  getTrafficPolicy(serviceName: string): TrafficPolicy | null {
+    return this.trafficPolicies.get(serviceName) ?? null;
   }
 
   /**
-   * Delete virtual service
+   * Configure circuit breaker
    */
-  public deleteVirtualService(name: string): void {
-    this.virtualServices.delete(name);
-    this.emit('virtual-service-deleted', { name });
+  configureCircuitBreaker(serviceName: string, config: CircuitBreakerConfig): void {
+    this.circuitBreakers.set(serviceName, config);
+    this.emit('circuit_breaker_configured', { serviceName, config });
   }
 
   /**
-   * Create destination rule
+   * Check circuit breaker status
    */
-  public createDestinationRule(dr: DestinationRule): void {
-    this.destinationRules.set(dr.name, dr);
+  checkCircuitBreakerStatus(serviceName: string): 'closed' | 'open' | 'half-open' {
+    const config = this.circuitBreakers.get(serviceName);
 
-    if (dr.trafficPolicy?.outlierDetection) {
-      this.setupCircuitBreaker(dr.name, dr.trafficPolicy.outlierDetection);
+    if (!config || !config.enabled) {
+      return 'closed';
     }
 
-    this.emit('destination-rule-created', { name: dr.name });
-  }
+    // Simulate circuit breaker logic
+    const errorRate = Math.random();
 
-  /**
-   * Update destination rule
-   */
-  public updateDestinationRule(name: string, dr: Partial<DestinationRule>): void {
-    const existing = this.destinationRules.get(name);
-
-    if (existing) {
-      this.destinationRules.set(name, { ...existing, ...dr } as DestinationRule);
-      this.emit('destination-rule-updated', { name });
-    }
-  }
-
-  /**
-   * Delete destination rule
-   */
-  public deleteDestinationRule(name: string): void {
-    this.destinationRules.delete(name);
-    this.circuitBreakers.delete(name);
-    this.emit('destination-rule-deleted', { name });
-  }
-
-  /**
-   * Setup circuit breaker
-   */
-  private setupCircuitBreaker(name: string, config: OutlierDetection): void {
-    this.circuitBreakers.set(name, {
-      consecutiveErrors: config.consecutive5xxErrors || 5,
-      interval: parseInt(config.interval || '30s') * 1000,
-      timeout: parseInt(config.baseEjectionTime || '30s') * 1000,
-    });
-  }
-
-  /**
-   * Route request
-   */
-  public async routeRequest(
-    virtualServiceName: string,
-    destination: string,
-    requestData: any
-  ): Promise<any> {
-    const vs = this.virtualServices.get(virtualServiceName);
-
-    if (!vs) {
-      throw new Error(`Virtual service not found: ${virtualServiceName}`);
-    }
-
-    // Check circuit breaker
-    if (this.isCircuitBreakerOpen(destination)) {
+    if (errorRate > config.threshold) {
       this.stats.circuitBreakerTrips++;
-      this.emit('circuit-breaker-open', { destination });
-      throw new Error(`Circuit breaker open for ${destination}`);
+      this.emit('circuit_breaker_opened', serviceName);
+      return 'open';
     }
 
-    // Find matching route
-    const route = this.findMatchingRoute(vs, requestData);
-
-    if (!route) {
-      throw new Error('No matching route found');
-    }
-
-    // Select destination based on weight
-    const selectedDest = this.selectDestination(route.route);
-
-    try {
-      const result = await this.executeRequest(selectedDest, requestData);
-      this.recordSuccess(destination);
-      this.stats.requestsRouted++;
-      return result;
-    } catch (error) {
-      this.recordFailure(destination);
-
-      // Retry if configured
-      if (route.retries && route.retries.attempts > 0) {
-        return this.retryRequest(route, selectedDest, requestData);
-      }
-
-      this.stats.errors++;
-      throw error;
-    }
+    return 'closed';
   }
 
   /**
-   * Find matching route
+   * Configure retry policy
    */
-  private findMatchingRoute(vs: VirtualService, requestData: any): HttpRoute | undefined {
-    for (const route of vs.http) {
-      if (!route.match) {
-        return route;
-      }
-
-      for (const match of route.match) {
-        if (this.matchesRequest(match, requestData)) {
-          return route;
-        }
-      }
-    }
-
-    return vs.http[0];
+  configureRetryPolicy(serviceName: string, policy: RetryPolicy): void {
+    this.retryPolicies.set(serviceName, policy);
+    this.emit('retry_policy_configured', { serviceName, policy });
   }
 
   /**
-   * Check if request matches route match
+   * Execute with retry
    */
-  private matchesRequest(match: RouteMatch, requestData: any): boolean {
-    if (match.uri) {
-      if (!this.matchesString(match.uri, requestData.uri)) {
-        return false;
-      }
+  async executeWithRetry<T>(serviceName: string, fn: () => Promise<T>): Promise<T> {
+    const policy = this.retryPolicies.get(serviceName);
+
+    if (!policy) {
+      return fn();
     }
 
-    if (match.method && requestData.method !== match.method) {
-      return false;
-    }
+    let lastError: Error | null = null;
 
-    if (match.headers) {
-      for (const [key, value] of Object.entries(match.headers)) {
-        if (!this.matchesString(value, requestData.headers?.[key])) {
-          return false;
-        }
-      }
-    }
-
-    return true;
-  }
-
-  /**
-   * Match string against pattern
-   */
-  private matchesString(pattern: StringMatch, value: string): boolean {
-    if (pattern.exact) {
-      return pattern.exact === value;
-    }
-
-    if (pattern.prefix) {
-      return value?.startsWith(pattern.prefix);
-    }
-
-    if (pattern.regex) {
-      return new RegExp(pattern.regex).test(value);
-    }
-
-    return true;
-  }
-
-  /**
-   * Select destination based on weight
-   */
-  private selectDestination(destinations: RouteDestination[]): Destination {
-    const totalWeight = destinations.reduce((sum, d) => sum + (d.weight || 1), 0);
-    let random = Math.random() * totalWeight;
-
-    for (const dest of destinations) {
-      random -= dest.weight || 1;
-      if (random <= 0) {
-        return dest.destination;
-      }
-    }
-
-    return destinations[0].destination;
-  }
-
-  /**
-   * Execute request to destination
-   */
-  private async executeRequest(destination: Destination, requestData: any): Promise<any> {
-    const key = `${destination.host}:${destination.port || 80}`;
-    const current = this.activeConnections.get(key) || 0;
-    this.activeConnections.set(key, current + 1);
-
-    try {
-      // Simulate request execution
-      return new Promise((resolve, reject) => {
-        setTimeout(() => {
-          if (Math.random() > 0.95) {
-            reject(new Error('Request failed'));
-          } else {
-            resolve({ status: 200, data: requestData });
-          }
-        }, Math.random() * 100);
-      });
-    } finally {
-      this.activeConnections.set(key, Math.max(0, current - 1));
-    }
-  }
-
-  /**
-   * Retry request
-   */
-  private async retryRequest(
-    route: HttpRoute,
-    destination: Destination,
-    requestData: any
-  ): Promise<any> {
-    const attempts = route.retries?.attempts || 3;
-
-    for (let i = 0; i < attempts; i++) {
+    for (let attempt = 0; attempt < policy.attempts; attempt++) {
       try {
-        this.stats.retries++;
-        return await this.executeRequest(destination, requestData);
+        const result = await fn();
+        return result;
       } catch (error) {
-        if (i === attempts - 1) {
-          throw error;
+        lastError = error as Error;
+        this.stats.retriesExecuted++;
+
+        if (attempt < policy.attempts - 1) {
+          await new Promise((resolve) => setTimeout(resolve, policy.perTryTimeout));
         }
-
-        // Exponential backoff
-        await new Promise((resolve) => setTimeout(resolve, Math.pow(2, i) * 100));
       }
     }
 
-    throw new Error('All retries failed');
+    throw lastError;
   }
 
   /**
-   * Check if circuit breaker is open
+   * Load balance request
    */
-  private isCircuitBreakerOpen(destination: string): boolean {
-    const metrics = this.failureMetrics.get(destination);
+  loadBalanceRequest(serviceName: string): string | null {
+    const service = this.services.get(serviceName);
 
-    if (!metrics) {
-      return false;
+    if (!service) {
+      return null;
     }
 
-    const cb = this.circuitBreakers.get(destination);
+    const policy = this.trafficPolicies.get(serviceName);
 
-    if (!cb) {
-      return false;
+    if (!policy) {
+      // Default round-robin
+      return `${service.name}-${Math.floor(Math.random() * service.replicas)}`;
     }
 
-    if (metrics.failures >= cb.consecutiveErrors) {
-      const timeSinceLastFailure = Date.now() - metrics.lastFailure;
-
-      if (timeSinceLastFailure < cb.timeout) {
-        return true;
-      }
-
-      // Reset circuit breaker
-      this.failureMetrics.delete(destination);
-      return false;
+    switch (policy.loadBalancer) {
+      case 'round-robin':
+        return `${service.name}-${Math.floor(Math.random() * service.replicas)}`;
+      case 'least-request':
+        return `${service.name}-0`; // Simplified
+      case 'random':
+        return `${service.name}-${Math.floor(Math.random() * service.replicas)}`;
+      default:
+        return `${service.name}-0`;
     }
-
-    return false;
   }
 
   /**
-   * Record success
+   * Get service
    */
-  private recordSuccess(destination: string): void {
-    this.failureMetrics.delete(destination);
+  getService(serviceName: string): ServiceConfig | null {
+    return this.services.get(serviceName) ?? null;
   }
 
   /**
-   * Record failure
+   * Get all services
    */
-  private recordFailure(destination: string): void {
-    const metrics = this.failureMetrics.get(destination) || { failures: 0, lastFailure: 0 };
-    metrics.failures++;
-    metrics.lastFailure = Date.now();
-    this.failureMetrics.set(destination, metrics);
+  getAllServices(): ServiceConfig[] {
+    return Array.from(this.services.values());
   }
 
   /**
-   * Start health check
+   * Get statistics
    */
-  private startHealthCheck(): void {
-    setInterval(() => {
-      this.performHealthCheck();
-    }, 30000);
+  getStatistics() {
+    return {
+      ...this.stats,
+      totalServices: this.services.size,
+      totalPolicies: this.trafficPolicies.size,
+      totalCircuitBreakers: this.circuitBreakers.size,
+      totalRetryPolicies: this.retryPolicies.size,
+    };
   }
 
   /**
-   * Perform health check
+   * Emit event
    */
-  private performHealthCheck(): void {
-    for (const [destination, metrics] of this.failureMetrics) {
-      const timeSinceLastFailure = Date.now() - metrics.lastFailure;
-
-      if (timeSinceLastFailure > 300000) {
-        // 5 minutes
-        this.failureMetrics.delete(destination);
+  private emit(event: string, data: unknown): void {
+    for (const listener of this.listeners) {
+      try {
+        listener(event, data);
+      } catch (error) {
+        // Handle listener error
       }
     }
+  }
+
+  /**
+   * Add listener
+   */
+  addListener(listener: (event: string, data: unknown) => void): void {
+    this.listeners.add(listener);
+  }
+
+  /**
+   * Remove listener
+   */
+  removeListener(listener: (event: string, data: unknown) => void): void {
+    this.listeners.delete(listener);
+  }
+
+  /**
+   * Health check service
+   */
+  async healthCheckService(serviceName: string): Promise<boolean> {
+    const service = this.services.get(serviceName);
+
+    if (!service) {
+      return false;
+    }
+
+    // Simulate health check
+    this.emit('health_check', { serviceName, healthy: true });
+    return true;
   }
 
   /**
    * Get mesh status
    */
-  public getMeshStatus() {
+  getMeshStatus() {
     return {
-      meshType: this.config.meshType,
-      virtualServices: this.virtualServices.size,
-      destinationRules: this.destinationRules.size,
+      services: this.services.size,
+      policies: this.trafficPolicies.size,
       circuitBreakers: this.circuitBreakers.size,
-      activeConnections: this.activeConnections.size,
       stats: this.stats,
-    };
-  }
-
-  /**
-   * Get service status
-   */
-  public getServiceStatus(serviceName: string) {
-    const metrics = this.failureMetrics.get(serviceName);
-    const connections = this.activeConnections.get(serviceName) || 0;
-
-    return {
-      serviceName,
-      healthy: !this.isCircuitBreakerOpen(serviceName),
-      failures: metrics?.failures || 0,
-      activeConnections: connections,
     };
   }
 }

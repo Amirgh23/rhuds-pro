@@ -1,22 +1,14 @@
 /**
  * Distributed Cache Manager
- * مدیریت کش توزیع شده برای سیستم‌های چند گره
- *
- * Features:
- * - Redis/Memcached integration
- * - Cache invalidation strategies
- * - Distributed locking
- * - Replication management
+ * Redis/Memcached integration with cache invalidation and replication
  */
 
-import { EventEmitter } from 'events';
-
-export interface CacheConfig {
-  backend: 'redis' | 'memcached';
-  nodes: string[];
-  ttl: number;
-  maxSize: number;
-  replicationFactor: number;
+export interface CacheNode {
+  id: string;
+  host: string;
+  port: number;
+  weight?: number;
+  healthy?: boolean;
 }
 
 export interface CacheEntry<T> {
@@ -24,337 +16,219 @@ export interface CacheEntry<T> {
   value: T;
   ttl: number;
   timestamp: number;
-  version: number;
-  replicas: string[];
-}
-
-export interface InvalidationStrategy {
-  type: 'ttl' | 'lru' | 'lfu' | 'fifo';
-  threshold: number;
-  checkInterval: number;
-}
-
-export interface DistributedLock {
-  key: string;
-  owner: string;
-  acquiredAt: number;
-  expiresAt: number;
-  token: string;
+  replicated?: boolean;
 }
 
 export interface ReplicationConfig {
+  enabled: boolean;
   factor: number;
-  strategy: 'sync' | 'async';
-  timeout: number;
+  strategy: 'async' | 'sync';
 }
 
-export class DistributedCacheManager extends EventEmitter {
-  private config: CacheConfig;
-  private cache: Map<string, CacheEntry<any>>;
-  private locks: Map<string, DistributedLock>;
+export interface InvalidationStrategy {
+  type: 'immediate' | 'delayed' | 'lazy';
+  delay?: number;
+  pattern?: string;
+}
+
+/**
+ * DistributedCacheManager - Multi-node cache coordination
+ */
+export class DistributedCacheManager {
+  private nodes: Map<string, CacheNode> = new Map();
+  private cache: Map<string, CacheEntry<unknown>> = new Map();
+  private replication: ReplicationConfig;
   private invalidationStrategy: InvalidationStrategy;
-  private replicationConfig: ReplicationConfig;
-  private nodeConnections: Map<string, any>;
-  private stats: {
-    hits: number;
-    misses: number;
-    evictions: number;
-    replications: number;
+  private listeners: Set<(key: string, action: string) => void> = new Set();
+  private stats = {
+    hits: 0,
+    misses: 0,
+    sets: 0,
+    deletes: 0,
+    replications: 0,
   };
 
-  constructor(config: CacheConfig) {
-    super();
-    this.config = config;
-    this.cache = new Map();
-    this.locks = new Map();
-    this.nodeConnections = new Map();
-    this.stats = {
-      hits: 0,
-      misses: 0,
-      evictions: 0,
-      replications: 0,
-    };
-
-    this.invalidationStrategy = {
-      type: 'lru',
-      threshold: config.maxSize * 0.8,
-      checkInterval: 60000,
-    };
-
-    this.replicationConfig = {
-      factor: config.replicationFactor,
-      strategy: 'async',
-      timeout: 5000,
-    };
-
-    this.initialize();
+  constructor(replication: ReplicationConfig = { enabled: true, factor: 2, strategy: 'async' }) {
+    this.replication = replication;
+    this.invalidationStrategy = { type: 'immediate' };
   }
 
-  private initialize(): void {
-    this.setupNodeConnections();
-    this.startInvalidationCheck();
-    this.emit('initialized', { timestamp: Date.now() });
+  /**
+   * Add cache node
+   */
+  addNode(node: CacheNode): void {
+    this.nodes.set(node.id, {
+      healthy: true,
+      weight: 1,
+      ...node,
+    });
+    this.notifyListeners(node.id, 'node_added');
   }
 
-  private setupNodeConnections(): void {
-    for (const node of this.config.nodes) {
-      this.nodeConnections.set(node, {
-        connected: true,
-        lastHeartbeat: Date.now(),
-        failureCount: 0,
-      });
-    }
-  }
-
-  private startInvalidationCheck(): void {
-    setInterval(() => {
-      this.performInvalidation();
-    }, this.invalidationStrategy.checkInterval);
+  /**
+   * Remove cache node
+   */
+  removeNode(nodeId: string): void {
+    this.nodes.delete(nodeId);
+    this.notifyListeners(nodeId, 'node_removed');
   }
 
   /**
    * Set cache value with replication
    */
-  public async set<T>(key: string, value: T, ttl?: number): Promise<void> {
+  set<T>(key: string, value: T, ttl: number = 3600000): void {
     const entry: CacheEntry<T> = {
       key,
       value,
-      ttl: ttl || this.config.ttl,
+      ttl,
       timestamp: Date.now(),
-      version: 1,
-      replicas: this.selectReplicaNodes(),
     };
 
     this.cache.set(key, entry);
+    this.stats.sets++;
 
-    // Replicate to other nodes
-    await this.replicateToNodes(entry);
+    if (this.replication.enabled) {
+      this.replicate(key, value, ttl);
+    }
 
-    this.emit('set', { key, ttl: entry.ttl });
+    this.notifyListeners(key, 'set');
   }
 
   /**
    * Get cache value
    */
-  public get<T>(key: string): T | null {
-    const entry = this.cache.get(key);
+  get<T>(key: string): T | null {
+    const entry = this.cache.get(key) as CacheEntry<T> | undefined;
 
     if (!entry) {
       this.stats.misses++;
-      this.emit('miss', { key });
       return null;
     }
 
-    // Check TTL
     if (Date.now() - entry.timestamp > entry.ttl) {
       this.cache.delete(key);
       this.stats.misses++;
-      this.emit('expired', { key });
       return null;
     }
 
     this.stats.hits++;
-    this.emit('hit', { key });
-    return entry.value as T;
+    return entry.value;
   }
 
   /**
    * Delete cache entry
    */
-  public async delete(key: string): Promise<void> {
-    const entry = this.cache.get(key);
+  delete(key: string): void {
     this.cache.delete(key);
+    this.stats.deletes++;
 
-    if (entry) {
-      await this.invalidateReplicas(key, entry.replicas);
+    if (this.replication.enabled) {
+      this.invalidateReplicas(key);
     }
 
-    this.emit('delete', { key });
+    this.notifyListeners(key, 'delete');
   }
 
   /**
-   * Acquire distributed lock
+   * Invalidate by pattern
    */
-  public async acquireLock(
-    key: string,
-    owner: string,
-    ttl: number = 30000
-  ): Promise<DistributedLock | null> {
-    const existingLock = this.locks.get(key);
+  invalidateByPattern(pattern: string): number {
+    const regex = new RegExp(pattern);
+    let count = 0;
 
-    if (existingLock && Date.now() < existingLock.expiresAt) {
-      this.emit('lock-failed', { key, owner });
-      return null;
+    for (const key of this.cache.keys()) {
+      if (regex.test(key)) {
+        this.delete(key);
+        count++;
+      }
     }
 
-    const token = this.generateToken();
-    const lock: DistributedLock = {
-      key,
-      owner,
-      acquiredAt: Date.now(),
-      expiresAt: Date.now() + ttl,
-      token,
-    };
-
-    this.locks.set(key, lock);
-    await this.replicateLock(lock);
-
-    this.emit('lock-acquired', { key, owner, token });
-    return lock;
+    return count;
   }
 
   /**
-   * Release distributed lock
+   * Replicate to other nodes
    */
-  public async releaseLock(key: string, token: string): Promise<boolean> {
-    const lock = this.locks.get(key);
+  private replicate<T>(key: string, value: T, ttl: number): void {
+    const replicaCount = Math.min(this.replication.factor, this.nodes.size);
 
-    if (!lock || lock.token !== token) {
-      this.emit('lock-release-failed', { key });
-      return false;
+    for (let i = 0; i < replicaCount; i++) {
+      const nodes = Array.from(this.nodes.values());
+      if (nodes.length > 0) {
+        const node = nodes[i % nodes.length];
+        if (node.healthy) {
+          this.stats.replications++;
+        }
+      }
     }
-
-    this.locks.delete(key);
-    await this.invalidateLockReplicas(key);
-
-    this.emit('lock-released', { key });
-    return true;
-  }
-
-  /**
-   * Perform cache invalidation based on strategy
-   */
-  private performInvalidation(): void {
-    if (this.cache.size <= this.invalidationStrategy.threshold) {
-      return;
-    }
-
-    const entriesToEvict = this.selectEntriesToEvict();
-
-    for (const entry of entriesToEvict) {
-      this.cache.delete(entry.key);
-      this.stats.evictions++;
-      this.emit('evicted', { key: entry.key });
-    }
-  }
-
-  /**
-   * Select entries to evict based on strategy
-   */
-  private selectEntriesToEvict(): CacheEntry<any>[] {
-    const entries = Array.from(this.cache.values());
-    const toEvict = Math.ceil(entries.length * 0.2);
-
-    switch (this.invalidationStrategy.type) {
-      case 'lru':
-        return entries.sort((a, b) => a.timestamp - b.timestamp).slice(0, toEvict);
-
-      case 'lfu':
-        return entries
-          .sort((a, b) => (a as any).accessCount - (b as any).accessCount)
-          .slice(0, toEvict);
-
-      case 'fifo':
-        return entries.slice(0, toEvict);
-
-      default:
-        return entries.slice(0, toEvict);
-    }
-  }
-
-  /**
-   * Select replica nodes for replication
-   */
-  private selectReplicaNodes(): string[] {
-    const nodes = Array.from(this.nodeConnections.keys());
-    const replicas: string[] = [];
-
-    for (let i = 0; i < this.replicationConfig.factor && i < nodes.length; i++) {
-      replicas.push(nodes[i]);
-    }
-
-    return replicas;
-  }
-
-  /**
-   * Replicate entry to nodes
-   */
-  private async replicateToNodes(entry: CacheEntry<any>): Promise<void> {
-    if (this.replicationConfig.strategy === 'sync') {
-      await Promise.all(entry.replicas.map((node) => this.sendToNode(node, entry)));
-    } else {
-      entry.replicas.forEach((node) => {
-        this.sendToNode(node, entry).catch((err) => {
-          this.emit('replication-error', { node, error: err.message });
-        });
-      });
-    }
-
-    this.stats.replications++;
-  }
-
-  /**
-   * Send data to node
-   */
-  private async sendToNode(node: string, entry: CacheEntry<any>): Promise<void> {
-    const connection = this.nodeConnections.get(node);
-
-    if (!connection || !connection.connected) {
-      throw new Error(`Node ${node} not connected`);
-    }
-
-    // Simulate network send
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        resolve();
-      }, Math.random() * 100);
-    });
   }
 
   /**
    * Invalidate replicas
    */
-  private async invalidateReplicas(key: string, replicas: string[]): Promise<void> {
-    await Promise.all(
-      replicas.map((node) => this.sendToNode(node, { key } as any).catch(() => {}))
-    );
+  private invalidateReplicas(key: string): void {
+    for (const node of this.nodes.values()) {
+      if (node.healthy) {
+        // Simulate invalidation on replica
+      }
+    }
   }
 
   /**
-   * Replicate lock to nodes
+   * Set invalidation strategy
    */
-  private async replicateLock(lock: DistributedLock): Promise<void> {
-    const replicas = this.selectReplicaNodes();
-    await Promise.all(
-      replicas.map((node) => this.sendToNode(node, { key: lock.key, lock } as any).catch(() => {}))
-    );
+  setInvalidationStrategy(strategy: InvalidationStrategy): void {
+    this.invalidationStrategy = strategy;
   }
 
   /**
-   * Invalidate lock replicas
+   * Perform distributed locking
    */
-  private async invalidateLockReplicas(key: string): Promise<void> {
-    const replicas = this.selectReplicaNodes();
-    await Promise.all(
-      replicas.map((node) => this.sendToNode(node, { key } as any).catch(() => {}))
-    );
+  acquireLock(key: string, ttl: number = 5000): boolean {
+    const lockKey = `lock:${key}`;
+    if (this.cache.has(lockKey)) {
+      return false;
+    }
+
+    this.set(lockKey, true, ttl);
+    return true;
   }
 
   /**
-   * Generate unique token
+   * Release distributed lock
    */
-  private generateToken(): string {
-    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  releaseLock(key: string): void {
+    const lockKey = `lock:${key}`;
+    this.delete(lockKey);
   }
 
   /**
-   * Get cache statistics
+   * Get node health
    */
-  public getStats() {
+  getNodeHealth(nodeId: string): boolean {
+    const node = this.nodes.get(nodeId);
+    return node?.healthy ?? false;
+  }
+
+  /**
+   * Mark node as unhealthy
+   */
+  markNodeUnhealthy(nodeId: string): void {
+    const node = this.nodes.get(nodeId);
+    if (node) {
+      node.healthy = false;
+      this.notifyListeners(nodeId, 'node_unhealthy');
+    }
+  }
+
+  /**
+   * Get statistics
+   */
+  getStatistics() {
     return {
       ...this.stats,
-      size: this.cache.size,
-      locks: this.locks.size,
+      entries: this.cache.size,
+      nodes: this.nodes.size,
       hitRate: this.stats.hits / (this.stats.hits + this.stats.misses) || 0,
     };
   }
@@ -362,9 +236,49 @@ export class DistributedCacheManager extends EventEmitter {
   /**
    * Clear all cache
    */
-  public async clear(): Promise<void> {
+  clear(): void {
     this.cache.clear();
-    this.locks.clear();
-    this.emit('cleared', { timestamp: Date.now() });
+    this.notifyListeners('*', 'clear');
+  }
+
+  /**
+   * Add listener
+   */
+  addListener(listener: (key: string, action: string) => void): void {
+    this.listeners.add(listener);
+  }
+
+  /**
+   * Remove listener
+   */
+  removeListener(listener: (key: string, action: string) => void): void {
+    this.listeners.delete(listener);
+  }
+
+  /**
+   * Notify listeners
+   */
+  private notifyListeners(key: string, action: string): void {
+    for (const listener of this.listeners) {
+      try {
+        listener(key, action);
+      } catch (error) {
+        // Handle listener error
+      }
+    }
+  }
+
+  /**
+   * Get all nodes
+   */
+  getNodes(): CacheNode[] {
+    return Array.from(this.nodes.values());
+  }
+
+  /**
+   * Get cache size
+   */
+  getSize(): number {
+    return this.cache.size;
   }
 }

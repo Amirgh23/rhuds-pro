@@ -1,333 +1,391 @@
 /**
  * Heatmap Engine
- * Create heatmaps from data
- *
- * موتور نقشه حرارتی
- * ایجاد نقشه های حرارتی از داده ها
+ * Creates heatmaps from data with color mapping, density calculation, and smoothing
  */
-
-import { EventEmitter } from 'events';
 
 export interface HeatmapPoint {
   x: number;
   y: number;
   value: number;
-  metadata?: Record<string, any>;
-}
-
-export interface HeatmapData {
-  id: string;
-  points: HeatmapPoint[];
-  width: number;
-  height: number;
-  minValue?: number;
-  maxValue?: number;
-  metadata?: Record<string, any>;
-}
-
-export interface ColorStop {
-  value: number;
-  color: string;
 }
 
 export interface HeatmapConfig {
-  colorStops: ColorStop[];
-  smoothing: 'none' | 'gaussian' | 'bilinear';
-  radius: number;
-  opacity: number;
-  interpolation: 'linear' | 'cubic';
+  width: number;
+  height: number;
+  cellSize: number;
+  smoothing?: number;
+  colorScheme?: 'viridis' | 'plasma' | 'inferno' | 'magma' | 'custom';
+  customColors?: string[];
 }
 
-export class HeatmapEngine extends EventEmitter {
-  private heatmaps: Map<string, HeatmapData> = new Map();
-  private grids: Map<string, number[][]> = new Map();
-  private colorMaps: Map<string, Uint8ClampedArray> = new Map();
+export interface HeatmapCell {
+  x: number;
+  y: number;
+  value: number;
+  color: string;
+  density: number;
+}
+
+export interface HeatmapData {
+  cells: HeatmapCell[];
+  min: number;
+  max: number;
+  mean: number;
+}
+
+export interface ColorMap {
+  [key: number]: string;
+}
+
+/**
+ * HeatmapEngine - Advanced heatmap generation and rendering
+ */
+export class HeatmapEngine {
   private config: HeatmapConfig;
+  private points: HeatmapPoint[] = [];
+  private grid: Map<string, number> = new Map();
+  private colorMap: ColorMap = {};
 
-  constructor() {
-    super();
+  constructor(config: HeatmapConfig) {
     this.config = {
-      colorStops: [
-        { value: 0, color: '#0000ff' },
-        { value: 0.25, color: '#00ffff' },
-        { value: 0.5, color: '#00ff00' },
-        { value: 0.75, color: '#ffff00' },
-        { value: 1, color: '#ff0000' },
-      ],
-      smoothing: 'gaussian',
-      radius: 50,
-      opacity: 0.8,
-      interpolation: 'linear',
+      smoothing: 1,
+      colorScheme: 'viridis',
+      ...config,
     };
+    this.initializeColorMap();
   }
 
   /**
-   * Load heatmap data
+   * Initialize color map based on scheme
    */
-  loadHeatmap(heatmapData: HeatmapData): void {
-    this.heatmaps.set(heatmapData.id, heatmapData);
-    this.generateGrid(heatmapData.id);
-    this.generateColorMap(heatmapData.id);
-    this.emit('heatmap:loaded', { id: heatmapData.id });
+  private initializeColorMap(): void {
+    const scheme = this.config.colorScheme;
+
+    if (scheme === 'custom' && this.config.customColors) {
+      this.generateCustomColorMap(this.config.customColors);
+    } else {
+      this.generateColorScheme(scheme);
+    }
   }
 
   /**
-   * Generate density grid
+   * Generate standard color scheme
    */
-  private generateGrid(heatmapId: string): void {
-    const heatmap = this.heatmaps.get(heatmapId);
-    if (!heatmap) return;
+  private generateColorScheme(scheme: string): void {
+    const schemes: Record<string, string[]> = {
+      viridis: [
+        '#440154',
+        '#482878',
+        '#3e4a89',
+        '#31688e',
+        '#26828e',
+        '#35b779',
+        '#6ece58',
+        '#b5de2b',
+        '#fde724',
+      ],
+      plasma: [
+        '#0d0887',
+        '#46039f',
+        '#7201a8',
+        '#9c179e',
+        '#bd3786',
+        '#d8576b',
+        '#ed7953',
+        '#fb9f3a',
+        '#fdca26',
+        '#f0f921',
+      ],
+      inferno: [
+        '#000004',
+        '#170b3b',
+        '#420a68',
+        '#932667',
+        '#dd513a',
+        '#f37819',
+        '#fcb040',
+        '#ffea46',
+        '#ffffd2',
+      ],
+      magma: [
+        '#000004',
+        '#140e4b',
+        '#3b0f70',
+        '#561b7e',
+        '#7e2e84',
+        '#a12e7a',
+        '#c44e52',
+        '#e16462',
+        '#fd9668',
+        '#fde724',
+      ],
+    };
 
-    const grid: number[][] = Array(heatmap.height)
-      .fill(null)
-      .map(() => Array(heatmap.width).fill(0));
+    const colors = schemes[scheme] || schemes.viridis;
+    this.generateCustomColorMap(colors);
+  }
 
-    // Calculate min/max values
-    let minValue = heatmap.minValue ?? Infinity;
-    let maxValue = heatmap.maxValue ?? -Infinity;
+  /**
+   * Generate custom color map
+   */
+  private generateCustomColorMap(colors: string[]): void {
+    this.colorMap = {};
+    for (let i = 0; i < colors.length; i++) {
+      const key = i / (colors.length - 1);
+      this.colorMap[key] = colors[i];
+    }
+  }
 
-    heatmap.points.forEach((point) => {
-      minValue = Math.min(minValue, point.value);
-      maxValue = Math.max(maxValue, point.value);
-    });
+  /**
+   * Add data points
+   */
+  addPoints(points: HeatmapPoint[]): void {
+    this.points.push(...points);
+    this.updateGrid();
+  }
 
-    // Distribute points to grid
-    heatmap.points.forEach((point) => {
-      const x = Math.floor((point.x / 100) * heatmap.width);
-      const y = Math.floor((point.y / 100) * heatmap.height);
+  /**
+   * Clear all points
+   */
+  clearPoints(): void {
+    this.points = [];
+    this.grid.clear();
+  }
 
-      if (x >= 0 && x < heatmap.width && y >= 0 && y < heatmap.height) {
-        const normalized = (point.value - minValue) / (maxValue - minValue || 1);
-        grid[y][x] = normalized;
+  /**
+   * Update grid with current points
+   */
+  private updateGrid(): void {
+    this.grid.clear();
+
+    for (const point of this.points) {
+      const cellX = Math.floor(point.x / this.config.cellSize);
+      const cellY = Math.floor(point.y / this.config.cellSize);
+      const key = `${cellX},${cellY}`;
+
+      const current = this.grid.get(key) || 0;
+      this.grid.set(key, current + point.value);
+    }
+  }
+
+  /**
+   * Generate heatmap data
+   */
+  generateHeatmap(): HeatmapData {
+    const cells: HeatmapCell[] = [];
+    let min = Infinity;
+    let max = -Infinity;
+    let sum = 0;
+    let count = 0;
+
+    // Calculate statistics
+    for (const value of this.grid.values()) {
+      min = Math.min(min, value);
+      max = Math.max(max, value);
+      sum += value;
+      count++;
+    }
+
+    const mean = count > 0 ? sum / count : 0;
+    const range = max - min || 1;
+
+    // Generate cells
+    for (const [key, value] of this.grid.entries()) {
+      const [x, y] = key.split(',').map(Number);
+      const normalized = (value - min) / range;
+      const color = this.getColor(normalized);
+      const density = this.calculateDensity(x, y);
+
+      cells.push({
+        x: x * this.config.cellSize,
+        y: y * this.config.cellSize,
+        value,
+        color,
+        density,
+      });
+    }
+
+    // Apply smoothing if configured
+    if (this.config.smoothing && this.config.smoothing > 1) {
+      this.applySmoothingFilter(cells);
+    }
+
+    return { cells, min, max, mean };
+  }
+
+  /**
+   * Get color for normalized value
+   */
+  private getColor(normalized: number): string {
+    normalized = Math.max(0, Math.min(1, normalized));
+
+    let closestKey = 0;
+    let closestDist = 1;
+
+    for (const key of Object.keys(this.colorMap).map(Number)) {
+      const dist = Math.abs(key - normalized);
+      if (dist < closestDist) {
+        closestDist = dist;
+        closestKey = key;
       }
-    });
-
-    // Apply smoothing
-    if (this.config.smoothing === 'gaussian') {
-      this.applyGaussianSmoothing(grid, this.config.radius);
-    } else if (this.config.smoothing === 'bilinear') {
-      this.applyBilinearSmoothing(grid);
     }
 
-    this.grids.set(heatmapId, grid);
-    this.emit('grid:generated', { id: heatmapId });
+    return this.colorMap[closestKey];
   }
 
   /**
-   * Apply Gaussian smoothing
+   * Calculate density around a cell
    */
-  private applyGaussianSmoothing(grid: number[][], radius: number): void {
-    const height = grid.length;
-    const width = grid[0].length;
-    const sigma = radius / 3;
-    const kernel: number[] = [];
+  private calculateDensity(x: number, y: number): number {
+    let density = 0;
+    const radius = 2;
 
-    // Generate Gaussian kernel
-    for (let i = -radius; i <= radius; i++) {
-      kernel.push(Math.exp(-(i * i) / (2 * sigma * sigma)));
+    for (let dx = -radius; dx <= radius; dx++) {
+      for (let dy = -radius; dy <= radius; dy++) {
+        const key = `${x + dx},${y + dy}`;
+        const value = this.grid.get(key) || 0;
+        const distance = Math.sqrt(dx * dx + dy * dy) || 1;
+        density += value / distance;
+      }
     }
 
-    const sum = kernel.reduce((a, b) => a + b, 0);
-    kernel.forEach((_, i) => {
-      kernel[i] /= sum;
-    });
+    return density;
+  }
 
-    // Apply horizontal blur
-    const temp: number[][] = grid.map((row) => [...row]);
-    for (let y = 0; y < height; y++) {
-      for (let x = 0; x < width; x++) {
-        let value = 0;
-        for (let i = -radius; i <= radius; i++) {
-          const px = Math.max(0, Math.min(width - 1, x + i));
-          value += grid[y][px] * kernel[i + radius];
+  /**
+   * Apply smoothing filter
+   */
+  private applySmoothingFilter(cells: HeatmapCell[]): void {
+    const cellMap = new Map<string, HeatmapCell>();
+    for (const cell of cells) {
+      cellMap.set(`${cell.x},${cell.y}`, cell);
+    }
+
+    for (const cell of cells) {
+      let sum = cell.value;
+      let count = 1;
+
+      for (let dx = -this.config.cellSize; dx <= this.config.cellSize; dx += this.config.cellSize) {
+        for (
+          let dy = -this.config.cellSize;
+          dy <= this.config.cellSize;
+          dy += this.config.cellSize
+        ) {
+          if (dx === 0 && dy === 0) continue;
+
+          const key = `${cell.x + dx},${cell.y + dy}`;
+          const neighbor = cellMap.get(key);
+          if (neighbor) {
+            sum += neighbor.value;
+            count++;
+          }
         }
-        temp[y][x] = value;
       }
-    }
 
-    // Apply vertical blur
-    for (let y = 0; y < height; y++) {
-      for (let x = 0; x < width; x++) {
-        let value = 0;
-        for (let i = -radius; i <= radius; i++) {
-          const py = Math.max(0, Math.min(height - 1, y + i));
-          value += temp[py][x] * kernel[i + radius];
-        }
-        grid[y][x] = value;
-      }
+      cell.value = sum / count;
     }
   }
 
   /**
-   * Apply bilinear smoothing
+   * Get heatmap statistics
    */
-  private applyBilinearSmoothing(grid: number[][]): void {
-    const height = grid.length;
-    const width = grid[0].length;
-    const temp: number[][] = grid.map((row) => [...row]);
+  getStatistics(): Record<string, number> {
+    const values = Array.from(this.grid.values());
 
-    for (let y = 1; y < height - 1; y++) {
-      for (let x = 1; x < width - 1; x++) {
-        const avg =
-          (grid[y - 1][x - 1] +
-            grid[y - 1][x] +
-            grid[y - 1][x + 1] +
-            grid[y][x - 1] +
-            grid[y][x] +
-            grid[y][x + 1] +
-            grid[y + 1][x - 1] +
-            grid[y + 1][x] +
-            grid[y + 1][x + 1]) /
-          9;
-        temp[y][x] = avg;
-      }
+    if (values.length === 0) {
+      return {
+        cellCount: 0,
+        pointCount: 0,
+        min: 0,
+        max: 0,
+        mean: 0,
+        median: 0,
+        stdDev: 0,
+      };
     }
 
-    for (let y = 0; y < height; y++) {
-      for (let x = 0; x < width; x++) {
-        grid[y][x] = temp[y][x];
-      }
-    }
-  }
+    const sorted = [...values].sort((a, b) => a - b);
+    const min = sorted[0];
+    const max = sorted[sorted.length - 1];
+    const mean = values.reduce((a, b) => a + b) / values.length;
+    const median = sorted[Math.floor(sorted.length / 2)];
 
-  /**
-   * Generate color map
-   */
-  private generateColorMap(heatmapId: string): void {
-    const grid = this.grids.get(heatmapId);
-    if (!grid) return;
-
-    const height = grid.length;
-    const width = grid[0].length;
-    const colorData = new Uint8ClampedArray(width * height * 4);
-
-    for (let y = 0; y < height; y++) {
-      for (let x = 0; x < width; x++) {
-        const value = grid[y][x];
-        const color = this.interpolateColor(value);
-        const idx = (y * width + x) * 4;
-
-        colorData[idx] = color.r;
-        colorData[idx + 1] = color.g;
-        colorData[idx + 2] = color.b;
-        colorData[idx + 3] = Math.floor(255 * this.config.opacity);
-      }
-    }
-
-    this.colorMaps.set(heatmapId, colorData);
-    this.emit('colormap:generated', { id: heatmapId });
-  }
-
-  /**
-   * Interpolate color based on value
-   */
-  private interpolateColor(value: number): { r: number; g: number; b: number } {
-    const stops = this.config.colorStops;
-    let stop1 = stops[0];
-    let stop2 = stops[stops.length - 1];
-
-    for (let i = 0; i < stops.length - 1; i++) {
-      if (value >= stops[i].value && value <= stops[i + 1].value) {
-        stop1 = stops[i];
-        stop2 = stops[i + 1];
-        break;
-      }
-    }
-
-    const t = (value - stop1.value) / (stop2.value - stop1.value || 1);
-    const c1 = this.hexToRgb(stop1.color);
-    const c2 = this.hexToRgb(stop2.color);
+    const variance = values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length;
+    const stdDev = Math.sqrt(variance);
 
     return {
-      r: Math.floor(c1.r + (c2.r - c1.r) * t),
-      g: Math.floor(c1.g + (c2.g - c1.g) * t),
-      b: Math.floor(c1.b + (c2.b - c1.b) * t),
+      cellCount: this.grid.size,
+      pointCount: this.points.length,
+      min,
+      max,
+      mean,
+      median,
+      stdDev,
     };
-  }
-
-  /**
-   * Convert hex to RGB
-   */
-  private hexToRgb(hex: string): { r: number; g: number; b: number } {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result
-      ? {
-          r: parseInt(result[1], 16),
-          g: parseInt(result[2], 16),
-          b: parseInt(result[3], 16),
-        }
-      : { r: 0, g: 0, b: 0 };
-  }
-
-  /**
-   * Get grid
-   */
-  getGrid(heatmapId: string): number[][] | null {
-    return this.grids.get(heatmapId) || null;
   }
 
   /**
    * Get color map
    */
-  getColorMap(heatmapId: string): Uint8ClampedArray | null {
-    return this.colorMaps.get(heatmapId) || null;
+  getColorMap(): ColorMap {
+    return { ...this.colorMap };
   }
 
   /**
-   * Get heatmap
+   * Set custom color scheme
    */
-  getHeatmap(heatmapId: string): HeatmapData | null {
-    return this.heatmaps.get(heatmapId) || null;
+  setColorScheme(
+    scheme: 'viridis' | 'plasma' | 'inferno' | 'magma' | 'custom',
+    colors?: string[]
+  ): void {
+    if (scheme === 'custom' && colors) {
+      this.generateCustomColorMap(colors);
+    } else {
+      this.generateColorScheme(scheme);
+    }
   }
 
   /**
-   * Set color stops
+   * Export heatmap as image data
    */
-  setColorStops(stops: ColorStop[]): void {
-    this.config.colorStops = stops;
-    this.heatmaps.forEach((_, id) => {
-      this.generateColorMap(id);
-    });
-    this.emit('colorstops:updated', stops);
-  }
+  exportAsImageData(width: number, height: number): ImageData {
+    const canvas = new OffscreenCanvas(width, height);
+    const ctx = canvas.getContext('2d');
 
-  /**
-   * Set smoothing
-   */
-  setSmoothing(smoothing: 'none' | 'gaussian' | 'bilinear'): void {
-    this.config.smoothing = smoothing;
-    this.heatmaps.forEach((_, id) => {
-      this.generateGrid(id);
-      this.generateColorMap(id);
-    });
-    this.emit('smoothing:updated', smoothing);
-  }
-
-  /**
-   * Generate legend
-   */
-  generateLegend(heatmapId: string, steps: number = 10): Array<{ value: number; color: string }> {
-    const legend: Array<{ value: number; color: string }> = [];
-
-    for (let i = 0; i <= steps; i++) {
-      const value = i / steps;
-      const color = this.interpolateColor(value);
-      legend.push({
-        value,
-        color: `rgb(${color.r},${color.g},${color.b})`,
-      });
+    if (!ctx) {
+      throw new Error('Failed to get canvas context');
     }
 
-    return legend;
+    const imageData = ctx.createImageData(width, height);
+    const data = imageData.data;
+
+    const heatmap = this.generateHeatmap();
+
+    for (const cell of heatmap.cells) {
+      const x = Math.floor((cell.x / this.config.width) * width);
+      const y = Math.floor((cell.y / this.config.height) * height);
+
+      if (x >= 0 && x < width && y >= 0 && y < height) {
+        const idx = (y * width + x) * 4;
+        const rgb = this.hexToRgb(cell.color);
+
+        data[idx] = rgb[0];
+        data[idx + 1] = rgb[1];
+        data[idx + 2] = rgb[2];
+        data[idx + 3] = 255;
+      }
+    }
+
+    return imageData;
   }
 
   /**
-   * Remove heatmap
+   * Convert hex color to RGB
    */
-  removeHeatmap(heatmapId: string): void {
-    this.heatmaps.delete(heatmapId);
-    this.grids.delete(heatmapId);
-    this.colorMaps.delete(heatmapId);
-    this.emit('heatmap:removed', { id: heatmapId });
+  private hexToRgb(hex: string): [number, number, number] {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result
+      ? [parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)]
+      : [0, 0, 0];
   }
 }

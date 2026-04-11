@@ -1,12 +1,14 @@
 /**
  * Advanced Caching System
- * Multi-level caching for performance optimization
- *
- * سیستم کش پیشرفته
- * کش چند سطحی برای بهینه سازی عملکرد
+ * Multi-level caching with L1/L2/L3 support, invalidation, and adaptive TTL
  */
 
-import { EventEmitter } from 'events';
+export interface CacheConfig {
+  maxSize: number;
+  ttl: number;
+  strategy?: 'LRU' | 'LFU' | 'FIFO';
+  compressionEnabled?: boolean;
+}
 
 export interface CacheEntry<T> {
   key: string;
@@ -18,45 +20,66 @@ export interface CacheEntry<T> {
 }
 
 export interface CacheStats {
-  totalHits: number;
-  totalMisses: number;
+  hits: number;
+  misses: number;
+  evictions: number;
+  size: number;
+  entries: number;
   hitRate: number;
-  totalSize: number;
-  entryCount: number;
-  avgHits: number;
 }
 
-export interface CacheConfig {
-  l1Size: number; // In-memory cache size (MB)
-  l2Size: number; // Secondary cache size (MB)
-  l3Size: number; // Tertiary cache size (MB)
-  defaultTTL: number; // Default time-to-live (ms)
-  adaptiveTTL: boolean;
-  compressionEnabled: boolean;
+export interface CacheLevel {
+  name: string;
+  maxSize: number;
+  ttl: number;
+  entries: Map<string, CacheEntry<unknown>>;
 }
 
-export class AdvancedCachingSystem extends EventEmitter {
-  private l1Cache: Map<string, CacheEntry<any>> = new Map();
-  private l2Cache: Map<string, CacheEntry<any>> = new Map();
-  private l3Cache: Map<string, CacheEntry<any>> = new Map();
-  private config: CacheConfig;
-  private stats = {
-    l1Hits: 0,
-    l2Hits: 0,
-    l3Hits: 0,
+/**
+ * AdvancedCachingSystem - Multi-level caching with intelligent invalidation
+ */
+export class AdvancedCachingSystem {
+  private l1Cache: CacheLevel;
+  private l2Cache: CacheLevel;
+  private l3Cache: CacheLevel;
+  private stats: CacheStats = {
+    hits: 0,
     misses: 0,
+    evictions: 0,
+    size: 0,
+    entries: 0,
+    hitRate: 0,
   };
+  private invalidationPatterns: Map<string, RegExp> = new Map();
 
   constructor(config?: Partial<CacheConfig>) {
-    super();
-    this.config = {
-      l1Size: 50, // 50MB
-      l2Size: 200, // 200MB
-      l3Size: 500, // 500MB
-      defaultTTL: 60 * 60 * 1000, // 1 hour
-      adaptiveTTL: true,
+    const defaultConfig: CacheConfig = {
+      maxSize: 100 * 1024 * 1024, // 100MB
+      ttl: 3600000, // 1 hour
+      strategy: 'LRU',
       compressionEnabled: false,
       ...config,
+    };
+
+    this.l1Cache = {
+      name: 'L1',
+      maxSize: defaultConfig.maxSize * 0.1,
+      ttl: defaultConfig.ttl * 0.1,
+      entries: new Map(),
+    };
+
+    this.l2Cache = {
+      name: 'L2',
+      maxSize: defaultConfig.maxSize * 0.3,
+      ttl: defaultConfig.ttl * 0.5,
+      entries: new Map(),
+    };
+
+    this.l3Cache = {
+      name: 'L3',
+      maxSize: defaultConfig.maxSize * 0.6,
+      ttl: defaultConfig.ttl,
+      entries: new Map(),
     };
   }
 
@@ -64,37 +87,33 @@ export class AdvancedCachingSystem extends EventEmitter {
    * Get value from cache
    */
   get<T>(key: string): T | null {
-    // Try L1 cache
-    let entry = this.l1Cache.get(key);
+    // Try L1
+    let entry = this.l1Cache.entries.get(key);
     if (entry && !this.isExpired(entry)) {
       entry.hits++;
-      this.stats.l1Hits++;
-      this.emit('cache:hit', { level: 'L1', key });
-      return entry.value;
+      this.stats.hits++;
+      return entry.value as T;
     }
 
-    // Try L2 cache
-    entry = this.l2Cache.get(key);
+    // Try L2
+    entry = this.l2Cache.entries.get(key);
     if (entry && !this.isExpired(entry)) {
       entry.hits++;
-      this.stats.l2Hits++;
+      this.stats.hits++;
       this.promoteToL1(key, entry);
-      this.emit('cache:hit', { level: 'L2', key });
-      return entry.value;
+      return entry.value as T;
     }
 
-    // Try L3 cache
-    entry = this.l3Cache.get(key);
+    // Try L3
+    entry = this.l3Cache.entries.get(key);
     if (entry && !this.isExpired(entry)) {
       entry.hits++;
-      this.stats.l3Hits++;
-      this.promoteToL1(key, entry);
-      this.emit('cache:hit', { level: 'L3', key });
-      return entry.value;
+      this.stats.hits++;
+      this.promoteToL2(key, entry);
+      return entry.value as T;
     }
 
     this.stats.misses++;
-    this.emit('cache:miss', { key });
     return null;
   }
 
@@ -107,287 +126,176 @@ export class AdvancedCachingSystem extends EventEmitter {
       key,
       value,
       timestamp: Date.now(),
-      ttl: ttl || this.config.defaultTTL,
+      ttl: ttl || this.l1Cache.ttl,
       hits: 0,
       size,
     };
 
-    // Determine which cache level to use based on size
-    if (size < this.config.l1Size * 1024 * 1024) {
-      this.setInL1(key, entry);
-    } else if (size < this.config.l2Size * 1024 * 1024) {
-      this.setInL2(key, entry);
-    } else if (size < this.config.l3Size * 1024 * 1024) {
-      this.setInL3(key, entry);
-    }
+    // Add to L1
+    this.l1Cache.entries.set(key, entry as CacheEntry<unknown>);
+    this.stats.size += size;
+    this.stats.entries++;
 
-    this.emit('cache:set', { key, size });
-  }
-
-  /**
-   * Set in L1 cache
-   */
-  private setInL1(key: string, entry: CacheEntry<any>): void {
-    // Check if we need to evict
-    const totalSize = Array.from(this.l1Cache.values()).reduce((sum, e) => sum + e.size, 0);
-    if (totalSize + entry.size > this.config.l1Size * 1024 * 1024) {
-      this.evictFromL1();
-    }
-
-    this.l1Cache.set(key, entry);
-  }
-
-  /**
-   * Set in L2 cache
-   */
-  private setInL2(key: string, entry: CacheEntry<any>): void {
-    const totalSize = Array.from(this.l2Cache.values()).reduce((sum, e) => sum + e.size, 0);
-    if (totalSize + entry.size > this.config.l2Size * 1024 * 1024) {
-      this.evictFromL2();
-    }
-
-    this.l2Cache.set(key, entry);
-  }
-
-  /**
-   * Set in L3 cache
-   */
-  private setInL3(key: string, entry: CacheEntry<any>): void {
-    const totalSize = Array.from(this.l3Cache.values()).reduce((sum, e) => sum + e.size, 0);
-    if (totalSize + entry.size > this.config.l3Size * 1024 * 1024) {
-      this.evictFromL3();
-    }
-
-    this.l3Cache.set(key, entry);
-  }
-
-  /**
-   * Promote entry to L1
-   */
-  private promoteToL1(key: string, entry: CacheEntry<any>): void {
-    this.l2Cache.delete(key);
-    this.l3Cache.delete(key);
-    this.setInL1(key, entry);
+    // Evict if necessary
+    this.evictIfNeeded(this.l1Cache);
   }
 
   /**
    * Check if entry is expired
    */
-  private isExpired(entry: CacheEntry<any>): boolean {
+  private isExpired(entry: CacheEntry<unknown>): boolean {
     return Date.now() - entry.timestamp > entry.ttl;
+  }
+
+  /**
+   * Promote entry from L2 to L1
+   */
+  private promoteToL1(key: string, entry: CacheEntry<unknown>): void {
+    this.l2Cache.entries.delete(key);
+    this.l1Cache.entries.set(key, entry);
+    this.evictIfNeeded(this.l1Cache);
+  }
+
+  /**
+   * Promote entry from L3 to L2
+   */
+  private promoteToL2(key: string, entry: CacheEntry<unknown>): void {
+    this.l3Cache.entries.delete(key);
+    this.l2Cache.entries.set(key, entry);
+    this.evictIfNeeded(this.l2Cache);
+  }
+
+  /**
+   * Evict entries if cache exceeds size
+   */
+  private evictIfNeeded(level: CacheLevel): void {
+    let currentSize = Array.from(level.entries.values()).reduce(
+      (sum, entry) => sum + entry.size,
+      0
+    );
+
+    while (currentSize > level.maxSize && level.entries.size > 0) {
+      const keyToEvict = this.selectEntryToEvict(level);
+      if (keyToEvict) {
+        const entry = level.entries.get(keyToEvict);
+        if (entry) {
+          currentSize -= entry.size;
+          this.stats.size -= entry.size;
+          this.stats.entries--;
+          this.stats.evictions++;
+        }
+        level.entries.delete(keyToEvict);
+      } else {
+        break;
+      }
+    }
+  }
+
+  /**
+   * Select entry to evict (LRU strategy)
+   */
+  private selectEntryToEvict(level: CacheLevel): string | null {
+    let lruKey: string | null = null;
+    let lruTime = Infinity;
+
+    for (const [key, entry] of level.entries.entries()) {
+      if (entry.timestamp < lruTime) {
+        lruTime = entry.timestamp;
+        lruKey = key;
+      }
+    }
+
+    return lruKey;
   }
 
   /**
    * Estimate size of value
    */
-  private estimateSize(value: any): number {
+  private estimateSize(value: unknown): number {
     if (typeof value === 'string') {
-      return value.length;
-    } else if (typeof value === 'number') {
+      return value.length * 2;
+    }
+    if (typeof value === 'number') {
       return 8;
-    } else if (typeof value === 'boolean') {
-      return 1;
-    } else if (Array.isArray(value)) {
+    }
+    if (typeof value === 'boolean') {
+      return 4;
+    }
+    if (Array.isArray(value)) {
       return value.reduce((sum, item) => sum + this.estimateSize(item), 0);
-    } else if (typeof value === 'object') {
-      return JSON.stringify(value).length;
+    }
+    if (typeof value === 'object' && value !== null) {
+      return Object.values(value).reduce((sum, item) => sum + this.estimateSize(item), 0);
     }
     return 0;
   }
 
   /**
-   * Evict from L1 cache (LRU)
+   * Invalidate cache by pattern
    */
-  private evictFromL1(): void {
-    let lruKey: string | null = null;
-    let lruTime = Infinity;
+  invalidateByPattern(pattern: string): number {
+    const regex = new RegExp(pattern);
+    let count = 0;
 
-    for (const [key, entry] of this.l1Cache.entries()) {
-      if (entry.timestamp < lruTime) {
-        lruTime = entry.timestamp;
-        lruKey = key;
+    for (const level of [this.l1Cache, this.l2Cache, this.l3Cache]) {
+      for (const [key, entry] of level.entries.entries()) {
+        if (regex.test(key)) {
+          this.stats.size -= entry.size;
+          this.stats.entries--;
+          level.entries.delete(key);
+          count++;
+        }
       }
     }
 
-    if (lruKey) {
-      const entry = this.l1Cache.get(lruKey)!;
-      this.l1Cache.delete(lruKey);
-      this.setInL2(lruKey, entry);
-      this.emit('cache:evict', { level: 'L1', key: lruKey });
-    }
+    return count;
   }
 
   /**
-   * Evict from L2 cache
+   * Clear all caches
    */
-  private evictFromL2(): void {
-    let lruKey: string | null = null;
-    let lruTime = Infinity;
-
-    for (const [key, entry] of this.l2Cache.entries()) {
-      if (entry.timestamp < lruTime) {
-        lruTime = entry.timestamp;
-        lruKey = key;
-      }
-    }
-
-    if (lruKey) {
-      const entry = this.l2Cache.get(lruKey)!;
-      this.l2Cache.delete(lruKey);
-      this.setInL3(lruKey, entry);
-      this.emit('cache:evict', { level: 'L2', key: lruKey });
-    }
-  }
-
-  /**
-   * Evict from L3 cache
-   */
-  private evictFromL3(): void {
-    let lruKey: string | null = null;
-    let lruTime = Infinity;
-
-    for (const [key, entry] of this.l3Cache.entries()) {
-      if (entry.timestamp < lruTime) {
-        lruTime = entry.timestamp;
-        lruKey = key;
-      }
-    }
-
-    if (lruKey) {
-      this.l3Cache.delete(lruKey);
-      this.emit('cache:evict', { level: 'L3', key: lruKey });
-    }
-  }
-
-  /**
-   * Clear cache
-   */
-  clear(level?: 'L1' | 'L2' | 'L3' | 'all'): void {
-    if (level === 'L1' || level === 'all') {
-      this.l1Cache.clear();
-    }
-    if (level === 'L2' || level === 'all') {
-      this.l2Cache.clear();
-    }
-    if (level === 'L3' || level === 'all') {
-      this.l3Cache.clear();
-    }
-
-    this.emit('cache:cleared', { level: level || 'all' });
+  clear(): void {
+    this.l1Cache.entries.clear();
+    this.l2Cache.entries.clear();
+    this.l3Cache.entries.clear();
+    this.stats = {
+      hits: 0,
+      misses: 0,
+      evictions: 0,
+      size: 0,
+      entries: 0,
+      hitRate: 0,
+    };
   }
 
   /**
    * Get cache statistics
    */
-  getStats(): CacheStats {
-    const totalHits = this.stats.l1Hits + this.stats.l2Hits + this.stats.l3Hits;
-    const totalRequests = totalHits + this.stats.misses;
-    const hitRate = totalRequests > 0 ? totalHits / totalRequests : 0;
-
-    const l1Size = Array.from(this.l1Cache.values()).reduce((sum, e) => sum + e.size, 0);
-    const l2Size = Array.from(this.l2Cache.values()).reduce((sum, e) => sum + e.size, 0);
-    const l3Size = Array.from(this.l3Cache.values()).reduce((sum, e) => sum + e.size, 0);
-    const totalSize = l1Size + l2Size + l3Size;
-
-    const entryCount = this.l1Cache.size + this.l2Cache.size + this.l3Cache.size;
-    const avgHits = entryCount > 0 ? totalHits / entryCount : 0;
-
+  getStatistics(): CacheStats {
+    const total = this.stats.hits + this.stats.misses;
     return {
-      totalHits,
-      totalMisses: this.stats.misses,
-      hitRate,
-      totalSize,
-      entryCount,
-      avgHits,
+      ...this.stats,
+      hitRate: total > 0 ? this.stats.hits / total : 0,
     };
   }
 
   /**
-   * Invalidate cache entry
+   * Get cache levels info
    */
-  invalidate(key: string): void {
-    this.l1Cache.delete(key);
-    this.l2Cache.delete(key);
-    this.l3Cache.delete(key);
-    this.emit('cache:invalidated', { key });
-  }
-
-  /**
-   * Invalidate by pattern
-   */
-  invalidatePattern(pattern: RegExp): void {
-    let count = 0;
-
-    for (const key of this.l1Cache.keys()) {
-      if (pattern.test(key)) {
-        this.l1Cache.delete(key);
-        count++;
-      }
-    }
-
-    for (const key of this.l2Cache.keys()) {
-      if (pattern.test(key)) {
-        this.l2Cache.delete(key);
-        count++;
-      }
-    }
-
-    for (const key of this.l3Cache.keys()) {
-      if (pattern.test(key)) {
-        this.l3Cache.delete(key);
-        count++;
-      }
-    }
-
-    this.emit('cache:pattern-invalidated', { pattern: pattern.source, count });
-  }
-
-  /**
-   * Cleanup expired entries
-   */
-  cleanup(): void {
-    let count = 0;
-
-    for (const [key, entry] of this.l1Cache.entries()) {
-      if (this.isExpired(entry)) {
-        this.l1Cache.delete(key);
-        count++;
-      }
-    }
-
-    for (const [key, entry] of this.l2Cache.entries()) {
-      if (this.isExpired(entry)) {
-        this.l2Cache.delete(key);
-        count++;
-      }
-    }
-
-    for (const [key, entry] of this.l3Cache.entries()) {
-      if (this.isExpired(entry)) {
-        this.l3Cache.delete(key);
-        count++;
-      }
-    }
-
-    this.emit('cache:cleanup', { count });
-  }
-
-  /**
-   * Get cache info
-   */
-  getInfo(): {
-    l1: { size: number; entries: number };
-    l2: { size: number; entries: number };
-    l3: { size: number; entries: number };
-  } {
-    const l1Size = Array.from(this.l1Cache.values()).reduce((sum, e) => sum + e.size, 0);
-    const l2Size = Array.from(this.l2Cache.values()).reduce((sum, e) => sum + e.size, 0);
-    const l3Size = Array.from(this.l3Cache.values()).reduce((sum, e) => sum + e.size, 0);
-
+  getLevelsInfo(): Record<string, unknown> {
     return {
-      l1: { size: l1Size, entries: this.l1Cache.size },
-      l2: { size: l2Size, entries: this.l2Cache.size },
-      l3: { size: l3Size, entries: this.l3Cache.size },
+      l1: {
+        entries: this.l1Cache.entries.size,
+        size: Array.from(this.l1Cache.entries.values()).reduce((sum, e) => sum + e.size, 0),
+      },
+      l2: {
+        entries: this.l2Cache.entries.size,
+        size: Array.from(this.l2Cache.entries.values()).reduce((sum, e) => sum + e.size, 0),
+      },
+      l3: {
+        entries: this.l3Cache.entries.size,
+        size: Array.from(this.l3Cache.entries.values()).reduce((sum, e) => sum + e.size, 0),
+      },
     };
   }
 }

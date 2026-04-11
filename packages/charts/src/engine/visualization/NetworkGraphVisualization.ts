@@ -1,315 +1,346 @@
 /**
- * Network Graph Visualization
- * Visualize network and relationship data
- *
- * تصور نمودار شبکه
- * تصور داده های شبکه و روابط
+ * Network Graph Visualization Engine
+ * Renders network and relationship data with force-directed layout and clustering
  */
 
-import { EventEmitter } from 'events';
-
-export interface Node {
+export interface NetworkNode<T = Record<string, unknown>> {
   id: string;
   label: string;
-  x?: number;
-  y?: number;
-  size?: number;
+  value?: number;
   color?: string;
-  metadata?: Record<string, any>;
+  size?: number;
+  metadata?: T;
 }
 
-export interface Edge {
-  id: string;
+export interface NetworkEdge {
   source: string;
   target: string;
   weight?: number;
+  label?: string;
   color?: string;
-  metadata?: Record<string, any>;
 }
 
-export interface NetworkData {
-  id: string;
-  nodes: Node[];
-  edges: Edge[];
-  metadata?: Record<string, any>;
+export interface NetworkData<T = Record<string, unknown>> {
+  nodes: NetworkNode<T>[];
+  edges: NetworkEdge[];
 }
 
-export interface LayoutConfig {
-  algorithm: 'force-directed' | 'circular' | 'hierarchical';
+export interface ForceDirectedConfig {
   iterations: number;
-  temperature: number;
-  damping: number;
   repulsion: number;
   attraction: number;
+  damping: number;
+  minDistance: number;
 }
 
-export interface ClusterConfig {
-  algorithm: 'kmeans' | 'louvain' | 'connected-components';
-  k?: number;
-  resolution?: number;
+export interface NodePosition {
+  id: string;
+  x: number;
+  y: number;
+  vx?: number;
+  vy?: number;
 }
 
-export class NetworkGraphVisualization extends EventEmitter {
-  private networks: Map<string, NetworkData> = new Map();
-  private layouts: Map<string, Map<string, { x: number; y: number }>> = new Map();
-  private clusters: Map<string, Map<string, number>> = new Map();
-  private layoutConfig: LayoutConfig;
-  private clusterConfig: ClusterConfig;
+export interface ClusterInfo {
+  id: string;
+  nodes: string[];
+  centroid: [number, number];
+  color: string;
+}
 
-  constructor() {
-    super();
-    this.layoutConfig = {
-      algorithm: 'force-directed',
+/**
+ * NetworkGraphVisualization - Advanced network graph rendering
+ */
+export class NetworkGraphVisualization<T = Record<string, unknown>> {
+  private nodes: Map<string, NetworkNode<T>> = new Map();
+  private edges: Map<string, NetworkEdge> = new Map();
+  private positions: Map<string, NodePosition> = new Map();
+  private clusters: Map<string, ClusterInfo> = new Map();
+  private forceConfig: ForceDirectedConfig;
+
+  constructor(forceConfig?: Partial<ForceDirectedConfig>) {
+    this.forceConfig = {
       iterations: 100,
-      temperature: 1,
-      damping: 0.9,
       repulsion: 100,
       attraction: 0.1,
-    };
-
-    this.clusterConfig = {
-      algorithm: 'connected-components',
+      damping: 0.9,
+      minDistance: 10,
+      ...forceConfig,
     };
   }
 
   /**
    * Load network data
    */
-  loadNetwork(networkData: NetworkData): void {
-    this.networks.set(networkData.id, networkData);
-    this.computeLayout(networkData.id);
-    this.detectClusters(networkData.id);
-    this.emit('network:loaded', { id: networkData.id });
+  loadData(data: NetworkData<T>): void {
+    this.nodes.clear();
+    this.edges.clear();
+    this.positions.clear();
+
+    // Load nodes
+    for (const node of data.nodes) {
+      this.nodes.set(node.id, node);
+      this.positions.set(node.id, {
+        id: node.id,
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        vx: 0,
+        vy: 0,
+      });
+    }
+
+    // Load edges
+    for (const edge of data.edges) {
+      const key = `${edge.source}-${edge.target}`;
+      this.edges.set(key, edge);
+    }
   }
 
   /**
-   * Compute layout using force-directed algorithm
+   * Apply force-directed layout
    */
-  private computeLayout(networkId: string): void {
-    const network = this.networks.get(networkId);
-    if (!network) return;
+  applyForceDirectedLayout(): Map<string, NodePosition> {
+    for (let iter = 0; iter < this.forceConfig.iterations; iter++) {
+      // Reset forces
+      for (const pos of this.positions.values()) {
+        pos.vx = 0;
+        pos.vy = 0;
+      }
 
-    const layout = new Map<string, { x: number; y: number }>();
-    const velocities = new Map<string, { vx: number; vy: number }>();
+      // Apply repulsion forces
+      const posArray = Array.from(this.positions.values());
+      for (let i = 0; i < posArray.length; i++) {
+        for (let j = i + 1; j < posArray.length; j++) {
+          const p1 = posArray[i];
+          const p2 = posArray[j];
 
-    // Initialize positions
-    network.nodes.forEach((node, index) => {
-      const angle = (index / network.nodes.length) * Math.PI * 2;
-      const radius = 100;
-      layout.set(node.id, {
-        x: Math.cos(angle) * radius,
-        y: Math.sin(angle) * radius,
-      });
-      velocities.set(node.id, { vx: 0, vy: 0 });
-    });
-
-    // Force-directed simulation
-    for (let iter = 0; iter < this.layoutConfig.iterations; iter++) {
-      const forces = new Map<string, { fx: number; fy: number }>();
-
-      // Initialize forces
-      network.nodes.forEach((node) => {
-        forces.set(node.id, { fx: 0, fy: 0 });
-      });
-
-      // Repulsive forces
-      for (let i = 0; i < network.nodes.length; i++) {
-        for (let j = i + 1; j < network.nodes.length; j++) {
-          const node1 = network.nodes[i];
-          const node2 = network.nodes[j];
-          const pos1 = layout.get(node1.id)!;
-          const pos2 = layout.get(node2.id)!;
-
-          const dx = pos2.x - pos1.x;
-          const dy = pos2.y - pos1.y;
+          const dx = p2.x - p1.x;
+          const dy = p2.y - p1.y;
           const dist = Math.sqrt(dx * dx + dy * dy) || 1;
 
-          const force = this.layoutConfig.repulsion / (dist * dist);
-          const fx = (force * dx) / dist;
-          const fy = (force * dy) / dist;
+          const force = this.forceConfig.repulsion / (dist * dist);
+          const fx = (dx / dist) * force;
+          const fy = (dy / dist) * force;
 
-          const f1 = forces.get(node1.id)!;
-          const f2 = forces.get(node2.id)!;
-
-          f1.fx -= fx;
-          f1.fy -= fy;
-          f2.fx += fx;
-          f2.fy += fy;
+          p1.vx! -= fx;
+          p1.vy! -= fy;
+          p2.vx! += fx;
+          p2.vy! += fy;
         }
       }
 
-      // Attractive forces
-      network.edges.forEach((edge) => {
-        const pos1 = layout.get(edge.source)!;
-        const pos2 = layout.get(edge.target)!;
+      // Apply attraction forces
+      for (const edge of this.edges.values()) {
+        const p1 = this.positions.get(edge.source);
+        const p2 = this.positions.get(edge.target);
 
-        const dx = pos2.x - pos1.x;
-        const dy = pos2.y - pos1.y;
+        if (!p1 || !p2) continue;
+
+        const dx = p2.x - p1.x;
+        const dy = p2.y - p1.y;
         const dist = Math.sqrt(dx * dx + dy * dy) || 1;
 
-        const force = this.layoutConfig.attraction * dist;
-        const fx = (force * dx) / dist;
-        const fy = (force * dy) / dist;
+        const force = dist * this.forceConfig.attraction;
+        const fx = (dx / dist) * force;
+        const fy = (dy / dist) * force;
 
-        const f1 = forces.get(edge.source)!;
-        const f2 = forces.get(edge.target)!;
-
-        f1.fx += fx;
-        f1.fy += fy;
-        f2.fx -= fx;
-        f2.fy -= fy;
-      });
+        p1.vx! += fx;
+        p1.vy! += fy;
+        p2.vx! -= fx;
+        p2.vy! -= fy;
+      }
 
       // Update positions
-      network.nodes.forEach((node) => {
-        const force = forces.get(node.id)!;
-        const vel = velocities.get(node.id)!;
-        const pos = layout.get(node.id)!;
-
-        vel.vx = (vel.vx + force.fx) * this.layoutConfig.damping;
-        vel.vy = (vel.vy + force.fy) * this.layoutConfig.damping;
-
-        pos.x += vel.vx;
-        pos.y += vel.vy;
-      });
-
-      this.layoutConfig.temperature *= 0.95;
+      for (const pos of this.positions.values()) {
+        pos.vx! *= this.forceConfig.damping;
+        pos.vy! *= this.forceConfig.damping;
+        pos.x += pos.vx!;
+        pos.y += pos.vy!;
+      }
     }
 
-    this.layouts.set(networkId, layout);
-    this.emit('layout:computed', { id: networkId });
+    return this.positions;
   }
 
   /**
-   * Detect clusters in network
+   * Detect clusters using connected components
    */
-  private detectClusters(networkId: string): void {
-    const network = this.networks.get(networkId);
-    if (!network) return;
-
-    const clusters = new Map<string, number>();
+  detectClusters(): Map<string, ClusterInfo> {
+    this.clusters.clear();
     const visited = new Set<string>();
-    let clusterId = 0;
+    let clusterCount = 0;
 
-    // Connected components algorithm
-    network.nodes.forEach((node) => {
-      if (!visited.has(node.id)) {
-        this.dfs(node.id, clusterId, network, clusters, visited);
-        clusterId++;
+    for (const nodeId of this.nodes.keys()) {
+      if (visited.has(nodeId)) continue;
+
+      const cluster: string[] = [];
+      const queue = [nodeId];
+
+      while (queue.length > 0) {
+        const current = queue.shift()!;
+        if (visited.has(current)) continue;
+
+        visited.add(current);
+        cluster.push(current);
+
+        // Find connected nodes
+        for (const edge of this.edges.values()) {
+          if (edge.source === current && !visited.has(edge.target)) {
+            queue.push(edge.target);
+          } else if (edge.target === current && !visited.has(edge.source)) {
+            queue.push(edge.source);
+          }
+        }
       }
-    });
 
-    this.clusters.set(networkId, clusters);
-    this.emit('clusters:detected', { id: networkId, count: clusterId });
-  }
-
-  /**
-   * DFS for cluster detection
-   */
-  private dfs(
-    nodeId: string,
-    clusterId: number,
-    network: NetworkData,
-    clusters: Map<string, number>,
-    visited: Set<string>
-  ): void {
-    visited.add(nodeId);
-    clusters.set(nodeId, clusterId);
-
-    const neighbors = network.edges
-      .filter((e) => e.source === nodeId || e.target === nodeId)
-      .map((e) => (e.source === nodeId ? e.target : e.source));
-
-    neighbors.forEach((neighborId) => {
-      if (!visited.has(neighborId)) {
-        this.dfs(neighborId, clusterId, network, clusters, visited);
+      // Calculate centroid
+      let cx = 0,
+        cy = 0;
+      for (const id of cluster) {
+        const pos = this.positions.get(id);
+        if (pos) {
+          cx += pos.x;
+          cy += pos.y;
+        }
       }
-    });
+      cx /= cluster.length;
+      cy /= cluster.length;
+
+      const clusterInfo: ClusterInfo = {
+        id: `cluster-${clusterCount}`,
+        nodes: cluster,
+        centroid: [cx, cy],
+        color: this.generateClusterColor(clusterCount),
+      };
+
+      this.clusters.set(clusterInfo.id, clusterInfo);
+      clusterCount++;
+    }
+
+    return this.clusters;
   }
 
   /**
-   * Get layout
+   * Generate cluster color
    */
-  getLayout(networkId: string): Map<string, { x: number; y: number }> | null {
-    return this.layouts.get(networkId) || null;
+  private generateClusterColor(index: number): string {
+    const hue = (index * 137.5) % 360;
+    return `hsl(${hue}, 70%, 50%)`;
   }
 
   /**
-   * Get clusters
+   * Get node by ID
    */
-  getClusters(networkId: string): Map<string, number> | null {
-    return this.clusters.get(networkId) || null;
+  getNode(id: string): NetworkNode<T> | undefined {
+    return this.nodes.get(id);
   }
 
   /**
-   * Get network
+   * Get edge between nodes
    */
-  getNetwork(networkId: string): NetworkData | null {
-    return this.networks.get(networkId) || null;
+  getEdge(source: string, target: string): NetworkEdge | undefined {
+    return this.edges.get(`${source}-${target}`) || this.edges.get(`${target}-${source}`);
   }
 
   /**
-   * Set layout config
+   * Get node position
    */
-  setLayoutConfig(config: Partial<LayoutConfig>): void {
-    this.layoutConfig = { ...this.layoutConfig, ...config };
-    this.emit('layout-config:updated', this.layoutConfig);
+  getNodePosition(id: string): NodePosition | undefined {
+    return this.positions.get(id);
   }
 
   /**
-   * Set cluster config
+   * Get all positions
    */
-  setClusterConfig(config: Partial<ClusterConfig>): void {
-    this.clusterConfig = { ...this.clusterConfig, ...config };
-    this.emit('cluster-config:updated', this.clusterConfig);
+  getAllPositions(): Map<string, NodePosition> {
+    return new Map(this.positions);
   }
 
   /**
-   * Find shortest path
+   * Get neighbors of a node
    */
-  findShortestPath(networkId: string, source: string, target: string): string[] {
-    const network = this.networks.get(networkId);
-    if (!network) return [];
+  getNeighbors(nodeId: string): string[] {
+    const neighbors: string[] = [];
 
-    const queue: string[] = [source];
+    for (const edge of this.edges.values()) {
+      if (edge.source === nodeId) {
+        neighbors.push(edge.target);
+      } else if (edge.target === nodeId) {
+        neighbors.push(edge.source);
+      }
+    }
+
+    return neighbors;
+  }
+
+  /**
+   * Get node degree
+   */
+  getNodeDegree(nodeId: string): number {
+    return this.getNeighbors(nodeId).length;
+  }
+
+  /**
+   * Calculate shortest path between nodes
+   */
+  shortestPath(source: string, target: string): string[] {
+    const queue = [[source]];
     const visited = new Set<string>([source]);
-    const parent = new Map<string, string>();
 
     while (queue.length > 0) {
-      const current = queue.shift()!;
-      if (current === target) break;
+      const path = queue.shift()!;
+      const current = path[path.length - 1];
 
-      const neighbors = network.edges
-        .filter((e) => e.source === current || e.target === current)
-        .map((e) => (e.source === current ? e.target : e.source));
+      if (current === target) {
+        return path;
+      }
 
-      neighbors.forEach((neighbor) => {
+      for (const neighbor of this.getNeighbors(current)) {
         if (!visited.has(neighbor)) {
           visited.add(neighbor);
-          parent.set(neighbor, current);
-          queue.push(neighbor);
+          queue.push([...path, neighbor]);
         }
-      });
+      }
     }
 
-    const path: string[] = [];
-    let current = target;
-    while (current !== source && parent.has(current)) {
-      path.unshift(current);
-      current = parent.get(current)!;
-    }
-    path.unshift(source);
-
-    return path;
+    return [];
   }
 
   /**
-   * Remove network
+   * Get network statistics
    */
-  removeNetwork(networkId: string): void {
-    this.networks.delete(networkId);
-    this.layouts.delete(networkId);
-    this.clusters.delete(networkId);
-    this.emit('network:removed', { id: networkId });
+  getStatistics(): Record<string, number | string> {
+    const degrees = Array.from(this.nodes.keys()).map((id) => this.getNodeDegree(id));
+
+    return {
+      nodeCount: this.nodes.size,
+      edgeCount: this.edges.size,
+      clusterCount: this.clusters.size,
+      avgDegree: degrees.length > 0 ? degrees.reduce((a, b) => a + b) / degrees.length : 0,
+      maxDegree: Math.max(...degrees, 0),
+      minDegree: Math.min(...degrees, 0),
+      density:
+        this.nodes.size > 1 ? (2 * this.edges.size) / (this.nodes.size * (this.nodes.size - 1)) : 0,
+    };
+  }
+
+  /**
+   * Export network data
+   */
+  exportData(): NetworkData<T> {
+    return {
+      nodes: Array.from(this.nodes.values()),
+      edges: Array.from(this.edges.values()),
+    };
+  }
+
+  /**
+   * Clear all data
+   */
+  clear(): void {
+    this.nodes.clear();
+    this.edges.clear();
+    this.positions.clear();
+    this.clusters.clear();
   }
 }

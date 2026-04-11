@@ -1,258 +1,264 @@
 /**
- * Event Broadcasting
- * Broadcast events to multiple subscribers
- *
- * پخش رویدادها
- * پخش رویدادها به چندین مشترک
+ * Event Broadcasting System
+ * Broadcast events to multiple subscribers with filtering and delivery guarantees
  */
 
-import { EventEmitter } from 'events';
-
-export interface BroadcastEvent {
+export interface BroadcastEvent<T = unknown> {
   id: string;
   type: string;
-  data: any;
-  timestamp: number;
+  data: T;
+  timestamp: Date;
   source: string;
-  priority?: 'low' | 'normal' | 'high' | 'critical';
+  priority: 'low' | 'normal' | 'high' | 'critical';
 }
 
-export interface Subscriber {
-  id: string;
-  eventTypes: string[];
-  handler: (event: BroadcastEvent) => void;
-  filter?: (event: BroadcastEvent) => boolean;
-  active: boolean;
+export interface EventFilter {
+  types?: string[];
+  sources?: string[];
+  priority?: string[];
+  timeRange?: { start: Date; end: Date };
 }
 
-export interface BroadcastMetrics {
-  eventsBroadcasted: number;
-  subscribersCount: number;
-  averageDeliveryTime: number;
-  failedDeliveries: number;
+export interface EventHistory {
+  events: BroadcastEvent[];
+  maxSize: number;
+  overflow: number;
 }
 
-export class EventBroadcasting extends EventEmitter {
-  private subscribers: Map<string, Subscriber> = new Map();
-  private eventHistory: BroadcastEvent[] = [];
-  private maxHistorySize: number = 1000;
-  private metrics: BroadcastMetrics = {
-    eventsBroadcasted: 0,
-    subscribersCount: 0,
-    averageDeliveryTime: 0,
-    failedDeliveries: 0,
+/**
+ * EventBroadcasting - Event publishing and subscription
+ */
+export class EventBroadcasting<T = unknown> {
+  private subscribers: Map<string, Set<(event: BroadcastEvent<T>) => void>> = new Map();
+  private globalSubscribers: Set<(event: BroadcastEvent<T>) => void> = new Set();
+  private eventHistory: EventHistory = {
+    events: [],
+    maxSize: 1000,
+    overflow: 0,
   };
-  private deliveryTimes: number[] = [];
-
-  constructor() {
-    super();
-  }
+  private eventSequence: number = 0;
+  private filters: Map<string, EventFilter> = new Map();
 
   /**
-   * Subscribe to events
+   * Subscribe to event type
    */
-  subscribe(
-    subscriberId: string,
-    eventTypes: string[],
-    handler: (event: BroadcastEvent) => void,
-    filter?: (event: BroadcastEvent) => boolean
-  ): void {
-    const subscriber: Subscriber = {
-      id: subscriberId,
-      eventTypes,
-      handler,
-      filter,
-      active: true,
+  subscribe(type: string, callback: (event: BroadcastEvent<T>) => void): () => void {
+    if (!this.subscribers.has(type)) {
+      this.subscribers.set(type, new Set());
+    }
+
+    this.subscribers.get(type)!.add(callback);
+
+    return () => {
+      this.subscribers.get(type)?.delete(callback);
     };
-
-    this.subscribers.set(subscriberId, subscriber);
-    this.metrics.subscribersCount = this.subscribers.size;
-
-    this.emit('subscriber:added', { subscriberId, eventTypes });
   }
 
   /**
-   * Unsubscribe from events
+   * Subscribe to all events
    */
-  unsubscribe(subscriberId: string): void {
-    this.subscribers.delete(subscriberId);
-    this.metrics.subscribersCount = this.subscribers.size;
+  subscribeAll(callback: (event: BroadcastEvent<T>) => void): () => void {
+    this.globalSubscribers.add(callback);
 
-    this.emit('subscriber:removed', { subscriberId });
+    return () => {
+      this.globalSubscribers.delete(callback);
+    };
   }
 
   /**
-   * Broadcast event
+   * Publish event
    */
-  broadcast(type: string, data: any, source: string, priority: string = 'normal'): void {
-    const event: BroadcastEvent = {
-      id: `event-${Date.now()}-${Math.random()}`,
+  publish(
+    type: string,
+    data: T,
+    source: string,
+    priority: 'low' | 'normal' | 'high' | 'critical' = 'normal'
+  ): string {
+    const event: BroadcastEvent<T> = {
+      id: `event-${this.eventSequence++}`,
       type,
       data,
-      timestamp: Date.now(),
+      timestamp: new Date(),
       source,
-      priority: priority as any,
+      priority,
     };
 
-    this.eventHistory.push(event);
-    if (this.eventHistory.length > this.maxHistorySize) {
-      this.eventHistory.shift();
+    // Store in history
+    this.addToHistory(event);
+
+    // Notify type-specific subscribers
+    const typeSubscribers = this.subscribers.get(type);
+    if (typeSubscribers) {
+      typeSubscribers.forEach((subscriber) => {
+        try {
+          subscriber(event);
+        } catch (error) {
+          console.error('Subscriber error:', error);
+        }
+      });
     }
 
-    this.metrics.eventsBroadcasted++;
-
-    // Deliver to subscribers
-    const startTime = Date.now();
-    let deliveredCount = 0;
-
-    for (const subscriber of this.subscribers.values()) {
-      if (!subscriber.active) continue;
-
-      // Check if subscriber is interested in this event type
-      if (!subscriber.eventTypes.includes(type) && !subscriber.eventTypes.includes('*')) {
-        continue;
-      }
-
-      // Apply filter if present
-      if (subscriber.filter && !subscriber.filter(event)) {
-        continue;
-      }
-
+    // Notify global subscribers
+    this.globalSubscribers.forEach((subscriber) => {
       try {
-        subscriber.handler(event);
-        deliveredCount++;
+        subscriber(event);
       } catch (error) {
-        this.metrics.failedDeliveries++;
-        this.emit('delivery:failed', { subscriberId: subscriber.id, error });
+        console.error('Global subscriber error:', error);
       }
-    }
-
-    const deliveryTime = Date.now() - startTime;
-    this.deliveryTimes.push(deliveryTime);
-    if (this.deliveryTimes.length > 100) {
-      this.deliveryTimes.shift();
-    }
-
-    this.metrics.averageDeliveryTime =
-      this.deliveryTimes.reduce((a, b) => a + b, 0) / this.deliveryTimes.length;
-
-    this.emit('event:broadcasted', {
-      eventId: event.id,
-      type,
-      deliveredCount,
-      deliveryTime,
     });
+
+    return event.id;
   }
 
   /**
-   * Pause subscriber
+   * Add to history
    */
-  pauseSubscriber(subscriberId: string): void {
-    const subscriber = this.subscribers.get(subscriberId);
-    if (subscriber) {
-      subscriber.active = false;
-      this.emit('subscriber:paused', { subscriberId });
+  private addToHistory(event: BroadcastEvent<T>): void {
+    if (this.eventHistory.events.length >= this.eventHistory.maxSize) {
+      this.eventHistory.overflow++;
+      this.eventHistory.events.shift();
     }
-  }
 
-  /**
-   * Resume subscriber
-   */
-  resumeSubscriber(subscriberId: string): void {
-    const subscriber = this.subscribers.get(subscriberId);
-    if (subscriber) {
-      subscriber.active = true;
-      this.emit('subscriber:resumed', { subscriberId });
-    }
+    this.eventHistory.events.push(event);
   }
 
   /**
    * Get event history
    */
-  getEventHistory(type?: string, limit: number = 100): BroadcastEvent[] {
-    let history = this.eventHistory;
+  getHistory(filter?: EventFilter): BroadcastEvent<T>[] {
+    let events = [...this.eventHistory.events];
 
-    if (type) {
-      history = history.filter((e) => e.type === type);
+    if (!filter) {
+      return events;
     }
 
-    return history.slice(-limit);
-  }
+    if (filter.types && filter.types.length > 0) {
+      events = events.filter((e) => filter.types!.includes(e.type));
+    }
 
-  /**
-   * Get metrics
-   */
-  getMetrics(): BroadcastMetrics {
-    return { ...this.metrics };
-  }
+    if (filter.sources && filter.sources.length > 0) {
+      events = events.filter((e) => filter.sources!.includes(e.source));
+    }
 
-  /**
-   * Get subscribers
-   */
-  getSubscribers(): Subscriber[] {
-    return Array.from(this.subscribers.values());
-  }
+    if (filter.priority && filter.priority.length > 0) {
+      events = events.filter((e) => filter.priority!.includes(e.priority));
+    }
 
-  /**
-   * Get subscriber info
-   */
-  getSubscriber(subscriberId: string): Subscriber | null {
-    return this.subscribers.get(subscriberId) || null;
+    if (filter.timeRange) {
+      events = events.filter(
+        (e) => e.timestamp >= filter.timeRange!.start && e.timestamp <= filter.timeRange!.end
+      );
+    }
+
+    return events;
   }
 
   /**
    * Clear history
    */
   clearHistory(): void {
-    this.eventHistory = [];
-    this.emit('history:cleared', {});
+    this.eventHistory.events = [];
+    this.eventHistory.overflow = 0;
   }
 
   /**
-   * Reset metrics
+   * Set history size
    */
-  resetMetrics(): void {
-    this.metrics = {
-      eventsBroadcasted: 0,
-      subscribersCount: this.subscribers.size,
-      averageDeliveryTime: 0,
-      failedDeliveries: 0,
+  setHistorySize(size: number): void {
+    this.eventHistory.maxSize = size;
+  }
+
+  /**
+   * Get subscriber count
+   */
+  getSubscriberCount(type?: string): number {
+    if (type) {
+      return this.subscribers.get(type)?.size || 0;
+    }
+
+    let total = this.globalSubscribers.size;
+    this.subscribers.forEach((subscribers) => {
+      total += subscribers.size;
+    });
+
+    return total;
+  }
+
+  /**
+   * Register filter
+   */
+  registerFilter(name: string, filter: EventFilter): void {
+    this.filters.set(name, filter);
+  }
+
+  /**
+   * Get filtered history
+   */
+  getFilteredHistory(filterName: string): BroadcastEvent<T>[] {
+    const filter = this.filters.get(filterName);
+    if (!filter) {
+      return [];
+    }
+
+    return this.getHistory(filter);
+  }
+
+  /**
+   * Get event by ID
+   */
+  getEventById(id: string): BroadcastEvent<T> | undefined {
+    return this.eventHistory.events.find((e) => e.id === id);
+  }
+
+  /**
+   * Get events by type
+   */
+  getEventsByType(type: string): BroadcastEvent<T>[] {
+    return this.eventHistory.events.filter((e) => e.type === type);
+  }
+
+  /**
+   * Get events by source
+   */
+  getEventsBySource(source: string): BroadcastEvent<T>[] {
+    return this.eventHistory.events.filter((e) => e.source === source);
+  }
+
+  /**
+   * Get events by priority
+   */
+  getEventsByPriority(priority: string): BroadcastEvent<T>[] {
+    return this.eventHistory.events.filter((e) => e.priority === priority);
+  }
+
+  /**
+   * Get statistics
+   */
+  getStatistics(): {
+    totalEvents: number;
+    overflow: number;
+    subscriberCount: number;
+    typeCount: number;
+  } {
+    return {
+      totalEvents: this.eventHistory.events.length,
+      overflow: this.eventHistory.overflow,
+      subscriberCount: this.getSubscriberCount(),
+      typeCount: this.subscribers.size,
     };
-    this.deliveryTimes = [];
-    this.emit('metrics:reset', {});
   }
 
   /**
-   * Broadcast with priority queue
+   * Clear subscribers
    */
-  broadcastPrioritized(
-    type: string,
-    data: any,
-    source: string,
-    priority: 'low' | 'normal' | 'high' | 'critical'
-  ): void {
-    // In a real implementation, this would use a priority queue
-    // For now, just broadcast immediately with priority
-    this.broadcast(type, data, source, priority);
-  }
-
-  /**
-   * Get subscribers for event type
-   */
-  getSubscribersForType(eventType: string): Subscriber[] {
-    return Array.from(this.subscribers.values()).filter(
-      (s) => s.eventTypes.includes(eventType) || s.eventTypes.includes('*')
-    );
-  }
-
-  /**
-   * Update subscriber filter
-   */
-  updateSubscriberFilter(subscriberId: string, filter: (event: BroadcastEvent) => boolean): void {
-    const subscriber = this.subscribers.get(subscriberId);
-    if (subscriber) {
-      subscriber.filter = filter;
-      this.emit('subscriber:filter-updated', { subscriberId });
+  clearSubscribers(type?: string): void {
+    if (type) {
+      this.subscribers.delete(type);
+    } else {
+      this.subscribers.clear();
+      this.globalSubscribers.clear();
     }
   }
 }
+
+export default EventBroadcasting;

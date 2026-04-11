@@ -1,273 +1,293 @@
 /**
- * 3D Terrain Visualization
- * Visualize geographic and terrain data in 3D
- *
- * تصور سه بعدی زمین
- * تصور داده های جغرافیایی و زمین در سه بعد
+ * 3D Terrain Visualization Engine
+ * Renders geographic and terrain data in 3D with height mapping, textures, and lighting
  */
 
-import { EventEmitter } from 'events';
-
-export interface TerrainData {
-  id: string;
+export interface TerrainConfig {
   width: number;
   height: number;
-  heightMap: number[][];
-  textureMap?: Uint8Array;
-  metadata?: Record<string, any>;
+  scale: number;
+  heightScale: number;
+  wireframe?: boolean;
+  lighting?: boolean;
+  textureUrl?: string;
+}
+
+export interface TerrainData {
+  elevations: number[][];
+  metadata?: Record<string, unknown>;
+  colorMap?: Record<number, string>;
 }
 
 export interface TerrainMesh {
   vertices: Float32Array;
   indices: Uint32Array;
   normals: Float32Array;
-  texCoords: Float32Array;
+  texCoords?: Float32Array;
 }
 
 export interface LightingConfig {
-  ambientLight: { r: number; g: number; b: number };
-  directionalLight: {
-    direction: { x: number; y: number; z: number };
-    color: { r: number; g: number; b: number };
-  };
-  specularLight: { r: number; g: number; b: number };
+  ambientIntensity: number;
+  directionalIntensity: number;
+  direction: [number, number, number];
+  shadowMap?: boolean;
 }
 
-export interface CameraConfig {
-  position: { x: number; y: number; z: number };
-  target: { x: number; y: number; z: number };
-  fov: number;
-  near: number;
-  far: number;
+export interface CameraControl {
+  position: [number, number, number];
+  target: [number, number, number];
+  zoom: number;
+  rotation: [number, number];
 }
 
-export class Terrain3DVisualization extends EventEmitter {
-  private terrains: Map<string, TerrainData> = new Map();
-  private meshes: Map<string, TerrainMesh> = new Map();
+/**
+ * Terrain3DVisualization - Advanced 3D terrain rendering
+ */
+export class Terrain3DVisualization {
+  private config: TerrainConfig;
+  private mesh: TerrainMesh | null = null;
   private lighting: LightingConfig;
-  private camera: CameraConfig;
-  private renderScale: number = 1;
+  private camera: CameraControl;
+  private textureCache: Map<string, unknown> = new Map();
 
-  constructor() {
-    super();
+  constructor(config: TerrainConfig) {
+    this.config = {
+      wireframe: false,
+      lighting: true,
+      ...config,
+    };
     this.lighting = {
-      ambientLight: { r: 0.5, g: 0.5, b: 0.5 },
-      directionalLight: {
-        direction: { x: 1, y: 1, z: 1 },
-        color: { r: 1, g: 1, b: 1 },
-      },
-      specularLight: { r: 0.5, g: 0.5, b: 0.5 },
+      ambientIntensity: 0.5,
+      directionalIntensity: 0.8,
+      direction: [1, 1, 1],
+      shadowMap: false,
     };
-
     this.camera = {
-      position: { x: 0, y: 50, z: 50 },
-      target: { x: 0, y: 0, z: 0 },
-      fov: 45,
-      near: 0.1,
-      far: 1000,
+      position: [0, 50, 50],
+      target: [0, 0, 0],
+      zoom: 1,
+      rotation: [0, 0],
     };
   }
 
   /**
-   * Load terrain data
+   * Generate mesh from elevation data
    */
-  loadTerrain(terrainData: TerrainData): void {
-    this.terrains.set(terrainData.id, terrainData);
-    this.generateMesh(terrainData.id);
-    this.emit('terrain:loaded', { id: terrainData.id });
-  }
+  generateMesh(data: TerrainData): TerrainMesh {
+    const { elevations } = data;
+    const rows = elevations.length;
+    const cols = elevations[0]?.length || 0;
 
-  /**
-   * Generate mesh from height map
-   */
-  private generateMesh(terrainId: string): void {
-    const terrain = this.terrains.get(terrainId);
-    if (!terrain) return;
-
-    const { width, height, heightMap } = terrain;
-    const vertexCount = width * height;
-    const vertices = new Float32Array(vertexCount * 3);
-    const normals = new Float32Array(vertexCount * 3);
-    const texCoords = new Float32Array(vertexCount * 2);
+    const vertices = new Float32Array(rows * cols * 3);
+    const indices = new Uint32Array((rows - 1) * (cols - 1) * 6);
+    const normals = new Float32Array(rows * cols * 3);
 
     // Generate vertices
-    for (let y = 0; y < height; y++) {
-      for (let x = 0; x < width; x++) {
-        const index = y * width + x;
-        const h = heightMap[y][x];
+    for (let i = 0; i < rows; i++) {
+      for (let j = 0; j < cols; j++) {
+        const idx = (i * cols + j) * 3;
+        vertices[idx] = (j - cols / 2) * this.config.scale;
+        vertices[idx + 1] = elevations[i][j] * this.config.heightScale;
+        vertices[idx + 2] = (i - rows / 2) * this.config.scale;
+      }
+    }
 
-        vertices[index * 3] = x;
-        vertices[index * 3 + 1] = h;
-        vertices[index * 3 + 2] = y;
+    // Generate indices
+    let indexCount = 0;
+    for (let i = 0; i < rows - 1; i++) {
+      for (let j = 0; j < cols - 1; j++) {
+        const a = i * cols + j;
+        const b = a + 1;
+        const c = a + cols;
+        const d = c + 1;
 
-        texCoords[index * 2] = x / width;
-        texCoords[index * 2 + 1] = y / height;
+        indices[indexCount++] = a;
+        indices[indexCount++] = c;
+        indices[indexCount++] = b;
+        indices[indexCount++] = b;
+        indices[indexCount++] = c;
+        indices[indexCount++] = d;
       }
     }
 
     // Calculate normals
-    this.calculateNormals(vertices, normals, width, height);
+    this.calculateNormals(vertices, indices, normals);
 
-    // Generate indices
-    const indexCount = (width - 1) * (height - 1) * 6;
-    const indices = new Uint32Array(indexCount);
-    let indexIdx = 0;
-
-    for (let y = 0; y < height - 1; y++) {
-      for (let x = 0; x < width - 1; x++) {
-        const a = y * width + x;
-        const b = a + 1;
-        const c = a + width;
-        const d = c + 1;
-
-        indices[indexIdx++] = a;
-        indices[indexIdx++] = c;
-        indices[indexIdx++] = b;
-
-        indices[indexIdx++] = b;
-        indices[indexIdx++] = c;
-        indices[indexIdx++] = d;
-      }
-    }
-
-    this.meshes.set(terrainId, {
-      vertices,
-      indices,
-      normals,
-      texCoords,
-    });
-
-    this.emit('mesh:generated', { id: terrainId, vertexCount });
+    this.mesh = { vertices, indices, normals };
+    return this.mesh;
   }
 
   /**
-   * Calculate normals
+   * Calculate vertex normals
    */
   private calculateNormals(
     vertices: Float32Array,
-    normals: Float32Array,
-    width: number,
-    height: number
+    indices: Uint32Array,
+    normals: Float32Array
   ): void {
-    for (let i = 0; i < normals.length; i++) {
-      normals[i] = 0;
-    }
+    // Initialize normals to zero
+    normals.fill(0);
 
-    for (let y = 0; y < height - 1; y++) {
-      for (let x = 0; x < width - 1; x++) {
-        const a = y * width + x;
-        const b = a + 1;
-        const c = a + width;
+    // Accumulate face normals
+    for (let i = 0; i < indices.length; i += 3) {
+      const i0 = indices[i] * 3;
+      const i1 = indices[i + 1] * 3;
+      const i2 = indices[i + 2] * 3;
 
-        const v1 = [
-          vertices[b * 3] - vertices[a * 3],
-          vertices[b * 3 + 1] - vertices[a * 3 + 1],
-          vertices[b * 3 + 2] - vertices[a * 3 + 2],
-        ];
+      const v0 = [vertices[i0], vertices[i0 + 1], vertices[i0 + 2]];
+      const v1 = [vertices[i1], vertices[i1 + 1], vertices[i1 + 2]];
+      const v2 = [vertices[i2], vertices[i2 + 1], vertices[i2 + 2]];
 
-        const v2 = [
-          vertices[c * 3] - vertices[a * 3],
-          vertices[c * 3 + 1] - vertices[a * 3 + 1],
-          vertices[c * 3 + 2] - vertices[a * 3 + 2],
-        ];
+      const e1 = [v1[0] - v0[0], v1[1] - v0[1], v1[2] - v0[2]];
+      const e2 = [v2[0] - v0[0], v2[1] - v0[1], v2[2] - v0[2]];
 
-        const normal = this.crossProduct(v1, v2);
-        this.normalize(normal);
+      const normal = this.crossProduct(e1, e2);
 
-        for (const idx of [a, b, c]) {
-          normals[idx * 3] += normal[0];
-          normals[idx * 3 + 1] += normal[1];
-          normals[idx * 3 + 2] += normal[2];
-        }
+      for (let j = 0; j < 3; j++) {
+        normals[indices[i + j] * 3] += normal[0];
+        normals[indices[i + j] * 3 + 1] += normal[1];
+        normals[indices[i + j] * 3 + 2] += normal[2];
       }
     }
 
+    // Normalize
     for (let i = 0; i < normals.length; i += 3) {
-      const n = [normals[i], normals[i + 1], normals[i + 2]];
-      this.normalize(n);
-      normals[i] = n[0];
-      normals[i + 1] = n[1];
-      normals[i + 2] = n[2];
+      const len = Math.sqrt(
+        normals[i] * normals[i] + normals[i + 1] * normals[i + 1] + normals[i + 2] * normals[i + 2]
+      );
+      if (len > 0) {
+        normals[i] /= len;
+        normals[i + 1] /= len;
+        normals[i + 2] /= len;
+      }
     }
   }
 
   /**
-   * Cross product
+   * Cross product of two vectors
    */
   private crossProduct(a: number[], b: number[]): number[] {
     return [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
   }
 
   /**
-   * Normalize vector
+   * Apply height mapping with color
    */
-  private normalize(v: number[]): void {
-    const len = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
-    if (len > 0) {
-      v[0] /= len;
-      v[1] /= len;
-      v[2] /= len;
-    }
+  applyHeightMapping(data: TerrainData): Record<number, string> {
+    const colorMap = data.colorMap || this.generateDefaultColorMap();
+    return colorMap;
   }
 
   /**
-   * Set lighting
+   * Generate default color map based on elevation
+   */
+  private generateDefaultColorMap(): Record<number, string> {
+    return {
+      0: '#1a472a', // Deep water
+      0.2: '#2d5a3d', // Shallow water
+      0.4: '#8b7355', // Sand
+      0.6: '#228b22', // Forest
+      0.8: '#696969', // Mountain
+      1.0: '#ffffff', // Snow
+    };
+  }
+
+  /**
+   * Configure lighting
    */
   setLighting(config: Partial<LightingConfig>): void {
     this.lighting = { ...this.lighting, ...config };
-    this.emit('lighting:updated', this.lighting);
   }
 
   /**
-   * Set camera
+   * Update camera position
    */
-  setCamera(config: Partial<CameraConfig>): void {
-    this.camera = { ...this.camera, ...config };
-    this.emit('camera:updated', this.camera);
+  setCameraPosition(position: [number, number, number]): void {
+    this.camera.position = position;
   }
 
   /**
-   * Get mesh
+   * Update camera target
    */
-  getMesh(terrainId: string): TerrainMesh | null {
-    return this.meshes.get(terrainId) || null;
+  setCameraTarget(target: [number, number, number]): void {
+    this.camera.target = target;
   }
 
   /**
-   * Get terrain
+   * Rotate camera
    */
-  getTerrain(terrainId: string): TerrainData | null {
-    return this.terrains.get(terrainId) || null;
+  rotateCamera(deltaX: number, deltaY: number): void {
+    this.camera.rotation[0] += deltaX;
+    this.camera.rotation[1] += deltaY;
   }
 
   /**
-   * Get lighting
+   * Zoom camera
+   */
+  zoomCamera(factor: number): void {
+    this.camera.zoom *= factor;
+    this.camera.zoom = Math.max(0.1, Math.min(10, this.camera.zoom));
+  }
+
+  /**
+   * Get current mesh
+   */
+  getMesh(): TerrainMesh | null {
+    return this.mesh;
+  }
+
+  /**
+   * Get camera state
+   */
+  getCamera(): CameraControl {
+    return { ...this.camera };
+  }
+
+  /**
+   * Get lighting configuration
    */
   getLighting(): LightingConfig {
     return { ...this.lighting };
   }
 
   /**
-   * Get camera
+   * Load texture
    */
-  getCamera(): CameraConfig {
-    return { ...this.camera };
+  async loadTexture(url: string): Promise<unknown> {
+    if (this.textureCache.has(url)) {
+      return this.textureCache.get(url);
+    }
+
+    try {
+      const response = await fetch(url);
+      const data = await response.blob();
+      this.textureCache.set(url, data);
+      return data;
+    } catch (error) {
+      console.error(`Failed to load texture: ${url}`, error);
+      return null;
+    }
   }
 
   /**
-   * Set render scale
+   * Clear texture cache
    */
-  setRenderScale(scale: number): void {
-    this.renderScale = Math.max(0.1, Math.min(2, scale));
-    this.emit('render-scale:changed', { scale: this.renderScale });
+  clearTextureCache(): void {
+    this.textureCache.clear();
   }
 
   /**
-   * Remove terrain
+   * Get mesh statistics
    */
-  removeTerrain(terrainId: string): void {
-    this.terrains.delete(terrainId);
-    this.meshes.delete(terrainId);
-    this.emit('terrain:removed', { id: terrainId });
+  getStatistics(): Record<string, number> {
+    if (!this.mesh) {
+      return { vertices: 0, indices: 0, triangles: 0 };
+    }
+
+    return {
+      vertices: this.mesh.vertices.length / 3,
+      indices: this.mesh.indices.length,
+      triangles: this.mesh.indices.length / 3,
+    };
   }
 }

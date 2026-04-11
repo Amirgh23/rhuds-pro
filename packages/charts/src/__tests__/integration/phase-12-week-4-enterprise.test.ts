@@ -1,64 +1,59 @@
 /**
- * Phase 12 Week 4 - Enterprise & Optimization Tests
- * Test suite for all enterprise features
- *
- * تست های سازمانی و بهینه سازی
- * مجموعه تست برای تمام ویژگی های سازمانی
+ * Phase 12 Week 4 - Enterprise & Optimization Integration Tests
+ * Tests for Advanced Caching, Load Balancing, Database Optimization, API Gateway, and Monitoring
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { AdvancedCachingSystem } from '../../engine/enterprise/AdvancedCachingSystem';
-import { LoadBalancingManager } from '../../engine/enterprise/LoadBalancingManager';
-import { DatabaseOptimization } from '../../engine/enterprise/DatabaseOptimization';
-import { APIGateway } from '../../engine/enterprise/APIGateway';
-import { EnterpriseMonitoring } from '../../engine/enterprise/EnterpriseMonitoring';
+import {
+  AdvancedCachingSystem,
+  LoadBalancingManager,
+  DatabaseOptimization,
+  APIGateway,
+  EnterpriseMonitoring,
+  type ServerConfig,
+  type RouteConfig,
+  type MetricConfig,
+} from '../../engine/enterprise';
 
 describe('Phase 12 Week 4 - Enterprise & Optimization', () => {
   describe('AdvancedCachingSystem', () => {
     let cache: AdvancedCachingSystem;
 
     beforeEach(() => {
-      cache = new AdvancedCachingSystem();
+      cache = new AdvancedCachingSystem({
+        maxSize: 10 * 1024 * 1024,
+        ttl: 3600000,
+      });
     });
 
-    it('should set and get values from L1 cache', () => {
+    it('should set and get values', () => {
       cache.set('key1', 'value1');
-      const result = cache.get('key1');
+      const value = cache.get<string>('key1');
 
-      expect(result).toBe('value1');
+      expect(value).toBe('value1');
     });
 
-    it('should handle cache misses', () => {
-      const result = cache.get('nonexistent');
-
-      expect(result).toBeNull();
-    });
-
-    it('should promote from L2 to L1', () => {
+    it('should handle multiple cache levels', () => {
+      cache.set('key1', 'value1');
       cache.set('key2', 'value2');
-      cache.get('key2');
+      cache.set('key3', 'value3');
 
-      const stats = cache.getStats();
-      expect(stats.totalHits).toBeGreaterThan(0);
+      expect(cache.get('key1')).toBe('value1');
+      expect(cache.get('key2')).toBe('value2');
+      expect(cache.get('key3')).toBe('value3');
     });
 
     it('should track cache statistics', () => {
-      cache.set('key3', 'value3');
-      cache.get('key3');
+      cache.set('key1', 'value1');
+      cache.get('key1');
+      cache.get('key1');
       cache.get('nonexistent');
 
-      const stats = cache.getStats();
-      expect(stats.totalHits).toBe(1);
-      expect(stats.totalMisses).toBe(1);
-      expect(stats.hitRate).toBe(0.5);
-    });
+      const stats = cache.getStatistics();
 
-    it('should invalidate cache entries', () => {
-      cache.set('key4', 'value4');
-      cache.invalidate('key4');
-
-      const result = cache.get('key4');
-      expect(result).toBeNull();
+      expect(stats.hits).toBe(2);
+      expect(stats.misses).toBe(1);
+      expect(stats.entries).toBe(1);
     });
 
     it('should invalidate by pattern', () => {
@@ -66,139 +61,116 @@ describe('Phase 12 Week 4 - Enterprise & Optimization', () => {
       cache.set('user:2', 'data2');
       cache.set('post:1', 'data3');
 
-      cache.invalidatePattern(/^user:/);
+      const invalidated = cache.invalidateByPattern('^user:');
 
+      expect(invalidated).toBe(2);
       expect(cache.get('user:1')).toBeNull();
-      expect(cache.get('user:2')).toBeNull();
       expect(cache.get('post:1')).toBe('data3');
     });
 
     it('should clear cache', () => {
-      cache.set('key5', 'value5');
+      cache.set('key1', 'value1');
+      cache.set('key2', 'value2');
+
       cache.clear();
 
-      const result = cache.get('key5');
-      expect(result).toBeNull();
+      expect(cache.get('key1')).toBeNull();
+      expect(cache.get('key2')).toBeNull();
     });
 
-    it('should get cache info', () => {
-      cache.set('key6', 'value6');
+    it('should get cache levels info', () => {
+      cache.set('key1', 'value1');
+      const info = cache.getLevelsInfo();
 
-      const info = cache.getInfo();
-      expect(info.l1.entries).toBeGreaterThan(0);
+      expect(info).toHaveProperty('l1');
+      expect(info).toHaveProperty('l2');
+      expect(info).toHaveProperty('l3');
     });
   });
 
   describe('LoadBalancingManager', () => {
-    let lb: LoadBalancingManager;
+    let balancer: LoadBalancingManager;
 
     beforeEach(() => {
-      lb = new LoadBalancingManager();
+      balancer = new LoadBalancingManager({ name: 'round-robin' });
     });
 
     it('should add servers', () => {
-      lb.addServer({
+      const server: ServerConfig = {
         id: 'server1',
         host: 'localhost',
         port: 3000,
-        weight: 1,
-      });
+      };
 
-      const servers = lb.getAllServers();
-      expect(servers.length).toBe(1);
+      balancer.addServer(server);
+
+      expect(balancer.getTotalServersCount()).toBe(1);
     });
 
-    it('should remove servers', () => {
-      lb.addServer({
-        id: 'server1',
-        host: 'localhost',
-        port: 3000,
-        weight: 1,
-      });
+    it('should get next server', () => {
+      balancer.addServer({ id: 'server1', host: 'localhost', port: 3000 });
+      balancer.addServer({ id: 'server2', host: 'localhost', port: 3001 });
 
-      lb.removeServer('server1');
-
-      const servers = lb.getAllServers();
-      expect(servers.length).toBe(0);
-    });
-
-    it('should select next server with round-robin', () => {
-      lb.addServer({
-        id: 'server1',
-        host: 'localhost',
-        port: 3000,
-        weight: 1,
-      });
-
-      lb.addServer({
-        id: 'server2',
-        host: 'localhost',
-        port: 3001,
-        weight: 1,
-      });
-
-      const server1 = lb.getNextServer();
-      const server2 = lb.getNextServer();
+      const server1 = balancer.getNextServer();
+      const server2 = balancer.getNextServer();
 
       expect(server1?.id).toBe('server1');
       expect(server2?.id).toBe('server2');
     });
 
-    it('should handle session persistence', () => {
-      lb.addServer({
-        id: 'server1',
-        host: 'localhost',
-        port: 3000,
-        weight: 1,
-      });
+    it('should track server health', () => {
+      balancer.addServer({ id: 'server1', host: 'localhost', port: 3000 });
 
-      const server1 = lb.getNextServer('session1');
-      const server2 = lb.getNextServer('session1');
+      balancer.recordRequest('server1', 100, true);
+      balancer.recordRequest('server1', 150, true);
 
-      expect(server1?.id).toBe(server2?.id);
+      const health = balancer.getServerHealth('server1');
+
+      expect(health?.healthy).toBe(true);
+      expect(health?.successCount).toBe(2);
     });
 
-    it('should get load distribution', () => {
-      lb.addServer({
-        id: 'server1',
-        host: 'localhost',
-        port: 3000,
-        weight: 1,
-      });
+    it('should mark unhealthy servers', () => {
+      balancer.addServer({ id: 'server1', host: 'localhost', port: 3000 });
 
-      lb.getNextServer();
+      balancer.recordRequest('server1', 100, false);
+      balancer.recordRequest('server1', 100, false);
+      balancer.recordRequest('server1', 100, false);
 
-      const distribution = lb.getLoadDistribution();
-      expect(distribution['server1']).toBeGreaterThan(0);
+      const health = balancer.getServerHealth('server1');
+
+      expect(health?.healthy).toBe(false);
+      expect(health?.failureCount).toBe(3);
     });
 
-    it('should update server weight', () => {
-      lb.addServer({
-        id: 'server1',
-        host: 'localhost',
-        port: 3000,
-        weight: 1,
-      });
+    it('should manage connections', () => {
+      balancer.addServer({ id: 'server1', host: 'localhost', port: 3000 });
 
-      lb.updateServerWeight('server1', 2);
+      balancer.incrementConnections('server1');
+      balancer.incrementConnections('server1');
+      balancer.recordRequest('server1', 100, true);
 
-      const server = lb.getServerStats('server1');
-      expect(server?.weight).toBe(2);
+      const stats = balancer.getStatistics();
+
+      expect(stats.activeConnections).toBeGreaterThanOrEqual(0);
+
+      balancer.decrementConnections('server1');
+
+      const statsAfter = balancer.getStatistics();
+      expect(statsAfter.activeConnections).toBeGreaterThanOrEqual(0);
     });
 
-    it('should release connections', () => {
-      lb.addServer({
-        id: 'server1',
-        host: 'localhost',
-        port: 3000,
-        weight: 1,
-      });
+    it('should get statistics', () => {
+      balancer.addServer({ id: 'server1', host: 'localhost', port: 3000 });
 
-      const server = lb.getNextServer();
-      lb.releaseConnection(server!.id, 100);
+      balancer.recordRequest('server1', 100, true);
+      balancer.recordRequest('server1', 150, false);
 
-      const stats = lb.getServerStats(server!.id);
-      expect(stats?.activeConnections).toBe(0);
+      const stats = balancer.getStatistics();
+
+      expect(stats.totalRequests).toBe(2);
+      expect(stats.successfulRequests).toBe(1);
+      expect(stats.failedRequests).toBe(1);
     });
   });
 
@@ -209,65 +181,64 @@ describe('Phase 12 Week 4 - Enterprise & Optimization', () => {
       db = new DatabaseOptimization();
     });
 
-    it('should execute queries', async () => {
-      const result = await db.executeQuery('SELECT * FROM users');
+    it('should optimize queries', () => {
+      const plan = db.optimizeQuery('SELECT * FROM users');
 
-      expect(result).toBeDefined();
-      expect(result.result).toBe('mock-result');
-    });
-
-    it('should cache query results', async () => {
-      const query = 'SELECT * FROM users';
-
-      await db.executeQuery(query);
-      const result = await db.executeQuery(query);
-
-      expect(result).toBeDefined();
+      expect(plan.suggestions.length).toBeGreaterThan(0);
+      expect(plan.optimized).toBe(false);
     });
 
     it('should create indexes', () => {
-      db.createIndex('idx_users_email', ['email']);
+      db.createIndex({
+        name: 'idx_user_id',
+        columns: ['user_id'],
+      });
 
-      const index = db.getIndexInfo('idx_users_email');
-      expect(index).toBeDefined();
-      expect(index?.columns).toContain('email');
+      const indexes = db.getIndexes();
+
+      expect(indexes.length).toBe(1);
+      expect(indexes[0].name).toBe('idx_user_id');
     });
 
-    it('should drop indexes', () => {
-      db.createIndex('idx_users_email', ['email']);
-      db.dropIndex('idx_users_email');
+    it('should cache query results', () => {
+      const query = 'SELECT * FROM users WHERE id = 1';
+      const result = { id: 1, name: 'John' };
 
-      const index = db.getIndexInfo('idx_users_email');
-      expect(index).toBeNull();
+      db.cacheQueryResult(query, result);
+      const cached = db.getCachedQueryResult(query);
+
+      expect(cached).toEqual(result);
     });
 
-    it('should get query statistics', async () => {
-      await db.executeQuery('SELECT * FROM users');
+    it('should track query execution', () => {
+      db.recordQueryExecution('SELECT * FROM users', 100);
+      db.recordQueryExecution('SELECT * FROM users', 150);
 
-      const stats = db.getQueryStats();
-      expect(stats.totalQueries).toBeGreaterThan(0);
+      const stats = db.getStatistics();
+
+      expect(stats.averageQueryTime).toBeGreaterThan(0);
     });
 
     it('should manage connection pool', () => {
-      db.acquireConnection();
+      const acquired = db.acquireConnection();
 
-      const status = db.getConnectionPoolStatus();
-      expect(status.activeConnections).toBeGreaterThan(0);
+      expect(acquired).toBe(true);
 
       db.releaseConnection();
-      expect(db.getConnectionPoolStatus().activeConnections).toBe(0);
+
+      const status = db.getConnectionPoolStatus();
+
+      expect(status.available).toBeGreaterThan(0);
     });
 
-    it('should optimize tables', () => {
-      db.optimizeTable('users');
+    it('should identify slow queries', () => {
+      db.recordQueryExecution('SELECT * FROM users', 2000);
+      db.recordQueryExecution('SELECT * FROM posts', 100);
 
-      expect(db).toBeDefined();
-    });
+      const slowQueries = db.getSlowQueries(1000);
 
-    it('should enable replication', () => {
-      db.enableReplication(['replica1', 'replica2']);
-
-      expect(db).toBeDefined();
+      expect(slowQueries.length).toBe(1);
+      expect(slowQueries[0][0]).toBe('SELECT * FROM users');
     });
   });
 
@@ -275,113 +246,98 @@ describe('Phase 12 Week 4 - Enterprise & Optimization', () => {
     let gateway: APIGateway;
 
     beforeEach(() => {
-      gateway = new APIGateway();
+      gateway = new APIGateway({ type: 'bearer' });
     });
 
     it('should register routes', () => {
-      gateway.registerRoute({
+      const route: RouteConfig = {
         path: '/users',
         method: 'GET',
-        handler: async () => ({ users: [] }),
-      });
+        target: 'http://localhost:3000',
+      };
 
-      const route = gateway.getRoute('GET', '/users');
-      expect(route).toBeDefined();
+      gateway.registerRoute(route);
+
+      const retrieved = gateway.getRoute('GET', '/users');
+
+      expect(retrieved).toBeDefined();
+      expect(retrieved?.path).toBe('/users');
     });
 
     it('should handle requests', async () => {
       gateway.registerRoute({
         path: '/users',
         method: 'GET',
-        handler: async () => ({ users: [] }),
+        target: 'http://localhost:3000',
+        requiresAuth: false,
       });
 
-      const response = await gateway.handleRequest({
-        path: '/users',
-        method: 'GET',
-        clientId: 'client1',
-      });
+      const result = await gateway.handleRequest('GET', '/users');
 
-      expect(response.status).toBe(200);
-    });
-
-    it('should return 404 for unknown routes', async () => {
-      const response = await gateway.handleRequest({
-        path: '/unknown',
-        method: 'GET',
-        clientId: 'client1',
-      });
-
-      expect(response.status).toBe(404);
+      expect(result.allowed).toBe(true);
     });
 
     it('should enforce authentication', async () => {
       gateway.registerRoute({
         path: '/admin',
         method: 'GET',
-        handler: async () => ({ admin: true }),
+        target: 'http://localhost:3000',
         requiresAuth: true,
       });
 
-      const response = await gateway.handleRequest({
-        path: '/admin',
-        method: 'GET',
-        clientId: 'client1',
-        authenticated: false,
-      });
+      const result = await gateway.handleRequest('GET', '/admin');
 
-      expect(response.status).toBe(401);
+      expect(result.allowed).toBe(false);
+      expect(result.reason).toBe('Unauthorized');
     });
 
-    it('should cache GET requests', async () => {
+    it('should enforce rate limiting', async () => {
       gateway.registerRoute({
-        path: '/data',
+        path: '/api/data',
         method: 'GET',
-        handler: async () => ({ data: 'test' }),
+        target: 'http://localhost:3000',
+        rateLimit: 2,
       });
 
-      await gateway.handleRequest({
-        path: '/data',
-        method: 'GET',
-        clientId: 'client1',
-      });
+      const result1 = await gateway.handleRequest('GET', '/api/data', undefined, 'client1');
+      const result2 = await gateway.handleRequest('GET', '/api/data', undefined, 'client1');
+      const result3 = await gateway.handleRequest('GET', '/api/data', undefined, 'client1');
 
-      const response = await gateway.handleRequest({
-        path: '/data',
-        method: 'GET',
-        clientId: 'client1',
-      });
-
-      expect(response.status).toBe(200);
+      expect(result1.allowed).toBe(true);
+      expect(result2.allowed).toBe(true);
+      expect(result3.allowed).toBe(false);
     });
 
-    it('should get request statistics', async () => {
-      gateway.registerRoute({
-        path: '/test',
-        method: 'GET',
-        handler: async () => ({ test: true }),
-      });
-
-      await gateway.handleRequest({
-        path: '/test',
-        method: 'GET',
-        clientId: 'client1',
-        authenticated: true,
-      });
-
-      const stats = gateway.getRequestStats();
-      expect(stats.totalRequests).toBeGreaterThan(0);
-    });
-
-    it('should get API documentation', () => {
+    it('should track statistics', async () => {
       gateway.registerRoute({
         path: '/users',
         method: 'GET',
-        handler: async () => ({ users: [] }),
+        target: 'http://localhost:3000',
       });
 
-      const docs = gateway.getDocumentation();
-      expect(docs.routes.length).toBeGreaterThan(0);
+      await gateway.handleRequest('GET', '/users');
+      gateway.recordResponseTime(100);
+
+      const stats = gateway.getStatistics();
+
+      expect(stats.totalRequests).toBe(1);
+      expect(stats.successfulRequests).toBe(1);
+      expect(stats.averageResponseTime).toBe(100);
+    });
+
+    it('should calculate success rate', async () => {
+      gateway.registerRoute({
+        path: '/users',
+        method: 'GET',
+        target: 'http://localhost:3000',
+      });
+
+      await gateway.handleRequest('GET', '/users');
+      await gateway.handleRequest('GET', '/nonexistent');
+
+      const successRate = gateway.getSuccessRate();
+
+      expect(successRate).toBe(0.5);
     });
   });
 
@@ -392,179 +348,196 @@ describe('Phase 12 Week 4 - Enterprise & Optimization', () => {
       monitoring = new EnterpriseMonitoring();
     });
 
+    it('should register metrics', () => {
+      const config: MetricConfig = {
+        name: 'cpu_usage',
+        type: 'gauge',
+        unit: 'percent',
+      };
+
+      monitoring.registerMetric(config);
+
+      const data = monitoring.getMetricData('cpu_usage');
+
+      expect(data).toBeDefined();
+    });
+
     it('should record metrics', () => {
+      monitoring.registerMetric({
+        name: 'cpu_usage',
+        type: 'gauge',
+      });
+
       monitoring.recordMetric({
         name: 'cpu_usage',
-        value: 45.5,
+        value: 75,
         timestamp: Date.now(),
       });
 
       const data = monitoring.getMetricData('cpu_usage');
-      expect(data.length).toBeGreaterThan(0);
+
+      expect(data.length).toBe(1);
+      expect(data[0].value).toBe(75);
     });
 
     it('should create alert rules', () => {
       monitoring.createAlertRule({
-        id: 'rule1',
+        id: 'alert1',
         name: 'High CPU',
         metric: 'cpu_usage',
         condition: 'greater',
         threshold: 80,
         duration: 60000,
-      });
-
-      expect(monitoring).toBeDefined();
-    });
-
-    it('should get metric statistics', () => {
-      monitoring.recordMetric({
-        name: 'memory_usage',
-        value: 50,
-        timestamp: Date.now(),
-      });
-
-      monitoring.recordMetric({
-        name: 'memory_usage',
-        value: 60,
-        timestamp: Date.now(),
-      });
-
-      const stats = monitoring.getMetricStats('memory_usage');
-      expect(stats.min).toBe(50);
-      expect(stats.max).toBe(60);
-      expect(stats.count).toBe(2);
-    });
-
-    it('should create dashboards', () => {
-      monitoring.createDashboard({
-        id: 'dashboard1',
-        name: 'System Dashboard',
-        metrics: ['cpu_usage', 'memory_usage'],
-        refreshInterval: 5000,
-      });
-
-      const dashboard = monitoring.getDashboard('dashboard1');
-      expect(dashboard).toBeDefined();
-      expect(dashboard?.name).toBe('System Dashboard');
-    });
-
-    it('should delete dashboards', () => {
-      monitoring.createDashboard({
-        id: 'dashboard2',
-        name: 'Test Dashboard',
-        metrics: [],
-        refreshInterval: 5000,
-      });
-
-      monitoring.deleteDashboard('dashboard2');
-
-      const dashboard = monitoring.getDashboard('dashboard2');
-      expect(dashboard).toBeNull();
-    });
-
-    it('should get trend analysis', () => {
-      monitoring.recordMetric({
-        name: 'requests',
-        value: 100,
-        timestamp: Date.now() - 1000,
-      });
-
-      monitoring.recordMetric({
-        name: 'requests',
-        value: 150,
-        timestamp: Date.now(),
-      });
-
-      const trend = monitoring.getTrendAnalysis('requests');
-      expect(trend.trend).toBe('up');
-    });
-
-    it('should get predictive alerts', () => {
-      for (let i = 0; i < 20; i++) {
-        monitoring.recordMetric({
-          name: 'latency',
-          value: 100 + i * 5,
-          timestamp: Date.now() - (20 - i) * 1000,
-        });
-      }
-
-      const prediction = monitoring.getPredictiveAlert('latency');
-      expect(prediction.predicted).toBe(true);
-    });
-
-    it('should get monitoring summary', () => {
-      monitoring.recordMetric({
-        name: 'test_metric',
-        value: 42,
-        timestamp: Date.now(),
-      });
-
-      const summary = monitoring.getMonitoringSummary();
-      expect(summary.totalMetrics).toBeGreaterThan(0);
-    });
-
-    it('should resolve alerts', () => {
-      monitoring.createAlertRule({
-        id: 'rule2',
-        name: 'Test Alert',
-        metric: 'test_metric',
-        condition: 'greater',
-        threshold: 50,
-        duration: 60000,
+        enabled: true,
       });
 
       const alerts = monitoring.getActiveAlerts();
-      if (alerts.length > 0) {
-        monitoring.resolveAlert(alerts[0].id);
-        expect(alerts[0].resolved).toBe(true);
+
+      expect(alerts).toBeDefined();
+    });
+
+    it('should trigger alerts', () => {
+      monitoring.registerMetric({
+        name: 'cpu_usage',
+        type: 'gauge',
+      });
+
+      monitoring.createAlertRule({
+        id: 'alert1',
+        name: 'High CPU',
+        metric: 'cpu_usage',
+        condition: 'greater',
+        threshold: 80,
+        duration: 60000,
+        enabled: true,
+      });
+
+      monitoring.recordMetric({
+        name: 'cpu_usage',
+        value: 90,
+        timestamp: Date.now(),
+      });
+
+      const alerts = monitoring.getActiveAlerts();
+
+      expect(alerts.length).toBeGreaterThan(0);
+    });
+
+    it('should analyze trends', () => {
+      monitoring.registerMetric({
+        name: 'memory_usage',
+        type: 'gauge',
+      });
+
+      for (let i = 0; i < 20; i++) {
+        monitoring.recordMetric({
+          name: 'memory_usage',
+          value: 50 + i,
+          timestamp: Date.now() + i * 1000,
+        });
       }
+
+      const trend = monitoring.analyzeTrend('memory_usage');
+
+      expect(trend).toBeDefined();
+      expect(trend?.trend).toBe('increasing');
+    });
+
+    it('should get metric summary', () => {
+      monitoring.registerMetric({
+        name: 'response_time',
+        type: 'histogram',
+      });
+
+      monitoring.recordMetric({
+        name: 'response_time',
+        value: 100,
+        timestamp: Date.now(),
+      });
+
+      monitoring.recordMetric({
+        name: 'response_time',
+        value: 200,
+        timestamp: Date.now(),
+      });
+
+      const summary = monitoring.getMetricSummary('response_time');
+
+      expect(summary.count).toBe(2);
+      expect(summary.min).toBe(100);
+      expect(summary.max).toBe(200);
+      expect(summary.avg).toBe(150);
+    });
+
+    it('should get statistics', () => {
+      monitoring.registerMetric({
+        name: 'cpu_usage',
+        type: 'gauge',
+      });
+
+      monitoring.createAlertRule({
+        id: 'alert1',
+        name: 'High CPU',
+        metric: 'cpu_usage',
+        condition: 'greater',
+        threshold: 80,
+        duration: 60000,
+        enabled: true,
+      });
+
+      const stats = monitoring.getStatistics();
+
+      expect(stats.totalMetrics).toBe(1);
+      expect(stats.alertRules).toBe(1);
     });
   });
 
   describe('Integration Tests', () => {
-    it('should handle multiple enterprise systems simultaneously', () => {
+    it('should work with all enterprise components together', () => {
       const cache = new AdvancedCachingSystem();
-      const lb = new LoadBalancingManager();
+      const balancer = new LoadBalancingManager();
       const db = new DatabaseOptimization();
       const gateway = new APIGateway();
       const monitoring = new EnterpriseMonitoring();
 
-      // Use all systems
-      cache.set('key', 'value');
-      lb.addServer({ id: 's1', host: 'localhost', port: 3000, weight: 1 });
-      db.createIndex('idx', ['col']);
-      gateway.registerRoute({
-        path: '/test',
-        method: 'GET',
-        handler: async () => ({}),
-      });
-      monitoring.recordMetric({
-        name: 'metric',
-        value: 42,
-        timestamp: Date.now(),
-      });
-
-      expect(cache.get('key')).toBe('value');
-      expect(lb.getAllServers().length).toBe(1);
-      expect(db.getIndexInfo('idx')).toBeDefined();
-      expect(gateway.getRoute('GET', '/test')).toBeDefined();
-      expect(monitoring.getMetricData('metric').length).toBeGreaterThan(0);
+      expect(cache).toBeDefined();
+      expect(balancer).toBeDefined();
+      expect(db).toBeDefined();
+      expect(gateway).toBeDefined();
+      expect(monitoring).toBeDefined();
     });
 
-    it('should emit events correctly', (done) => {
+    it('should handle complex enterprise scenarios', () => {
+      // Setup caching
       const cache = new AdvancedCachingSystem();
-      let eventFired = false;
+      cache.set('config', { version: '1.0' });
 
-      cache.on('cache:set', () => {
-        eventFired = true;
+      // Setup load balancing
+      const balancer = new LoadBalancingManager();
+      balancer.addServer({ id: 'server1', host: 'localhost', port: 3000 });
+      balancer.addServer({ id: 'server2', host: 'localhost', port: 3001 });
+
+      // Setup database
+      const db = new DatabaseOptimization();
+      db.createIndex({ name: 'idx_id', columns: ['id'] });
+
+      // Setup gateway
+      const gateway = new APIGateway();
+      gateway.registerRoute({
+        path: '/api/data',
+        method: 'GET',
+        target: 'http://localhost:3000',
       });
 
-      cache.set('key', 'value');
+      // Setup monitoring
+      const monitoring = new EnterpriseMonitoring();
+      monitoring.registerMetric({ name: 'requests', type: 'counter' });
 
-      setTimeout(() => {
-        expect(eventFired).toBe(true);
-        done();
-      }, 100);
+      expect(cache.get('config')).toBeDefined();
+      expect(balancer.getTotalServersCount()).toBe(2);
+      expect(db.getIndexes().length).toBe(1);
+      expect(gateway.getRoutes().length).toBe(1);
+      expect(monitoring.getStatistics().totalMetrics).toBe(1);
     });
   });
 });

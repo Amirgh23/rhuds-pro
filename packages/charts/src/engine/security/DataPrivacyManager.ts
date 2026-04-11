@@ -1,273 +1,357 @@
 /**
  * Data Privacy Manager
- * مدیریت حریم خصوصی داده برای حفاظت از اطلاعات حساس
- *
- * Features:
- * - Data classification
- * - PII detection
- * - Anonymization
- * - Retention policies
+ * GDPR/CCPA compliance, data retention, and privacy controls
  */
 
-import { EventEmitter } from 'events';
+export interface PrivacyPolicy {
+  dataRetentionDays: number;
+  allowDataSharing: boolean;
+  allowProfiling: boolean;
+  allowCookies: boolean;
+  allowAnalytics: boolean;
+  consentRequired: boolean;
+}
+
+export interface UserConsent {
+  userId: string;
+  timestamp: number;
+  policies: Record<string, boolean>;
+  ipAddress: string;
+  userAgent: string;
+}
 
 export interface DataClassification {
   level: 'public' | 'internal' | 'confidential' | 'restricted';
-  tags: string[];
-  owner: string;
-  createdAt: Date;
+  pii: boolean;
+  sensitive: boolean;
+  regulated: boolean;
 }
 
-export interface PIIPattern {
-  name: string;
-  regex: RegExp;
-  category: 'email' | 'phone' | 'ssn' | 'credit_card' | 'name' | 'address';
-  severity: 'low' | 'medium' | 'high';
-}
-
-export interface AnonymizationRule {
-  pattern: RegExp;
-  replacement: string;
-  category: string;
-}
-
-export interface RetentionPolicy {
+export interface PrivacyEvent {
+  id: string;
+  userId: string;
+  eventType: 'access' | 'modification' | 'deletion' | 'export' | 'consent';
+  timestamp: number;
   dataType: string;
-  retentionDays: number;
-  archiveAfterDays?: number;
-  deleteAfterDays: number;
+  details: Record<string, unknown>;
 }
 
-export class DataPrivacyManager extends EventEmitter {
-  private classifications: Map<string, DataClassification>;
-  private piiPatterns: PIIPattern[];
-  private anonymizationRules: AnonymizationRule[];
-  private retentionPolicies: Map<string, RetentionPolicy>;
-  private stats: {
-    dataClassified: number;
-    piiDetected: number;
-    dataAnonymized: number;
-    policyViolations: number;
-  };
+export interface DataSubject {
+  id: string;
+  email: string;
+  createdAt: number;
+  lastAccessedAt: number;
+  dataCollected: string[];
+  consentStatus: Record<string, boolean>;
+}
 
-  constructor() {
-    super();
-    this.classifications = new Map();
-    this.piiPatterns = [];
-    this.anonymizationRules = [];
-    this.retentionPolicies = new Map();
-    this.stats = {
-      dataClassified: 0,
-      piiDetected: 0,
-      dataAnonymized: 0,
-      policyViolations: 0,
+/**
+ * Data Privacy Manager
+ * Manages GDPR/CCPA compliance, data retention, and privacy controls
+ */
+export class DataPrivacyManager {
+  private policy: PrivacyPolicy;
+  private consents: Map<string, UserConsent> = new Map();
+  private dataSubjects: Map<string, DataSubject> = new Map();
+  private privacyEvents: PrivacyEvent[] = [];
+  private dataClassifications: Map<string, DataClassification> = new Map();
+  private deletionRequests: Map<string, number> = new Map();
+
+  constructor(policy: PrivacyPolicy) {
+    this.policy = policy;
+    this.initializeDataClassifications();
+  }
+
+  /**
+   * Initialize data classifications
+   */
+  private initializeDataClassifications(): void {
+    const classifications: Record<string, DataClassification> = {
+      email: { level: 'confidential', pii: true, sensitive: false, regulated: false },
+      phone: { level: 'confidential', pii: true, sensitive: false, regulated: false },
+      ssn: { level: 'restricted', pii: true, sensitive: true, regulated: true },
+      creditCard: { level: 'restricted', pii: false, sensitive: true, regulated: true },
+      medicalRecord: { level: 'restricted', pii: true, sensitive: true, regulated: true },
+      location: { level: 'confidential', pii: false, sensitive: true, regulated: false },
+      browsing: { level: 'internal', pii: false, sensitive: false, regulated: false },
+      preferences: { level: 'internal', pii: false, sensitive: false, regulated: false },
     };
 
-    this.initialize();
-  }
-
-  private initialize(): void {
-    this.registerDefaultPIIPatterns();
-    this.registerDefaultRetentionPolicies();
-    this.emit('initialized', { timestamp: Date.now() });
-  }
-
-  /**
-   * Register default PII patterns
-   */
-  private registerDefaultPIIPatterns(): void {
-    this.piiPatterns.push(
-      {
-        name: 'Email',
-        regex: /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g,
-        category: 'email',
-        severity: 'high',
-      },
-      {
-        name: 'Phone',
-        regex: /(\+\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/g,
-        category: 'phone',
-        severity: 'high',
-      },
-      {
-        name: 'SSN',
-        regex: /\d{3}-\d{2}-\d{4}/g,
-        category: 'ssn',
-        severity: 'high',
-      },
-      {
-        name: 'Credit Card',
-        regex: /\d{4}[\s-]?\d{4}[\s-]?\d{4}[\s-]?\d{4}/g,
-        category: 'credit_card',
-        severity: 'high',
-      }
-    );
-  }
-
-  /**
-   * Register default retention policies
-   */
-  private registerDefaultRetentionPolicies(): void {
-    this.retentionPolicies.set('user_data', {
-      dataType: 'user_data',
-      retentionDays: 365,
-      archiveAfterDays: 180,
-      deleteAfterDays: 730,
-    });
-
-    this.retentionPolicies.set('transaction_data', {
-      dataType: 'transaction_data',
-      retentionDays: 2555,
-      deleteAfterDays: 2555,
-    });
-
-    this.retentionPolicies.set('log_data', {
-      dataType: 'log_data',
-      retentionDays: 90,
-      deleteAfterDays: 90,
+    Object.entries(classifications).forEach(([key, value]) => {
+      this.dataClassifications.set(key, value);
     });
   }
 
   /**
-   * Classify data
+   * Record user consent
    */
-  public classifyData(
-    dataId: string,
-    level: DataClassification['level'],
-    tags: string[],
-    owner: string
-  ): void {
-    const classification: DataClassification = {
-      level,
-      tags,
-      owner,
-      createdAt: new Date(),
+  public recordConsent(
+    userId: string,
+    policies: Record<string, boolean>,
+    ipAddress: string,
+    userAgent: string
+  ): UserConsent {
+    const consent: UserConsent = {
+      userId,
+      timestamp: Date.now(),
+      policies,
+      ipAddress,
+      userAgent,
     };
 
-    this.classifications.set(dataId, classification);
-    this.stats.dataClassified++;
+    this.consents.set(userId, consent);
 
-    this.emit('data-classified', { dataId, level, tags });
+    // Create or update data subject
+    let subject = this.dataSubjects.get(userId);
+    if (!subject) {
+      subject = {
+        id: userId,
+        email: `user-${userId}@example.com`,
+        createdAt: Date.now(),
+        lastAccessedAt: Date.now(),
+        dataCollected: [],
+        consentStatus: policies,
+      };
+      this.dataSubjects.set(userId, subject);
+    } else {
+      subject.consentStatus = policies;
+    }
+
+    this.logPrivacyEvent(userId, 'consent', 'consent', { policies });
+
+    return consent;
   }
 
   /**
-   * Detect PII in data
+   * Get user consent
    */
-  public detectPII(data: string): Array<{ pattern: string; matches: string[]; severity: string }> {
-    const results: Array<{ pattern: string; matches: string[]; severity: string }> = [];
-
-    for (const pattern of this.piiPatterns) {
-      const matches = data.match(pattern.regex);
-
-      if (matches && matches.length > 0) {
-        results.push({
-          pattern: pattern.name,
-          matches,
-          severity: pattern.severity,
-        });
-
-        this.stats.piiDetected += matches.length;
-      }
-    }
-
-    if (results.length > 0) {
-      this.emit('pii-detected', { count: results.length, results });
-    }
-
-    return results;
+  public getUserConsent(userId: string): UserConsent | undefined {
+    return this.consents.get(userId);
   }
 
   /**
-   * Anonymize data
+   * Check if user consented to policy
    */
-  public anonymizeData(data: string): string {
-    let anonymized = data;
+  public hasConsent(userId: string, policyKey: string): boolean {
+    const consent = this.consents.get(userId);
+    if (!consent) return false;
 
-    for (const pattern of this.piiPatterns) {
-      anonymized = anonymized.replace(pattern.regex, this.generateMask(pattern.category));
-    }
-
-    this.stats.dataAnonymized++;
-    this.emit('data-anonymized', { original: data, anonymized });
-
-    return anonymized;
+    return consent.policies[policyKey] === true;
   }
 
   /**
-   * Generate mask for PII
+   * Withdraw consent
    */
-  private generateMask(category: string): string {
-    switch (category) {
-      case 'email':
-        return '[EMAIL_REDACTED]';
-      case 'phone':
-        return '[PHONE_REDACTED]';
-      case 'ssn':
-        return '[SSN_REDACTED]';
-      case 'credit_card':
-        return '[CARD_REDACTED]';
-      default:
-        return '[REDACTED]';
-    }
-  }
+  public withdrawConsent(userId: string, policyKey: string): boolean {
+    const consent = this.consents.get(userId);
+    if (!consent) return false;
 
-  /**
-   * Register anonymization rule
-   */
-  public registerAnonymizationRule(pattern: RegExp, replacement: string, category: string): void {
-    this.anonymizationRules.push({ pattern, replacement, category });
-    this.emit('rule-registered', { category });
-  }
+    consent.policies[policyKey] = false;
+    this.logPrivacyEvent(userId, 'consent', 'consent', { policyKey, action: 'withdraw' });
 
-  /**
-   * Check retention policy compliance
-   */
-  public checkRetentionCompliance(
-    dataType: string,
-    createdDate: Date
-  ): { compliant: boolean; daysRemaining: number } {
-    const policy = this.retentionPolicies.get(dataType);
-
-    if (!policy) {
-      return { compliant: true, daysRemaining: -1 };
-    }
-
-    const now = new Date();
-    const ageInDays = Math.floor((now.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24));
-    const compliant = ageInDays <= policy.deleteAfterDays;
-    const daysRemaining = policy.deleteAfterDays - ageInDays;
-
-    if (!compliant) {
-      this.stats.policyViolations++;
-      this.emit('policy-violation', { dataType, ageInDays, policy });
-    }
-
-    return { compliant, daysRemaining };
+    return true;
   }
 
   /**
    * Get data classification
    */
-  public getClassification(dataId: string): DataClassification | undefined {
-    return this.classifications.get(dataId);
+  public getDataClassification(dataType: string): DataClassification | undefined {
+    return this.dataClassifications.get(dataType);
   }
 
   /**
-   * Get retention policy
+   * Check if data is PII
    */
-  public getRetentionPolicy(dataType: string): RetentionPolicy | undefined {
-    return this.retentionPolicies.get(dataType);
+  public isPII(dataType: string): boolean {
+    const classification = this.dataClassifications.get(dataType);
+    return classification?.pii || false;
   }
 
   /**
-   * Get statistics
+   * Check if data is sensitive
    */
-  public getStats() {
-    return {
-      ...this.stats,
-      classifiedDataCount: this.classifications.size,
-      piiPatternsCount: this.piiPatterns.length,
-      retentionPoliciesCount: this.retentionPolicies.size,
+  public isSensitive(dataType: string): boolean {
+    const classification = this.dataClassifications.get(dataType);
+    return classification?.sensitive || false;
+  }
+
+  /**
+   * Log data access
+   */
+  public logDataAccess(
+    userId: string,
+    dataType: string,
+    details: Record<string, unknown> = {}
+  ): void {
+    this.logPrivacyEvent(userId, 'access', dataType, details);
+  }
+
+  /**
+   * Log data modification
+   */
+  public logDataModification(
+    userId: string,
+    dataType: string,
+    details: Record<string, unknown> = {}
+  ): void {
+    this.logPrivacyEvent(userId, 'modification', dataType, details);
+  }
+
+  /**
+   * Request data export
+   */
+  public requestDataExport(userId: string): PrivacyEvent {
+    const event = this.logPrivacyEvent(userId, 'export', 'all', { status: 'requested' });
+    return event;
+  }
+
+  /**
+   * Request data deletion (Right to be forgotten)
+   */
+  public requestDataDeletion(userId: string): boolean {
+    this.deletionRequests.set(userId, Date.now());
+    this.logPrivacyEvent(userId, 'deletion', 'all', { status: 'requested' });
+    return true;
+  }
+
+  /**
+   * Get deletion requests
+   */
+  public getDeletionRequests(): Map<string, number> {
+    return new Map(this.deletionRequests);
+  }
+
+  /**
+   * Process deletion request
+   */
+  public processDeletionRequest(userId: string): boolean {
+    if (!this.deletionRequests.has(userId)) return false;
+
+    // Remove user data
+    this.dataSubjects.delete(userId);
+    this.consents.delete(userId);
+    this.deletionRequests.delete(userId);
+
+    this.logPrivacyEvent(userId, 'deletion', 'all', { status: 'completed' });
+
+    return true;
+  }
+
+  /**
+   * Log privacy event
+   */
+  private logPrivacyEvent(
+    userId: string,
+    eventType: 'access' | 'modification' | 'deletion' | 'export' | 'consent',
+    dataType: string,
+    details: Record<string, unknown>
+  ): PrivacyEvent {
+    const event: PrivacyEvent = {
+      id: `event-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      userId,
+      eventType,
+      timestamp: Date.now(),
+      dataType,
+      details,
     };
+
+    this.privacyEvents.push(event);
+
+    // Update last accessed time
+    const subject = this.dataSubjects.get(userId);
+    if (subject) {
+      subject.lastAccessedAt = Date.now();
+    }
+
+    return event;
+  }
+
+  /**
+   * Get privacy events
+   */
+  public getPrivacyEvents(userId?: string, startTime?: number, endTime?: number): PrivacyEvent[] {
+    return this.privacyEvents.filter((event) => {
+      if (userId && event.userId !== userId) return false;
+      if (startTime && event.timestamp < startTime) return false;
+      if (endTime && event.timestamp > endTime) return false;
+      return true;
+    });
+  }
+
+  /**
+   * Check data retention compliance
+   */
+  public checkRetentionCompliance(): Record<string, unknown> {
+    const cutoffTime = Date.now() - this.policy.dataRetentionDays * 24 * 60 * 60 * 1000;
+    const expiredSubjects: string[] = [];
+
+    for (const [userId, subject] of this.dataSubjects) {
+      if (subject.lastAccessedAt < cutoffTime) {
+        expiredSubjects.push(userId);
+      }
+    }
+
+    return {
+      retentionDays: this.policy.dataRetentionDays,
+      expiredSubjects,
+      expiredCount: expiredSubjects.length,
+      totalSubjects: this.dataSubjects.size,
+    };
+  }
+
+  /**
+   * Get privacy compliance report
+   */
+  public getPrivacyComplianceReport(): Record<string, unknown> {
+    const totalUsers = this.dataSubjects.size;
+    const consentedUsers = Array.from(this.consents.values()).filter((c) =>
+      Object.values(c.policies).some((v) => v === true)
+    ).length;
+
+    const piiAccessEvents = this.privacyEvents.filter((e) => {
+      const classification = this.dataClassifications.get(e.dataType);
+      return classification?.pii && e.eventType === 'access';
+    });
+
+    return {
+      totalUsers,
+      consentedUsers,
+      consentRate: totalUsers > 0 ? (consentedUsers / totalUsers) * 100 : 0,
+      totalPrivacyEvents: this.privacyEvents.length,
+      piiAccessEvents: piiAccessEvents.length,
+      deletionRequests: this.deletionRequests.size,
+      dataRetentionCompliance: this.checkRetentionCompliance(),
+      policy: this.policy,
+    };
+  }
+
+  /**
+   * Get data subject info
+   */
+  public getDataSubjectInfo(userId: string): DataSubject | undefined {
+    return this.dataSubjects.get(userId);
+  }
+
+  /**
+   * Update privacy policy
+   */
+  public updatePrivacyPolicy(policy: Partial<PrivacyPolicy>): void {
+    this.policy = { ...this.policy, ...policy };
+  }
+
+  /**
+   * Anonymize user data
+   */
+  public anonymizeUserData(userId: string): boolean {
+    const subject = this.dataSubjects.get(userId);
+    if (!subject) return false;
+
+    // Replace identifying information
+    subject.email = `anonymous-${Math.random().toString(36).substr(2, 9)}@example.com`;
+    subject.id = `anon-${Math.random().toString(36).substr(2, 9)}`;
+
+    this.logPrivacyEvent(userId, 'modification', 'all', { action: 'anonymized' });
+
+    return true;
   }
 }

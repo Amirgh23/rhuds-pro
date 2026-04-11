@@ -1,323 +1,343 @@
 /**
- * Timeline Visualization
- * Visualize temporal data
- *
- * تصور خط زمانی
- * تصور داده های زمانی
+ * Timeline Visualization Engine
+ * Renders temporal data with event markers, zoom, pan, and annotations
  */
-
-import { EventEmitter } from 'events';
 
 export interface TimelineEvent {
   id: string;
   timestamp: number;
-  title: string;
+  label: string;
   description?: string;
   category?: string;
   color?: string;
-  metadata?: Record<string, any>;
-}
-
-export interface TimelineData {
-  id: string;
-  events: TimelineEvent[];
-  startTime: number;
-  endTime: number;
-  metadata?: Record<string, any>;
+  icon?: string;
 }
 
 export interface TimelineConfig {
-  orientation: 'horizontal' | 'vertical';
-  scale: 'linear' | 'logarithmic';
-  zoom: number;
-  pan: number;
-  showLabels: boolean;
-  eventSize: number;
+  startTime: number;
+  endTime: number;
+  height: number;
+  orientation?: 'horizontal' | 'vertical';
+  showGrid?: boolean;
+  gridInterval?: number;
 }
 
-export interface TimelineFilter {
-  categories?: string[];
-  startTime?: number;
-  endTime?: number;
-  searchText?: string;
+export interface TimelineRange {
+  start: number;
+  end: number;
+  duration: number;
 }
 
-export class TimelineVisualization extends EventEmitter {
-  private timelines: Map<string, TimelineData> = new Map();
-  private filteredEvents: Map<string, TimelineEvent[]> = new Map();
-  private annotations: Map<string, Map<string, string>> = new Map();
+export interface TimelineAnnotation {
+  id: string;
+  eventId: string;
+  text: string;
+  position: 'top' | 'bottom';
+  color?: string;
+}
+
+export interface EventCluster {
+  timestamp: number;
+  events: TimelineEvent[];
+  count: number;
+}
+
+/**
+ * TimelineVisualization - Advanced timeline rendering
+ */
+export class TimelineVisualization {
   private config: TimelineConfig;
-  private filters: Map<string, TimelineFilter> = new Map();
+  private events: Map<string, TimelineEvent> = new Map();
+  private annotations: Map<string, TimelineAnnotation> = new Map();
+  private currentRange: TimelineRange;
+  private zoomLevel: number = 1;
 
-  constructor() {
-    super();
+  constructor(config: TimelineConfig) {
     this.config = {
       orientation: 'horizontal',
-      scale: 'linear',
-      zoom: 1,
-      pan: 0,
-      showLabels: true,
-      eventSize: 10,
+      showGrid: true,
+      gridInterval: 1000,
+      ...config,
+    };
+
+    this.currentRange = {
+      start: config.startTime,
+      end: config.endTime,
+      duration: config.endTime - config.startTime,
     };
   }
 
   /**
-   * Load timeline data
+   * Add event to timeline
    */
-  loadTimeline(timelineData: TimelineData): void {
-    this.timelines.set(timelineData.id, timelineData);
-    this.sortEvents(timelineData.id);
-    this.filteredEvents.set(timelineData.id, [...timelineData.events]);
-    this.annotations.set(timelineData.id, new Map());
-    this.emit('timeline:loaded', { id: timelineData.id });
+  addEvent(event: TimelineEvent): void {
+    this.events.set(event.id, event);
   }
 
   /**
-   * Sort events by timestamp
+   * Add multiple events
    */
-  private sortEvents(timelineId: string): void {
-    const timeline = this.timelines.get(timelineId);
-    if (!timeline) return;
-
-    timeline.events.sort((a, b) => a.timestamp - b.timestamp);
-    this.emit('events:sorted', { id: timelineId });
+  addEvents(events: TimelineEvent[]): void {
+    for (const event of events) {
+      this.addEvent(event);
+    }
   }
 
   /**
-   * Apply filter
+   * Remove event
    */
-  applyFilter(timelineId: string, filter: TimelineFilter): void {
-    const timeline = this.timelines.get(timelineId);
-    if (!timeline) return;
-
-    this.filters.set(timelineId, filter);
-
-    let filtered = [...timeline.events];
-
-    if (filter.categories && filter.categories.length > 0) {
-      filtered = filtered.filter((e) => filter.categories!.includes(e.category || ''));
-    }
-
-    if (filter.startTime !== undefined) {
-      filtered = filtered.filter((e) => e.timestamp >= filter.startTime!);
-    }
-
-    if (filter.endTime !== undefined) {
-      filtered = filtered.filter((e) => e.timestamp <= filter.endTime!);
-    }
-
-    if (filter.searchText) {
-      const text = filter.searchText.toLowerCase();
-      filtered = filtered.filter(
-        (e) => e.title.toLowerCase().includes(text) || e.description?.toLowerCase().includes(text)
-      );
-    }
-
-    this.filteredEvents.set(timelineId, filtered);
-    this.emit('filter:applied', { id: timelineId, count: filtered.length });
+  removeEvent(eventId: string): boolean {
+    return this.events.delete(eventId);
   }
 
   /**
-   * Clear filter
+   * Get event by ID
    */
-  clearFilter(timelineId: string): void {
-    const timeline = this.timelines.get(timelineId);
-    if (!timeline) return;
+  getEvent(eventId: string): TimelineEvent | undefined {
+    return this.events.get(eventId);
+  }
 
-    this.filters.delete(timelineId);
-    this.filteredEvents.set(timelineId, [...timeline.events]);
-    this.emit('filter:cleared', { id: timelineId });
+  /**
+   * Get events in time range
+   */
+  getEventsInRange(start: number, end: number): TimelineEvent[] {
+    return Array.from(this.events.values()).filter(
+      (event) => event.timestamp >= start && event.timestamp <= end
+    );
+  }
+
+  /**
+   * Get events in current view
+   */
+  getVisibleEvents(): TimelineEvent[] {
+    return this.getEventsInRange(this.currentRange.start, this.currentRange.end);
   }
 
   /**
    * Add annotation
    */
-  addAnnotation(timelineId: string, eventId: string, annotation: string): void {
-    let annotations = this.annotations.get(timelineId);
-    if (!annotations) {
-      annotations = new Map();
-      this.annotations.set(timelineId, annotations);
-    }
-
-    annotations.set(eventId, annotation);
-    this.emit('annotation:added', { timelineId, eventId });
+  addAnnotation(annotation: TimelineAnnotation): void {
+    this.annotations.set(annotation.id, annotation);
   }
 
   /**
    * Remove annotation
    */
-  removeAnnotation(timelineId: string, eventId: string): void {
-    const annotations = this.annotations.get(timelineId);
-    if (annotations) {
-      annotations.delete(eventId);
-      this.emit('annotation:removed', { timelineId, eventId });
+  removeAnnotation(annotationId: string): boolean {
+    return this.annotations.delete(annotationId);
+  }
+
+  /**
+   * Get annotations for event
+   */
+  getAnnotationsForEvent(eventId: string): TimelineAnnotation[] {
+    return Array.from(this.annotations.values()).filter((ann) => ann.eventId === eventId);
+  }
+
+  /**
+   * Zoom in
+   */
+  zoomIn(factor: number = 1.5): void {
+    this.zoomLevel *= factor;
+    this.updateRangeForZoom();
+  }
+
+  /**
+   * Zoom out
+   */
+  zoomOut(factor: number = 1.5): void {
+    this.zoomLevel /= factor;
+    this.updateRangeForZoom();
+  }
+
+  /**
+   * Update range based on zoom level
+   */
+  private updateRangeForZoom(): void {
+    const originalDuration = this.config.endTime - this.config.startTime;
+    const newDuration = originalDuration / this.zoomLevel;
+    const center = (this.currentRange.start + this.currentRange.end) / 2;
+
+    this.currentRange.start = center - newDuration / 2;
+    this.currentRange.end = center + newDuration / 2;
+    this.currentRange.duration = newDuration;
+
+    // Clamp to original range
+    if (this.currentRange.start < this.config.startTime) {
+      this.currentRange.start = this.config.startTime;
+      this.currentRange.end = this.currentRange.start + newDuration;
+    }
+    if (this.currentRange.end > this.config.endTime) {
+      this.currentRange.end = this.config.endTime;
+      this.currentRange.start = this.currentRange.end - newDuration;
     }
   }
 
   /**
-   * Get annotation
+   * Pan timeline
    */
-  getAnnotation(timelineId: string, eventId: string): string | null {
-    const annotations = this.annotations.get(timelineId);
-    return annotations?.get(eventId) || null;
-  }
+  pan(delta: number): void {
+    const newStart = this.currentRange.start + delta;
+    const newEnd = this.currentRange.end + delta;
 
-  /**
-   * Calculate event positions
-   */
-  calculatePositions(timelineId: string): Map<string, { position: number; label: string }> {
-    const timeline = this.timelines.get(timelineId);
-    const filtered = this.filteredEvents.get(timelineId);
-
-    if (!timeline || !filtered) return new Map();
-
-    const positions = new Map<string, { position: number; label: string }>();
-    const timeRange = timeline.endTime - timeline.startTime;
-
-    filtered.forEach((event) => {
-      let position = (event.timestamp - timeline.startTime) / timeRange;
-
-      if (this.config.scale === 'logarithmic') {
-        position = Math.log(position + 1) / Math.log(2);
-      }
-
-      position = position * this.config.zoom + this.config.pan;
-
-      positions.set(event.id, {
-        position: Math.max(0, Math.min(1, position)),
-        label: new Date(event.timestamp).toLocaleDateString(),
-      });
-    });
-
-    return positions;
-  }
-
-  /**
-   * Get events in range
-   */
-  getEventsInRange(timelineId: string, startTime: number, endTime: number): TimelineEvent[] {
-    const filtered = this.filteredEvents.get(timelineId);
-    if (!filtered) return [];
-
-    return filtered.filter((e) => e.timestamp >= startTime && e.timestamp <= endTime);
-  }
-
-  /**
-   * Get timeline
-   */
-  getTimeline(timelineId: string): TimelineData | null {
-    return this.timelines.get(timelineId) || null;
-  }
-
-  /**
-   * Get filtered events
-   */
-  getFilteredEvents(timelineId: string): TimelineEvent[] {
-    return this.filteredEvents.get(timelineId) || [];
-  }
-
-  /**
-   * Set zoom
-   */
-  setZoom(zoom: number): void {
-    this.config.zoom = Math.max(0.1, Math.min(10, zoom));
-    this.emit('zoom:changed', { zoom: this.config.zoom });
-  }
-
-  /**
-   * Set pan
-   */
-  setPan(pan: number): void {
-    this.config.pan = Math.max(-1, Math.min(1, pan));
-    this.emit('pan:changed', { pan: this.config.pan });
-  }
-
-  /**
-   * Set orientation
-   */
-  setOrientation(orientation: 'horizontal' | 'vertical'): void {
-    this.config.orientation = orientation;
-    this.emit('orientation:changed', { orientation });
-  }
-
-  /**
-   * Get statistics
-   */
-  getStatistics(timelineId: string): {
-    totalEvents: number;
-    filteredEvents: number;
-    timeSpan: number;
-    categories: string[];
-  } {
-    const timeline = this.timelines.get(timelineId);
-    const filtered = this.filteredEvents.get(timelineId);
-
-    if (!timeline || !filtered) {
-      return {
-        totalEvents: 0,
-        filteredEvents: 0,
-        timeSpan: 0,
-        categories: [],
-      };
+    if (newStart >= this.config.startTime && newEnd <= this.config.endTime) {
+      this.currentRange.start = newStart;
+      this.currentRange.end = newEnd;
     }
+  }
 
-    const categories = Array.from(
-      new Set(timeline.events.map((e) => e.category || 'uncategorized'))
-    );
-
-    return {
-      totalEvents: timeline.events.length,
-      filteredEvents: filtered.length,
-      timeSpan: timeline.endTime - timeline.startTime,
-      categories,
+  /**
+   * Reset to full range
+   */
+  reset(): void {
+    this.zoomLevel = 1;
+    this.currentRange = {
+      start: this.config.startTime,
+      end: this.config.endTime,
+      duration: this.config.endTime - this.config.startTime,
     };
   }
 
   /**
-   * Export timeline
+   * Get current view range
    */
-  exportTimeline(timelineId: string, format: 'json' | 'csv'): string {
-    const timeline = this.timelines.get(timelineId);
-    const filtered = this.filteredEvents.get(timelineId);
+  getCurrentRange(): TimelineRange {
+    return { ...this.currentRange };
+  }
 
-    if (!timeline || !filtered) return '';
+  /**
+   * Get zoom level
+   */
+  getZoomLevel(): number {
+    return this.zoomLevel;
+  }
 
-    if (format === 'json') {
-      return JSON.stringify(
-        {
-          id: timelineId,
-          events: filtered,
-          metadata: timeline.metadata,
-        },
-        null,
-        2
-      );
-    } else {
-      // CSV format
-      const headers = ['ID', 'Timestamp', 'Title', 'Description', 'Category'];
-      const rows = filtered.map((e) => [
-        e.id,
-        new Date(e.timestamp).toISOString(),
-        e.title,
-        e.description || '',
-        e.category || '',
-      ]);
+  /**
+   * Cluster events by time
+   */
+  clusterEvents(interval: number): EventCluster[] {
+    const clusters = new Map<number, TimelineEvent[]>();
 
-      const csv = [headers, ...rows]
-        .map((row) => row.map((cell) => `"${cell}"`).join(','))
-        .join('\n');
-      return csv;
+    for (const event of this.getVisibleEvents()) {
+      const clusterTime = Math.floor(event.timestamp / interval) * interval;
+      if (!clusters.has(clusterTime)) {
+        clusters.set(clusterTime, []);
+      }
+      clusters.get(clusterTime)!.push(event);
+    }
+
+    return Array.from(clusters.entries())
+      .map(([timestamp, events]) => ({
+        timestamp,
+        events,
+        count: events.length,
+      }))
+      .sort((a, b) => a.timestamp - b.timestamp);
+  }
+
+  /**
+   * Get grid lines for current view
+   */
+  getGridLines(): number[] {
+    if (!this.config.showGrid) return [];
+
+    const lines: number[] = [];
+    const interval = this.config.gridInterval! * this.zoomLevel;
+    const start = Math.ceil(this.currentRange.start / interval) * interval;
+    const end = Math.floor(this.currentRange.end / interval) * interval;
+
+    for (let time = start; time <= end; time += interval) {
+      lines.push(time);
+    }
+
+    return lines;
+  }
+
+  /**
+   * Convert timestamp to pixel position
+   */
+  timestampToPixel(timestamp: number, width: number): number {
+    const ratio = (timestamp - this.currentRange.start) / this.currentRange.duration;
+    return ratio * width;
+  }
+
+  /**
+   * Convert pixel position to timestamp
+   */
+  pixelToTimestamp(pixel: number, width: number): number {
+    const ratio = pixel / width;
+    return this.currentRange.start + ratio * this.currentRange.duration;
+  }
+
+  /**
+   * Get timeline statistics
+   */
+  getStatistics(): Record<string, number | string> {
+    const events = Array.from(this.events.values());
+    const timestamps = events.map((e) => e.timestamp);
+
+    if (timestamps.length === 0) {
+      return {
+        eventCount: 0,
+        annotationCount: 0,
+        timeSpan: 0,
+        eventsPerDay: 0,
+      };
+    }
+
+    const min = Math.min(...timestamps);
+    const max = Math.max(...timestamps);
+    const timeSpan = max - min;
+    const eventsPerDay = (events.length / timeSpan) * (24 * 60 * 60 * 1000);
+
+    return {
+      eventCount: events.length,
+      annotationCount: this.annotations.size,
+      timeSpan,
+      eventsPerDay: Math.round(eventsPerDay * 100) / 100,
+      earliestEvent: new Date(min).toISOString(),
+      latestEvent: new Date(max).toISOString(),
+    };
+  }
+
+  /**
+   * Export timeline data
+   */
+  exportData(): Record<string, unknown> {
+    return {
+      config: this.config,
+      events: Array.from(this.events.values()),
+      annotations: Array.from(this.annotations.values()),
+      currentRange: this.currentRange,
+      zoomLevel: this.zoomLevel,
+    };
+  }
+
+  /**
+   * Import timeline data
+   */
+  importData(data: Record<string, unknown>): void {
+    if (data.events && Array.isArray(data.events)) {
+      this.events.clear();
+      for (const event of data.events as TimelineEvent[]) {
+        this.addEvent(event);
+      }
+    }
+
+    if (data.annotations && Array.isArray(data.annotations)) {
+      this.annotations.clear();
+      for (const annotation of data.annotations as TimelineAnnotation[]) {
+        this.addAnnotation(annotation);
+      }
     }
   }
 
   /**
-   * Remove timeline
+   * Clear all data
    */
-  removeTimeline(timelineId: string): void {
-    this.timelines.delete(timelineId);
-    this.filteredEvents.delete(timelineId);
-    this.annotations.delete(timelineId);
-    this.filters.delete(timelineId);
-    this.emit('timeline:removed', { id: timelineId });
+  clear(): void {
+    this.events.clear();
+    this.annotations.clear();
+    this.reset();
   }
 }

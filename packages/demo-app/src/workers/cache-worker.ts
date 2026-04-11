@@ -16,6 +16,31 @@ interface CacheMetrics {
   timestamp: number;
 }
 
+/**
+ * Cloudflare Environment variables
+ */
+interface CloudflareEnv {
+  CACHE_BUCKET?: unknown;
+  CACHE_KV?: unknown;
+  CACHE_TTL?: string;
+}
+
+/**
+ * Cloudflare Context
+ */
+interface CloudflareContext {
+  waitUntil(promise: Promise<unknown>): void;
+  passThroughOnException(): void;
+}
+
+/**
+ * Scheduled event from Cloudflare
+ */
+interface ScheduledEvent {
+  cron: string;
+  scheduledTime: number;
+}
+
 // Cache configurations for different content types
 const CACHE_CONFIGS: Record<string, CacheConfig> = {
   // Static assets - cache forever
@@ -148,7 +173,7 @@ function getCacheHitRate(): number {
  * Main request handler
  */
 export default {
-  async fetch(request: Request, env: any, ctx: any): Promise<Response> {
+  async fetch(request: Request, env: CloudflareEnv, ctx: CloudflareContext): Promise<Response> {
     // Only cache GET requests
     if (request.method !== 'GET') {
       return fetch(request);
@@ -159,7 +184,7 @@ export default {
     const cacheConfig = getCacheConfig(url.toString());
 
     // Try to get from cache
-    const cache = caches.default;
+    const cache = caches.default as Cache;
     let response = await cache.match(cacheKey);
 
     if (response) {
@@ -191,7 +216,12 @@ export default {
         newResponse.headers.set('X-Cache-Hit-Rate', getCacheHitRate().toFixed(2));
 
         // Cache the response
-        ctx.waitUntil(cache.put(cacheKey, newResponse.clone()));
+        ctx.waitUntil(
+          (cache as unknown as { put: (key: string, response: Response) => Promise<void> }).put(
+            cacheKey,
+            newResponse.clone()
+          )
+        );
 
         return newResponse;
       }
@@ -212,7 +242,11 @@ export default {
   /**
    * Scheduled handler for cache maintenance
    */
-  async scheduled(event: any, env: any, ctx: any): Promise<void> {
+  async scheduled(
+    event: ScheduledEvent,
+    env: CloudflareEnv,
+    ctx: CloudflareContext
+  ): Promise<void> {
     // Reset metrics every 6 hours
     cacheMetrics = {
       hits: 0,

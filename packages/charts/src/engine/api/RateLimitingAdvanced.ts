@@ -1,347 +1,259 @@
 /**
  * Rate Limiting Advanced
- * محدودیت نرخ پیشرفته برای کنترل ترافیک
- *
- * Features:
- * - Token bucket algorithm
- * - Sliding window
- * - Per-user limits
- * - Dynamic adjustment
+ * Advanced rate limiting strategies and quota management
  */
 
-import { EventEmitter } from 'events';
-
 export interface RateLimitConfig {
-  algorithm: 'token-bucket' | 'sliding-window' | 'fixed-window';
-  requestsPerSecond: number;
-  burstSize: number;
-  windowSize: number;
+  strategy: 'fixed-window' | 'sliding-window' | 'token-bucket' | 'leaky-bucket';
+  requestsPerWindow: number;
+  windowSize: number; // milliseconds
+  burstSize?: number;
 }
 
-export interface UserLimit {
+export interface RateLimitQuota {
   userId: string;
+  endpoint: string;
   limit: number;
   remaining: number;
   resetTime: number;
-  tokens?: number;
-  lastRefill?: number;
 }
 
-export interface RateLimitStatus {
-  allowed: boolean;
-  remaining: number;
-  resetTime: number;
-  retryAfter?: number;
+export interface RateLimitRule {
+  pattern: string;
+  config: RateLimitConfig;
+  priority: number;
 }
 
-export interface DynamicLimitRule {
-  condition: (metrics: any) => boolean;
-  newLimit: number;
-  duration: number;
-}
-
-export class RateLimitingAdvanced extends EventEmitter {
-  private config: RateLimitConfig;
-  private userLimits: Map<string, UserLimit>;
-  private globalTokens: number;
-  private lastRefill: number;
-  private dynamicRules: DynamicLimitRule[];
-  private stats: {
-    requestsAllowed: number;
-    requestsBlocked: number;
-    limitExceeded: number;
+/**
+ * RateLimitingAdvanced - Advanced rate limiting
+ */
+export class RateLimitingAdvanced {
+  private rules: Map<string, RateLimitRule> = new Map();
+  private quotas: Map<string, RateLimitQuota> = new Map();
+  private tokens: Map<string, number> = new Map();
+  private listeners: Set<(event: string, data: unknown) => void> = new Set();
+  private defaultConfig: RateLimitConfig = {
+    strategy: 'token-bucket',
+    requestsPerWindow: 100,
+    windowSize: 60000,
+    burstSize: 10,
   };
 
-  constructor(config: RateLimitConfig) {
-    super();
-    this.config = config;
-    this.userLimits = new Map();
-    this.globalTokens = config.burstSize;
-    this.lastRefill = Date.now();
-    this.dynamicRules = [];
-    this.stats = {
-      requestsAllowed: 0,
-      requestsBlocked: 0,
-      limitExceeded: 0,
-    };
-
-    this.initialize();
+  constructor(defaultConfig?: RateLimitConfig) {
+    if (defaultConfig) {
+      this.defaultConfig = defaultConfig;
+    }
   }
 
-  private initialize(): void {
-    this.startRefillTimer();
-    this.emit('initialized', { algorithm: this.config.algorithm });
+  /**
+   * Register rate limit rule
+   */
+  registerRule(pattern: string, config: RateLimitConfig, priority: number = 0): void {
+    this.rules.set(pattern, { pattern, config, priority });
+    this.emit('rule_registered', { pattern, config });
+  }
+
+  /**
+   * Get rule for endpoint
+   */
+  getRuleForEndpoint(endpoint: string): RateLimitRule | null {
+    let bestRule: RateLimitRule | null = null;
+    let bestPriority = -Infinity;
+
+    for (const rule of this.rules.values()) {
+      if (this.matchPattern(rule.pattern, endpoint) && rule.priority > bestPriority) {
+        bestRule = rule;
+        bestPriority = rule.priority;
+      }
+    }
+
+    return bestRule;
+  }
+
+  /**
+   * Match pattern
+   */
+  private matchPattern(pattern: string, endpoint: string): boolean {
+    const regex = new RegExp(`^${pattern.replace(/\*/g, '.*')}$`);
+    return regex.test(endpoint);
   }
 
   /**
    * Check rate limit
    */
-  public checkLimit(userId: string, endpoint?: string): RateLimitStatus {
-    switch (this.config.algorithm) {
-      case 'token-bucket':
-        return this.checkTokenBucket(userId);
-      case 'sliding-window':
-        return this.checkSlidingWindow(userId);
+  checkRateLimit(userId: string, endpoint: string): boolean {
+    const key = `${userId}:${endpoint}`;
+    const rule = this.getRuleForEndpoint(endpoint);
+    const config = rule?.config || this.defaultConfig;
+
+    switch (config.strategy) {
       case 'fixed-window':
-        return this.checkFixedWindow(userId);
+        return this.checkFixedWindow(key, config);
+      case 'sliding-window':
+        return this.checkSlidingWindow(key, config);
+      case 'token-bucket':
+        return this.checkTokenBucket(key, config);
+      case 'leaky-bucket':
+        return this.checkLeakyBucket(key, config);
       default:
-        return this.checkTokenBucket(userId);
+        return true;
     }
   }
 
   /**
-   * Check token bucket algorithm
+   * Check fixed window
    */
-  private checkTokenBucket(userId: string): RateLimitStatus {
+  private checkFixedWindow(key: string, config: RateLimitConfig): boolean {
+    const quota = this.quotas.get(key);
     const now = Date.now();
-    let userLimit = this.userLimits.get(userId);
 
-    if (!userLimit) {
-      userLimit = {
-        userId,
-        limit: this.config.requestsPerSecond,
-        remaining: this.config.requestsPerSecond,
-        resetTime: now + 1000,
-        tokens: this.config.burstSize,
-        lastRefill: now,
-      };
-      this.userLimits.set(userId, userLimit);
+    if (!quota || now > quota.resetTime) {
+      this.quotas.set(key, {
+        userId: key.split(':')[0],
+        endpoint: key.split(':')[1],
+        limit: config.requestsPerWindow,
+        remaining: config.requestsPerWindow - 1,
+        resetTime: now + config.windowSize,
+      });
+      return true;
     }
 
-    // Refill tokens
-    const timePassed = (now - (userLimit.lastRefill || now)) / 1000;
-    const tokensToAdd = timePassed * this.config.requestsPerSecond;
-    userLimit.tokens = Math.min(this.config.burstSize, (userLimit.tokens || 0) + tokensToAdd);
-    userLimit.lastRefill = now;
-
-    if (userLimit.tokens >= 1) {
-      userLimit.tokens--;
-      userLimit.remaining--;
-      this.stats.requestsAllowed++;
-
-      this.emit('request-allowed', { userId, remaining: userLimit.remaining });
-
-      return {
-        allowed: true,
-        remaining: Math.floor(userLimit.remaining),
-        resetTime: userLimit.resetTime,
-      };
-    } else {
-      this.stats.requestsBlocked++;
-      this.stats.limitExceeded++;
-
-      const retryAfter = Math.ceil((1 - userLimit.tokens) / this.config.requestsPerSecond);
-
-      this.emit('request-blocked', { userId, retryAfter });
-
-      return {
-        allowed: false,
-        remaining: 0,
-        resetTime: userLimit.resetTime,
-        retryAfter,
-      };
+    if (quota.remaining > 0) {
+      quota.remaining--;
+      return true;
     }
+
+    this.emit('rate_limit_exceeded', { key });
+    return false;
   }
 
   /**
-   * Check sliding window algorithm
+   * Check sliding window
    */
-  private checkSlidingWindow(userId: string): RateLimitStatus {
+  private checkSlidingWindow(key: string, config: RateLimitConfig): boolean {
     const now = Date.now();
-    let userLimit = this.userLimits.get(userId);
+    const windowStart = now - config.windowSize;
 
-    if (!userLimit) {
-      userLimit = {
-        userId,
-        limit: this.config.requestsPerSecond,
-        remaining: this.config.requestsPerSecond,
-        resetTime: now + this.config.windowSize,
-      };
-      this.userLimits.set(userId, userLimit);
+    if (!this.tokens.has(key)) {
+      this.tokens.set(key, 0);
     }
 
-    // Check if window has expired
-    if (now > userLimit.resetTime) {
-      userLimit.remaining = this.config.requestsPerSecond;
-      userLimit.resetTime = now + this.config.windowSize;
+    const count = this.tokens.get(key)!;
+
+    if (count < config.requestsPerWindow) {
+      this.tokens.set(key, count + 1);
+      return true;
     }
 
-    if (userLimit.remaining > 0) {
-      userLimit.remaining--;
-      this.stats.requestsAllowed++;
-
-      this.emit('request-allowed', { userId, remaining: userLimit.remaining });
-
-      return {
-        allowed: true,
-        remaining: userLimit.remaining,
-        resetTime: userLimit.resetTime,
-      };
-    } else {
-      this.stats.requestsBlocked++;
-      this.stats.limitExceeded++;
-
-      const retryAfter = Math.ceil((userLimit.resetTime - now) / 1000);
-
-      this.emit('request-blocked', { userId, retryAfter });
-
-      return {
-        allowed: false,
-        remaining: 0,
-        resetTime: userLimit.resetTime,
-        retryAfter,
-      };
-    }
+    this.emit('rate_limit_exceeded', { key });
+    return false;
   }
 
   /**
-   * Check fixed window algorithm
+   * Check token bucket
    */
-  private checkFixedWindow(userId: string): RateLimitStatus {
+  private checkTokenBucket(key: string, config: RateLimitConfig): boolean {
     const now = Date.now();
-    const windowStart = Math.floor(now / this.config.windowSize) * this.config.windowSize;
-    const windowEnd = windowStart + this.config.windowSize;
+    const refillKey = `${key}:refill`;
+    const tokensKey = `${key}:tokens`;
 
-    let userLimit = this.userLimits.get(userId);
+    let tokens = this.tokens.get(tokensKey) || config.requestsPerWindow;
+    const lastRefill = (this.tokens.get(refillKey) as number) || now;
 
-    if (!userLimit || userLimit.resetTime !== windowEnd) {
-      userLimit = {
-        userId,
-        limit: this.config.requestsPerSecond,
-        remaining: this.config.requestsPerSecond,
-        resetTime: windowEnd,
-      };
-      this.userLimits.set(userId, userLimit);
+    // Refill tokens based on time passed
+    const timePassed = now - lastRefill;
+    const refillRate = config.requestsPerWindow / config.windowSize;
+    const tokensToAdd = timePassed * refillRate;
+    tokens = Math.min(tokens + tokensToAdd, config.burstSize || config.requestsPerWindow);
+
+    this.tokens.set(refillKey, now);
+
+    if (tokens >= 1) {
+      this.tokens.set(tokensKey, tokens - 1);
+      return true;
     }
 
-    if (userLimit.remaining > 0) {
-      userLimit.remaining--;
-      this.stats.requestsAllowed++;
-
-      this.emit('request-allowed', { userId, remaining: userLimit.remaining });
-
-      return {
-        allowed: true,
-        remaining: userLimit.remaining,
-        resetTime: userLimit.resetTime,
-      };
-    } else {
-      this.stats.requestsBlocked++;
-      this.stats.limitExceeded++;
-
-      const retryAfter = Math.ceil((userLimit.resetTime - now) / 1000);
-
-      this.emit('request-blocked', { userId, retryAfter });
-
-      return {
-        allowed: false,
-        remaining: 0,
-        resetTime: userLimit.resetTime,
-        retryAfter,
-      };
-    }
+    this.emit('rate_limit_exceeded', { key });
+    return false;
   }
 
   /**
-   * Add dynamic limit rule
+   * Check leaky bucket
    */
-  public addDynamicRule(rule: DynamicLimitRule): void {
-    this.dynamicRules.push(rule);
-    this.emit('dynamic-rule-added', { rules: this.dynamicRules.length });
-  }
+  private checkLeakyBucket(key: string, config: RateLimitConfig): boolean {
+    const now = Date.now();
+    let bucket = this.tokens.get(key) || 0;
 
-  /**
-   * Set user limit
-   */
-  public setUserLimit(userId: string, limit: number): void {
-    const userLimit = this.userLimits.get(userId);
+    // Leak from bucket
+    const lastLeak = (this.tokens.get(`${key}:leak`) as number) || now;
+    const timePassed = now - lastLeak;
+    const leakRate = config.requestsPerWindow / config.windowSize;
+    bucket = Math.max(0, bucket - leakRate * timePassed);
 
-    if (userLimit) {
-      userLimit.limit = limit;
-      userLimit.remaining = limit;
+    this.tokens.set(`${key}:leak`, now);
+
+    if (bucket < (config.burstSize || config.requestsPerWindow)) {
+      this.tokens.set(key, bucket + 1);
+      return true;
     }
 
-    this.emit('user-limit-set', { userId, limit });
+    this.emit('rate_limit_exceeded', { key });
+    return false;
   }
 
   /**
-   * Get user limit
+   * Get quota
    */
-  public getUserLimit(userId: string): UserLimit | undefined {
-    return this.userLimits.get(userId);
+  getQuota(userId: string, endpoint: string): RateLimitQuota | null {
+    const key = `${userId}:${endpoint}`;
+    return this.quotas.get(key) ?? null;
   }
 
   /**
-   * Reset user limit
+   * Reset quota
    */
-  public resetUserLimit(userId: string): void {
-    const userLimit = this.userLimits.get(userId);
-
-    if (userLimit) {
-      userLimit.remaining = userLimit.limit;
-      userLimit.resetTime = Date.now() + this.config.windowSize;
-
-      if (this.config.algorithm === 'token-bucket') {
-        userLimit.tokens = this.config.burstSize;
-      }
-    }
-
-    this.emit('user-limit-reset', { userId });
-  }
-
-  /**
-   * Start refill timer
-   */
-  private startRefillTimer(): void {
-    setInterval(() => {
-      this.refillGlobalTokens();
-    }, 1000 / this.config.requestsPerSecond);
-  }
-
-  /**
-   * Refill global tokens
-   */
-  private refillGlobalTokens(): void {
-    this.globalTokens = Math.min(this.config.burstSize, this.globalTokens + 1);
+  resetQuota(userId: string, endpoint: string): void {
+    const key = `${userId}:${endpoint}`;
+    this.quotas.delete(key);
+    this.tokens.delete(key);
+    this.emit('quota_reset', { userId, endpoint });
   }
 
   /**
    * Get statistics
    */
-  public getStats() {
+  getStatistics() {
     return {
-      ...this.stats,
-      allowRate:
-        this.stats.requestsAllowed / (this.stats.requestsAllowed + this.stats.requestsBlocked) || 0,
-      activeUsers: this.userLimits.size,
-      globalTokens: this.globalTokens,
+      totalRules: this.rules.size,
+      totalQuotas: this.quotas.size,
+      activeTokens: this.tokens.size,
     };
   }
 
   /**
-   * Get all user limits
+   * Emit event
    */
-  public getAllUserLimits(): UserLimit[] {
-    return Array.from(this.userLimits.values());
+  private emit(event: string, data: unknown): void {
+    for (const listener of this.listeners) {
+      try {
+        listener(event, data);
+      } catch (error) {
+        // Handle listener error
+      }
+    }
   }
 
   /**
-   * Clear expired limits
+   * Add listener
    */
-  public clearExpiredLimits(): void {
-    const now = Date.now();
-    const toDelete: string[] = [];
+  addListener(listener: (event: string, data: unknown) => void): void {
+    this.listeners.add(listener);
+  }
 
-    for (const [userId, limit] of this.userLimits) {
-      if (limit.resetTime < now) {
-        toDelete.push(userId);
-      }
-    }
-
-    for (const userId of toDelete) {
-      this.userLimits.delete(userId);
-    }
-
-    this.emit('expired-limits-cleared', { count: toDelete.length });
+  /**
+   * Remove listener
+   */
+  removeListener(listener: (event: string, data: unknown) => void): void {
+    this.listeners.delete(listener);
   }
 }

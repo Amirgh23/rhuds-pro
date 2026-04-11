@@ -1,349 +1,156 @@
 /**
  * Custom Chart Builder
- * Allow users to create custom charts
- *
- * سازنده نمودار سفارشی
- * اجازه دهید کاربران نمودارهای سفارشی ایجاد کنند
+ * Allows users to create custom charts with drag-and-drop, templates, and styling
  */
 
-import { EventEmitter } from 'events';
+export type ChartType =
+  | 'line'
+  | 'bar'
+  | 'scatter'
+  | 'pie'
+  | 'area'
+  | 'bubble'
+  | 'heatmap'
+  | 'network'
+  | 'timeline'
+  | 'custom';
 
 export interface ChartTemplate {
   id: string;
   name: string;
-  type: string;
-  config: Record<string, any>;
-  description?: string;
+  type: ChartType;
+  description: string;
+  config: Record<string, unknown>;
+  preview?: string;
 }
 
 export interface DataMapping {
-  source: string;
-  target: string;
-  transform?: (value: any) => any;
+  xAxis?: string;
+  yAxis?: string;
+  series?: string;
+  label?: string;
+  value?: string;
+  color?: string;
+  size?: string;
 }
 
 export interface ChartStyle {
   colors?: string[];
-  fonts?: { family: string; size: number };
-  margins?: { top: number; right: number; bottom: number; left: number };
-  padding?: number;
-  borderRadius?: number;
+  fontSize?: number;
+  fontFamily?: string;
   backgroundColor?: string;
-  gridLines?: boolean;
+  borderColor?: string;
+  borderWidth?: number;
+  padding?: number;
+  margin?: number;
+  opacity?: number;
+  [key: string]: unknown;
 }
 
-export interface CustomChart {
+export interface CustomChartConfig {
   id: string;
   name: string;
-  type: string;
-  data: Record<string, any>;
-  mappings: DataMapping[];
+  type: ChartType;
+  data: Record<string, unknown>[];
+  mapping: DataMapping;
   style: ChartStyle;
-  template?: string;
-  metadata?: Record<string, any>;
+  options?: Record<string, unknown>;
 }
 
-export class CustomChartBuilder extends EventEmitter {
-  private charts: Map<string, CustomChart> = new Map();
+export interface ChartExport {
+  format: 'json' | 'svg' | 'png' | 'csv';
+  data: unknown;
+}
+
+/**
+ * CustomChartBuilder - Advanced custom chart creation
+ */
+export class CustomChartBuilder {
   private templates: Map<string, ChartTemplate> = new Map();
-  private presets: Map<string, ChartStyle> = new Map();
+  private charts: Map<string, CustomChartConfig> = new Map();
+  private defaultTemplates: ChartTemplate[] = [];
 
   constructor() {
-    super();
-    this.initializeTemplates();
-    this.initializePresets();
+    this.initializeDefaultTemplates();
   }
 
   /**
-   * Initialize default templates
+   * Initialize default chart templates
    */
-  private initializeTemplates(): void {
-    const templates: ChartTemplate[] = [
+  private initializeDefaultTemplates(): void {
+    this.defaultTemplates = [
       {
-        id: 'bar-chart',
-        name: 'Bar Chart',
+        id: 'line-basic',
+        name: 'Basic Line Chart',
+        type: 'line',
+        description: 'Simple line chart for time series data',
+        config: {
+          showGrid: true,
+          showLegend: true,
+          showTooltip: true,
+          smooth: false,
+        },
+      },
+      {
+        id: 'bar-grouped',
+        name: 'Grouped Bar Chart',
         type: 'bar',
+        description: 'Grouped bar chart for comparing categories',
         config: {
           orientation: 'vertical',
-          stacked: false,
+          grouped: true,
           showLegend: true,
-          showGrid: true,
+          showValues: true,
         },
       },
       {
-        id: 'line-chart',
-        name: 'Line Chart',
-        type: 'line',
-        config: {
-          smooth: true,
-          showPoints: true,
-          showLegend: true,
-          showGrid: true,
-        },
-      },
-      {
-        id: 'pie-chart',
-        name: 'Pie Chart',
+        id: 'pie-donut',
+        name: 'Donut Chart',
         type: 'pie',
+        description: 'Donut chart for showing proportions',
         config: {
+          innerRadius: 0.4,
+          showLegend: true,
           showLabels: true,
-          showLegend: true,
-          donutHole: 0,
+          showPercentage: true,
         },
       },
       {
-        id: 'scatter-plot',
-        name: 'Scatter Plot',
-        type: 'scatter',
+        id: 'scatter-bubble',
+        name: 'Bubble Chart',
+        type: 'bubble',
+        description: 'Bubble chart for three-dimensional data',
         config: {
-          showTrendline: false,
-          pointSize: 5,
+          showGrid: true,
           showLegend: true,
+          minBubbleSize: 5,
+          maxBubbleSize: 50,
         },
       },
       {
-        id: 'area-chart',
-        name: 'Area Chart',
+        id: 'area-stacked',
+        name: 'Stacked Area Chart',
         type: 'area',
+        description: 'Stacked area chart for cumulative data',
         config: {
-          stacked: false,
-          smooth: true,
+          stacked: true,
+          showGrid: true,
           showLegend: true,
+          opacity: 0.7,
         },
       },
     ];
 
-    templates.forEach((template) => {
+    for (const template of this.defaultTemplates) {
       this.templates.set(template.id, template);
-    });
-  }
-
-  /**
-   * Initialize style presets
-   */
-  private initializePresets(): void {
-    const presets: Record<string, ChartStyle> = {
-      default: {
-        colors: ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd'],
-        fonts: { family: 'Arial', size: 12 },
-        margins: { top: 20, right: 20, bottom: 20, left: 20 },
-        padding: 10,
-        borderRadius: 4,
-        backgroundColor: '#ffffff',
-        gridLines: true,
-      },
-      dark: {
-        colors: ['#00d9ff', '#ff006e', '#ffbe0b', '#8338ec', '#3a86ff'],
-        fonts: { family: 'Courier New', size: 12 },
-        margins: { top: 20, right: 20, bottom: 20, left: 20 },
-        padding: 10,
-        borderRadius: 4,
-        backgroundColor: '#1a1a1a',
-        gridLines: true,
-      },
-      minimal: {
-        colors: ['#333333', '#666666', '#999999', '#cccccc', '#eeeeee'],
-        fonts: { family: 'Helvetica', size: 11 },
-        margins: { top: 10, right: 10, bottom: 10, left: 10 },
-        padding: 5,
-        borderRadius: 0,
-        backgroundColor: '#ffffff',
-        gridLines: false,
-      },
-      vibrant: {
-        colors: ['#ff006e', '#ffbe0b', '#00d9ff', '#8338ec', '#3a86ff'],
-        fonts: { family: 'Georgia', size: 13 },
-        margins: { top: 25, right: 25, bottom: 25, left: 25 },
-        padding: 15,
-        borderRadius: 8,
-        backgroundColor: '#f5f5f5',
-        gridLines: true,
-      },
-    };
-
-    Object.entries(presets).forEach(([name, style]) => {
-      this.presets.set(name, style);
-    });
-  }
-
-  /**
-   * Create chart from template
-   */
-  createFromTemplate(chartId: string, templateId: string, data: Record<string, any>): CustomChart {
-    const template = this.templates.get(templateId);
-    if (!template) {
-      throw new Error(`Template ${templateId} not found`);
-    }
-
-    const chart: CustomChart = {
-      id: chartId,
-      name: template.name,
-      type: template.type,
-      data,
-      mappings: [],
-      style: this.presets.get('default') || {},
-      template: templateId,
-    };
-
-    this.charts.set(chartId, chart);
-    this.emit('chart:created', { id: chartId, template: templateId });
-
-    return chart;
-  }
-
-  /**
-   * Create blank chart
-   */
-  createBlankChart(chartId: string, type: string, data: Record<string, any>): CustomChart {
-    const chart: CustomChart = {
-      id: chartId,
-      name: `Chart ${chartId}`,
-      type,
-      data,
-      mappings: [],
-      style: this.presets.get('default') || {},
-    };
-
-    this.charts.set(chartId, chart);
-    this.emit('chart:created', { id: chartId, type });
-
-    return chart;
-  }
-
-  /**
-   * Add data mapping
-   */
-  addMapping(chartId: string, mapping: DataMapping): void {
-    const chart = this.charts.get(chartId);
-    if (!chart) return;
-
-    chart.mappings.push(mapping);
-    this.emit('mapping:added', { chartId, mapping });
-  }
-
-  /**
-   * Remove mapping
-   */
-  removeMapping(chartId: string, source: string): void {
-    const chart = this.charts.get(chartId);
-    if (!chart) return;
-
-    chart.mappings = chart.mappings.filter((m) => m.source !== source);
-    this.emit('mapping:removed', { chartId, source });
-  }
-
-  /**
-   * Apply style preset
-   */
-  applyStylePreset(chartId: string, presetName: string): void {
-    const chart = this.charts.get(chartId);
-    const preset = this.presets.get(presetName);
-
-    if (!chart || !preset) return;
-
-    chart.style = { ...preset };
-    this.emit('style:applied', { chartId, preset: presetName });
-  }
-
-  /**
-   * Update style
-   */
-  updateStyle(chartId: string, style: Partial<ChartStyle>): void {
-    const chart = this.charts.get(chartId);
-    if (!chart) return;
-
-    chart.style = { ...chart.style, ...style };
-    this.emit('style:updated', { chartId, style });
-  }
-
-  /**
-   * Update data
-   */
-  updateData(chartId: string, data: Record<string, any>): void {
-    const chart = this.charts.get(chartId);
-    if (!chart) return;
-
-    chart.data = { ...chart.data, ...data };
-    this.emit('data:updated', { chartId });
-  }
-
-  /**
-   * Apply mappings to data
-   */
-  applyMappings(chartId: string): Record<string, any> {
-    const chart = this.charts.get(chartId);
-    if (!chart) return {};
-
-    const mapped = { ...chart.data };
-
-    chart.mappings.forEach((mapping) => {
-      if (mapping.source in mapped) {
-        const value = mapped[mapping.source];
-        mapped[mapping.target] = mapping.transform ? mapping.transform(value) : value;
-      }
-    });
-
-    return mapped;
-  }
-
-  /**
-   * Export chart
-   */
-  exportChart(chartId: string, format: 'json' | 'svg' | 'png'): string | Blob {
-    const chart = this.charts.get(chartId);
-    if (!chart) return '';
-
-    if (format === 'json') {
-      return JSON.stringify(chart, null, 2);
-    } else if (format === 'svg') {
-      return this.generateSVG(chart);
-    } else {
-      // PNG would require canvas rendering
-      return this.generateSVG(chart);
     }
   }
 
   /**
-   * Generate SVG representation
+   * Get template by ID
    */
-  private generateSVG(chart: CustomChart): string {
-    const width = 800;
-    const height = 600;
-    const style = chart.style;
-
-    let svg = `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">`;
-    svg += `<rect width="${width}" height="${height}" fill="${style.backgroundColor || '#fff'}"/>`;
-
-    // Add title
-    svg += `<text x="${width / 2}" y="30" text-anchor="middle" font-size="18" font-weight="bold">${chart.name}</text>`;
-
-    // Add chart type indicator
-    svg += `<text x="20" y="60" font-size="12" fill="#666">Type: ${chart.type}</text>`;
-
-    // Add data summary
-    const dataKeys = Object.keys(chart.data).slice(0, 3);
-    let yPos = 80;
-    dataKeys.forEach((key) => {
-      svg += `<text x="20" y="${yPos}" font-size="11" fill="#999">${key}: ${JSON.stringify(chart.data[key]).substring(0, 30)}</text>`;
-      yPos += 20;
-    });
-
-    svg += '</svg>';
-    return svg;
-  }
-
-  /**
-   * Get chart
-   */
-  getChart(chartId: string): CustomChart | null {
-    return this.charts.get(chartId) || null;
-  }
-
-  /**
-   * Get template
-   */
-  getTemplate(templateId: string): ChartTemplate | null {
-    return this.templates.get(templateId) || null;
+  getTemplate(templateId: string): ChartTemplate | undefined {
+    return this.templates.get(templateId);
   }
 
   /**
@@ -354,45 +161,283 @@ export class CustomChartBuilder extends EventEmitter {
   }
 
   /**
-   * Get style preset
+   * Get templates by type
    */
-  getStylePreset(presetName: string): ChartStyle | null {
-    return this.presets.get(presetName) || null;
+  getTemplatesByType(type: ChartType): ChartTemplate[] {
+    return Array.from(this.templates.values()).filter((t) => t.type === type);
   }
 
   /**
-   * Get all presets
+   * Create chart from template
    */
-  getAllPresets(): string[] {
-    return Array.from(this.presets.keys());
-  }
+  createFromTemplate(
+    chartId: string,
+    templateId: string,
+    data: Record<string, unknown>[],
+    mapping: DataMapping
+  ): CustomChartConfig {
+    const template = this.getTemplate(templateId);
+    if (!template) {
+      throw new Error(`Template not found: ${templateId}`);
+    }
 
-  /**
-   * Duplicate chart
-   */
-  duplicateChart(sourceId: string, newId: string): CustomChart | null {
-    const source = this.charts.get(sourceId);
-    if (!source) return null;
-
-    const duplicate: CustomChart = {
-      ...source,
-      id: newId,
-      name: `${source.name} (Copy)`,
-      mappings: [...source.mappings],
-      style: { ...source.style },
+    const config: CustomChartConfig = {
+      id: chartId,
+      name: template.name,
+      type: template.type,
+      data,
+      mapping,
+      style: this.getDefaultStyle(),
+      options: template.config,
     };
 
-    this.charts.set(newId, duplicate);
-    this.emit('chart:duplicated', { sourceId, newId });
-
-    return duplicate;
+    this.charts.set(chartId, config);
+    return config;
   }
 
   /**
-   * Remove chart
+   * Create custom chart
    */
-  removeChart(chartId: string): void {
-    this.charts.delete(chartId);
-    this.emit('chart:removed', { id: chartId });
+  createChart(
+    chartId: string,
+    type: ChartType,
+    data: Record<string, unknown>[],
+    mapping: DataMapping
+  ): CustomChartConfig {
+    const config: CustomChartConfig = {
+      id: chartId,
+      name: `Custom ${type} Chart`,
+      type,
+      data,
+      mapping,
+      style: this.getDefaultStyle(),
+      options: {},
+    };
+
+    this.charts.set(chartId, config);
+    return config;
+  }
+
+  /**
+   * Get default style
+   */
+  private getDefaultStyle(): ChartStyle {
+    return {
+      colors: [
+        '#1f77b4',
+        '#ff7f0e',
+        '#2ca02c',
+        '#d62728',
+        '#9467bd',
+        '#8c564b',
+        '#e377c2',
+        '#7f7f7f',
+        '#bcbd22',
+        '#17becf',
+      ],
+      fontSize: 12,
+      fontFamily: 'Arial, sans-serif',
+      backgroundColor: '#ffffff',
+      borderColor: '#cccccc',
+      borderWidth: 1,
+      padding: 10,
+      margin: 10,
+      opacity: 1,
+    };
+  }
+
+  /**
+   * Get chart by ID
+   */
+  getChart(chartId: string): CustomChartConfig | undefined {
+    return this.charts.get(chartId);
+  }
+
+  /**
+   * Update chart data
+   */
+  updateChartData(chartId: string, data: Record<string, unknown>[]): void {
+    const chart = this.charts.get(chartId);
+    if (chart) {
+      chart.data = data;
+    }
+  }
+
+  /**
+   * Update data mapping
+   */
+  updateDataMapping(chartId: string, mapping: Partial<DataMapping>): void {
+    const chart = this.charts.get(chartId);
+    if (chart) {
+      chart.mapping = { ...chart.mapping, ...mapping };
+    }
+  }
+
+  /**
+   * Update chart style
+   */
+  updateChartStyle(chartId: string, style: Partial<ChartStyle>): void {
+    const chart = this.charts.get(chartId);
+    if (chart) {
+      chart.style = { ...chart.style, ...style };
+    }
+  }
+
+  /**
+   * Update chart options
+   */
+  updateChartOptions(chartId: string, options: Record<string, unknown>): void {
+    const chart = this.charts.get(chartId);
+    if (chart) {
+      chart.options = { ...chart.options, ...options };
+    }
+  }
+
+  /**
+   * Validate chart configuration
+   */
+  validateChart(chartId: string): { valid: boolean; errors: string[] } {
+    const chart = this.charts.get(chartId);
+    const errors: string[] = [];
+
+    if (!chart) {
+      errors.push(`Chart not found: ${chartId}`);
+      return { valid: false, errors };
+    }
+
+    if (!chart.data || chart.data.length === 0) {
+      errors.push('Chart data is empty');
+    }
+
+    if (!chart.mapping || Object.keys(chart.mapping).length === 0) {
+      errors.push('Data mapping is not configured');
+    }
+
+    if (!chart.style || Object.keys(chart.style).length === 0) {
+      errors.push('Chart style is not configured');
+    }
+
+    return { valid: errors.length === 0, errors };
+  }
+
+  /**
+   * Clone chart
+   */
+  cloneChart(sourceId: string, newId: string): CustomChartConfig | undefined {
+    const source = this.charts.get(sourceId);
+    if (!source) return undefined;
+
+    const cloned: CustomChartConfig = {
+      ...source,
+      id: newId,
+      data: [...source.data],
+      mapping: { ...source.mapping },
+      style: { ...source.style },
+      options: { ...source.options },
+    };
+
+    this.charts.set(newId, cloned);
+    return cloned;
+  }
+
+  /**
+   * Delete chart
+   */
+  deleteChart(chartId: string): boolean {
+    return this.charts.delete(chartId);
+  }
+
+  /**
+   * Get all charts
+   */
+  getAllCharts(): CustomChartConfig[] {
+    return Array.from(this.charts.values());
+  }
+
+  /**
+   * Get charts by type
+   */
+  getChartsByType(type: ChartType): CustomChartConfig[] {
+    return Array.from(this.charts.values()).filter((c) => c.type === type);
+  }
+
+  /**
+   * Export chart
+   */
+  exportChart(chartId: string, format: 'json' | 'csv'): ChartExport | undefined {
+    const chart = this.charts.get(chartId);
+    if (!chart) return undefined;
+
+    if (format === 'json') {
+      return {
+        format: 'json',
+        data: chart,
+      };
+    }
+
+    if (format === 'csv') {
+      const csv = this.convertToCSV(chart);
+      return {
+        format: 'csv',
+        data: csv,
+      };
+    }
+
+    return undefined;
+  }
+
+  /**
+   * Convert chart data to CSV
+   */
+  private convertToCSV(chart: CustomChartConfig): string {
+    if (chart.data.length === 0) return '';
+
+    const headers = Object.keys(chart.data[0]);
+    const rows = chart.data.map((row) =>
+      headers.map((header) => {
+        const value = row[header];
+        return typeof value === 'string' && value.includes(',') ? `"${value}"` : value;
+      })
+    );
+
+    return [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
+  }
+
+  /**
+   * Import chart
+   */
+  importChart(config: CustomChartConfig): void {
+    this.charts.set(config.id, config);
+  }
+
+  /**
+   * Get chart statistics
+   */
+  getStatistics(): Record<string, number> {
+    const charts = Array.from(this.charts.values());
+    const typeCount = new Map<ChartType, number>();
+
+    for (const chart of charts) {
+      typeCount.set(chart.type, (typeCount.get(chart.type) || 0) + 1);
+    }
+
+    return {
+      totalCharts: charts.length,
+      totalTemplates: this.templates.size,
+      lineCharts: typeCount.get('line') || 0,
+      barCharts: typeCount.get('bar') || 0,
+      pieCharts: typeCount.get('pie') || 0,
+      scatterCharts: typeCount.get('scatter') || 0,
+      areaCharts: typeCount.get('area') || 0,
+      bubbleCharts: typeCount.get('bubble') || 0,
+      customCharts: typeCount.get('custom') || 0,
+    };
+  }
+
+  /**
+   * Clear all charts
+   */
+  clear(): void {
+    this.charts.clear();
   }
 }

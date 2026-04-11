@@ -1,464 +1,392 @@
-import { EventEmitter } from 'events';
+/**
+ * Compliance Automation
+ * Automated compliance checking, reporting, and remediation
+ */
 
-// ============================================================================
-// Types & Interfaces
-// ============================================================================
-
-interface ComplianceFramework {
-  id: string;
-  name: 'GDPR' | 'HIPAA' | 'SOC2' | 'PCI-DSS' | 'ISO27001';
+export interface ComplianceFramework {
+  name: string;
   version: string;
   requirements: ComplianceRequirement[];
-  enabled: boolean;
-  lastAuditDate?: Date;
-  nextAuditDate?: Date;
 }
 
-interface ComplianceRequirement {
-  id: string;
-  code: string;
-  description: string;
-  category: string;
-  status: 'compliant' | 'non-compliant' | 'partial' | 'not-applicable';
-  evidence?: string;
-  remediationDeadline?: Date;
-}
-
-interface AuditTrail {
-  id: string;
-  timestamp: Date;
-  action: string;
-  actor: string;
-  resource: string;
-  changes: Record<string, any>;
-  status: 'success' | 'failure';
-  details: Record<string, any>;
-}
-
-interface ComplianceReport {
+export interface ComplianceRequirement {
   id: string;
   framework: string;
-  generatedAt: Date;
-  period: { start: Date; end: Date };
-  compliantRequirements: number;
-  nonCompliantRequirements: number;
-  partialRequirements: number;
-  complianceScore: number;
-  findings: ComplianceFinding[];
-}
-
-interface ComplianceFinding {
-  id: string;
-  requirement: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
+  title: string;
   description: string;
-  remediation: string;
-  dueDate: Date;
+  category: string;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  automatable: boolean;
 }
 
-interface DataRetentionPolicy {
+export interface ComplianceCheck {
   id: string;
-  dataType: string;
-  retentionPeriod: number; // days
-  archiveAfter: number; // days
-  deleteAfter: number; // days
-  enabled: boolean;
+  requirementId: string;
+  timestamp: number;
+  status: 'pass' | 'fail' | 'warning' | 'not-applicable';
+  evidence: string;
+  details: Record<string, unknown>;
 }
 
-interface ConsentRecord {
+export interface ComplianceReport {
   id: string;
-  userId: string;
-  consentType: string;
-  granted: boolean;
-  timestamp: Date;
-  expiresAt?: Date;
-  ipAddress: string;
-  userAgent: string;
+  framework: string;
+  timestamp: number;
+  totalRequirements: number;
+  passedChecks: number;
+  failedChecks: number;
+  warningChecks: number;
+  complianceScore: number;
+  checks: ComplianceCheck[];
 }
 
-// ============================================================================
-// Compliance Automation
-// ============================================================================
+export interface RemediationAction {
+  id: string;
+  checkId: string;
+  action: string;
+  priority: 'low' | 'medium' | 'high' | 'critical';
+  estimatedTime: number;
+  status: 'pending' | 'in-progress' | 'completed' | 'failed';
+}
 
-export class ComplianceAutomation extends EventEmitter {
+/**
+ * Compliance Automation
+ * Automates compliance checking and reporting
+ */
+export class ComplianceAutomation {
   private frameworks: Map<string, ComplianceFramework> = new Map();
-  private auditTrails: AuditTrail[] = [];
-  private complianceReports: Map<string, ComplianceReport> = new Map();
-  private retentionPolicies: Map<string, DataRetentionPolicy> = new Map();
-  private consentRecords: Map<string, ConsentRecord> = new Map();
-  private automationRules: Map<string, AutomationRule> = new Map();
+  private checks: ComplianceCheck[] = [];
+  private reports: ComplianceReport[] = [];
+  private remediations: RemediationAction[] = [];
+  private checkSchedules: Map<string, number> = new Map();
 
   constructor() {
-    super();
     this.initializeFrameworks();
   }
 
-  // ========================================================================
-  // Framework Management
-  // ========================================================================
+  /**
+   * Initialize compliance frameworks
+   */
+  private initializeFrameworks(): void {
+    const frameworks: ComplianceFramework[] = [
+      {
+        name: 'GDPR',
+        version: '2018',
+        requirements: [
+          {
+            id: 'gdpr-1',
+            framework: 'GDPR',
+            title: 'Data Protection Impact Assessment',
+            description: 'Conduct DPIA for high-risk processing',
+            category: 'Data Protection',
+            severity: 'high',
+            automatable: true,
+          },
+          {
+            id: 'gdpr-2',
+            framework: 'GDPR',
+            title: 'Right to Access',
+            description: 'Provide data access within 30 days',
+            category: 'Data Subject Rights',
+            severity: 'high',
+            automatable: true,
+          },
+          {
+            id: 'gdpr-3',
+            framework: 'GDPR',
+            title: 'Data Breach Notification',
+            description: 'Notify authorities within 72 hours',
+            category: 'Incident Response',
+            severity: 'critical',
+            automatable: false,
+          },
+        ],
+      },
+      {
+        name: 'CCPA',
+        version: '2020',
+        requirements: [
+          {
+            id: 'ccpa-1',
+            framework: 'CCPA',
+            title: 'Consumer Rights Notice',
+            description: 'Provide privacy notice at collection',
+            category: 'Transparency',
+            severity: 'high',
+            automatable: true,
+          },
+          {
+            id: 'ccpa-2',
+            framework: 'CCPA',
+            title: 'Opt-Out Mechanism',
+            description: 'Provide clear opt-out option',
+            category: 'Consumer Rights',
+            severity: 'high',
+            automatable: true,
+          },
+        ],
+      },
+      {
+        name: 'HIPAA',
+        version: '2013',
+        requirements: [
+          {
+            id: 'hipaa-1',
+            framework: 'HIPAA',
+            title: 'Encryption of PHI',
+            description: 'Encrypt all protected health information',
+            category: 'Technical Safeguards',
+            severity: 'critical',
+            automatable: true,
+          },
+          {
+            id: 'hipaa-2',
+            framework: 'HIPAA',
+            title: 'Access Controls',
+            description: 'Implement access control mechanisms',
+            category: 'Technical Safeguards',
+            severity: 'high',
+            automatable: true,
+          },
+        ],
+      },
+      {
+        name: 'SOC2',
+        version: '2022',
+        requirements: [
+          {
+            id: 'soc2-1',
+            framework: 'SOC2',
+            title: 'Security Monitoring',
+            description: 'Monitor systems for security events',
+            category: 'Security',
+            severity: 'high',
+            automatable: true,
+          },
+          {
+            id: 'soc2-2',
+            framework: 'SOC2',
+            title: 'Incident Response',
+            description: 'Maintain incident response procedures',
+            category: 'Incident Response',
+            severity: 'high',
+            automatable: false,
+          },
+        ],
+      },
+    ];
 
-  registerFramework(
-    name: 'GDPR' | 'HIPAA' | 'SOC2' | 'PCI-DSS' | 'ISO27001',
-    version: string,
-    requirements: ComplianceRequirement[]
-  ): ComplianceFramework {
-    const id = `framework-${name}-${Date.now()}`;
-    const framework: ComplianceFramework = {
-      id,
-      name,
-      version,
-      requirements,
-      enabled: true,
-    };
-
-    this.frameworks.set(id, framework);
-    this.emit('framework-registered', { frameworkId: id, name });
-    return framework;
+    frameworks.forEach((fw) => this.frameworks.set(fw.name, fw));
   }
 
-  getFramework(frameworkId: string): ComplianceFramework | undefined {
-    return this.frameworks.get(frameworkId);
-  }
+  /**
+   * Run compliance check
+   */
+  public runComplianceCheck(requirementId: string, checkFunction: () => boolean): ComplianceCheck {
+    const requirement = this.findRequirement(requirementId);
+    if (!requirement) {
+      throw new Error(`Requirement ${requirementId} not found`);
+    }
 
-  listFrameworks(): ComplianceFramework[] {
-    return Array.from(this.frameworks.values());
-  }
+    let status: 'pass' | 'fail' | 'warning' | 'not-applicable' = 'pass';
+    let evidence = '';
 
-  updateRequirementStatus(
-    frameworkId: string,
-    requirementId: string,
-    status: 'compliant' | 'non-compliant' | 'partial' | 'not-applicable',
-    evidence?: string
-  ): ComplianceRequirement {
-    const framework = this.frameworks.get(frameworkId);
-    if (!framework) throw new Error(`Framework ${frameworkId} not found`);
+    try {
+      const result = checkFunction();
+      status = result ? 'pass' : 'fail';
+      evidence = result ? 'Check passed' : 'Check failed';
+    } catch (error) {
+      status = 'warning';
+      evidence = `Check error: ${error instanceof Error ? error.message : 'Unknown error'}`;
+    }
 
-    const requirement = framework.requirements.find((r) => r.id === requirementId);
-    if (!requirement) throw new Error(`Requirement ${requirementId} not found`);
-
-    requirement.status = status;
-    if (evidence) requirement.evidence = evidence;
-
-    this.emit('requirement-updated', { frameworkId, requirementId, status });
-    return requirement;
-  }
-
-  // ========================================================================
-  // Audit Trail Management
-  // ========================================================================
-
-  logAuditTrail(
-    action: string,
-    actor: string,
-    resource: string,
-    changes: Record<string, any>,
-    status: 'success' | 'failure' = 'success',
-    details: Record<string, any> = {}
-  ): AuditTrail {
-    const id = `audit-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    const trail: AuditTrail = {
-      id,
-      timestamp: new Date(),
-      action,
-      actor,
-      resource,
-      changes,
+    const check: ComplianceCheck = {
+      id: `check-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      requirementId,
+      timestamp: Date.now(),
       status,
-      details,
+      evidence,
+      details: {
+        framework: requirement.framework,
+        title: requirement.title,
+        automatable: requirement.automatable,
+      },
     };
 
-    this.auditTrails.push(trail);
-    this.emit('audit-logged', { auditId: id, action, actor });
-    return trail;
+    this.checks.push(check);
+
+    // Create remediation if failed
+    if (status === 'fail') {
+      this.createRemediationAction(check, requirement);
+    }
+
+    return check;
   }
 
-  getAuditTrails(limit: number = 100): AuditTrail[] {
-    return this.auditTrails.slice(-limit);
+  /**
+   * Find requirement
+   */
+  private findRequirement(requirementId: string): ComplianceRequirement | undefined {
+    for (const framework of this.frameworks.values()) {
+      const req = framework.requirements.find((r) => r.id === requirementId);
+      if (req) return req;
+    }
+    return undefined;
   }
 
-  getAuditTrailsByActor(actor: string): AuditTrail[] {
-    return this.auditTrails.filter((t) => t.actor === actor);
+  /**
+   * Create remediation action
+   */
+  private createRemediationAction(
+    check: ComplianceCheck,
+    requirement: ComplianceRequirement
+  ): void {
+    const action: RemediationAction = {
+      id: `remediation-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      checkId: check.id,
+      action: `Remediate: ${requirement.title}`,
+      priority: requirement.severity === 'critical' ? 'critical' : 'high',
+      estimatedTime: requirement.severity === 'critical' ? 1 : 4,
+      status: 'pending',
+    };
+
+    this.remediations.push(action);
   }
 
-  getAuditTrailsByResource(resource: string): AuditTrail[] {
-    return this.auditTrails.filter((t) => t.resource === resource);
-  }
+  /**
+   * Generate compliance report
+   */
+  public generateComplianceReport(framework: string): ComplianceReport {
+    const fw = this.frameworks.get(framework);
+    if (!fw) {
+      throw new Error(`Framework ${framework} not found`);
+    }
 
-  getAuditTrailsByDateRange(start: Date, end: Date): AuditTrail[] {
-    return this.auditTrails.filter((t) => t.timestamp >= start && t.timestamp <= end);
-  }
+    const frameworkChecks = this.checks.filter((c) => {
+      const req = this.findRequirement(c.requirementId);
+      return req?.framework === framework;
+    });
 
-  // ========================================================================
-  // Compliance Reporting
-  // ========================================================================
+    const passedChecks = frameworkChecks.filter((c) => c.status === 'pass').length;
+    const failedChecks = frameworkChecks.filter((c) => c.status === 'fail').length;
+    const warningChecks = frameworkChecks.filter((c) => c.status === 'warning').length;
 
-  generateComplianceReport(
-    frameworkId: string,
-    period: { start: Date; end: Date }
-  ): ComplianceReport {
-    const framework = this.frameworks.get(frameworkId);
-    if (!framework) throw new Error(`Framework ${frameworkId} not found`);
+    const totalRequirements = fw.requirements.length;
+    const complianceScore = totalRequirements > 0 ? (passedChecks / totalRequirements) * 100 : 0;
 
-    const compliant = framework.requirements.filter((r) => r.status === 'compliant').length;
-    const nonCompliant = framework.requirements.filter((r) => r.status === 'non-compliant').length;
-    const partial = framework.requirements.filter((r) => r.status === 'partial').length;
-
-    const total = framework.requirements.length;
-    const complianceScore = total > 0 ? (compliant / total) * 100 : 0;
-
-    const findings: ComplianceFinding[] = framework.requirements
-      .filter((r) => r.status !== 'compliant')
-      .map((r) => ({
-        id: `finding-${r.id}`,
-        requirement: r.code,
-        severity: r.status === 'non-compliant' ? 'high' : 'medium',
-        description: r.description,
-        remediation: `Remediate ${r.code}`,
-        dueDate: r.remediationDeadline || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-      }));
-
-    const reportId = `report-${frameworkId}-${Date.now()}`;
     const report: ComplianceReport = {
-      id: reportId,
-      framework: framework.name,
-      generatedAt: new Date(),
-      period,
-      compliantRequirements: compliant,
-      nonCompliantRequirements: nonCompliant,
-      partialRequirements: partial,
+      id: `report-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      framework,
+      timestamp: Date.now(),
+      totalRequirements,
+      passedChecks,
+      failedChecks,
+      warningChecks,
       complianceScore,
-      findings,
+      checks: frameworkChecks,
     };
 
-    this.complianceReports.set(reportId, report);
-    this.emit('report-generated', { reportId, framework: framework.name });
+    this.reports.push(report);
     return report;
   }
 
-  getComplianceReport(reportId: string): ComplianceReport | undefined {
-    return this.complianceReports.get(reportId);
+  /**
+   * Get compliance score
+   */
+  public getComplianceScore(framework: string): number {
+    const report = this.reports
+      .filter((r) => r.framework === framework)
+      .sort((a, b) => b.timestamp - a.timestamp)[0];
+
+    return report?.complianceScore || 0;
   }
 
-  listComplianceReports(): ComplianceReport[] {
-    return Array.from(this.complianceReports.values());
+  /**
+   * Get pending remediations
+   */
+  public getPendingRemediations(): RemediationAction[] {
+    return this.remediations.filter((r) => r.status === 'pending');
   }
 
-  // ========================================================================
-  // Data Retention Policies
-  // ========================================================================
-
-  createRetentionPolicy(
-    dataType: string,
-    retentionPeriod: number,
-    archiveAfter: number,
-    deleteAfter: number
-  ): DataRetentionPolicy {
-    const id = `policy-${dataType}-${Date.now()}`;
-    const policy: DataRetentionPolicy = {
-      id,
-      dataType,
-      retentionPeriod,
-      archiveAfter,
-      deleteAfter,
-      enabled: true,
-    };
-
-    this.retentionPolicies.set(id, policy);
-    this.emit('retention-policy-created', { policyId: id, dataType });
-    return policy;
+  /**
+   * Update remediation status
+   */
+  public updateRemediationStatus(
+    remediationId: string,
+    status: 'pending' | 'in-progress' | 'completed' | 'failed'
+  ): boolean {
+    const remediation = this.remediations.find((r) => r.id === remediationId);
+    if (remediation) {
+      remediation.status = status;
+      return true;
+    }
+    return false;
   }
 
-  getRetentionPolicy(policyId: string): DataRetentionPolicy | undefined {
-    return this.retentionPolicies.get(policyId);
+  /**
+   * Get compliance reports
+   */
+  public getComplianceReports(framework?: string): ComplianceReport[] {
+    if (framework) {
+      return this.reports.filter((r) => r.framework === framework);
+    }
+    return this.reports;
   }
 
-  listRetentionPolicies(): DataRetentionPolicy[] {
-    return Array.from(this.retentionPolicies.values());
+  /**
+   * Get framework requirements
+   */
+  public getFrameworkRequirements(framework: string): ComplianceRequirement[] {
+    const fw = this.frameworks.get(framework);
+    return fw?.requirements || [];
   }
 
-  enforceRetentionPolicies(): { archived: number; deleted: number } {
-    let archived = 0;
-    let deleted = 0;
-
-    this.retentionPolicies.forEach((policy) => {
-      if (policy.enabled) {
-        archived += Math.floor(Math.random() * 10);
-        deleted += Math.floor(Math.random() * 5);
-      }
-    });
-
-    this.emit('retention-enforced', { archived, deleted });
-    return { archived, deleted };
+  /**
+   * Get all frameworks
+   */
+  public getFrameworks(): string[] {
+    return Array.from(this.frameworks.keys());
   }
 
-  // ========================================================================
-  // Consent Management
-  // ========================================================================
-
-  recordConsent(
-    userId: string,
-    consentType: string,
-    granted: boolean,
-    ipAddress: string,
-    userAgent: string,
-    expiresAt?: Date
-  ): ConsentRecord {
-    const id = `consent-${userId}-${consentType}-${Date.now()}`;
-    const record: ConsentRecord = {
-      id,
-      userId,
-      consentType,
-      granted,
-      timestamp: new Date(),
-      expiresAt,
-      ipAddress,
-      userAgent,
-    };
-
-    this.consentRecords.set(id, record);
-    this.emit('consent-recorded', { userId, consentType, granted });
-    return record;
+  /**
+   * Schedule compliance check
+   */
+  public scheduleComplianceCheck(framework: string, intervalMs: number): void {
+    this.checkSchedules.set(framework, intervalMs);
   }
 
-  getConsentRecord(recordId: string): ConsentRecord | undefined {
-    return this.consentRecords.get(recordId);
+  /**
+   * Get check schedules
+   */
+  public getCheckSchedules(): Map<string, number> {
+    return new Map(this.checkSchedules);
   }
 
-  getUserConsents(userId: string): ConsentRecord[] {
-    return Array.from(this.consentRecords.values()).filter((c) => c.userId === userId);
-  }
+  /**
+   * Get compliance summary
+   */
+  public getComplianceSummary(): Record<string, unknown> {
+    const summary: Record<string, unknown> = {};
 
-  hasConsent(userId: string, consentType: string): boolean {
-    const consents = this.getUserConsents(userId);
-    const latestConsent = consents
-      .filter((c) => c.consentType === consentType)
-      .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())[0];
+    for (const framework of this.frameworks.keys()) {
+      const report = this.reports
+        .filter((r) => r.framework === framework)
+        .sort((a, b) => b.timestamp - a.timestamp)[0];
 
-    if (!latestConsent) return false;
-    if (latestConsent.expiresAt && latestConsent.expiresAt < new Date()) {
-      return false;
+      summary[framework] = {
+        score: report?.complianceScore || 0,
+        passed: report?.passedChecks || 0,
+        failed: report?.failedChecks || 0,
+        warnings: report?.warningChecks || 0,
+        lastChecked: report?.timestamp || null,
+      };
     }
 
-    return latestConsent.granted;
-  }
-
-  // ========================================================================
-  // Automation Rules
-  // ========================================================================
-
-  createAutomationRule(
-    name: string,
-    trigger: string,
-    action: string,
-    enabled: boolean = true
-  ): AutomationRule {
-    const id = `rule-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    const rule: AutomationRule = {
-      id,
-      name,
-      trigger,
-      action,
-      enabled,
-      createdAt: new Date(),
+    return {
+      frameworks: summary,
+      totalRemediations: this.remediations.length,
+      pendingRemediations: this.getPendingRemediations().length,
+      completedRemediations: this.remediations.filter((r) => r.status === 'completed').length,
     };
-
-    this.automationRules.set(id, rule);
-    this.emit('automation-rule-created', { ruleId: id, name });
-    return rule;
-  }
-
-  getAutomationRule(ruleId: string): AutomationRule | undefined {
-    return this.automationRules.get(ruleId);
-  }
-
-  listAutomationRules(): AutomationRule[] {
-    return Array.from(this.automationRules.values());
-  }
-
-  executeAutomationRules(): { executed: number; failed: number } {
-    let executed = 0;
-    let failed = 0;
-
-    this.automationRules.forEach((rule) => {
-      if (rule.enabled) {
-        try {
-          this.emit('automation-executed', { ruleId: rule.id });
-          executed++;
-        } catch {
-          failed++;
-        }
-      }
-    });
-
-    this.emit('automation-batch-completed', { executed, failed });
-    return { executed, failed };
-  }
-
-  // ========================================================================
-  // Initialization
-  // ========================================================================
-
-  private initializeFrameworks(): void {
-    this.registerFramework('GDPR', '2018', [
-      {
-        id: 'gdpr-1',
-        code: 'GDPR-1',
-        description: 'Data subject rights',
-        category: 'rights',
-        status: 'compliant',
-      },
-      {
-        id: 'gdpr-2',
-        code: 'GDPR-2',
-        description: 'Data processing agreements',
-        category: 'processing',
-        status: 'compliant',
-      },
-    ]);
-
-    this.registerFramework('HIPAA', '2013', [
-      {
-        id: 'hipaa-1',
-        code: 'HIPAA-1',
-        description: 'Privacy rule',
-        category: 'privacy',
-        status: 'compliant',
-      },
-      {
-        id: 'hipaa-2',
-        code: 'HIPAA-2',
-        description: 'Security rule',
-        category: 'security',
-        status: 'compliant',
-      },
-    ]);
-
-    this.registerFramework('SOC2', '2022', [
-      {
-        id: 'soc2-1',
-        code: 'SOC2-1',
-        description: 'Security controls',
-        category: 'security',
-        status: 'compliant',
-      },
-      {
-        id: 'soc2-2',
-        code: 'SOC2-2',
-        description: 'Availability controls',
-        category: 'availability',
-        status: 'compliant',
-      },
-    ]);
   }
 }
-
-interface AutomationRule {
-  id: string;
-  name: string;
-  trigger: string;
-  action: string;
-  enabled: boolean;
-  createdAt: Date;
-}
-
-export default ComplianceAutomation;

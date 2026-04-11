@@ -1,247 +1,313 @@
 /**
  * Memory Management System
- * سیستم مدیریت حافظه برای بهینه‌سازی استفاده از منابع
- *
- * Features:
- * - Memory pooling
- * - Garbage collection
- * - Leak detection
- * - Resource tracking
+ * Optimizes memory usage and detects memory leaks
  */
 
-export interface MemoryBlock {
-  id: string;
-  size: number;
-  allocated: boolean;
+export interface MemorySnapshot {
   timestamp: number;
-  data?: any;
+  heapUsed: number;
+  heapTotal: number;
+  external: number;
+  rss: number;
+  arrayBuffers: number;
 }
 
-export interface MemoryStats {
-  totalMemory: number;
-  usedMemory: number;
-  freeMemory: number;
-  fragmentationRatio: number;
-  gcCount: number;
-  leaksDetected: number;
-}
-
-export interface ResourceAllocation {
+export interface MemoryLeak {
   id: string;
-  type: string;
-  size: number;
-  timestamp: number;
-  released: boolean;
+  name: string;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  growthRate: number;
+  estimatedLeakSize: number;
+  firstDetected: number;
+  lastDetected: number;
+  recommendation: string;
 }
 
+export interface MemoryOptimization {
+  id: string;
+  title: string;
+  description: string;
+  priority: 'low' | 'medium' | 'high' | 'critical';
+  estimatedSavings: number;
+  effort: 'low' | 'medium' | 'high';
+}
+
+/**
+ * Memory Management System
+ * Tracks and optimizes memory usage
+ */
 export class MemoryManagementSystem {
-  private memoryPool: Map<string, MemoryBlock>;
-  private resourceAllocations: Map<string, ResourceAllocation>;
-  private stats: {
-    totalAllocations: number;
-    totalDeallocations: number;
-    gcRuns: number;
-    leaksFound: number;
+  private snapshots: MemorySnapshot[] = [];
+  private detectedLeaks: Map<string, MemoryLeak> = new Map();
+  private objectRegistry: Map<string, number> = new Map();
+  private thresholds = {
+    heapUsagePercent: 85,
+    growthRateThreshold: 0.1, // 10% growth
+    leakDetectionWindow: 60000, // 1 minute
   };
-  private poolSize: number;
 
-  constructor(poolSize: number = 100 * 1024 * 1024) {
-    this.memoryPool = new Map();
-    this.resourceAllocations = new Map();
-    this.poolSize = poolSize;
-    this.stats = {
-      totalAllocations: 0,
-      totalDeallocations: 0,
-      gcRuns: 0,
-      leaksFound: 0,
+  /**
+   * Take a memory snapshot
+   */
+  public takeSnapshot(): MemorySnapshot {
+    const memUsage = process.memoryUsage();
+
+    const snapshot: MemorySnapshot = {
+      timestamp: Date.now(),
+      heapUsed: memUsage.heapUsed,
+      heapTotal: memUsage.heapTotal,
+      external: memUsage.external,
+      rss: memUsage.rss,
+      arrayBuffers: memUsage.arrayBuffers || 0,
     };
 
-    this.initializePool();
+    this.snapshots.push(snapshot);
+
+    // Keep only last 1000 snapshots
+    if (this.snapshots.length > 1000) {
+      this.snapshots.shift();
+    }
+
+    // Analyze for leaks
+    this.analyzeForLeaks();
+
+    return snapshot;
   }
 
   /**
-   * Initialize memory pool
+   * Analyze snapshots for memory leaks
    */
-  private initializePool(): void {
-    const blockSize = 1024 * 1024; // 1MB blocks
-    const blockCount = Math.floor(this.poolSize / blockSize);
+  private analyzeForLeaks(): void {
+    if (this.snapshots.length < 2) return;
 
-    for (let i = 0; i < blockCount; i++) {
-      const blockId = `block-${i}`;
-      this.memoryPool.set(blockId, {
-        id: blockId,
-        size: blockSize,
-        allocated: false,
-        timestamp: Date.now(),
-      });
+    const recent = this.snapshots.slice(-10);
+    const oldest = recent[0];
+    const newest = recent[recent.length - 1];
+
+    const timeDiff = newest.timestamp - oldest.timestamp;
+    const heapDiff = newest.heapUsed - oldest.heapUsed;
+    const growthRate = heapDiff / oldest.heapUsed;
+
+    // Detect potential leak
+    if (
+      growthRate > this.thresholds.growthRateThreshold &&
+      timeDiff < this.thresholds.leakDetectionWindow
+    ) {
+      const leakId = `leak-${Date.now()}`;
+      const leak: MemoryLeak = {
+        id: leakId,
+        name: `Memory Leak ${this.detectedLeaks.size + 1}`,
+        severity: this.calculateLeakSeverity(growthRate, heapDiff),
+        growthRate,
+        estimatedLeakSize: heapDiff,
+        firstDetected: oldest.timestamp,
+        lastDetected: newest.timestamp,
+        recommendation: this.getLeakRecommendation(growthRate),
+      };
+
+      this.detectedLeaks.set(leakId, leak);
     }
   }
 
   /**
-   * Allocate memory
+   * Calculate leak severity
    */
-  public allocate(size: number, type: string = 'general'): string {
-    const blockId = this.findFreeBlock(size);
-    if (!blockId) {
-      this.runGarbageCollection();
-      return this.allocate(size, type);
-    }
-
-    const block = this.memoryPool.get(blockId);
-    if (block) {
-      block.allocated = true;
-      block.timestamp = Date.now();
-    }
-
-    const allocationId = `alloc-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-    this.resourceAllocations.set(allocationId, {
-      id: allocationId,
-      type,
-      size,
-      timestamp: Date.now(),
-      released: false,
-    });
-
-    this.stats.totalAllocations++;
-
-    return allocationId;
+  private calculateLeakSeverity(
+    growthRate: number,
+    heapDiff: number
+  ): 'low' | 'medium' | 'high' | 'critical' {
+    if (growthRate > 0.5 || heapDiff > 100 * 1024 * 1024) return 'critical';
+    if (growthRate > 0.3 || heapDiff > 50 * 1024 * 1024) return 'high';
+    if (growthRate > 0.15 || heapDiff > 10 * 1024 * 1024) return 'medium';
+    return 'low';
   }
 
   /**
-   * Find free memory block
+   * Get leak recommendation
    */
-  private findFreeBlock(size: number): string | null {
-    for (const [blockId, block] of this.memoryPool) {
-      if (!block.allocated && block.size >= size) {
-        return blockId;
-      }
+  private getLeakRecommendation(growthRate: number): string {
+    if (growthRate > 0.5) {
+      return 'Critical memory leak detected. Check for circular references and ensure proper cleanup.';
     }
-    return null;
+    if (growthRate > 0.3) {
+      return 'Significant memory growth detected. Review event listeners and timers.';
+    }
+    return 'Moderate memory growth detected. Consider implementing memory pooling.';
   }
 
   /**
-   * Deallocate memory
+   * Register object for tracking
    */
-  public deallocate(allocationId: string): boolean {
-    const allocation = this.resourceAllocations.get(allocationId);
-    if (!allocation) return false;
-
-    allocation.released = true;
-    this.stats.totalDeallocations++;
-
-    return true;
+  public registerObject(name: string, size: number): void {
+    const current = this.objectRegistry.get(name) || 0;
+    this.objectRegistry.set(name, current + size);
   }
 
   /**
-   * Run garbage collection
+   * Unregister object
    */
-  public runGarbageCollection(): void {
-    const now = Date.now();
-    const timeout = 60000; // 1 minute
-
-    for (const [allocationId, allocation] of this.resourceAllocations) {
-      if (allocation.released && now - allocation.timestamp > timeout) {
-        this.resourceAllocations.delete(allocationId);
-      }
+  public unregisterObject(name: string, size: number): void {
+    const current = this.objectRegistry.get(name) || 0;
+    const newSize = Math.max(0, current - size);
+    if (newSize === 0) {
+      this.objectRegistry.delete(name);
+    } else {
+      this.objectRegistry.set(name, newSize);
     }
-
-    // Mark released blocks as free
-    for (const [blockId, block] of this.memoryPool) {
-      if (block.allocated && now - block.timestamp > timeout) {
-        block.allocated = false;
-      }
-    }
-
-    this.stats.gcRuns++;
-  }
-
-  /**
-   * Detect memory leaks
-   */
-  public detectLeaks(): ResourceAllocation[] {
-    const leaks: ResourceAllocation[] = [];
-    const now = Date.now();
-    const leakThreshold = 300000; // 5 minutes
-
-    for (const allocation of this.resourceAllocations.values()) {
-      if (!allocation.released && now - allocation.timestamp > leakThreshold) {
-        leaks.push(allocation);
-      }
-    }
-
-    this.stats.leaksFound += leaks.length;
-
-    return leaks;
   }
 
   /**
    * Get memory statistics
    */
-  public getMemoryStats(): MemoryStats {
-    let usedMemory = 0;
-    let allocatedBlocks = 0;
-
-    for (const block of this.memoryPool.values()) {
-      if (block.allocated) {
-        usedMemory += block.size;
-        allocatedBlocks++;
-      }
+  public getStatistics(): Record<string, unknown> {
+    if (this.snapshots.length === 0) {
+      return {
+        snapshotCount: 0,
+        detectedLeaks: 0,
+        objectRegistry: Object.fromEntries(this.objectRegistry),
+      };
     }
 
-    const freeMemory = this.poolSize - usedMemory;
-    const fragmentationRatio =
-      allocatedBlocks > 0 ? (this.memoryPool.size - allocatedBlocks) / this.memoryPool.size : 0;
+    const latest = this.snapshots[this.snapshots.length - 1];
+    const heapUsagePercent = (latest.heapUsed / latest.heapTotal) * 100;
 
     return {
-      totalMemory: this.poolSize,
-      usedMemory,
-      freeMemory,
-      fragmentationRatio,
-      gcCount: this.stats.gcRuns,
-      leaksDetected: this.stats.leaksFound,
+      snapshotCount: this.snapshots.length,
+      latestSnapshot: latest,
+      heapUsagePercent,
+      detectedLeaks: this.detectedLeaks.size,
+      objectRegistry: Object.fromEntries(this.objectRegistry),
+      isHighMemoryUsage: heapUsagePercent > this.thresholds.heapUsagePercent,
     };
   }
 
   /**
-   * Compact memory
+   * Get detected leaks
    */
-  public compactMemory(): void {
-    const allocatedBlocks: MemoryBlock[] = [];
-    const freeBlocks: MemoryBlock[] = [];
+  public getDetectedLeaks(): MemoryLeak[] {
+    return Array.from(this.detectedLeaks.values()).sort((a, b) => {
+      const severityMap = { critical: 4, high: 3, medium: 2, low: 1 };
+      return severityMap[b.severity] - severityMap[a.severity];
+    });
+  }
 
-    for (const block of this.memoryPool.values()) {
-      if (block.allocated) {
-        allocatedBlocks.push(block);
-      } else {
-        freeBlocks.push(block);
+  /**
+   * Generate memory optimizations
+   */
+  public generateOptimizations(): MemoryOptimization[] {
+    const optimizations: MemoryOptimization[] = [];
+
+    // Check for high memory usage
+    if (this.snapshots.length > 0) {
+      const latest = this.snapshots[this.snapshots.length - 1];
+      const heapUsagePercent = (latest.heapUsed / latest.heapTotal) * 100;
+
+      if (heapUsagePercent > this.thresholds.heapUsagePercent) {
+        optimizations.push({
+          id: `opt-heap-${Date.now()}`,
+          title: 'Reduce Heap Usage',
+          description: 'Implement object pooling and lazy loading to reduce memory footprint',
+          priority: 'high',
+          estimatedSavings: latest.heapUsed * 0.2,
+          effort: 'medium',
+        });
       }
     }
 
-    // Reorganize pool
-    this.memoryPool.clear();
-    let index = 0;
-
-    for (const block of allocatedBlocks) {
-      block.id = `block-${index}`;
-      this.memoryPool.set(block.id, block);
-      index++;
+    // Check for detected leaks
+    for (const leak of this.getDetectedLeaks()) {
+      optimizations.push({
+        id: `opt-${leak.id}`,
+        title: `Fix ${leak.name}`,
+        description: leak.recommendation,
+        priority: leak.severity === 'critical' ? 'critical' : 'high',
+        estimatedSavings: leak.estimatedLeakSize,
+        effort: 'high',
+      });
     }
 
-    for (const block of freeBlocks) {
-      block.id = `block-${index}`;
-      this.memoryPool.set(block.id, block);
-      index++;
+    // Check for large objects
+    const largeObjects = Array.from(this.objectRegistry.entries())
+      .filter(([, size]) => size > 10 * 1024 * 1024)
+      .sort((a, b) => b[1] - a[1]);
+
+    for (const [name, size] of largeObjects.slice(0, 3)) {
+      optimizations.push({
+        id: `opt-obj-${name}`,
+        title: `Optimize ${name}`,
+        description: `This object uses ${(size / 1024 / 1024).toFixed(2)}MB. Consider compression or lazy loading.`,
+        priority: 'medium',
+        estimatedSavings: size * 0.3,
+        effort: 'medium',
+      });
+    }
+
+    return optimizations;
+  }
+
+  /**
+   * Get memory trend
+   */
+  public getMemoryTrend(windowSize: number = 10): Record<string, unknown> {
+    if (this.snapshots.length < 2) {
+      return { trend: 'insufficient_data' };
+    }
+
+    const recent = this.snapshots.slice(-windowSize);
+    const heapUsages = recent.map((s) => s.heapUsed);
+    const avgHeap = heapUsages.reduce((a, b) => a + b, 0) / heapUsages.length;
+    const maxHeap = Math.max(...heapUsages);
+    const minHeap = Math.min(...heapUsages);
+
+    const trend = heapUsages[heapUsages.length - 1] > avgHeap ? 'increasing' : 'decreasing';
+
+    return {
+      trend,
+      averageHeap: avgHeap,
+      maxHeap,
+      minHeap,
+      currentHeap: heapUsages[heapUsages.length - 1],
+      variance: this.calculateVariance(heapUsages),
+    };
+  }
+
+  /**
+   * Calculate variance
+   */
+  private calculateVariance(values: number[]): number {
+    const mean = values.reduce((a, b) => a + b, 0) / values.length;
+    const squaredDiffs = values.map((v) => Math.pow(v - mean, 2));
+    return squaredDiffs.reduce((a, b) => a + b, 0) / values.length;
+  }
+
+  /**
+   * Set threshold
+   */
+  public setThreshold(key: string, value: number): void {
+    if (key in this.thresholds) {
+      this.thresholds[key as keyof typeof this.thresholds] = value;
     }
   }
 
   /**
-   * Get statistics
+   * Clear old snapshots
    */
-  public getStats() {
+  public clearOldSnapshots(olderThanMs: number): void {
+    const cutoffTime = Date.now() - olderThanMs;
+    this.snapshots = this.snapshots.filter((s) => s.timestamp > cutoffTime);
+  }
+
+  /**
+   * Export memory data
+   */
+  public exportData(): Record<string, unknown> {
     return {
-      ...this.stats,
-      activeAllocations: this.resourceAllocations.size,
-      poolBlocks: this.memoryPool.size,
+      snapshots: this.snapshots,
+      detectedLeaks: Array.from(this.detectedLeaks.values()),
+      objectRegistry: Object.fromEntries(this.objectRegistry),
+      statistics: this.getStatistics(),
+      trend: this.getMemoryTrend(),
+      optimizations: this.generateOptimizations(),
     };
   }
 }

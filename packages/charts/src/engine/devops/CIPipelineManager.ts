@@ -4,335 +4,310 @@
  */
 
 export interface PipelineStage {
+  id: string;
   name: string;
-  type: 'build' | 'test' | 'deploy' | 'validate' | 'release';
-  commands: string[];
+  type: 'build' | 'test' | 'deploy' | 'validate';
+  command: string;
   timeout: number;
   retries: number;
   dependencies: string[];
-  environment: Record<string, string>;
-  artifacts?: string[];
-  notifications?: boolean;
 }
 
-export interface PipelineConfig {
-  name: string;
-  version: string;
-  trigger: {
-    branches: string[];
-    tags: string[];
-    events: string[];
-    schedule?: string;
-  };
-  stages: PipelineStage[];
-  variables: Record<string, string>;
-  secrets: string[];
-  notifications: {
-    slack?: string;
-    email?: string[];
-    webhook?: string;
-  };
-}
-
-export interface PipelineExecution {
+export interface PipelineRun {
   id: string;
   pipelineId: string;
   status: 'pending' | 'running' | 'success' | 'failed' | 'cancelled';
   startTime: number;
   endTime?: number;
-  duration?: number;
-  stages: StageExecution[];
-  logs: string[];
-  artifacts: Map<string, string>;
-  metadata: Record<string, any>;
+  stageResults: Map<string, StageResult>;
+  artifacts: string[];
 }
 
-export interface StageExecution {
-  name: string;
+export interface StageResult {
+  stageId: string;
   status: 'pending' | 'running' | 'success' | 'failed' | 'skipped';
   startTime: number;
   endTime?: number;
-  duration?: number;
+  duration: number;
   output: string;
-  exitCode?: number;
+  error?: string;
 }
 
+export interface Pipeline {
+  id: string;
+  name: string;
+  description: string;
+  stages: PipelineStage[];
+  triggers: string[];
+  createdAt: number;
+  updatedAt: number;
+}
+
+/**
+ * CI/CD Pipeline Manager
+ * Manages build, test, and deployment pipelines
+ */
 export class CIPipelineManager {
-  private pipelines: Map<string, PipelineConfig> = new Map();
-  private executions: Map<string, PipelineExecution> = new Map();
-  private executionHistory: PipelineExecution[] = [];
-  private webhookHandlers: Map<string, Function> = new Map();
-  private eventEmitter: any;
+  private pipelines: Map<string, Pipeline> = new Map();
+  private runs: Map<string, PipelineRun> = new Map();
+  private stageExecutors: Map<string, (command: string) => Promise<string>> = new Map();
 
-  constructor() {
-    this.initializeEventEmitter();
-  }
-
-  private initializeEventEmitter(): void {
-    this.eventEmitter = {
-      listeners: new Map<string, Function[]>(),
-      on: (event: string, handler: Function) => {
-        if (!this.eventEmitter.listeners.has(event)) {
-          this.eventEmitter.listeners.set(event, []);
-        }
-        this.eventEmitter.listeners.get(event).push(handler);
-      },
-      emit: (event: string, data: any) => {
-        const handlers = this.eventEmitter.listeners.get(event) || [];
-        handlers.forEach((h: Function) => h(data));
-      },
+  /**
+   * Create a new pipeline
+   */
+  public createPipeline(name: string, description: string, stages: PipelineStage[]): Pipeline {
+    const pipeline: Pipeline = {
+      id: `pipeline-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      name,
+      description,
+      stages,
+      triggers: [],
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
     };
+
+    this.pipelines.set(pipeline.id, pipeline);
+    return pipeline;
   }
 
   /**
-   * Register a new pipeline
+   * Register stage executor
    */
-  registerPipeline(config: PipelineConfig): void {
-    this.pipelines.set(config.name, config);
-    this.eventEmitter.emit('pipeline:registered', { name: config.name });
+  public registerStageExecutor(
+    stageType: string,
+    executor: (command: string) => Promise<string>
+  ): void {
+    this.stageExecutors.set(stageType, executor);
   }
 
   /**
-   * Get pipeline configuration
+   * Run pipeline
    */
-  getPipeline(name: string): PipelineConfig | undefined {
-    return this.pipelines.get(name);
-  }
-
-  /**
-   * List all pipelines
-   */
-  listPipelines(): PipelineConfig[] {
-    return Array.from(this.pipelines.values());
-  }
-
-  /**
-   * Trigger pipeline execution
-   */
-  async triggerPipeline(
-    pipelineName: string,
-    variables?: Record<string, string>
-  ): Promise<PipelineExecution> {
-    const pipeline = this.pipelines.get(pipelineName);
+  public async runPipeline(pipelineId: string): Promise<PipelineRun> {
+    const pipeline = this.pipelines.get(pipelineId);
     if (!pipeline) {
-      throw new Error(`Pipeline not found: ${pipelineName}`);
+      throw new Error(`Pipeline not found: ${pipelineId}`);
     }
 
-    const execution: PipelineExecution = {
-      id: `exec-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-      pipelineId: pipelineName,
-      status: 'pending',
+    const run: PipelineRun = {
+      id: `run-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      pipelineId,
+      status: 'running',
       startTime: Date.now(),
-      stages: [],
-      logs: [],
-      artifacts: new Map(),
-      metadata: { variables: { ...pipeline.variables, ...variables } },
+      stageResults: new Map(),
+      artifacts: [],
     };
 
-    this.executions.set(execution.id, execution);
-    this.eventEmitter.emit('pipeline:started', { executionId: execution.id });
+    this.runs.set(run.id, run);
 
     try {
-      await this.executePipeline(execution, pipeline);
-      execution.status = 'success';
+      // Execute stages in order
+      for (const stage of pipeline.stages) {
+        const result = await this.executeStage(stage);
+        run.stageResults.set(stage.id, result);
+
+        if (result.status === 'failed') {
+          run.status = 'failed';
+          run.endTime = Date.now();
+          return run;
+        }
+      }
+
+      run.status = 'success';
+      run.endTime = Date.now();
     } catch (error) {
-      execution.status = 'failed';
-      execution.logs.push(`Error: ${error}`);
+      run.status = 'failed';
+      run.endTime = Date.now();
     }
 
-    execution.endTime = Date.now();
-    execution.duration = execution.endTime - execution.startTime;
-
-    this.executionHistory.push(execution);
-    this.eventEmitter.emit('pipeline:completed', {
-      executionId: execution.id,
-      status: execution.status,
-    });
-
-    return execution;
+    return run;
   }
 
   /**
-   * Execute pipeline stages
+   * Execute a single stage
    */
-  private async executePipeline(
-    execution: PipelineExecution,
-    pipeline: PipelineConfig
-  ): Promise<void> {
-    execution.status = 'running';
+  private async executeStage(stage: PipelineStage): Promise<StageResult> {
+    const result: StageResult = {
+      stageId: stage.id,
+      status: 'running',
+      startTime: Date.now(),
+      duration: 0,
+      output: '',
+    };
 
-    for (const stage of pipeline.stages) {
-      const stageExecution: StageExecution = {
-        name: stage.name,
-        status: 'pending',
-        startTime: Date.now(),
-        output: '',
-      };
+    try {
+      const executor = this.stageExecutors.get(stage.type);
+      if (!executor) {
+        throw new Error(`No executor for stage type: ${stage.type}`);
+      }
 
-      execution.stages.push(stageExecution);
+      // Execute with timeout and retries
+      let lastError: Error | null = null;
+      for (let attempt = 0; attempt <= stage.retries; attempt++) {
+        try {
+          const output = await Promise.race([
+            executor(stage.command),
+            new Promise<string>((_, reject) =>
+              setTimeout(() => reject(new Error('Stage timeout')), stage.timeout)
+            ),
+          ]);
 
-      try {
-        stageExecution.status = 'running';
-        this.eventEmitter.emit('stage:started', { stage: stage.name, executionId: execution.id });
-
-        // Simulate stage execution
-        await this.executeStage(stage, stageExecution, execution);
-
-        stageExecution.status = 'success';
-        stageExecution.exitCode = 0;
-      } catch (error) {
-        stageExecution.status = 'failed';
-        stageExecution.exitCode = 1;
-        stageExecution.output += `\nError: ${error}`;
-
-        if (stage.retries > 0) {
-          for (let i = 0; i < stage.retries; i++) {
-            try {
-              await this.executeStage(stage, stageExecution, execution);
-              stageExecution.status = 'success';
-              stageExecution.exitCode = 0;
-              break;
-            } catch (retryError) {
-              stageExecution.output += `\nRetry ${i + 1} failed: ${retryError}`;
-            }
+          result.output = output;
+          result.status = 'success';
+          result.endTime = Date.now();
+          result.duration = result.endTime - result.startTime;
+          return result;
+        } catch (error) {
+          lastError = error as Error;
+          if (attempt < stage.retries) {
+            // Wait before retry
+            await new Promise((resolve) => setTimeout(resolve, 1000 * Math.pow(2, attempt)));
           }
         }
-
-        if (stageExecution.status === 'failed') {
-          throw error;
-        }
       }
 
-      stageExecution.endTime = Date.now();
-      stageExecution.duration = stageExecution.endTime - stageExecution.startTime;
+      result.status = 'failed';
+      result.error = lastError?.message;
+      result.endTime = Date.now();
+      result.duration = result.endTime - result.startTime;
+    } catch (error) {
+      result.status = 'failed';
+      result.error = (error as Error).message;
+      result.endTime = Date.now();
+      result.duration = result.endTime - result.startTime;
+    }
 
-      this.eventEmitter.emit('stage:completed', {
-        stage: stage.name,
-        status: stageExecution.status,
-        executionId: execution.id,
-      });
+    return result;
+  }
+
+  /**
+   * Get pipeline run status
+   */
+  public getPipelineRun(runId: string): PipelineRun | undefined {
+    return this.runs.get(runId);
+  }
+
+  /**
+   * Get pipeline runs
+   */
+  public getPipelineRuns(pipelineId: string, limit: number = 10): PipelineRun[] {
+    return Array.from(this.runs.values())
+      .filter((run) => run.pipelineId === pipelineId)
+      .sort((a, b) => b.startTime - a.startTime)
+      .slice(0, limit);
+  }
+
+  /**
+   * Cancel pipeline run
+   */
+  public cancelPipelineRun(runId: string): void {
+    const run = this.runs.get(runId);
+    if (run && run.status === 'running') {
+      run.status = 'cancelled';
+      run.endTime = Date.now();
     }
   }
 
   /**
-   * Execute individual stage
+   * Rollback to previous version
    */
-  private async executeStage(
-    stage: PipelineStage,
-    stageExecution: StageExecution,
-    execution: PipelineExecution
-  ): Promise<void> {
-    const timeout = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error(`Stage timeout: ${stage.timeout}ms`)), stage.timeout)
-    );
-
-    const execution_promise = (async () => {
-      for (const command of stage.commands) {
-        stageExecution.output += `\n$ ${command}\n`;
-        // Simulate command execution
-        await new Promise((resolve) => setTimeout(resolve, 100));
-        stageExecution.output += `Command executed successfully\n`;
-      }
-
-      if (stage.artifacts) {
-        for (const artifact of stage.artifacts) {
-          execution.artifacts.set(artifact, `artifact-${Date.now()}`);
-        }
-      }
-    })();
-
-    await Promise.race([execution_promise, timeout]);
-  }
-
-  /**
-   * Get execution details
-   */
-  getExecution(executionId: string): PipelineExecution | undefined {
-    return this.executions.get(executionId);
-  }
-
-  /**
-   * Get execution history
-   */
-  getExecutionHistory(pipelineName?: string, limit: number = 50): PipelineExecution[] {
-    let history = this.executionHistory;
-    if (pipelineName) {
-      history = history.filter((e) => e.pipelineId === pipelineName);
+  public async rollback(pipelineId: string, version: string): Promise<PipelineRun> {
+    const pipeline = this.pipelines.get(pipelineId);
+    if (!pipeline) {
+      throw new Error(`Pipeline not found: ${pipelineId}`);
     }
-    return history.slice(-limit);
-  }
 
-  /**
-   * Cancel execution
-   */
-  cancelExecution(executionId: string): void {
-    const execution = this.executions.get(executionId);
-    if (execution && execution.status === 'running') {
-      execution.status = 'cancelled';
-      execution.endTime = Date.now();
-      execution.duration = execution.endTime - execution.startTime;
-      this.eventEmitter.emit('pipeline:cancelled', { executionId });
-    }
-  }
+    // Create rollback stage
+    const rollbackStage: PipelineStage = {
+      id: `rollback-${Date.now()}`,
+      name: 'Rollback',
+      type: 'deploy',
+      command: `rollback --version=${version}`,
+      timeout: 300000,
+      retries: 2,
+      dependencies: [],
+    };
 
-  /**
-   * Register webhook handler
-   */
-  registerWebhook(event: string, handler: Function): void {
-    this.webhookHandlers.set(event, handler);
-  }
+    const run: PipelineRun = {
+      id: `rollback-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      pipelineId,
+      status: 'running',
+      startTime: Date.now(),
+      stageResults: new Map(),
+      artifacts: [],
+    };
 
-  /**
-   * Trigger webhook
-   */
-  async triggerWebhook(event: string, data: any): Promise<void> {
-    const handler = this.webhookHandlers.get(event);
-    if (handler) {
-      await handler(data);
-    }
+    this.runs.set(run.id, run);
+
+    const result = await this.executeStage(rollbackStage);
+    run.stageResults.set(rollbackStage.id, result);
+    run.status = result.status === 'success' ? 'success' : 'failed';
+    run.endTime = Date.now();
+
+    return run;
   }
 
   /**
    * Get pipeline statistics
    */
-  getPipelineStats(pipelineName: string): {
-    totalRuns: number;
-    successCount: number;
-    failureCount: number;
-    averageDuration: number;
-    successRate: number;
-  } {
-    const executions = this.executionHistory.filter((e) => e.pipelineId === pipelineName);
-    const successful = executions.filter((e) => e.status === 'success');
-    const totalDuration = executions.reduce((sum, e) => sum + (e.duration || 0), 0);
+  public getStatistics(pipelineId: string): Record<string, unknown> {
+    const runs = this.getPipelineRuns(pipelineId, 100);
+    const successCount = runs.filter((r) => r.status === 'success').length;
+    const failureCount = runs.filter((r) => r.status === 'failed').length;
+    const totalDuration = runs.reduce((sum, r) => sum + ((r.endTime || 0) - r.startTime), 0);
 
     return {
-      totalRuns: executions.length,
-      successCount: successful.length,
-      failureCount: executions.length - successful.length,
-      averageDuration: executions.length > 0 ? totalDuration / executions.length : 0,
-      successRate: executions.length > 0 ? (successful.length / executions.length) * 100 : 0,
+      totalRuns: runs.length,
+      successCount,
+      failureCount,
+      successRate: runs.length > 0 ? (successCount / runs.length) * 100 : 0,
+      averageDuration: runs.length > 0 ? totalDuration / runs.length : 0,
+      lastRun: runs[0] || null,
     };
+  }
+
+  /**
+   * Get all pipelines
+   */
+  public getPipelines(): Pipeline[] {
+    return Array.from(this.pipelines.values());
+  }
+
+  /**
+   * Update pipeline
+   */
+  public updatePipeline(pipelineId: string, updates: Partial<Pipeline>): Pipeline {
+    const pipeline = this.pipelines.get(pipelineId);
+    if (!pipeline) {
+      throw new Error(`Pipeline not found: ${pipelineId}`);
+    }
+
+    const updated = { ...pipeline, ...updates, updatedAt: Date.now() };
+    this.pipelines.set(pipelineId, updated);
+    return updated;
+  }
+
+  /**
+   * Delete pipeline
+   */
+  public deletePipeline(pipelineId: string): void {
+    this.pipelines.delete(pipelineId);
   }
 
   /**
    * Export pipeline configuration
    */
-  exportPipeline(pipelineName: string): string {
-    const pipeline = this.pipelines.get(pipelineName);
+  public exportPipeline(pipelineId: string): Record<string, unknown> {
+    const pipeline = this.pipelines.get(pipelineId);
     if (!pipeline) {
-      throw new Error(`Pipeline not found: ${pipelineName}`);
+      throw new Error(`Pipeline not found: ${pipelineId}`);
     }
-    return JSON.stringify(pipeline, null, 2);
-  }
 
-  /**
-   * Import pipeline configuration
-   */
-  importPipeline(config: string): void {
-    const pipeline = JSON.parse(config) as PipelineConfig;
-    this.registerPipeline(pipeline);
+    return {
+      name: pipeline.name,
+      description: pipeline.description,
+      stages: pipeline.stages,
+      triggers: pipeline.triggers,
+    };
   }
 }
-
-export default CIPipelineManager;
